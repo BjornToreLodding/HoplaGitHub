@@ -17,7 +17,7 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying to GitHub..."
-    - git config --global user.email "vakvaer@stud.ntnu.no"
-    - git config --global user.name "Vilde Adela Svejkovsky Kværne"
+    - git config --global user.email "vildegk@hotmail.com"
+    - git config --global user.name "vildesk"
     - git remote add github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/Hopla.git
     - git push github HEAD:main
