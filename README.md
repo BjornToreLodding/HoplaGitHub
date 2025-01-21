@@ -17,5 +17,7 @@ Utviklere:
 
 Utviklet for Hopla (Thea Dyring) som vårt bachelorprosjekt. 
 
+Sjekk Wikien for mer info
+
 ## Project status
 
