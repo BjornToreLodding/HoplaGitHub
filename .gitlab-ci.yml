@@ -1,0 +1,25 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - echo "Building the project..."
+    - # Add your build steps here
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - # Add your test steps here
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to GitHub..."
+    - git config --global user.email "vakvaer@stud.ntnu.no"
+    - git config --global user.name "Vilde Adela Svejkovsky Kværne"
+    - git remote add github https://vildesk:${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}@github.com/vildesk/Hopla.git
+    - git push github HEAD:main
