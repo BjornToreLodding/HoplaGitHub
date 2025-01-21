@@ -11,7 +11,7 @@ build:
 test:
   stage: test
   script:
-    - echo "Running tests...."
+    - echo "Running tests..."
 
 deploy:
   stage: deploy
@@ -20,5 +20,10 @@ deploy:
     - echo "Token starts with: ${GITHUB_TOKEN:0:4}******"
     - git config --global user.email "vildegk@hotmail.com"
     - git config --global user.name "vildesk"
-    - if git remote | grep github; then git remote set-url github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git; else git remote add github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git; fi
+    - |
+      if git remote | grep github; then
+        git remote set-url github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git
+      else
+        git remote add github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git
+      fi
     - git push github HEAD:main
