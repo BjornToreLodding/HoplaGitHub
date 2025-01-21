@@ -19,5 +19,5 @@ deploy:
     - echo "Deploying to GitHub..."
     - git config --global user.email "vildegk@hotmail.com"
     - git config --global user.name "vildesk"
-    - git remote add github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git
+    - if git remote | grep github; then git remote set-url github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git; else git remote add github https://vildesk:${GITHUB_TOKEN}@github.com/vildesk/HoplaGitHub.git; fi
     - git push github HEAD:main
