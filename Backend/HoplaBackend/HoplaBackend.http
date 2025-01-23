@@ -1,0 +1,6 @@
+@HoplaBackend_HostAddress = http://localhost:5267
+
+GET {{HoplaBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
