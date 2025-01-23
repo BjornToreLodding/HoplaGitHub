@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "mnmn4wnSjKM=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\bjorn\\projects\\bacheloroppgave\\hopla\\backend\\HoplaBackend\\HoplaBackend.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bjorn\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.1\\microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",
+    "C:\\Users\\bjorn\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
