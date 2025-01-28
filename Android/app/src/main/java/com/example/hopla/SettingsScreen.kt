@@ -1,5 +1,7 @@
 package com.example.hopla
 
+import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.material.Text
 import androidx.compose.foundation.clickable
@@ -9,10 +11,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
+import java.util.Locale
 
 
 @Composable
@@ -37,18 +41,41 @@ fun SettingsScreen(languageViewModel: LanguageViewModel,
     }
 }
 
-class LanguageViewModel : ViewModel() {
-    private val _selectedLanguage = mutableStateOf("Norwegian")
+fun setLocale(context: Context, languageCode: String) {
+    val locale = Locale(languageCode)
+    Locale.setDefault(locale)
+    val config = Configuration()
+    config.setLocale(locale)
+    context.resources.updateConfiguration(config, context.resources.displayMetrics)
+}
+
+class LanguageViewModel(
+    private val context: Context,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val _selectedLanguage = mutableStateOf(savedStateHandle.get<String>("language") ?: "Norwegian")
     val selectedLanguage: State<String> = _selectedLanguage
 
     fun setLanguage(language: String) {
         _selectedLanguage.value = language
+        savedStateHandle["language"] = language
+        setLocale(context, if (language == "Norwegian") "no" else "en")
+    }
+
+    private fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 }
 
 @Composable
 fun LanguageSelection(languageViewModel: LanguageViewModel) {
     val language = languageViewModel.selectedLanguage.value
+
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -59,7 +86,7 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
             Text(
                 text = "Norsk",
                 modifier = Modifier
-                    .padding(end = 8.dp, start = 8.dp)
+                    .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("Norwegian") }
             )
             Text(

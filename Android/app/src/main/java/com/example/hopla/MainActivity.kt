@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,20 +26,36 @@ import androidx.lifecycle.ViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
-    private val languageViewModel: LanguageViewModel by viewModels()
+    private val languageViewModel: LanguageViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return LanguageViewModel(applicationContext, SavedStateHandle()) as T
+            }
+        }
+    }
+
     private val themeViewModel: ThemeViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
+            val currentLanguage = languageViewModel.selectedLanguage.value
+            setLocale(this, if (currentLanguage == "Norwegian") "no" else "en")
+
             HoplaTheme {
                 val navController = rememberNavController()
                 val isLoggedIn by userViewModel.isLoggedIn
+
                 if (isLoggedIn) {
                     Scaffold(
                         bottomBar = { BottomNavigationBar(navController, languageViewModel) }
@@ -64,6 +81,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = context.resources.configuration
+        config.setLocale(locale)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 }
 
