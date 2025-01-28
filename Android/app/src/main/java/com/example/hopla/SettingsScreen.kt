@@ -3,18 +3,18 @@ package com.example.hopla
 import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
 import java.util.Locale
 
@@ -23,30 +23,21 @@ import java.util.Locale
 fun SettingsScreen(languageViewModel: LanguageViewModel,
                    themeViewModel: ThemeViewModel,
                    userViewModel: UserViewModel) {
-    val language = languageViewModel.selectedLanguage.value
-    Text(text = if (language == "Norwegian") "Innstillinger" else "Settings")
+    Text(text = stringResource(R.string.settings))
     Column {
         LanguageSelection(languageViewModel)
         ModeSelection(languageViewModel, themeViewModel)
         Button(onClick = {
             userViewModel.logOut()
         }) {
-            Text(text = if (language == "Norwegian") "Logg ut" else "Log out")
+            Text(text = stringResource(R.string.log_out))
         }
         Button(onClick = {
             userViewModel.deleteUser()
         }) {
-            Text(text = if (language == "Norwegian") "Slett bruker" else "Delete user")
+            Text(text = stringResource(R.string.delete_user))
         }
     }
-}
-
-fun setLocale(context: Context, languageCode: String) {
-    val locale = Locale(languageCode)
-    Locale.setDefault(locale)
-    val config = Configuration()
-    config.setLocale(locale)
-    context.resources.updateConfiguration(config, context.resources.displayMetrics)
 }
 
 class LanguageViewModel(

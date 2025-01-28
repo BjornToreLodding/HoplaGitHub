@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -65,7 +64,7 @@ class MainActivity : ComponentActivity() {
                             startDestination = Screen.Home.route,
                             modifier = Modifier.padding(innerPadding)
                         ) {
-                            composable(Screen.Home.route) { HomeScreen(languageViewModel) }
+                            composable(Screen.Home.route) { HomeScreen() }
                             composable(Screen.Profile.route) { ProfileScreen(languageViewModel) }
                             composable(Screen.Settings.route) {
                                 SettingsScreen(
