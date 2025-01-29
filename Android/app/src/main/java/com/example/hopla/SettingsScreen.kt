@@ -6,11 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -20,25 +25,42 @@ import java.util.Locale
 
 
 @Composable
-fun SettingsScreen(languageViewModel: LanguageViewModel,
-                   themeViewModel: ThemeViewModel,
-                   userViewModel: UserViewModel) {
-    Text(text = stringResource(R.string.settings))
-    Column {
-        LanguageSelection(languageViewModel)
-        ModeSelection(languageViewModel, themeViewModel)
-        Button(onClick = {
-            userViewModel.logOut()
-        }) {
-            Text(text = stringResource(R.string.log_out))
+fun SettingsScreen(
+    languageViewModel: LanguageViewModel,
+    themeViewModel: ThemeViewModel,
+    userViewModel: UserViewModel
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Icon button in the top-right corner
+        IconButton(
+            onClick = { /* Handle click action */ },
+            modifier = Modifier
+                .padding(16.dp) // Add padding from edges
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = stringResource(R.string.settings)
+            )
         }
-        Button(onClick = {
-            userViewModel.deleteUser()
-        }) {
-            Text(text = stringResource(R.string.delete_user))
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 56.dp)
+        ) {
+            Text(text = stringResource(R.string.settings))
+            LanguageSelection(languageViewModel)
+            ModeSelection(languageViewModel, themeViewModel)
+            Button(onClick = { userViewModel.logOut() }) {
+                Text(text = stringResource(R.string.log_out))
+            }
+            Button(onClick = { userViewModel.deleteUser() }) {
+                Text(text = stringResource(R.string.delete_user))
+            }
         }
     }
 }
+
 
 class LanguageViewModel(
     private val context: Context,
