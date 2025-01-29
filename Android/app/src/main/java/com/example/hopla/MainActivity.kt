@@ -6,7 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -36,6 +40,9 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 
 
 class MainActivity : ComponentActivity() {
@@ -50,6 +57,7 @@ class MainActivity : ComponentActivity() {
 
     private val themeViewModel: ThemeViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +74,7 @@ class MainActivity : ComponentActivity() {
 
                 if (isLoggedIn) {
                     Scaffold(
+                        topBar = { TopBar() },
                         bottomBar = { BottomNavigationBar(navController, languageViewModel) }
                     ) { innerPadding ->
                         NavHost(
@@ -95,6 +104,33 @@ class MainActivity : ComponentActivity() {
         context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar() {
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo1), // Load the image
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .height(40.dp) // Adjust size
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    )
+}
+
+
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController, languageViewModel: LanguageViewModel) {
@@ -174,3 +210,5 @@ sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
     data object Stables : Screen("stables", { context -> context.getString(R.string.stables) })
     data object Profile : Screen("profile", { context -> context.getString(R.string.profile) })
 }
+
+
