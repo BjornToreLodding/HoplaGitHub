@@ -74,9 +74,9 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         ) {
                             composable(Screen.Home.route) { HomeScreen() }
-                            composable(Screen.Routes.route) { HomeScreen() }
-                            composable(Screen.Map.route) { HomeScreen() }
-                            composable(Screen.Stables.route) { HomeScreen() }
+                            composable(Screen.Routes.route) { RoutesScreen() }
+                            composable(Screen.Map.route) { MapScreen() }
+                            composable(Screen.Stables.route) { StablesScreen() }
                             composable(Screen.Profile.route) { SettingsScreen(languageViewModel, themeViewModel, userViewModel)}
                         }
                     }
