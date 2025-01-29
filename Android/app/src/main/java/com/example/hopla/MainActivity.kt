@@ -29,6 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import java.util.Locale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Face
+
 
 class MainActivity : ComponentActivity() {
 
@@ -66,14 +74,10 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         ) {
                             composable(Screen.Home.route) { HomeScreen() }
-                            composable(Screen.Profile.route) { ProfileScreen(languageViewModel) }
-                            composable(Screen.Settings.route) {
-                                SettingsScreen(
-                                    languageViewModel,
-                                    themeViewModel,
-                                    userViewModel
-                                )
-                            }
+                            composable(Screen.Routes.route) { HomeScreen() }
+                            composable(Screen.Map.route) { HomeScreen() }
+                            composable(Screen.Stables.route) { HomeScreen() }
+                            composable(Screen.Profile.route) { SettingsScreen(languageViewModel, themeViewModel, userViewModel)}
                         }
                     }
                 } else {
@@ -96,18 +100,28 @@ class MainActivity : ComponentActivity() {
 fun BottomNavigationBar(navController: NavHostController, languageViewModel: LanguageViewModel) {
     val items = listOf(
         Screen.Home,
-        Screen.Profile,
-        Screen.Settings
+        Screen.Routes,
+        Screen.Map,
+        Screen.Stables,
+        Screen.Profile
     )
-    val language = languageViewModel.selectedLanguage.value
+    val context = LocalContext.current
     BottomNavigation(
         modifier = Modifier.height(100.dp)
     ) {
         val currentRoute = navController.currentBackStackEntry?.destination?.route
         items.forEach { screen ->
             BottomNavigationItem(
-                icon = { /* Add your icon here */ },
-                label = { Text(screen.titleProvider(language)) },
+                icon = {
+                    when(screen) {
+                        Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null)
+                        Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null)
+                        Screen.Map -> Icon(Icons.Outlined.Add, contentDescription = null)
+                        Screen.Routes -> Icon(Icons.Outlined.LocationOn, contentDescription = null)
+                        Screen.Stables -> Icon(Icons.Outlined.Face, contentDescription = null)
+                    }
+                },
+                label = { Text(screen.titleProvider(context)) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
@@ -153,8 +167,10 @@ class UserViewModel : ViewModel() {
     }
 }
 
-sealed class Screen(val route: String, val titleProvider: (String) -> String) {
-    data object Home : Screen("home", { language -> if (language == "Norwegian") "Hjem" else "Home" })
-    data object Profile : Screen("profile", { language -> if (language == "Norwegian") "Profil" else "Profile" })
-    data object Settings : Screen("settings", { language -> if (language == "Norwegian") "Innstillinger" else "Settings" })
+sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
+    data object Home : Screen("home", { context -> context.getString(R.string.home) })
+    data object Routes : Screen("routes", { context -> context.getString(R.string.routes) })
+    data object Map : Screen("map", { context -> context.getString(R.string.map) })
+    data object Stables : Screen("stables", { context -> context.getString(R.string.stables) })
+    data object Profile : Screen("profile", { context -> context.getString(R.string.profile) })
 }
