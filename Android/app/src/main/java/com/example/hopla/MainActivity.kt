@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import java.util.Locale
@@ -125,8 +126,8 @@ fun BottomNavigationBar(navController: NavHostController, languageViewModel: Lan
 @Composable
 fun LoginScreen(languageViewModel: LanguageViewModel, onLogin: () -> Unit) {
     val language = languageViewModel.selectedLanguage.value
-    val loginText = if (language == "Norwegian") "Vennligst logg inn" else "Please log in"
-    val buttonText = if (language == "Norwegian") "Logg Inn" else "Log In"
+    val loginText = stringResource(R.string.log_in)
+    val buttonText = stringResource(R.string.log_in)
 
     Column {
         Text(loginText)

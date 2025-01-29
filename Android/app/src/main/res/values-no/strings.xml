@@ -11,5 +11,8 @@
     <string name="profile">Profile</string>
     <string name="settings">Innstillinger</string>
     <string name="log_out">Logg ut</string>
+    <string name="log_in">Logg in</string>
     <string name="delete_user">Slett bruker</string>
+    <string name="mode">Modus</string>
+    <string name="light">Lys</string>
 </resources>

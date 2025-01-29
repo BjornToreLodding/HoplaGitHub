@@ -11,5 +11,8 @@
     <string name="settings">Innstillinger</string>
     <string name="hello_world">Hello Default!</string>
     <string name="log_out">Logg ut default</string>
+    <string name="log_in">Log in</string>
     <string name="delete_user">Slett bruker default</string>
+    <string name="mode">Modus</string>
+    <string name="light">Lys</string>
 </resources>

@@ -98,7 +98,7 @@ fun ModeSelection(languageViewModel: LanguageViewModel, themeViewModel: ThemeVie
         Row(
             modifier = Modifier.padding(top = 8.dp)
         ) {
-            Text(text = if (language == "Norwegian") "Modus" else "Mode")
+            Text(text = stringResource(R.string.mode))
             Button(onClick = { themeViewModel.setDarkTheme(false) }) {
                 Text(text = if (language == "Norwegian") "Lys" else "Light")
             }
