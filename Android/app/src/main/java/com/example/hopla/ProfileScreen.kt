@@ -40,6 +40,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.compose.ui.graphics.asImageBitmap
+
 
 @Composable
 fun ProfileScreen(
@@ -186,22 +198,97 @@ fun ModeSelection(languageViewModel: LanguageViewModel, themeViewModel: ThemeVie
 
 @Composable
 fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
-    Image(
-        painter = painterResource(id = imageResource),
-        contentDescription = null,
-        modifier = Modifier
-            .size(200.dp)
-            .clip(CircleShape)
-            .border(10.dp, Color.Black, CircleShape)
-    )
-    Text(
-        text = stringResource(R.string.change_profile_picture),
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .clickable { /* TODO */ },
-        style = TextStyle(textDecoration = TextDecoration.Underline)
-    )
-}
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var permissionGranted by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Camera launcher
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+        imageBitmap = bitmap
+    }
+
+    // Permission launcher
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        permissionGranted = isGranted
+        if (isGranted) {
+            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+            cameraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Check and request for camera permission
+    LaunchedEffect(Unit) {
+        when {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                permissionGranted = true
+            }
+            else -> {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+        // Display the current profile picture (either the captured or default image)
+        if (imageBitmap != null) {
+            Image(
+                bitmap = imageBitmap!!.asImageBitmap(),
+                contentDescription = "Captured Image",
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .border(10.dp, Color.Black, CircleShape)
+            )
+        } else {
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .border(10.dp, Color.Black, CircleShape)
+            )
+        }
+
+        // Text to trigger camera action
+        Text(
+            text = stringResource(R.string.change_profile_picture),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable { showDialog = true },
+            style = TextStyle(textDecoration = TextDecoration.Underline)
+        )
+
+        // Dialog to confirm taking a picture
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = "Take a Picture") },
+                text = { Text(text = "Click the button below to take a picture.") },
+                confirmButton = {
+                    Button(onClick = {
+                        if (permissionGranted) {
+                            cameraLauncher.launch(null)
+                        }
+                        showDialog = false
+                    }) {
+                        Text("Take a Picture")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+    }
+
+
 
 @Composable
 fun ProfileButtons() {

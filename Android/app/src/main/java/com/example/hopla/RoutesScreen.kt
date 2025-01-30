@@ -1,7 +1,7 @@
 package com.example.hopla
 
-import androidx.compose.runtime.Composable
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 
 @Composable
