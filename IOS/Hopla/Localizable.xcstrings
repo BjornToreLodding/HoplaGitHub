@@ -4,6 +4,7 @@
     "All Posts" : {
 
     },
+    
     "Community" : {
       "comment" : "Community tab",
       "localizations" : {
@@ -18,7 +19,7 @@
     "Filter" : {
 
     },
-    "Friends' Posts" : {
+    "Friends" : {
 
     },
     "Hikes" : {
@@ -42,6 +43,18 @@
         }
       }
     },
+    "Liked" : {
+
+    },
+    "Location" : {
+
+    },
+    "Map" : {
+
+    },
+    "More" : {
+
+    },
     "New hike" : {
       "comment" : "New hike tab",
       "localizations" : {
@@ -53,10 +66,13 @@
         }
       }
     },
-    "Posts" : {
+    "New Hike" : {
 
     },
-    "Posts Closest to Me" : {
+    "Popular" : {
+
+    },
+    "Posts" : {
 
     },
     "Profile" : {
@@ -69,6 +85,9 @@
           }
         }
       }
+    },
+    "Updates" : {
+
     }
   },
   "version" : "1.0"
