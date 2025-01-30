@@ -21,5 +21,6 @@
     <string name="profile">Profile</string>
 
     <string name="back">Back</string>
+    <string name="change_profile_picture">Change profile picture</string>
 
 </resources>

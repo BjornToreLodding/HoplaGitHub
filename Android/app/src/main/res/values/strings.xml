@@ -21,5 +21,6 @@
     <string name="profile">Profil</string>
 
     <string name="back">Tilbake</string>
+    <string name="change_profile_picture">Endre profilbilde</string>
 
 </resources>

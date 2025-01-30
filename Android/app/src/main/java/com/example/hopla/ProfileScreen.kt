@@ -22,9 +22,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
 import java.util.Locale
-import androidx.navigation.NavHostController
 import androidx.compose.material.icons.filled.ArrowBack
-
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.TextStyle
 
 @Composable
 fun ProfileScreen(
@@ -50,6 +60,7 @@ fun ProfileScreen(
 
             }
         }
+        ProfilePicture()
     }
 }
 
@@ -161,4 +172,28 @@ fun ModeSelection(languageViewModel: LanguageViewModel, themeViewModel: ThemeVie
     }
 }
 
-
+@Composable
+fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = imageResource),
+            contentDescription = null,
+            modifier = Modifier
+                .size(200.dp)
+                .clip(CircleShape)
+                .border(10.dp, Color.Black, CircleShape)
+        )
+        Text(
+            text = stringResource(R.string.change_profile_picture),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable { /* TODO */ },
+            style = TextStyle(textDecoration = TextDecoration.Underline)
+        )
+    }
+}
