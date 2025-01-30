@@ -19,4 +19,6 @@
     <string name="map">Kart</string>
     <string name="stables">Staller</string>
     <string name="profile">Profil</string>
+
+    <string name="back">Tilbake</string>
 </resources>

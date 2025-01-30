@@ -15,48 +15,78 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
 import java.util.Locale
+import androidx.navigation.NavHostController
+import androidx.compose.material.icons.filled.ArrowBack
 
+
+@Composable
+fun ProfileScreen(
+    navController: NavController
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(3.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            // Icon button in the top-right corner
+            IconButton(
+                onClick = { navController.navigate("settings") },
+                modifier = Modifier
+                    .padding(6.dp) // Add padding from edges
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.settings)
+                )
+
+            }
+        }
+    }
+}
 
 @Composable
 fun SettingsScreen(
     languageViewModel: LanguageViewModel,
     themeViewModel: ThemeViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    navController: NavController
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Icon button in the top-right corner
-        IconButton(
-            onClick = { /* Handle click action */ },
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 56.dp)
+    ) {
+        Row(
             modifier = Modifier
-                .padding(16.dp) // Add padding from edges
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Start
         ) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = stringResource(R.string.settings)
-            )
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 56.dp)
-        ) {
-            Text(text = stringResource(R.string.settings))
-            LanguageSelection(languageViewModel)
-            ModeSelection(languageViewModel, themeViewModel)
-            Button(onClick = { userViewModel.logOut() }) {
-                Text(text = stringResource(R.string.log_out))
-            }
-            Button(onClick = { userViewModel.deleteUser() }) {
-                Text(text = stringResource(R.string.delete_user))
-            }
+        Text(text = stringResource(R.string.settings))
+        LanguageSelection(languageViewModel)
+        ModeSelection(languageViewModel, themeViewModel)
+        Button(onClick = { userViewModel.logOut() }) {
+            Text(text = stringResource(R.string.log_out))
+        }
+        Button(onClick = { userViewModel.deleteUser() }) {
+            Text(text = stringResource(R.string.delete_user))
         }
     }
 }

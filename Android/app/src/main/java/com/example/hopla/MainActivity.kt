@@ -41,7 +41,6 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 
 
@@ -86,7 +85,8 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Routes.route) { RoutesScreen() }
                             composable(Screen.Map.route) { MapScreen() }
                             composable(Screen.Stables.route) { StablesScreen() }
-                            composable(Screen.Profile.route) { SettingsScreen(languageViewModel, themeViewModel, userViewModel)}
+                            composable(Screen.Profile.route) { ProfileScreen( navController) }
+                            composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                         }
                     }
                 } else {
