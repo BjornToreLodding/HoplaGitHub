@@ -23,4 +23,12 @@
     <string name="back">Tilbake</string>
     <string name="change_profile_picture">Endre profilbilde</string>
 
+    <string name="my_trips">Mine turer</string>
+    <string name="friends">Venner</string>
+    <string name="following">Følger</string>
+
+    <string name="username">Brukernavn</string>
+    <string name="email">E-post</string>
+    <string name="change_password">Endre passord</string>
+
 </resources>

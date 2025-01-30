@@ -23,18 +23,23 @@ import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
 import java.util.Locale
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.background
+import androidx.compose.material.Divider
+import androidx.compose.material.TextField
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
 
 @Composable
 fun ProfileScreen(
@@ -47,20 +52,27 @@ fun ProfileScreen(
                 .padding(3.dp),
             horizontalArrangement = Arrangement.End
         ) {
-            // Icon button in the top-right corner
             IconButton(
                 onClick = { navController.navigate("settings") },
                 modifier = Modifier
-                    .padding(6.dp) // Add padding from edges
+                    .padding(6.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = stringResource(R.string.settings)
                 )
-
             }
         }
-        ProfilePicture()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ProfilePicture()
+            ProfileButtons()
+            UserChanges(modifier = Modifier.weight(1f))
+        }
     }
 }
 
@@ -174,26 +186,98 @@ fun ModeSelection(languageViewModel: LanguageViewModel, themeViewModel: ThemeVie
 
 @Composable
 fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
-    Column(
+    Image(
+        painter = painterResource(id = imageResource),
+        contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .size(200.dp)
+            .clip(CircleShape)
+            .border(10.dp, Color.Black, CircleShape)
+    )
+    Text(
+        text = stringResource(R.string.change_profile_picture),
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .clickable { /* TODO */ },
+        style = TextStyle(textDecoration = TextDecoration.Underline)
+    )
+}
+
+@Composable
+fun ProfileButtons() {
+    Row(
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Image(
-            painter = painterResource(id = imageResource),
-            contentDescription = null,
+        Button(
+            onClick = { /* TODO */ },
             modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .border(10.dp, Color.Black, CircleShape)
-        )
-        Text(
-            text = stringResource(R.string.change_profile_picture),
+                .weight(1f)
+                .padding(2.dp)
+                .height(50.dp),
+            shape = RectangleShape
+        ) {
+            Text(text = stringResource(R.string.my_trips))
+        }
+        Button(
+            onClick = { /* TODO */ },
             modifier = Modifier
-                .padding(top = 8.dp)
-                .clickable { /* TODO */ },
-            style = TextStyle(textDecoration = TextDecoration.Underline)
-        )
+                .weight(1f)
+                .padding(2.dp)
+                .height(50.dp),
+            shape = RectangleShape
+        ) {
+            Text(text = stringResource(R.string.friends))
+        }
+        Button(
+            onClick = { /* TODO */ },
+            modifier = Modifier
+                .weight(1f)
+                .padding(2.dp)
+                .height(50.dp),
+            shape = RectangleShape
+        ) {
+            Text(text = stringResource(R.string.following))
+        }
+    }
+}
+
+@Composable
+fun UserChanges(modifier: Modifier = Modifier) {
+    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(Color.Gray)
+    ) {
+        Column {
+            Spacer(modifier = Modifier.height(8.dp))
+            Divider(color = Color.Black, thickness = 1.dp)
+            Text(text = stringResource(R.string.username))
+            TextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text(text = stringResource(R.string.username)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Divider(color = Color.Black, thickness = 1.dp)
+            Text(text = stringResource(R.string.email))
+            TextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text(text = stringResource(R.string.email)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Divider(color = Color.Black, thickness = 1.dp)
+            Text(
+                text = stringResource(R.string.change_password),
+                modifier = Modifier.clickable { /* TODO */ },
+                style = TextStyle(textDecoration = TextDecoration.Underline) )
+        }
     }
 }
