@@ -1,103 +1,80 @@
+// File to view everything together
+
 import SwiftUI
 
 // Struct with hikes
 struct Hike: Identifiable {
-    let id = UUID()
-    let name: String
-    let imageName: String // Added property for image name
+    let id = UUID() // ID
+    let name: String // Name of hike
+    let imageName: String // Image name
 }
 
-// Content view
 struct ContentView: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
+    // To detect light/dark mode
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
-        TabView {
-            Home()
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Hjem")
+        NavigationStack {
+            ZStack {
+                // Background color for the entire app
+                AdaptiveColor.background.color(for: colorScheme)
+                    .ignoresSafeArea() // Ensures it covers the whole screen
+                
+                TabView { // Tab at the bottom of screen
+                    Home()
+                        .tabItem {
+                            Image(systemName: "house") // Symbol name
+                            Text("Home")
+                        }
+                    Hikes()
+                        .tabItem {
+                            Image(systemName: "map")
+                            Text("Hikes")
+                        }
+                    NewHike()
+                        .tabItem {
+                            Image(systemName: "plus.circle")
+                            Text("New hike")
+                        }
+                    Community()
+                        .tabItem {
+                            Image(systemName: "person.2.circle")
+                            Text("Community")
+                        }
+                    Profile()
+                        .tabItem {
+                            Image(systemName: "person")
+                            Text("Profile")
+                        }
                 }
-            Map()
-                .tabItem {
-                    Image(systemName: "map")
-                    Text("Kart")
+            }
+            .toolbar { // Logo
+                ToolbarItem(placement: .principal) {
+                    Image("LogoUtenBakgrunn")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 50) // Size
+                        
                 }
-            Profile()
-                .tabItem {
-                    Image(systemName: "person")
-                    Text("Profil")
-                }
+            }
+            .navigationBarTitleDisplayMode(.inline) // Inline navigation bar title (removes extra space)
+        }
+        .onAppear {
+            setupNavigationBar(for: colorScheme) // Ensure navbar updates on view load
+        }
+        .onChange(of: colorScheme) {
+            // Navbar updates immediately when switching between light and dark mode
+            setupNavigationBar(for: colorScheme)
         }
     }
 }
 
-// Preview
-#Preview {
+
+#Preview("English") {
     ContentView()
 }
 
-// Home tab
-struct Home: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    let hikes = [
-            Hike(name: "Gjøvikrunden", imageName: "Gjøvik.jpg"),
-            Hike(name: "Preikestolen", imageName: "preikestolen.jpg"),
-            Hike(name: "Vågan", imageName: "Gjøvik.jpg"),
-            Hike(name: "Bobby", imageName: "preikestolen.jpg"),
-            Hike(name: "Våganes", imageName: "Gjøvik.jpg"),
-            Hike(name: "Bob", imageName: "preikestolen.jpg")
-        ]
-    
- var body: some View {
-     NavigationStack {
-         ZStack {
-             // Background
-             (AdaptiveColor.background.color(for: colorScheme))
-                 .ignoresSafeArea() // Ensure it covers the entire screen
-             List(hikes) { hike in // List of hikes
-                 HStack {
-                     if let uiImage = UIImage(named: hike.imageName) {
-                         // Custom image
-                         Image(uiImage: uiImage)
-                             .resizable()
-                             .scaledToFill()
-                             .frame(width: 100, height: 100)
-                     } else {
-                         // SF Symbol
-                         Image(systemName: hike.imageName)
-                             .resizable()
-                             .scaledToFit()
-                             .frame(width: 100, height: 100)
-                             .foregroundColor(.green)
-                     }
-                     Text(hike.name)
-                         .font(.headline)
-                         .padding(.horizontal, 20)
-                     Spacer()
-                 }
-                 .padding()
-                 .listRowBackground(AdaptiveColor.background.color(for: colorScheme))
-                 .onTapGesture { // When clicking on a hike
-                     print(hike.name)
-                 }
-             }
-             .scrollContentBackground(.hidden) // Removes the default list background
-         }
-         .navigationTitle("Løyper")
-     }
- }
-}
-
-struct Profile: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    var body: some View {
-        Text("Profil")
-    }
-}
-
-struct Map: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    var body: some View {
-        Text("Kart")
-    }
+#Preview("Norsk") {
+    ContentView()
+        .environment(\.locale, Locale(identifier: "nb_NO"))
 }

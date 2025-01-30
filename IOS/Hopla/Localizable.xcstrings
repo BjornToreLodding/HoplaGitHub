@@ -1,0 +1,75 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "All Posts" : {
+
+    },
+    "Community" : {
+      "comment" : "Community tab",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fellesskap"
+          }
+        }
+      }
+    },
+    "Filter" : {
+
+    },
+    "Friends' Posts" : {
+
+    },
+    "Hikes" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Løyper"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "comment" : "Home tab",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hjem"
+          }
+        }
+      }
+    },
+    "New hike" : {
+      "comment" : "New hike tab",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny tur"
+          }
+        }
+      }
+    },
+    "Posts" : {
+
+    },
+    "Posts Closest to Me" : {
+
+    },
+    "Profile" : {
+      "comment" : "Profile tab",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

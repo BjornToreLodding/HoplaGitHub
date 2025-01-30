@@ -63,3 +63,23 @@ extension AdaptiveColor {
     static let text = AdaptiveColor(light: .black, dark: .white)
 }
 
+// MARK: - Color Scheme for Navigation Bar
+func setupNavigationBar(for colorScheme: ColorScheme) {
+    let appearance = UINavigationBarAppearance()
+    
+    // Set background color based on light/dark mode
+    appearance.backgroundColor = UIColor(colorScheme == .dark ? .black : .white)
+    
+    // Ensure the navbar has a solid color (not transparent)
+    appearance.backgroundEffect = UIBlurEffect(style: colorScheme == .dark ? .dark : .light)
+    
+    // Set text color
+    appearance.titleTextAttributes = [
+        .foregroundColor: UIColor(colorScheme == .dark ? .white : .black)
+    ]
+    
+    // Apply to all navigation bars
+    UINavigationBar.appearance().standardAppearance = appearance
+    UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    UINavigationBar.appearance().compactAppearance = appearance
+}
