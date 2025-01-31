@@ -53,7 +53,6 @@ struct Home: View {
                     Text("Area").tag("Area")
                     Text("Popular").tag("Popular")
                     Text("Updates").tag("Updates")
-                    Text("Updates").tag("Updates")
 
                 }
                 .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar

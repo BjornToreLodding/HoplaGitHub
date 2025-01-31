@@ -10,64 +10,75 @@ struct Hike: Identifiable {
 }
 
 struct ContentView: View {
-    // To detect light/dark mode
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background color for the entire app
                 AdaptiveColor.background.color(for: colorScheme)
-                    .ignoresSafeArea() // Ensures it covers the whole screen
+                    .ignoresSafeArea()
                 
-                TabView { // Tab at the bottom of screen
+                TabView {
                     Home()
                         .tabItem {
-                            Image(systemName: "house") // Symbol name
+                            Image(systemName: "house")
                             Text("Home")
                         }
+                    
                     Hikes()
                         .tabItem {
                             Image(systemName: "map")
                             Text("Hikes")
                         }
+                    
                     NewHike()
                         .tabItem {
                             Image(systemName: "plus.circle")
-                            Text("New hike")
+                            Text("New Hike")
                         }
+                    
                     Community()
                         .tabItem {
                             Image(systemName: "person.2.circle")
                             Text("Community")
                         }
-                    Profile()
+                    
+                    // Nested NavigationStack inside TabView for Profile
+                    ProfileNavigationWrapper()
                         .tabItem {
                             Image(systemName: "person")
                             Text("Profile")
                         }
                 }
             }
-            .toolbar { // Logo
+            .toolbar {
                 ToolbarItem(placement: .principal) {
                     Image("LogoUtenBakgrunn")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 100, height: 50) // Size
-                        
+                        .frame(width: 100, height: 50)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline) // Inline navigation bar title (removes extra space)
+            .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
-            setupNavigationBar(for: colorScheme) // Ensure navbar updates on view load
+            setupNavigationBar(for: colorScheme)
         }
         .onChange(of: colorScheme) {
-            // Navbar updates immediately when switching between light and dark mode
             setupNavigationBar(for: colorScheme)
         }
     }
 }
+
+struct ProfileNavigationWrapper: View {
+    var body: some View {
+        NavigationStack {
+            Profile()
+        }
+    }
+}
+
+
 
 
 #Preview("English") {

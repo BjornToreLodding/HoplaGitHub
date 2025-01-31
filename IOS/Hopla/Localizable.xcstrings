@@ -4,7 +4,21 @@
     "All Posts" : {
 
     },
-    
+    "Area" : {
+
+    },
+    "Bob" : {
+
+    },
+    "bob@mail.no" : {
+
+    },
+    "Change password" : {
+
+    },
+    "Change profile picture" : {
+
+    },
     "Community" : {
       "comment" : "Community tab",
       "localizations" : {
@@ -16,7 +30,13 @@
         }
       }
     },
+    "E-mail" : {
+
+    },
     "Filter" : {
+
+    },
+    "Following" : {
 
     },
     "Friends" : {
@@ -55,8 +75,12 @@
     "More" : {
 
     },
+    "My hikes" : {
+
+    },
     "New hike" : {
       "comment" : "New hike tab",
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -86,7 +110,16 @@
         }
       }
     },
+    "Settings" : {
+
+    },
+    "Settings content goes here..." : {
+
+    },
     "Updates" : {
+
+    },
+    "Username" : {
 
     }
   },
