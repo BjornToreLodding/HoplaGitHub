@@ -2,10 +2,24 @@
   "sourceLanguage" : "en",
   "strings" : {
     "All Posts" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle innlegg"
+          }
+        }
+      }
     },
     "Area" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Område"
+          }
+        }
+      }
     },
     "Bob" : {
 
@@ -14,10 +28,24 @@
 
     },
     "Change password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre passord"
+          }
+        }
+      }
     },
     "Change profile picture" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre profilbilde"
+          }
+        }
+      }
     },
     "Community" : {
       "comment" : "Community tab",
@@ -30,17 +58,54 @@
         }
       }
     },
+    "Dark mode" : {
+
+    },
+    "Display" : {
+
+    },
     "E-mail" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-post"
+          }
+        }
+      }
+    },
+    "English" : {
 
     },
     "Filter" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        }
+      }
     },
     "Following" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Følger"
+          }
+        }
+      }
     },
     "Friends" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venner"
+          }
+        }
+      }
     },
     "Hikes" : {
       "localizations" : {
@@ -64,40 +129,84 @@
       }
     },
     "Liked" : {
-
-    },
-    "Location" : {
-
-    },
-    "Map" : {
-
-    },
-    "More" : {
-
-    },
-    "My hikes" : {
-
-    },
-    "New hike" : {
-      "comment" : "New hike tab",
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ny tur"
+            "value" : "Liker"
+          }
+        }
+      }
+    },
+    "Location" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posisjon"
+          }
+        }
+      }
+    },
+    "Map" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kart"
+          }
+        }
+      }
+    },
+    "More" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mer"
+          }
+        }
+      }
+    },
+    "My hikes" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine turer"
           }
         }
       }
     },
     "New Hike" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny Tur"
+          }
+        }
+      }
     },
     "Popular" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Populært"
+          }
+        }
+      }
     },
     "Posts" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Innlegg"
+          }
+        }
+      }
     },
     "Profile" : {
       "comment" : "Profile tab",
@@ -111,16 +220,34 @@
       }
     },
     "Settings" : {
-
-    },
-    "Settings content goes here..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Innstillinger"
+          }
+        }
+      }
     },
     "Updates" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oppdateringer"
+          }
+        }
+      }
     },
     "Username" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brukernavn"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
