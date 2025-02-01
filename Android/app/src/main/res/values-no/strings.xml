@@ -4,7 +4,7 @@
     <string name="home_screen">Hjemskjerm</string>
     <string name="profile_screen">Profile Screen</string>
     <string name="settings_screen">Settings</string>
-    <string name="language">Language</string>
+    <string name="language">Språk</string>
     <string name="norwegian">Norwegian</string>
     <string name="english">English</string>
     <string name="settings">Innstillinger</string>
@@ -13,6 +13,7 @@
     <string name="delete_user">Slett bruker</string>
     <string name="mode">Modus</string>
     <string name="light">Lys</string>
+    <string name="dark">Mørk</string>
 
     <string name="home">Hjem</string>
     <string name="routes">Ruter</string>

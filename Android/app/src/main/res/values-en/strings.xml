@@ -13,6 +13,7 @@
     <string name="delete_user">Delete user</string>
     <string name="mode">Mode</string>
     <string name="light">Light</string>
+    <string name="dark">Dark</string>
 
     <string name="home">Home</string>
     <string name="routes">Routes</string>

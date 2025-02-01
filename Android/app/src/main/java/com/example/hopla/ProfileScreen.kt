@@ -53,6 +53,7 @@ import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import android.graphics.BitmapFactory
+import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -100,12 +101,12 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 56.dp)
+            .padding(top = 8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             horizontalArrangement = Arrangement.Start
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
@@ -114,17 +115,50 @@ fun SettingsScreen(
                     contentDescription = stringResource(R.string.back)
                 )
             }
+            Text(
+                text = stringResource(R.string.settings),
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(top = 8.dp)
+            )
         }
 
-        Text(text = stringResource(R.string.settings))
-        LanguageSelection(languageViewModel)
-        ModeSelection(languageViewModel, themeViewModel)
-        Button(onClick = { userViewModel.logOut() }) {
-            Text(text = stringResource(R.string.log_out))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+            ) {
+                Text(text = stringResource(R.string.language))
+                Text(text = stringResource(R.string.mode))
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+            ) {
+                LanguageSelection(languageViewModel)
+                ModeSelection(languageViewModel, themeViewModel)
+
+            }
         }
-        Button(onClick = { userViewModel.deleteUser() }) {
-            Text(text = stringResource(R.string.delete_user))
-        }
+
+        Text(
+            text = stringResource(R.string.log_out),
+            modifier = Modifier
+                .clickable { userViewModel.logOut() }
+        )
+
+        Text(
+            text = stringResource(R.string.delete_user),
+            modifier = Modifier
+                .clickable { userViewModel.deleteUser() }
+        )
     }
 }
 
@@ -154,15 +188,8 @@ class LanguageViewModel(
 
 @Composable
 fun LanguageSelection(languageViewModel: LanguageViewModel) {
-    val language = languageViewModel.selectedLanguage.value
-
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            Text(text = if (language == "Norwegian") "Språk" else "Language")
+    Column() {
+        Row() {
             Text(
                 text = "Norsk",
                 modifier = Modifier
@@ -180,20 +207,20 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
 
 @Composable
 fun ModeSelection(languageViewModel: LanguageViewModel, themeViewModel: ThemeViewModel = viewModel()) {
-    val language = languageViewModel.selectedLanguage.value
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            Text(text = stringResource(R.string.mode))
-            Button(onClick = { themeViewModel.setDarkTheme(false) }) {
-                Text(text = if (language == "Norwegian") "Lys" else "Light")
-            }
-            Button(onClick = { themeViewModel.setDarkTheme(true) }) {
-                Text(text = if (language == "Norwegian") "Mørk" else "Dark")
-            }
+    Column() {
+        Row() {
+            Text(
+                text = stringResource(R.string.light),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clickable { themeViewModel.setDarkTheme(false) }
+            )
+            Text(
+                text = stringResource(R.string.dark),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clickable { themeViewModel.setDarkTheme(true) }
+            )
         }
     }
 }
