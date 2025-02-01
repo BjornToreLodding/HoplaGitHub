@@ -151,13 +151,17 @@ fun SettingsScreen(
         Text(
             text = stringResource(R.string.log_out),
             modifier = Modifier
-                .clickable { userViewModel.logOut() }
+                .padding(start = 8.dp, bottom = 8.dp)
+                .clickable { userViewModel.logOut() },
+            style = TextStyle(textDecoration = TextDecoration.Underline)
         )
 
         Text(
             text = stringResource(R.string.delete_user),
             modifier = Modifier
-                .clickable { userViewModel.deleteUser() }
+                .padding(start = 8.dp)
+                .clickable { userViewModel.deleteUser() },
+            style = TextStyle(textDecoration = TextDecoration.Underline)
         )
     }
 }
@@ -381,8 +385,8 @@ fun ProfileButtons() {
 
 @Composable
 fun UserChanges(modifier: Modifier = Modifier) {
-    var email by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("test@gmail.com") }
+    var username by remember { mutableStateOf("test") }
 
     Box(
         modifier = modifier
@@ -397,7 +401,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
             TextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text(text = stringResource(R.string.username)) },
+                label = {  },
                 modifier = Modifier.fillMaxWidth()
             )
             Divider(color = Color.Black, thickness = 1.dp)
@@ -405,7 +409,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
             TextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(text = stringResource(R.string.email)) },
+                label = { },
                 modifier = Modifier.fillMaxWidth()
             )
             Divider(color = Color.Black, thickness = 1.dp)
