@@ -51,6 +51,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import android.graphics.BitmapFactory
 
 
 @Composable
@@ -208,6 +210,14 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
         imageBitmap = bitmap
     }
 
+    // Content picker launcher
+    val contentPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            val inputStream = context.contentResolver.openInputStream(it)
+            imageBitmap = BitmapFactory.decodeStream(inputStream)
+        }
+    }
+
     // Permission launcher
     val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         permissionGranted = isGranted
@@ -233,61 +243,72 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
             }
         }
     }
-        // Display the current profile picture (either the captured or default image)
-        if (imageBitmap != null) {
-            Image(
-                bitmap = imageBitmap!!.asImageBitmap(),
-                contentDescription = "Captured Image",
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .border(10.dp, Color.Black, CircleShape)
-            )
-        } else {
-            Image(
-                painter = painterResource(id = imageResource),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .border(10.dp, Color.Black, CircleShape)
-            )
-        }
 
-        // Text to trigger camera action
-        Text(
-            text = stringResource(R.string.change_profile_picture),
+    // Display the current profile picture (either the captured or default image)
+    if (imageBitmap != null) {
+        Image(
+            bitmap = imageBitmap!!.asImageBitmap(),
+            contentDescription = "Captured Image",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .padding(top = 8.dp)
-                .clickable { showDialog = true },
-            style = TextStyle(textDecoration = TextDecoration.Underline)
+                .size(200.dp)
+                .clip(CircleShape)
+                .border(10.dp, Color.Black, CircleShape)
         )
+    } else {
+        Image(
+            painter = painterResource(id = imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(200.dp)
+                .clip(CircleShape)
+                .border(10.dp, Color.Black, CircleShape)
+        )
+    }
 
-        // Dialog to confirm taking a picture
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text(text = "Take a Picture") },
-                text = { Text(text = "Click the button below to take a picture.") },
-                confirmButton = {
+    // Text to trigger camera action
+    Text(
+        text = stringResource(R.string.change_profile_picture),
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .clickable { showDialog = true },
+        style = TextStyle(textDecoration = TextDecoration.Underline)
+    )
+
+    // Dialog to confirm taking a picture
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = stringResource(R.string.change_profile_picture)) },
+            text = { Text(text = stringResource(R.string.profile_pic_description)) },
+            confirmButton = {
+                Column {
                     Button(onClick = {
                         if (permissionGranted) {
                             cameraLauncher.launch(null)
                         }
                         showDialog = false
                     }) {
-                        Text("Take a Picture")
+                        Text(text = stringResource(R.string.take_a_picture))
                     }
-                },
-                dismissButton = {
-                    Button(onClick = { showDialog = false }) {
-                        Text("Cancel")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = {
+                        contentPickerLauncher.launch("image/*")
+                        showDialog = false
+                    }) {
+                        Text(text = stringResource(R.string.choose_from_library))
                     }
                 }
-            )
-        }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
     }
-
+}
 
 
 @Composable

@@ -30,5 +30,9 @@
     <string name="username">Brukernavn</string>
     <string name="email">E-post</string>
     <string name="change_password">Endre passord</string>
+    <string name="take_a_picture">Ta et bilde</string>
+    <string name="choose_from_library">Velg fra bibliotek</string>
+    <string name="cancel">Avslutt</string>
+    <string name="profile_pic_description">Velg mellom å ta bilde eller velge fra bibliotek for å endre profilbilde</string>
 
 </resources>

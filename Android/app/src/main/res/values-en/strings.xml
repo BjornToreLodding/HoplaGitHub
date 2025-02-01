@@ -30,5 +30,9 @@
     <string name="username">Username</string>
     <string name="email">E-mail</string>
     <string name="change_password">Change password</string>
+    <string name="take_a_picture">Take a picture</string>
+    <string name="choose_from_library">Choose from library</string>
+    <string name="cancel">Avslutt</string>
+    <string name="profile_pic_description">Choose between taking a picture or choosing from library to change profile picture</string>
 
 </resources>
