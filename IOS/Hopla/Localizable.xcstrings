@@ -27,6 +27,9 @@
     "bob@mail.no" : {
 
     },
+    "Cancel" : {
+
+    },
     "Change password" : {
       "localizations" : {
         "nb" : {
@@ -36,6 +39,9 @@
           }
         }
       }
+    },
+    "Change Password" : {
+
     },
     "Change profile picture" : {
       "localizations" : {
@@ -58,11 +64,28 @@
         }
       }
     },
-    "Dark mode" : {
+    "Confirm new password" : {
 
     },
+    "Dark mode" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mørk-modus"
+          }
+        }
+      }
+    },
     "Display" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visning"
+          }
+        }
+      }
     },
     "E-mail" : {
       "localizations" : {
@@ -75,6 +98,19 @@
       }
     },
     "English" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engelsk"
+          }
+        }
+      }
+    },
+    "Enter new password" : {
+
+    },
+    "Enter old password" : {
 
     },
     "Filter" : {
@@ -178,6 +214,9 @@
         }
       }
     },
+    "My Hikes" : {
+
+    },
     "New Hike" : {
       "localizations" : {
         "nb" : {
@@ -228,6 +267,9 @@
           }
         }
       }
+    },
+    "Submit" : {
+
     },
     "Updates" : {
       "localizations" : {

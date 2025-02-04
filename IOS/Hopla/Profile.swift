@@ -17,6 +17,10 @@ struct Profile: View {
     // Stores the actual UIImage to display in the profile view
     @State private var profileImage: UIImage? = nil
     
+    @State private var username: String = "" // username
+    
+    @State private var email: String = "" // e-mail
+    
     var body: some View {
         ZStack {
             AdaptiveColor.background.color(for: colorScheme)
@@ -75,62 +79,79 @@ struct Profile: View {
                     }
                     
                     // The tree buttons
-                    NavigationView {
-                            HStack(spacing: 10) { // Add spacing between buttons
-                                NavigationLink(destination: MyHikes()) {
-                                    Text("My hikes")
-                                        .frame(width: 120, height: 50)
-                                        .background(Color.white)
-                                        .foregroundColor(Color.black) // Change from `foregroundStyle` to `foregroundColor`
-                                        .shadow(radius: 5)
-                                }
-                                
-                                NavigationLink(destination: Friends()) {
-                                    Text("Friends")
-                                        .frame(width: 120, height: 50)
-                                        .background(Color.white)
-                                        .foregroundColor(Color.black) // Change from `foregroundStyle` to `foregroundColor`
-                                        .shadow(radius: 5)
-                                }
-                                
-                                NavigationLink(destination: Following()) {
-                                    Text("Following")
-                                        .frame(width: 120, height: 50)
-                                        .background(Color.white)
-                                        .foregroundColor(Color.black) // Change from `foregroundStyle` to `foregroundColor`
-                                        .shadow(radius: 5)
-                                }
-                            }
+                    HStack(spacing: 10) { // Add spacing between buttons
+                        NavigationLink(destination: MyHikes()) {
+                            Text("My hikes")
+                                .frame(width: 120, height: 50)
+                                .background(Color.white)
+                                .foregroundColor(Color.black)
+                        }
+                        
+                        NavigationLink(destination: Friends()) {
+                            Text("Friends")
+                                .frame(width: 120, height: 50)
+                                .background(Color.white)
+                                .foregroundColor(Color.black)
+                        }
+                        
+                        NavigationLink(destination: Following()) {
+                            Text("Following")
+                                .frame(width: 120, height: 50)
+                                .background(Color.white)
+                                .foregroundColor(Color.black)
+                        }
                     }
-   
+                    .padding(.top, 20)
+                    
                     ZStack {
                         // White rectangle container
                         Rectangle()
-                            .frame(width: 380, height: 250)
+                            .frame(width: 380, height: 240)
                             .foregroundColor(.white)
                             .padding(.top, 20)
                         
                         VStack {
-                            Text("Username")
-                                .frame(width: 360, height: 40)
-                                .background(Color.darkBeige)
-                                .padding(.top, 20)
                             
-                            Text("Bob")
-                                .frame(width: 360, height: 40)
-                                .background(Color.lightBeige)
+                            Rectangle()
+                                .frame(width: 360, height: 3)
+                                .foregroundColor(.darkBeige)
+                                .padding(.top, 10)
+                            
+                            Text("Username")
+                                .frame(width: 360, height: 30)
+                                .background(Color.white)
+                                
+                            
+                            TextField(
+                                "Bob",
+                                text: $username
+                            )
+                            .background(Color.lightBeige)
+                            .frame(width: 360)
+                            .multilineTextAlignment(.center)
+                            
+                            Rectangle()
+                                .frame(width: 360, height: 3)
+                                .foregroundColor(.darkBeige)
                             
                             Text("E-mail")
-                                .frame(width: 360, height: 40)
-                                .background(Color.darkBeige)
+                                .frame(width: 360, height: 30)
+                                .background(Color.white)
                             
-                            Text("bob@mail.no")
-                                .frame(width: 360, height: 40)
-                                .background(Color.lightBeige)
+                            TextField(
+                                "bob@mail.no",
+                                text: $email
+                            )
+                            .background(Color.lightBeige)
+                            .frame(width: 360)
+                            .multilineTextAlignment(.center)
                             
-                            Text("Change password")
-                                .frame(width: 360, height: 40)
-                                .background(Color.darkBeige)
+                            Rectangle()
+                                .frame(width: 360, height: 3)
+                                .foregroundColor(.darkBeige)
+                            
+                            // Function to change password
+                            ChangePassword()
                         }
                     }
                     
@@ -145,6 +166,7 @@ struct Profile: View {
                         .frame(width: 200, height: 50)
                         .background(Color.white)
                     }
+                    
                     
                     Spacer()
                 }
