@@ -36,4 +36,8 @@
     <string name="cancel">Avslutt</string>
     <string name="profile_pic_description">Velg mellom å ta bilde eller velge fra bibliotek for å endre profilbilde</string>
 
+    <string name="current_password">Nåværende passord</string>
+    <string name="new_password">Nytt passord</string>
+    <string name="confirm_password">Bekreft passord</string>
+
 </resources>

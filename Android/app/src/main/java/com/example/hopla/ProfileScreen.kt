@@ -85,7 +85,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfilePicture()
-            ProfileButtons()
+            ProfileButtons(navController)
             UserChanges(modifier = Modifier.weight(1f))
         }
     }
@@ -341,9 +341,8 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
     }
 }
 
-
 @Composable
-fun ProfileButtons() {
+fun ProfileButtons(navController: NavController) {
     Row(
         modifier = Modifier
             .padding(top = 8.dp)
@@ -351,7 +350,7 @@ fun ProfileButtons() {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(
-            onClick = { /* TODO */ },
+            onClick = { navController.navigate("my_trips") },
             modifier = Modifier
                 .weight(1f)
                 .padding(2.dp)
@@ -361,7 +360,7 @@ fun ProfileButtons() {
             Text(text = stringResource(R.string.my_trips))
         }
         Button(
-            onClick = { /* TODO */ },
+            onClick = { navController.navigate("friends") },
             modifier = Modifier
                 .weight(1f)
                 .padding(2.dp)
@@ -371,7 +370,7 @@ fun ProfileButtons() {
             Text(text = stringResource(R.string.friends))
         }
         Button(
-            onClick = { /* TODO */ },
+            onClick = { navController.navigate("following") },
             modifier = Modifier
                 .weight(1f)
                 .padding(2.dp)
@@ -387,6 +386,10 @@ fun ProfileButtons() {
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf("test@gmail.com") }
     var username by remember { mutableStateOf("test") }
+    var showDialog by remember { mutableStateOf(false) }
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -415,8 +418,135 @@ fun UserChanges(modifier: Modifier = Modifier) {
             Divider(color = Color.Black, thickness = 1.dp)
             Text(
                 text = stringResource(R.string.change_password),
-                modifier = Modifier.clickable { /* TODO */ },
-                style = TextStyle(textDecoration = TextDecoration.Underline) )
+                modifier = Modifier.clickable { showDialog = true },
+                style = TextStyle(textDecoration = TextDecoration.Underline)
+            )
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = stringResource(R.string.change_password)) },
+            text = {
+                Column {
+                    TextField(
+                        value = currentPassword,
+                        onValueChange = { currentPassword = it },
+                        label = { Text(text = stringResource(R.string.current_password)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text(text = stringResource(R.string.new_password)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text(text = stringResource(R.string.confirm_password)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    // Handle password change logic here
+                    showDialog = false
+                }) {
+                    Text(text = stringResource(R.string.stables))
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun MyTripsScreen(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+            Text(
+                text = stringResource(R.string.my_trips),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun FriendsScreen(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+            Text(
+                text = stringResource(R.string.friends),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun FollowingScreen(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+            Text(
+                text = stringResource(R.string.following),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 16.dp)
+            )
         }
     }
 }

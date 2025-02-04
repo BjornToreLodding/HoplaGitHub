@@ -42,6 +42,7 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.sp
 
 
 class MainActivity : ComponentActivity() {
@@ -87,6 +88,9 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Stables.route) { StablesScreen() }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
+                            composable("my_trips") { MyTripsScreen(navController) }
+                            composable("friends") { FriendsScreen(navController) }
+                            composable("following") { FollowingScreen(navController) }
                         }
                     }
                 } else {
@@ -157,7 +161,7 @@ fun BottomNavigationBar(navController: NavHostController, languageViewModel: Lan
                         Screen.Stables -> Icon(Icons.Outlined.Face, contentDescription = null)
                     }
                 },
-                label = { Text(screen.titleProvider(context)) },
+                label = { Text(screen.titleProvider(context), fontSize = 12.sp) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
