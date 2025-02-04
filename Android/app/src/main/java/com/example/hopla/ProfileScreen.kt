@@ -53,6 +53,8 @@ import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
 
 
@@ -98,30 +100,37 @@ fun SettingsScreen(
     userViewModel: UserViewModel,
     navController: NavController
 ) {
+    var showReportDialog by remember { mutableStateOf(false) }
+    var reportTitle by remember { mutableStateOf("") }
+    var reportText by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 8.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Start
+                .padding(horizontal = 8.dp) // Add horizontal padding
+                .background(Color.Gray)
+                .padding(8.dp)
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.settings),
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
-            Text(
-                text = stringResource(R.string.settings),
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .padding(top = 8.dp)
-            )
         }
 
         Row(
@@ -144,9 +153,16 @@ fun SettingsScreen(
             ) {
                 LanguageSelection(languageViewModel)
                 ModeSelection(languageViewModel, themeViewModel)
-
             }
         }
+
+        Text(
+            text = stringResource(R.string.send_a_report),
+            modifier = Modifier
+                .padding(start = 8.dp, bottom = 8.dp)
+                .clickable { showReportDialog = true },
+            style = TextStyle(textDecoration = TextDecoration.Underline)
+        )
 
         Text(
             text = stringResource(R.string.log_out),
@@ -164,8 +180,54 @@ fun SettingsScreen(
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
     }
-}
 
+    if (showReportDialog) {
+        AlertDialog(
+            onDismissRequest = { showReportDialog = false },
+            title = { Text(text = stringResource(R.string.send_a_report)) },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    TextField(
+                        value = reportTitle,
+                        onValueChange = { reportTitle = it },
+                        label = { Text(text = stringResource(R.string.title)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = reportText,
+                        onValueChange = { reportText = it },
+                        label = { Text(text = stringResource(R.string.report)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    // Handle sending report logic here
+                    showReportDialog = false
+                }) {
+                    Text(text = stringResource(R.string.send))
+                    reportTitle = ""
+                    reportText = ""
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showReportDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                    reportTitle = ""
+                    reportText = ""
+                }
+            }
+        )
+    }
+}
 
 class LanguageViewModel(
     private val context: Context,
@@ -455,7 +517,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     // Handle password change logic here
                     showDialog = false
                 }) {
-                    Text(text = stringResource(R.string.stables))
+                    Text(text = stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
@@ -466,7 +528,6 @@ fun UserChanges(modifier: Modifier = Modifier) {
         )
     }
 }
-
 @Composable
 fun MyTripsScreen(navController: NavController) {
     Column(
@@ -474,23 +535,27 @@ fun MyTripsScreen(navController: NavController) {
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Start
+                .background(Color.Gray)
+                .padding(8.dp)
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.my_trips),
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
-            Text(
-                text = stringResource(R.string.my_trips),
-                fontSize = 24.sp,
-                modifier = Modifier.padding(start = 16.dp)
-            )
         }
     }
 }
@@ -500,25 +565,29 @@ fun FriendsScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Start
+                .background(Color.Gray)
+                .padding(8.dp)
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.friends),
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
-            Text(
-                text = stringResource(R.string.friends),
-                fontSize = 24.sp,
-                modifier = Modifier.padding(start = 16.dp)
-            )
         }
     }
 }
@@ -528,25 +597,29 @@ fun FollowingScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Start
+                .background(Color.Gray)
+                .padding(8.dp)
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.following),
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
-            Text(
-                text = stringResource(R.string.following),
-                fontSize = 24.sp,
-                modifier = Modifier.padding(start = 16.dp)
-            )
         }
     }
 }

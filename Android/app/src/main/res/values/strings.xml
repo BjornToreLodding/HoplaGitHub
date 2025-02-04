@@ -39,4 +39,10 @@
     <string name="new_password">Nytt passord</string>
     <string name="confirm_password">Bekreft passord</string>
 
+    <string name="send_a_report">Send en rapport</string>
+    <string name="report">Rapport</string>
+    <string name="title">TIttel</string>
+    <string name="send">Send</string>
+    <string name="confirm">Bekreft</string>
+
 </resources>
