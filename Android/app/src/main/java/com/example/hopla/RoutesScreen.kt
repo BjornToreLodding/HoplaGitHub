@@ -14,15 +14,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
-
 
 @Composable
 fun RoutesScreen() {
@@ -31,8 +30,9 @@ fun RoutesScreen() {
     var isFavoriteClicked by remember { mutableStateOf(false) }
     var isFollwingClicked by remember { mutableStateOf(false) }
     var isFiltersClicked by remember { mutableStateOf(false) }
-    var isHeartClicked by remember { mutableStateOf(false) }
-    var starRating by remember { mutableStateOf(3) }
+    var starRating by remember { mutableIntStateOf(3) }
+    var numRoutes by remember { mutableIntStateOf(5) }
+    var heartStates by remember { mutableStateOf(List(numRoutes) { false }) }
 
     Column(
         modifier = Modifier
@@ -50,116 +50,177 @@ fun RoutesScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                IconButton(onClick = { isMapClicked = !isMapClicked }) {
+                IconButton(onClick = {
+                    isMapClicked = !isMapClicked
+                    if (isMapClicked) {
+                        isCloseByClicked = false
+                        isFavoriteClicked = false
+                        isFollwingClicked = false
+                        isFiltersClicked = false
+                    }
+                }) {
                     Icon(
                         imageVector = if (isMapClicked) Icons.Outlined.Check else Icons.Outlined.List,
                         contentDescription = null
                     )
                 }
-                IconButton(onClick = { isCloseByClicked = !isCloseByClicked }) {
+                IconButton(onClick = {
+                    isCloseByClicked = !isCloseByClicked
+                    if (isCloseByClicked) {
+                        isMapClicked = false
+                        isFavoriteClicked = false
+                        isFollwingClicked = false
+                        isFiltersClicked = false
+                    }
+                }) {
                     Icon(
                         imageVector = if (isCloseByClicked) Icons.Filled.LocationOn else Icons.Outlined.LocationOn,
                         contentDescription = null
                     )
                 }
-                IconButton(onClick = { isFavoriteClicked = !isFavoriteClicked }) {
+                IconButton(onClick = {
+                    isFavoriteClicked = !isFavoriteClicked
+                    if (isFavoriteClicked) {
+                        isMapClicked = false
+                        isCloseByClicked = false
+                        isFollwingClicked = false
+                        isFiltersClicked = false
+                    }
+                }) {
                     Icon(
                         imageVector = if (isFavoriteClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = null
                     )
                 }
-
-                IconButton(onClick = { isFollwingClicked = !isFollwingClicked }) {
+                IconButton(onClick = {
+                    isFollwingClicked = !isFollwingClicked
+                    if (isFollwingClicked) {
+                        isMapClicked = false
+                        isCloseByClicked = false
+                        isFavoriteClicked = false
+                        isFiltersClicked = false
+                    }
+                }) {
                     Icon(
                         imageVector = if (isFollwingClicked) Icons.Filled.Star else Icons.TwoTone.Star,
                         contentDescription = null
                     )
                 }
-
-                IconButton(onClick = { isFiltersClicked = !isFiltersClicked }) {
+                IconButton(onClick = {
+                    isFiltersClicked = !isFiltersClicked
+                    if (isFiltersClicked) {
+                        isMapClicked = false
+                        isCloseByClicked = false
+                        isFavoriteClicked = false
+                        isFollwingClicked = false
+                    }
+                }) {
                     Icon(
-                        imageVector = if (isFiltersClicked) Icons.Outlined.KeyboardArrowDown else Icons.Outlined.KeyboardArrowDown,
+                        imageVector = Icons.Outlined.KeyboardArrowDown,
                         contentDescription = null
                     )
                 }
             }
         }
 
+        // If the "Map" toggle is active, show only "Map" text
         if (isMapClicked) {
-            // Content to display when the first icon is clicked
-            Text(text = "Map content", modifier = Modifier.padding(16.dp))
-        } else if (isCloseByClicked) {
-            // Content to display when the second icon is clicked
-            Text(text = "Close by content", modifier = Modifier.padding(16.dp))
-        } else if (isFavoriteClicked) {
-            // Content to display when the third icon is clicked
-            Text(text = "Favorite content", modifier = Modifier.padding(16.dp))
-        } else if (isFollwingClicked) {
-            // Content to display when the fourth icon is clicked
-            Text(text = "Following content", modifier = Modifier.padding(16.dp))
-        } else if (isFiltersClicked) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Map", color = Color.Black, fontWeight = FontWeight.Bold)
+            }
         } else {
-            // Frame
+            // Regular content display
+            val favoriteRoutes = heartStates.mapIndexedNotNull { index, isFavorite ->
+                if (isFavorite) index else null
+            }
+
+            LazyColumn {
+                val routesToDisplay = if (isFavoriteClicked) favoriteRoutes else (0 until numRoutes).toList()
+
+                items(routesToDisplay.size) { displayIndex ->
+                    val actualIndex = routesToDisplay[displayIndex]
+                    ContentBox(
+                        isHeartClicked = heartStates[actualIndex],
+                        starRating = starRating,
+                        onHeartClick = {
+                            heartStates = heartStates.toMutableList().apply {
+                                this[actualIndex] = !this[actualIndex]
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .height(150.dp)
+            .background(Color.Gray)
+    ) {
+        Column {
+            // MainBox
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp)
-                    .height(150.dp)
-                    .background(Color.Gray)
+                    .height(95.dp)
+                    .background(Color.Blue)
             ) {
-                Column {
-                    //MainBox
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .height(95.dp)
-                            .background(Color.Blue)
-                    ) {
-                        Text("Title",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(5.dp)
+                Text(
+                    "Title",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(5.dp)
+                )
+                IconButton(
+                    onClick = onHeartClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(5.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(5.dp)
+                ) {
+                    repeat(5) { index ->
+                        Icon(
+                            imageVector = if (index < starRating) Icons.Filled.Star else Icons.TwoTone.Star,
+                            contentDescription = null,
+                            tint = Color.Yellow
                         )
-                        IconButton(
-                            onClick = { isHeartClicked = !isHeartClicked },
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(5.dp)
-                        ) {
-                            Icon(
-                                imageVector = if (isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(5.dp)
-                        ) {
-                            repeat(5) { index ->
-                                Icon(
-                                    imageVector = if (index < starRating) Icons.Filled.Star else Icons.TwoTone.Star,
-                                    contentDescription = null,
-                                    tint = Color.Yellow
-                                )
-                            }
-                        }
-                    }
-                    //SmallBox
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
-                            .height(45.dp)
-                            .background(Color.Red)
-                    ) {
-                        Text("Description", color = Color.Gray)
                     }
                 }
+            }
+            // SmallBox
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
+                    .height(45.dp)
+                    .background(Color.Red)
+            ) {
+                Text("Description", color = Color.Gray)
             }
         }
     }
