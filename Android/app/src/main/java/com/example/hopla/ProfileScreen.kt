@@ -54,6 +54,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.unit.sp
+import com.example.hopla.ui.theme.PrimaryWhite
 
 
 @Composable
@@ -417,7 +418,7 @@ fun ProfileButtons(navController: NavController) {
                 .height(50.dp),
             shape = RectangleShape
         ) {
-            Text(text = stringResource(R.string.my_trips))
+            Text(text = stringResource(R.string.my_trips), color = PrimaryWhite)
         }
         Button(
             onClick = { navController.navigate("friends") },
@@ -427,7 +428,7 @@ fun ProfileButtons(navController: NavController) {
                 .height(50.dp),
             shape = RectangleShape
         ) {
-            Text(text = stringResource(R.string.friends))
+            Text(text = stringResource(R.string.friends), color = PrimaryWhite)
         }
         Button(
             onClick = { navController.navigate("following") },
@@ -437,7 +438,7 @@ fun ProfileButtons(navController: NavController) {
                 .height(50.dp),
             shape = RectangleShape
         ) {
-            Text(text = stringResource(R.string.following))
+            Text(text = stringResource(R.string.following),color = PrimaryWhite)
         }
     }
 }

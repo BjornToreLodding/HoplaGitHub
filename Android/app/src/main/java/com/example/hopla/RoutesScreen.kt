@@ -35,6 +35,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.ui.res.stringResource
+import com.example.hopla.ui.theme.StarColor
 
 @Composable
 fun RoutesScreen() {
@@ -60,7 +61,7 @@ fun RoutesScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(Color.Gray)
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(vertical = 8.dp)
             ) {
                 Row(
@@ -197,7 +198,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     .fillMaxWidth()
                     .padding(5.dp)
                     .height(95.dp)
-                    .background(Color.Blue)
+                    .background(MaterialTheme.colorScheme.secondary)
             ) {
                 Text(
                     "Boredalstien",
@@ -228,7 +229,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                         Icon(
                             imageVector = if (index < starRating) Icons.Filled.Star else Icons.TwoTone.Star,
                             contentDescription = null,
-                            tint = Color.Yellow
+                            tint = StarColor
                         )
                     }
                 }
@@ -239,7 +240,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     .fillMaxWidth()
                     .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
                     .height(45.dp)
-                    .background(Color.Red)
+                    .background(MaterialTheme.colorScheme.secondary)
             ) {
                 Text("Asfalt, Grus, Parkering", color = Color.Gray)
             }
@@ -261,14 +262,14 @@ fun RouteClicked(onBackClick: () -> Unit) {
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                 .height(60.dp)
-                .background(Color.Green)
+                .background(MaterialTheme.colorScheme.secondary)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp)
                     .fillMaxHeight()
-                    .background(Color.Yellow)
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -303,7 +304,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                         .height(250.dp)
-                        .background(Color.Green)
+                        .background(MaterialTheme.colorScheme.secondary)
                 ) {
                     Column {
                         Box(
@@ -359,7 +360,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
                                 .height(50.dp)
-                                .background(Color.Red)
+                                .background(MaterialTheme.colorScheme.primary)
                         ) {
                             Text("Asfalt, Grus, Parkering", color = Color.Gray)
                         }
@@ -380,7 +381,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.3f)
-                            .background(Color.Cyan)
+                            .background(MaterialTheme.colorScheme.secondary)
                             .clickable { /* Handle click */ },
                         contentAlignment = Alignment.Center
                     ) {
@@ -392,7 +393,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
-                            .background(Color.Magenta)
+                            .background(MaterialTheme.colorScheme.secondary)
                             .clickable { /* Handle click */ },
                         contentAlignment = Alignment.Center
                     ) {
@@ -413,7 +414,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(Color.Magenta),
+                            .background(MaterialTheme.colorScheme.secondary),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(text = stringResource(R.string.easy_trip_for_everyone_Parking), modifier = Modifier.padding(start = 8.dp))
@@ -423,7 +424,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(Color.Magenta),
+                            .background(MaterialTheme.colorScheme.secondary),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -439,7 +440,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                     Icon(
                                         imageVector = Icons.Filled.Star,
                                         contentDescription = null,
-                                        tint = Color.Yellow,
+                                        tint = StarColor,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -451,7 +452,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(Color.Magenta),
+                            .background(MaterialTheme.colorScheme.secondary),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -470,7 +471,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(Color.Magenta),
+                            .background(MaterialTheme.colorScheme.secondary),
                         contentAlignment = Alignment.Center
                     ) {
                         // Inner, clickable box for latest update
@@ -479,7 +480,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 .height(30.dp)
                                 .fillMaxWidth()
                                 .padding(4.dp)
-                                .background(Color.Green)
+                                .background(MaterialTheme.colorScheme.secondary)
                                 .clickable { /* Handle click */ },
                             contentAlignment = Alignment.Center
                         ) {

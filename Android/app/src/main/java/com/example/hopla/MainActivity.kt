@@ -147,7 +147,8 @@ fun BottomNavigationBar(navController: NavHostController, languageViewModel: Lan
     )
     val context = LocalContext.current
     BottomNavigation(
-        modifier = Modifier.height(100.dp)
+        modifier = Modifier.height(100.dp),
+        backgroundColor = MaterialTheme.colorScheme.primary
     ) {
         val currentRoute = navController.currentBackStackEntry?.destination?.route
         items.forEach { screen ->
