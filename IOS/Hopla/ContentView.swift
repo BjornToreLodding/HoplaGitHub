@@ -11,13 +11,25 @@ struct Hike: Identifiable {
 
 struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
+    @AppStorage("isDarkMode") private var isDarkMode = false // Global dark mode setting
     
     var body: some View {
         NavigationStack {
             ZStack {
+                // Background
                 AdaptiveColor.background.color(for: colorScheme)
-                    .ignoresSafeArea()
+                    .ignoresSafeArea(edges: .all)
                 
+                // Bottom Green Rectangle
+                VStack {
+                    Spacer() // Pushes rectangle to the bottom
+                    Rectangle()
+                        .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                        .frame(height: 10)
+                        .ignoresSafeArea(edges: .bottom) // Ensures it covers all bottom area
+                }
+                
+                // Tab Bar and Content
                 TabView {
                     Home()
                         .tabItem {
@@ -43,41 +55,40 @@ struct ContentView: View {
                             Text("Community")
                         }
                     
-                    // Nested NavigationStack inside TabView for Profile
-                    ProfileNavigationWrapper()
+                    Profile()
                         .tabItem {
                             Image(systemName: "person")
                             Text("Profile")
                         }
                 }
-            }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
+                .tint(colorScheme == .dark ? .white : .black)
+                .onAppear {
+                    setupTabBarAppearance(for: colorScheme) // Apply correct tab bar color
+                }
+                
+                // Overlay Logo
+                VStack {
                     Image("LogoUtenBakgrunn")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 100, height: 50)
+                        .frame(width: 100, height: 40)
+                        .padding(.top, -10)
+                    Spacer()
                 }
+                .frame(maxWidth: .infinity)
             }
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        .onAppear {
-            setupNavigationBar(for: colorScheme)
-        }
-        .onChange(of: colorScheme) {
-            setupNavigationBar(for: colorScheme)
-        }
-    }
-}
-
-struct ProfileNavigationWrapper: View {
-    var body: some View {
-        NavigationStack {
-            Profile()
+            .onAppear {
+                setupNavigationBar(for: colorScheme)
+                setupTabBarAppearance(for: colorScheme)
+            }
+            .onChange(of: colorScheme) { newColorScheme in
+                setupNavigationBar(for: newColorScheme)
+                setupTabBarAppearance(for: newColorScheme) // Ensure the tab bar updates
+            }
+            .preferredColorScheme(isDarkMode ? .dark : .light)
         }
     }
 }
-
 
 
 

@@ -11,6 +11,9 @@
         }
       }
     },
+    "Antall" : {
+
+    },
     "Area" : {
       "localizations" : {
         "nb" : {
@@ -28,7 +31,14 @@
 
     },
     "Cancel" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avbryt"
+          }
+        }
+      }
     },
     "Change password" : {
       "localizations" : {
@@ -41,7 +51,14 @@
       }
     },
     "Change Password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre passord"
+          }
+        }
+      }
     },
     "Change profile picture" : {
       "localizations" : {
@@ -65,9 +82,27 @@
       }
     },
     "Confirm new password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekreft nytt passord"
+          }
+        }
+      }
     },
     "Dark mode" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mørk-modus"
+          }
+        }
+      }
+    },
+    "Dark Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -108,10 +143,24 @@
       }
     },
     "Enter new password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv nytt passord"
+          }
+        }
+      }
     },
     "Enter old password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv gammelt passord"
+          }
+        }
+      }
     },
     "Filter" : {
       "localizations" : {
@@ -215,7 +264,15 @@
       }
     },
     "My Hikes" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine turer"
+          }
+        }
+      }
     },
     "New Hike" : {
       "localizations" : {
@@ -226,6 +283,12 @@
           }
         }
       }
+    },
+    "Norwegian" : {
+
+    },
+    "Pil tilbake" : {
+
     },
     "Popular" : {
       "localizations" : {
@@ -258,6 +321,9 @@
         }
       }
     },
+    "Search bar" : {
+
+    },
     "Settings" : {
       "localizations" : {
         "nb" : {
@@ -269,6 +335,16 @@
       }
     },
     "Submit" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send inn"
+          }
+        }
+      }
+    },
+    "The app must reload to apply language change" : {
 
     },
     "Updates" : {

@@ -12,15 +12,13 @@ struct Friends: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Display")) {
-                    Toggle(isOn: .constant(true), label: {
-                        Text("Dark mode")
-                    })
-                    Toggle(isOn: .constant(true), label: {
-                        Text("English")
-                    })
+            VStack {
+                HStack {
+                    Text("Pil tilbake")
+                    Text("Friends")
+                    Text("Antall")
                 }
+                Text("Search bar")
             }
             .navigationTitle("Friends")
         }

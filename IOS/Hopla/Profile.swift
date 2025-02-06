@@ -23,77 +23,78 @@ struct Profile: View {
     
     var body: some View {
         ZStack {
+            // Ensure the whole background is green
             AdaptiveColor.background.color(for: colorScheme)
-                .ignoresSafeArea()
-            
-            ScrollView {
+                .ignoresSafeArea(edges: .all) // Covers top & bottom
+            VStack {
+                // Top of screen is green
+                Rectangle()
+                    .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .frame(height: 110)
+                    .edgesIgnoringSafeArea(.top)
+                    .padding(.top, -435)
+            }
+
                 VStack {
                     ZStack {
+                        // Profile image section
                         Circle()
                             .frame(width: 200, height: 200)
                             .foregroundColor(.white)
-                            .padding(.top, 10)
-                        
-                        if let profileImage { // The user's selected profile image
+                            .padding(.top, 50)
+
+                        if let profileImage {
                             Image(uiImage: profileImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 180, height: 180)
                                 .clipShape(Circle())
-                                .padding(.top, 10)
-                            
-                        } else { // The standard image for profile
+                                .padding(.top, 50)
+                        } else {
                             Image("Profile")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 180, height: 180)
                                 .clipShape(Circle())
-                                .padding(.top, 10)
+                                .padding(.top, 50)
                         }
                     }
                     
-                    // Image picker for selecting a profile picture
+                    // Profile Picture Picker
                     PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
                         Text("Change profile picture")
                             .underline()
                             .padding(.top, 10)
                     }
-                    
-                    // using older version because other method doesnt work
                     .onChange(of: selectedItem) { newItem in
-                        // Handle image selection
                         if let newItem {
                             Task {
-                                do {
-                                    // Load the selected image asynchronously
-                                    if let data = try? await newItem.loadTransferable(type: Data.self),
-                                       let uiImage = UIImage(data: data) {
-                                        // Update the profileImage on the main thread
-                                        DispatchQueue.main.async {
-                                            profileImage = uiImage
-                                        }
+                                if let data = try? await newItem.loadTransferable(type: Data.self),
+                                   let uiImage = UIImage(data: data) {
+                                    DispatchQueue.main.async {
+                                        profileImage = uiImage
                                     }
                                 }
                             }
                         }
                     }
                     
-                    // The tree buttons
-                    HStack(spacing: 10) { // Add spacing between buttons
+                    // Buttons & User Info
+                    HStack(spacing: 10) {
                         NavigationLink(destination: MyHikes()) {
                             Text("My hikes")
                                 .frame(width: 120, height: 50)
                                 .background(Color.white)
                                 .foregroundColor(Color.black)
                         }
-                        
+
                         NavigationLink(destination: Friends()) {
                             Text("Friends")
                                 .frame(width: 120, height: 50)
                                 .background(Color.white)
                                 .foregroundColor(Color.black)
                         }
-                        
+
                         NavigationLink(destination: Following()) {
                             Text("Following")
                                 .frame(width: 120, height: 50)
@@ -103,59 +104,50 @@ struct Profile: View {
                     }
                     .padding(.top, 20)
                     
+                    // User Details Section
                     ZStack {
-                        // White rectangle container
                         Rectangle()
                             .frame(width: 380, height: 240)
                             .foregroundColor(.white)
                             .padding(.top, 20)
-                        
+
                         VStack {
-                            
                             Rectangle()
                                 .frame(width: 360, height: 3)
                                 .foregroundColor(.darkBeige)
                                 .padding(.top, 10)
-                            
+
                             Text("Username")
                                 .frame(width: 360, height: 30)
                                 .background(Color.white)
-                                
-                            
-                            TextField(
-                                "Bob",
-                                text: $username
-                            )
-                            .background(Color.lightBeige)
-                            .frame(width: 360)
-                            .multilineTextAlignment(.center)
-                            
+
+                            TextField("Bob", text: $username)
+                                .background(Color.mainLightBackground)
+                                .frame(width: 360)
+                                .multilineTextAlignment(.center)
+
                             Rectangle()
                                 .frame(width: 360, height: 3)
                                 .foregroundColor(.darkBeige)
-                            
+
                             Text("E-mail")
                                 .frame(width: 360, height: 30)
                                 .background(Color.white)
-                            
-                            TextField(
-                                "bob@mail.no",
-                                text: $email
-                            )
-                            .background(Color.lightBeige)
-                            .frame(width: 360)
-                            .multilineTextAlignment(.center)
-                            
+
+                            TextField("bob@mail.no", text: $email)
+                                .background(Color.mainLightBackground)
+                                .frame(width: 360)
+                                .multilineTextAlignment(.center)
+
                             Rectangle()
                                 .frame(width: 360, height: 3)
                                 .foregroundColor(.darkBeige)
-                            
-                            // Function to change password
+
                             ChangePassword()
                         }
                     }
-                    
-                    // Button for settings
+
+                    // Settings Button
                     NavigationLink(destination: Settings()) {
                         HStack {
                             Image(systemName: "gearshape")
@@ -166,14 +158,14 @@ struct Profile: View {
                         .frame(width: 200, height: 50)
                         .background(Color.white)
                     }
-                    
-                    
+
                     Spacer()
                 }
-            }
+            
         }
         .navigationTitle("Profile")
     }
+
 }
 
 

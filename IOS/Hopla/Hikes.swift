@@ -23,49 +23,43 @@ struct Hikes: View {
 
     var body: some View {
         NavigationStack {
-            filterBar
-            ZStack {
-                // To select filters for hikes
-                
-                AdaptiveColor.background.color(for: colorScheme)
-                    .ignoresSafeArea()
-                
-                List(hikes) { hike in
-                    HStack {
-                        if let uiImage = UIImage(named: hike.imageName) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                        } else {
-                            Image(systemName: hike.imageName)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 100, height: 100)
-                                .foregroundColor(.green)
+            VStack(spacing: 0) { // Ensure no extra spacing
+                filterBar
+                ZStack {
+                    AdaptiveColor.background.color(for: colorScheme)
+                        .ignoresSafeArea()
+
+                    List(hikes) { hike in
+                        HStack {
+                            if let uiImage = UIImage(named: hike.imageName) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100, height: 100)
+                            } else {
+                                Image(systemName: hike.imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                    .foregroundColor(.green)
+                            }
+                            Text(hike.name)
+                                .font(.headline)
+                                .padding(.horizontal, 20)
+                            Spacer()
                         }
-                        Text(hike.name)
-                            .font(.headline)
-                            .padding(.horizontal, 20)
-                        Spacer()
+                        .padding()
+                        .listRowBackground(AdaptiveColor.background.color(for: colorScheme))
+                        .onTapGesture {
+                            print(hike.name)
+                        }
                     }
-                    .padding()
-                    .listRowBackground(AdaptiveColor.background.color(for: colorScheme))
-                    .onTapGesture {
-                        print(hike.name)
-                    }
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
-            }
-            .onAppear {
-                setupNavigationBar(for: colorScheme) // Ensure navbar updates on view load
-            }
-            .onChange(of: colorScheme) {
-                // navbar updates immediately when switching between light and dark mode
-                setupNavigationBar(for: colorScheme)
             }
             .navigationTitle("Hikes")
         }
+
     }
     // MARK: - Filter Bar Below Logo
         private var filterBar: some View {
@@ -77,9 +71,11 @@ struct Hikes: View {
                     Text("Popular").tag("Popular")
                     Text("More").tag("More")
                 }
+                .padding(.top, 30)
                 .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
             }
-            .background(Color.lighterGreen)
+            .frame(height: 60)
+            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
         }
 }
 
@@ -91,3 +87,4 @@ struct Hikes: View {
     ContentView()
         .environment(\.locale, Locale(identifier: "nb_NO"))
 }
+

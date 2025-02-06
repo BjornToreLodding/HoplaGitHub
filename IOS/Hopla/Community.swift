@@ -19,23 +19,24 @@ struct Community: View {
     ]
     
     var body: some View {
-        NavigationStack { // Navigation
-            filterBar
-            ZStack {
-                // Background color for the entire app
-                AdaptiveColor.background.color(for: colorScheme)
-                    .ignoresSafeArea()
-                VStack {
-                    // Groups list
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(groups, id: \.image) { post in
-                                GroupContainer(imageName: post.image, comment: post.comment)
+        NavigationStack {
+            VStack(spacing: 0) { // Ensure no extra spacing
+                filterBar
+                ZStack {
+                    // Background color for the entire app
+                    AdaptiveColor.background.color(for: colorScheme)
+                        .ignoresSafeArea()
+                    VStack {
+                        // Groups list
+                        ScrollView {
+                            VStack(spacing: 10) {
+                                ForEach(groups, id: \.image) { post in
+                                    GroupContainer(imageName: post.image, comment: post.comment)
+                                }
                             }
+                            .padding()
                         }
-                        .padding()
                     }
-                    
                 }
             }
         }
@@ -47,9 +48,11 @@ struct Community: View {
                     Text("Location").tag("Location")
                     Text("Liked").tag("Liked")
                 }
+                .padding(.top, 30)
                 .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
             }
-            .background(Color.lighterGreen)
+            .frame(height: 60)
+            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
         }
 }
 

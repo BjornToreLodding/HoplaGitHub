@@ -20,20 +20,18 @@ struct Home: View {
     
     var body: some View {
         NavigationStack {
-            // Custom filter bar below the logo
-            filterBar
             ZStack {
-                // Background color for the entire app
-                AdaptiveColor.background.color(for: colorScheme)
+                Rectangle()
+                    .fill(AdaptiveColor.background.color(for: colorScheme))
                     .ignoresSafeArea()
-
+                
                 VStack {
+                    filterBar // Place inside VStack to avoid pushing content down
                     
-                    // Posts list
                     ScrollView {
                         VStack(spacing: 10) {
                             ForEach(posts, id: \.image) { post in
-                                PostContainer(imageName: post.image, comment: post.comment)
+                                PostContainer(imageName: post.image, comment: post.comment, colorScheme: colorScheme)
                             }
                         }
                         .padding()
@@ -41,48 +39,59 @@ struct Home: View {
                 }
             }
         }
-            .navigationTitle("Posts") // This comes from ContentView's NavigationStack
-        }
+
+        .navigationTitle("Posts") // This comes from ContentView's NavigationStack
+    }
     
     // MARK: - Filter Bar Below Logo
-        private var filterBar: some View {
-            HStack {
-                Picker("Filter", selection: $selectedFilter) {
-                    Text("All Posts").tag("All Posts")
-                    Text("Friends").tag("Friends")
-                    Text("Area").tag("Area")
-                    Text("Popular").tag("Popular")
-                    Text("Updates").tag("Updates")
-
-                }
-                .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
+    private var filterBar: some View {
+        HStack {
+            Picker("Filter", selection: $selectedFilter) {
+                Text("All Posts").tag("All Posts")
+                Text("Friends").tag("Friends")
+                Text("Area").tag("Area")
+                Text("Popular").tag("Popular")
+                Text("Updates").tag("Updates")
             }
-            .background(Color.lighterGreen)
+            .padding(.top, 30)
+            .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
         }
+        .frame(height: 60)
+        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+    }
 }
 
-// The posts
+
 struct PostContainer: View {
     var imageName: String
     var comment: String
+    var colorScheme: ColorScheme // Add colorScheme as a parameter
     
     var body: some View {
-        VStack {
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 360, height: 260) // Square image container
-                .clipped()
-            
-            Text(comment)
-                .padding(.top, 50)
-                .font(.body)
+        ZStack {
+            Rectangle()
+                .fill(AdaptiveColor(light: .white, dark: .darkPostBackground).color(for: colorScheme)) // Dynamic background
+                .ignoresSafeArea()
+
+            VStack {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 360, height: 260) // Square image container
+                    .clipped()
+                
+                Text(comment)
+                    .padding(.top, 50)
+                    .font(.body)
+                    .adaptiveTextColor(light: .black, dark: .white) // Text color adapts to theme
+            }
+            .frame(width: 340, height: 320) // Square container
+            .padding()
         }
-        .frame(width: 340, height: 320) // Square container
-        .padding()
-        .background(Color.white) // Light background for each post container
     }
 }
+
+
 
 #Preview("English") {
     ContentView()

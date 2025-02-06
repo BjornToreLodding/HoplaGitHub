@@ -10,22 +10,37 @@ import SwiftUI
 struct MyHikes: View {
     @Environment(\.colorScheme) var colorScheme
     
+    // Sample data
+    let posts = [
+        (image: "HorseImage", comment: "This is the first post."),
+        (image: "HorseImage2", comment: "This is the second post."),
+        (image: "HorseImage3", comment: "This is the third post."),
+    ]
+    
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Display")) {
-                    Toggle(isOn: .constant(true), label: {
-                        Text("Dark mode")
-                    })
-                    Toggle(isOn: .constant(true), label: {
-                        Text("English")
-                    })
+        NavigationStack {
+            ZStack {
+                Rectangle()
+                    .fill(AdaptiveColor.background.color(for: colorScheme))
+                    .ignoresSafeArea()
+                
+                VStack {
+                    ScrollView {
+                        VStack(spacing: 10) {
+                            ForEach(posts, id: \.image) { post in
+                                PostContainer(imageName: post.image, comment: post.comment, colorScheme: colorScheme)
+                            }
+                        }
+                        .padding()
+                    }
                 }
             }
-            .navigationTitle("My Hikes")
         }
+
+        .navigationTitle("My hikes") // This comes from ContentView's NavigationStack
     }
 }
+
 
 #Preview("English") {
     ContentView()
