@@ -22,7 +22,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
 import java.util.Locale
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
@@ -34,12 +33,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.background
-import androidx.compose.material.Divider
-import androidx.compose.material.TextField
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -55,6 +52,7 @@ import androidx.compose.ui.layout.ContentScale
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.unit.sp
 
 
@@ -121,7 +119,7 @@ fun SettingsScreen(
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back)
                     )
                 }
@@ -152,7 +150,7 @@ fun SettingsScreen(
                     .padding(start = 8.dp)
             ) {
                 LanguageSelection(languageViewModel)
-                ModeSelection(languageViewModel, themeViewModel)
+                ModeSelection(themeViewModel)
             }
         }
 
@@ -254,8 +252,8 @@ class LanguageViewModel(
 
 @Composable
 fun LanguageSelection(languageViewModel: LanguageViewModel) {
-    Column() {
-        Row() {
+    Column {
+        Row {
             Text(
                 text = "Norsk",
                 modifier = Modifier
@@ -272,9 +270,9 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
 }
 
 @Composable
-fun ModeSelection(languageViewModel: LanguageViewModel, themeViewModel: ThemeViewModel = viewModel()) {
-    Column() {
-        Row() {
+fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
+    Column {
+        Row {
             Text(
                 text = stringResource(R.string.light),
                 modifier = Modifier
@@ -461,7 +459,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
     ) {
         Column {
             Spacer(modifier = Modifier.height(8.dp))
-            Divider(color = Color.Black, thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.Black)
             Text(text = stringResource(R.string.username))
             TextField(
                 value = username,
@@ -469,7 +467,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 label = {  },
                 modifier = Modifier.fillMaxWidth()
             )
-            Divider(color = Color.Black, thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.Black)
             Text(text = stringResource(R.string.email))
             TextField(
                 value = email,
@@ -477,7 +475,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 label = { },
                 modifier = Modifier.fillMaxWidth()
             )
-            Divider(color = Color.Black, thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.Black)
             Text(
                 text = stringResource(R.string.change_password),
                 modifier = Modifier.clickable { showDialog = true },
@@ -546,7 +544,7 @@ fun MyTripsScreen(navController: NavController) {
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back)
                     )
                 }
@@ -578,7 +576,7 @@ fun FriendsScreen(navController: NavController) {
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back)
                     )
                 }
@@ -610,7 +608,7 @@ fun FollowingScreen(navController: NavController) {
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back)
                     )
                 }

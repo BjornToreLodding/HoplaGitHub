@@ -24,14 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.ui.res.stringResource
 
 @Composable
@@ -39,7 +41,7 @@ fun RoutesScreen() {
     var isMapClicked by remember { mutableStateOf(false) }
     var isCloseByClicked by remember { mutableStateOf(false) }
     var isFavoriteClicked by remember { mutableStateOf(false) }
-    var isFollwingClicked by remember { mutableStateOf(false) }
+    var isFollowingClicked by remember { mutableStateOf(false) }
     var isFiltersClicked by remember { mutableStateOf(false) }
     var starRating by remember { mutableIntStateOf(3) }
     var numRoutes by remember { mutableIntStateOf(5) }
@@ -70,12 +72,12 @@ fun RoutesScreen() {
                         if (isMapClicked) {
                             isCloseByClicked = false
                             isFavoriteClicked = false
-                            isFollwingClicked = false
+                            isFollowingClicked = false
                             isFiltersClicked = false
                         }
                     }) {
                         Icon(
-                            imageVector = if (isMapClicked) Icons.Outlined.Check else Icons.Outlined.List,
+                            imageVector = if (isMapClicked) Icons.Outlined.Check else Icons.AutoMirrored.Outlined.List,
                             contentDescription = null
                         )
                     }
@@ -84,7 +86,7 @@ fun RoutesScreen() {
                         if (isCloseByClicked) {
                             isMapClicked = false
                             isFavoriteClicked = false
-                            isFollwingClicked = false
+                            isFollowingClicked = false
                             isFiltersClicked = false
                         }
                     }) {
@@ -98,7 +100,7 @@ fun RoutesScreen() {
                         if (isFavoriteClicked) {
                             isMapClicked = false
                             isCloseByClicked = false
-                            isFollwingClicked = false
+                            isFollowingClicked = false
                             isFiltersClicked = false
                         }
                     }) {
@@ -108,8 +110,8 @@ fun RoutesScreen() {
                         )
                     }
                     IconButton(onClick = {
-                        isFollwingClicked = !isFollwingClicked
-                        if (isFollwingClicked) {
+                        isFollowingClicked = !isFollowingClicked
+                        if (isFollowingClicked) {
                             isMapClicked = false
                             isCloseByClicked = false
                             isFavoriteClicked = false
@@ -117,7 +119,7 @@ fun RoutesScreen() {
                         }
                     }) {
                         Icon(
-                            imageVector = if (isFollwingClicked) Icons.Filled.Star else Icons.TwoTone.Star,
+                            imageVector = if (isFollowingClicked) Icons.Filled.Star else Icons.TwoTone.Star,
                             contentDescription = null
                         )
                     }
@@ -127,7 +129,7 @@ fun RoutesScreen() {
                             isMapClicked = false
                             isCloseByClicked = false
                             isFavoriteClicked = false
-                            isFollwingClicked = false
+                            isFollowingClicked = false
                         }
                     }) {
                         Icon(
@@ -245,9 +247,11 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
     }
 }
 
+
 @Composable
 fun RouteClicked(onBackClick: () -> Unit) {
-    var currentImageIndex by remember { mutableStateOf(0) }
+    var currentImageIndex by remember { mutableIntStateOf(0) }
+    var userRating by remember { mutableIntStateOf(0) }
     val images = listOf(R.drawable.stockimg1, R.drawable.stockimg2)
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -273,7 +277,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                 ) {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -309,12 +313,14 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 .height(190.dp)
                                 .background(Color.Blue)
                         ) {
+                            // Display the images
                             Image(
                                 painter = painterResource(id = images[currentImageIndex]),
                                 contentDescription = "Route Image",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
+                            // Make the icons in the pictures buttons
                             IconButton(
                                 onClick = {
                                     currentImageIndex = (currentImageIndex - 1 + images.size) % images.size
@@ -323,12 +329,14 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                     .align(Alignment.CenterStart)
                                     .padding(start = 8.dp)
                             ) {
+                                // Click left icon
                                 Icon(
-                                    imageVector = Icons.Outlined.KeyboardArrowLeft,
+                                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
                                     contentDescription = "Left Arrow",
                                     tint = Color.Black
                                 )
                             }
+                            // Make the icons in the pictures buttons
                             IconButton(
                                 onClick = {
                                     currentImageIndex = (currentImageIndex + 1) % images.size
@@ -337,13 +345,15 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                     .align(Alignment.CenterEnd)
                                     .padding(end = 8.dp)
                             ) {
+                                // Click right icon
                                 Icon(
-                                    imageVector = Icons.Outlined.KeyboardArrowRight,
+                                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                                     contentDescription = "Right Arrow",
                                     tint = Color.Black
                                 )
                             }
                         }
+                        // Description below pictures
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -358,13 +368,14 @@ fun RouteClicked(onBackClick: () -> Unit) {
             }
 
             item {
-                // Start tur/ny oppdatering
+                // Row for start trip and new updates boxes
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(3.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
+                    // Start trip clickable box
                     Box(
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
@@ -376,6 +387,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         Text(text = stringResource(R.string.start_trip))
                     }
                     Spacer(modifier = Modifier.width(10.dp))
+                    // New updates clickable box
                     Box(
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
@@ -406,6 +418,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                     ) {
                         Text(text = stringResource(R.string.easy_trip_for_everyone_Parking), modifier = Modifier.padding(start = 8.dp))
                     }
+                    // Assessment box with star rating set
                     Box(
                         modifier = Modifier
                             .height(30.dp)
@@ -413,8 +426,27 @@ fun RouteClicked(onBackClick: () -> Unit) {
                             .background(Color.Magenta),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        Text(text = stringResource(R.string.assessment), modifier = Modifier.padding(start = 8.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = stringResource(R.string.assessment))
+                            Row {
+                                repeat(5) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Star,
+                                        contentDescription = null,
+                                        tint = Color.Yellow,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
+                    // My assessment box wih star rating, changeable
                     Box(
                         modifier = Modifier
                             .height(30.dp)
@@ -422,8 +454,18 @@ fun RouteClicked(onBackClick: () -> Unit) {
                             .background(Color.Magenta),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        Text(text = stringResource(R.string.my_assessment), modifier = Modifier.padding(start = 8.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = stringResource(R.string.my_assessment))
+                            StarRating(rating = userRating, onRatingChanged = { userRating = it })
+                        }
                     }
+                    // Outer box of latest update
                     Box(
                         modifier = Modifier
                             .height(30.dp)
@@ -431,6 +473,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                             .background(Color.Magenta),
                         contentAlignment = Alignment.Center
                     ) {
+                        // Inner, clickable box for latest update
                         Box(
                             modifier = Modifier
                                 .height(30.dp)
@@ -445,6 +488,23 @@ fun RouteClicked(onBackClick: () -> Unit) {
                     }
                 }
             }
+        }
+    }
+}
+
+// Function to be able to change the rating
+@Composable
+fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
+    Row {
+        repeat(5) { index ->
+            Icon(
+                imageVector = if (index < rating) Icons.Filled.Star else Icons.TwoTone.Star,
+                contentDescription = null,
+                tint = Color.Yellow,
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable { onRatingChanged(index + 1) }
+            )
         }
     }
 }
