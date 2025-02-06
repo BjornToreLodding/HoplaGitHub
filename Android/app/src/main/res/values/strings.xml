@@ -41,8 +41,16 @@
 
     <string name="send_a_report">Send en rapport</string>
     <string name="report">Rapport</string>
-    <string name="title">TIttel</string>
+    <string name="title">Tittel</string>
     <string name="send">Send</string>
     <string name="confirm">Bekreft</string>
+
+    <string name="start_trip">Start tur</string>
+    <string name="new_updates">Ny oppdatering</string>
+    <string name="easy_trip_for_everyone_Parking">Enkel tur for alle. Parkering</string>
+    <string name="assessment">Vurdering:</string>
+    <string name="my_assessment">Min vurdering:</string>
+    <string name="latest_update_about_the_route">Nyeste oppdatering om ruten</string>
+
 
 </resources>

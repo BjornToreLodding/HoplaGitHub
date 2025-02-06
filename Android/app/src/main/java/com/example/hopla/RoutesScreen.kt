@@ -31,6 +31,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun RoutesScreen() {
@@ -248,99 +250,200 @@ fun RouteClicked(onBackClick: () -> Unit) {
     var currentImageIndex by remember { mutableStateOf(0) }
     val images = listOf(R.drawable.stockimg1, R.drawable.stockimg2)
 
-    // Header
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
-            .height(60.dp)
-            .background(Color.Green)
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
-                .fillMaxHeight()
-                .background(Color.Yellow)
+                .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+                .height(60.dp)
+                .background(Color.Green)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxSize()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+                    .fillMaxHeight()
+                    .background(Color.Yellow)
             ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back"
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                    Text(
+                        text = "Boredalstien",
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     )
+                    Spacer(modifier = Modifier.width(48.dp))
                 }
-                Text(
-                    text = "Boredalstien",
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-                Spacer(modifier = Modifier.width(48.dp))
             }
         }
-    }
-    // Pictures + description
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
-            .height(250.dp)
-            .background(Color.Green)
-    ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
-                    .height(190.dp)
-                    .background(Color.Blue)
-            ) {
-                Image(
-                    painter = painterResource(id = images[currentImageIndex]),
-                    contentDescription = "Route Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-                IconButton(
-                    onClick = {
-                        currentImageIndex = (currentImageIndex - 1 + images.size) % images.size
-                    },
+
+        // Scrollable content starts here
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp)
+        ) {
+            item {
+                // Pictures + description
+                Box(
                     modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 8.dp)
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+                        .height(250.dp)
+                        .background(Color.Green)
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowLeft,
-                        contentDescription = "Left Arrow",
-                        tint = Color.Black
-                    )
-                }
-                IconButton(
-                    onClick = {
-                        currentImageIndex = (currentImageIndex + 1) % images.size
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowRight,
-                        contentDescription = "Right Arrow",
-                        tint = Color.Black
-                    )
+                    Column {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+                                .height(190.dp)
+                                .background(Color.Blue)
+                        ) {
+                            Image(
+                                painter = painterResource(id = images[currentImageIndex]),
+                                contentDescription = "Route Image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            IconButton(
+                                onClick = {
+                                    currentImageIndex = (currentImageIndex - 1 + images.size) % images.size
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(start = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.KeyboardArrowLeft,
+                                    contentDescription = "Left Arrow",
+                                    tint = Color.Black
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    currentImageIndex = (currentImageIndex + 1) % images.size
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(end = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.KeyboardArrowRight,
+                                    contentDescription = "Right Arrow",
+                                    tint = Color.Black
+                                )
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
+                                .height(50.dp)
+                                .background(Color.Red)
+                        ) {
+                            Text("Asfalt, Grus, Parkering", color = Color.Gray)
+                        }
+                    }
                 }
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
-                    .height(50.dp)
-                    .background(Color.Red)
-            ) {
-                Text("Asfalt, Grus, Parkering", color = Color.Gray)
+
+            item {
+                // Start tur/ny oppdatering
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(3.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(0.2f)
+                            .fillMaxWidth(0.3f)
+                            .background(Color.Cyan)
+                            .clickable { /* Handle click */ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = stringResource(R.string.start_trip))
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(0.2f)
+                            .fillMaxWidth(0.7f)
+                            .background(Color.Magenta)
+                            .clickable { /* Handle click */ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = stringResource(R.string.new_updates))
+                    }
+                }
+            }
+
+            item {
+                // Description Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(3.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth()
+                            .background(Color.Magenta),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(text = stringResource(R.string.easy_trip_for_everyone_Parking), modifier = Modifier.padding(start = 8.dp))
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth()
+                            .background(Color.Magenta),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(text = stringResource(R.string.assessment), modifier = Modifier.padding(start = 8.dp))
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth()
+                            .background(Color.Magenta),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(text = stringResource(R.string.my_assessment), modifier = Modifier.padding(start = 8.dp))
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth()
+                            .background(Color.Magenta),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(30.dp)
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                                .background(Color.Green)
+                                .clickable { /* Handle click */ },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = stringResource(R.string.latest_update_about_the_route))
+                        }
+                    }
+                }
             }
         }
     }
