@@ -40,7 +40,7 @@ import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
 
 @Composable
-fun RoutesScreen() {
+fun TrailsScreen() {
     var isMapClicked by remember { mutableStateOf(false) }
     var isCloseByClicked by remember { mutableStateOf(false) }
     var isFavoriteClicked by remember { mutableStateOf(false) }

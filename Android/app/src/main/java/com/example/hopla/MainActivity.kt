@@ -84,9 +84,9 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         ) {
                             composable(Screen.Home.route) { HomeScreen() }
-                            composable(Screen.Routes.route) { RoutesScreen() }
-                            composable(Screen.Map.route) { MapScreen() }
-                            composable(Screen.Stables.route) { StablesScreen() }
+                            composable(Screen.Trails.route) { TrailsScreen() }
+                            composable(Screen.NewTrip.route) { NewTripScreen() }
+                            composable(Screen.Community.route) { CommunityScreen() }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
@@ -141,9 +141,9 @@ fun TopBar() {
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         Screen.Home,
-        Screen.Routes,
-        Screen.Map,
-        Screen.Stables,
+        Screen.Trails,
+        Screen.NewTrip,
+        Screen.Community,
         Screen.Profile
     )
     val context = LocalContext.current
@@ -158,12 +158,12 @@ fun BottomNavigationBar(navController: NavHostController) {
                     when(screen) {
                         Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null)
                         Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null)
-                        Screen.Map -> Icon(Icons.Outlined.Add, contentDescription = null)
-                        Screen.Routes -> Icon(Icons.Outlined.LocationOn, contentDescription = null)
-                        Screen.Stables -> Icon(Icons.Outlined.Face, contentDescription = null)
+                        Screen.NewTrip -> Icon(Icons.Outlined.Add, contentDescription = null)
+                        Screen.Trails -> Icon(Icons.Outlined.LocationOn, contentDescription = null)
+                        Screen.Community -> Icon(Icons.Outlined.Face, contentDescription = null)
                     }
                 },
-                label = { Text(screen.titleProvider(context), fontSize = 12.sp) },
+                label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
@@ -208,9 +208,9 @@ class UserViewModel : ViewModel() {
 
 sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
     data object Home : Screen("home", { context -> context.getString(R.string.home) })
-    data object Routes : Screen("routes", { context -> context.getString(R.string.routes) })
-    data object Map : Screen("map", { context -> context.getString(R.string.map) })
-    data object Stables : Screen("stables", { context -> context.getString(R.string.stables) })
+    data object Trails : Screen("trails", { context -> context.getString(R.string.trails) })
+    data object NewTrip : Screen("new_trip", { context -> context.getString(R.string.new_trip) })
+    data object Community : Screen("community", { context -> context.getString(R.string.community) })
     data object Profile : Screen("profile", { context -> context.getString(R.string.profile) })
 }
 

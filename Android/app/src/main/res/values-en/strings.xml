@@ -57,5 +57,8 @@
     <string name="area">Area</string>
     <string name="popular">Popular</string>
     <string name="updates">Updates</string>
+    <string name="new_trip">New trip</string>
+    <string name="trails">Trails</string>
+    <string name="community">Community</string>
 
 </resources>

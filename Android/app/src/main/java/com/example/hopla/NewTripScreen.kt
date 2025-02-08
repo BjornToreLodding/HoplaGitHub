@@ -5,6 +5,6 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
 
 @Composable
-fun StablesScreen() {
-    Text(text = stringResource(R.string.stables))
+fun NewTripScreen() {
+    Text(text = stringResource(R.string.map))
 }

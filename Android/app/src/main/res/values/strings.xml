@@ -56,6 +56,9 @@
     <string name="area">Område</string>
     <string name="popular">Populært</string>
     <string name="updates">Oppdatering</string>
+    <string name="new_trip">Ny tur</string>
+    <string name="trails">Løyper</string>
+    <string name="community">Fellesskap</string>
 
 
 </resources>
