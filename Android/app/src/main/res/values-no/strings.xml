@@ -53,5 +53,10 @@
     <string name="my_assessment">Min vurdering:</string>
     <string name="latest_update_about_the_route">Nyeste oppdatering om ruten</string>
 
+    <string name="all">Alt</string>
+    <string name="area">Område</string>
+    <string name="popular">Populært</string>
+    <string name="updates">Oppdatering</string>
+
 
 </resources>

@@ -53,4 +53,9 @@
     <string name="my_assessment">My assessment:</string>
     <string name="latest_update_about_the_route">Latest update about the route</string>
 
+    <string name="all">All</string>
+    <string name="area">Area</string>
+    <string name="popular">Popular</string>
+    <string name="updates">Updates</string>
+
 </resources>
