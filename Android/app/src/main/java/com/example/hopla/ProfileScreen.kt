@@ -54,6 +54,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.unit.sp
+import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 
 
@@ -112,7 +113,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp) // Add horizontal padding
-                .background(Color.Gray)
+                .background(MaterialTheme.colorScheme.primary)
                 .padding(8.dp)
         ) {
             Row(
@@ -212,14 +213,14 @@ fun SettingsScreen(
                     // Handle sending report logic here
                     showReportDialog = false
                 }) {
-                    Text(text = stringResource(R.string.send))
+                    Text(text = stringResource(R.string.send), color = PrimaryWhite)
                     reportTitle = ""
                     reportText = ""
                 }
             },
             dismissButton = {
                 Button(onClick = { showReportDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
+                    Text(text = stringResource(R.string.cancel), color = PrimaryWhite)
                     reportTitle = ""
                     reportText = ""
                 }
@@ -345,7 +346,7 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
             modifier = Modifier
                 .size(200.dp)
                 .clip(CircleShape)
-                .border(10.dp, Color.Black, CircleShape)
+                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
         )
     } else {
         Image(
@@ -355,7 +356,7 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
             modifier = Modifier
                 .size(200.dp)
                 .clip(CircleShape)
-                .border(10.dp, Color.Black, CircleShape)
+                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
         )
     }
 
@@ -456,11 +457,11 @@ fun UserChanges(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(Color.Gray)
+            .background(MaterialTheme.colorScheme.tertiary)
     ) {
         Column {
             Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 1.dp, color = Color.Black)
+            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
             Text(text = stringResource(R.string.username))
             TextField(
                 value = username,
@@ -468,7 +469,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 label = {  },
                 modifier = Modifier.fillMaxWidth()
             )
-            HorizontalDivider(thickness = 1.dp, color = Color.Black)
+            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
             Text(text = stringResource(R.string.email))
             TextField(
                 value = email,
@@ -476,7 +477,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 label = { },
                 modifier = Modifier.fillMaxWidth()
             )
-            HorizontalDivider(thickness = 1.dp, color = Color.Black)
+            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
             Text(
                 text = stringResource(R.string.change_password),
                 modifier = Modifier.clickable { showDialog = true },
@@ -537,7 +538,7 @@ fun MyTripsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Gray)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         ) {
             Row(
@@ -569,7 +570,7 @@ fun FriendsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Gray)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         ) {
             Row(
@@ -601,7 +602,7 @@ fun FollowingScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Gray)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         ) {
             Row(

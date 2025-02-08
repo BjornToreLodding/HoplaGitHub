@@ -18,12 +18,13 @@ import androidx.lifecycle.ViewModel
 
 val PrimaryWhite = Color(0xFFFFFFFF)
 val StarColor = Color(0xFFFFEE71)
+val PrimaryBlack = Color(0xFF000000)
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF0B3D2B),
-    secondary = Color(0xFF282624),
-    tertiary = Color(0xFFCFBFAF),
-    background = Color(0xFF161818),
+    primary = Color(0xFF0B3D2B),        // Green
+    secondary = Color(0xFF282624),      // Brown
+    tertiary = Color(0xFFCFBFAF),       // light beige
+    background = Color(0xFF161818),     // Dark grey
     //surface = Color(0xFF161818),
     //onPrimary = CustomWhite,
     //onSecondary = CustomWhite,
@@ -33,10 +34,10 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF456559),
-    secondary = Color(0xFF745E4D),
-    tertiary = Color(0xFFEAE6E1),
-    background = Color(0xFFEAE6E1),
+    primary = Color(0xFF456559),        // Green
+    secondary = Color(0xFF745E4D),      // Brown
+    tertiary = Color(0xFF745E4D),       // light beige
+    background = Color(0xFFEAE6E1),           // light beige
     //surface = Color(0xFF161818),
     //onPrimary = CustomWhite,
     //onSecondary = CustomWhite,

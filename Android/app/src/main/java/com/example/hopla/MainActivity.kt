@@ -43,6 +43,7 @@ import androidx.compose.material.icons.outlined.Face
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import com.example.hopla.ui.theme.PrimaryWhite
 
 
 class MainActivity : ComponentActivity() {
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                 if (isLoggedIn) {
                     Scaffold(
                         topBar = { TopBar() },
-                        bottomBar = { BottomNavigationBar(navController, languageViewModel) }
+                        bottomBar = { BottomNavigationBar(navController) }
                     ) { innerPadding ->
                         NavHost(
                             navController = navController,
@@ -94,7 +95,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 } else {
-                    LoginScreen(languageViewModel = languageViewModel) { userViewModel.logIn() }
+                    LoginScreen { userViewModel.logIn() }
                 }
             }
         }
@@ -137,7 +138,7 @@ fun TopBar() {
 
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController, languageViewModel: LanguageViewModel) {
+fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         Screen.Home,
         Screen.Routes,
@@ -179,15 +180,12 @@ fun BottomNavigationBar(navController: NavHostController, languageViewModel: Lan
 }
 
 @Composable
-fun LoginScreen(languageViewModel: LanguageViewModel, onLogin: () -> Unit) {
-    val language = languageViewModel.selectedLanguage.value
-    val loginText = stringResource(R.string.log_in)
-    val buttonText = stringResource(R.string.log_in)
+fun LoginScreen(onLogin: () -> Unit) {
 
     Column {
-        Text(loginText)
+        Text(text = stringResource(R.string.log_in))
         Button(onClick = onLogin) {
-            Text(buttonText)
+            Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
         }
     }
 }

@@ -35,6 +35,8 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.ui.res.stringResource
+import com.example.hopla.ui.theme.PrimaryBlack
+import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
 
 @Composable
@@ -188,7 +190,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
             .fillMaxWidth()
             .padding(5.dp)
             .height(150.dp)
-            .background(Color.Gray)
+            .background(MaterialTheme.colorScheme.primary)
             .clickable(onClick = onBoxClick)
     ) {
         Column {
@@ -202,7 +204,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
             ) {
                 Text(
                     "Boredalstien",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -217,7 +219,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     Icon(
                         imageVector = if (isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = null,
-                        tint = Color.White
+                        tint = PrimaryWhite
                     )
                 }
                 Row(
@@ -242,7 +244,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     .height(45.dp)
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Asfalt, Grus, Parkering", color = Color.Gray)
+                Text("Asfalt, Grus, Parkering", color = PrimaryWhite)
             }
         }
     }
@@ -312,7 +314,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                                 .height(190.dp)
-                                .background(Color.Blue)
+                                .background(MaterialTheme.colorScheme.secondary)
                         ) {
                             // Display the images
                             Image(
@@ -334,7 +336,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
                                     contentDescription = "Left Arrow",
-                                    tint = Color.Black
+                                    tint = PrimaryBlack
                                 )
                             }
                             // Make the icons in the pictures buttons
@@ -350,7 +352,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                                     contentDescription = "Right Arrow",
-                                    tint = Color.Black
+                                    tint = PrimaryBlack
                                 )
                             }
                         }
@@ -362,7 +364,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 .height(50.dp)
                                 .background(MaterialTheme.colorScheme.primary)
                         ) {
-                            Text("Asfalt, Grus, Parkering", color = Color.Gray)
+                            Text("Asfalt, Grus, Parkering", color = PrimaryWhite)
                         }
                     }
                 }
@@ -501,7 +503,7 @@ fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
             Icon(
                 imageVector = if (index < rating) Icons.Filled.Star else Icons.TwoTone.Star,
                 contentDescription = null,
-                tint = Color.Yellow,
+                tint = StarColor,
                 modifier = Modifier
                     .size(20.dp)
                     .clickable { onRatingChanged(index + 1) }
