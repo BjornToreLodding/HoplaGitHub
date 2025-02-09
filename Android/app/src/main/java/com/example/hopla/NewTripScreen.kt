@@ -66,7 +66,8 @@ fun NewTripScreen() {
                 ) {
                     Button(
                         onClick = { isRunning = !isRunning },
-                        shape = MaterialTheme.shapes.small.copy(all = CornerSize(100)),
+                        shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
+                        modifier = Modifier.size(80.dp)
                     ) {
                         Text(text = if (isRunning) stringResource(R.string.stop) else stringResource(R.string.start))
                     }
