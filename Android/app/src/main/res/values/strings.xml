@@ -29,6 +29,8 @@
     <string name="following">Følger</string>
 
     <string name="username">Brukernavn</string>
+    <string name="password">Passord</string>
+    <string name="create_user">Opprett bruker</string>
     <string name="email">E-post</string>
     <string name="change_password">Endre passord</string>
     <string name="take_a_picture">Ta et bilde</string>
@@ -59,6 +61,8 @@
     <string name="new_trip">Ny tur</string>
     <string name="trails">Løyper</string>
     <string name="community">Fellesskap</string>
+    <string name="position">Posisjon</string>
+    <string name="liked">Liker</string>
 
 
 </resources>

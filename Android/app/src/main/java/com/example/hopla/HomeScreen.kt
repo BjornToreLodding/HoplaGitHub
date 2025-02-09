@@ -24,7 +24,6 @@ import androidx.compose.foundation.Image
 import com.example.hopla.ui.theme.PrimaryBlack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.runtime.*
 
 @Composable
 fun HomeScreen() {

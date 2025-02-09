@@ -44,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryWhite
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 
 class MainActivity : ComponentActivity() {
@@ -86,16 +88,28 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Home.route) { HomeScreen() }
                             composable(Screen.Trails.route) { TrailsScreen() }
                             composable(Screen.NewTrip.route) { NewTripScreen() }
-                            composable(Screen.Community.route) { CommunityScreen() }
+                            composable(Screen.Community.route) { CommunityScreen(navController) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("following") { FollowingScreen(navController) }
+                            // Update the composable block in MainActivity.kt
+                            composable(
+                                "communityDetail/{communityName}",
+                                arguments = listOf(navArgument("communityName") { type = NavType.StringType })
+                            ) { backStackEntry ->
+                                val communityName = backStackEntry.arguments?.getString("communityName")
+                                val communityGroup = communityName?.let { getCommunityGroupByName(it) }
+                                communityGroup?.let { CommunityDetailScreen(it) }
+                            }
                         }
                     }
                 } else {
-                    LoginScreen { userViewModel.logIn() }
+                    LoginScreen(
+                        onLogin = { userViewModel.logIn() },
+                        onCreateUser = { /* Handle create user action */ }
+                    )
                 }
             }
         }
@@ -175,17 +189,6 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                 }
             )
-        }
-    }
-}
-
-@Composable
-fun LoginScreen(onLogin: () -> Unit) {
-
-    Column {
-        Text(text = stringResource(R.string.log_in))
-        Button(onClick = onLogin) {
-            Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
         }
     }
 }

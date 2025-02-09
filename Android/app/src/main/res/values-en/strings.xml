@@ -29,6 +29,8 @@
     <string name="following">Following</string>
 
     <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="create_user">Create user</string>
     <string name="email">E-mail</string>
     <string name="change_password">Change password</string>
     <string name="take_a_picture">Take a picture</string>
@@ -60,5 +62,7 @@
     <string name="new_trip">New trip</string>
     <string name="trails">Trails</string>
     <string name="community">Community</string>
+    <string name="position">Position</string>
+    <string name="liked">Liked</string>
 
 </resources>
