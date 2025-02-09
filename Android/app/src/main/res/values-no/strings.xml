@@ -65,5 +65,10 @@
     <string name="position">Posisjon</string>
     <string name="liked">Liker</string>
 
+    <string name="start">Start</string>
+    <string name="stop">Stopp</string>
+    <string name="time">Tid</string>
+    <string name="distance">Distanse</string>
+
 
 </resources>
