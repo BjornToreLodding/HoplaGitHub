@@ -9,7 +9,23 @@ import SwiftUI
 
 struct Community: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    @State private var selectedFilter = "Location" // Track selected filter
+    // Track selected filter
+    @State private var selectedFilter: String = "location"
+    
+    // To select a filter
+    enum FilterOption: String, CaseIterable, Identifiable {
+            case location
+            case heart
+
+            var id: String { self.rawValue }
+
+            var systemImage: String {
+                switch self {
+                case .location: return "location"
+                case .heart: return "heart"
+                }
+            }
+        }
     
     // Sample data
     let groups = [
@@ -42,18 +58,18 @@ struct Community: View {
         }
     }
     // MARK: - Filter Bar Below Logo
-        private var filterBar: some View {
-            HStack {
-                Picker("Filter", selection: $selectedFilter) {
-                    Text("Location").tag("Location")
-                    Text("Liked").tag("Liked")
-                }
-                .padding(.top, 30)
-                .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
+    private var filterBar: some View {
+        HStack {
+            Picker("Filter", selection: $selectedFilter) {
+                Image(systemName: "location").tag("location")
+                Image(systemName: "heart").tag("heart")
             }
-            .frame(height: 60)
-            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+            .padding(.top, 30)
+            .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
         }
+        .frame(height: 60)
+        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+    }
 }
 
 

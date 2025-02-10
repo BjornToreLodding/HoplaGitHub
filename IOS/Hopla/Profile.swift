@@ -40,7 +40,7 @@ struct Profile: View {
                         // Profile image section
                         Circle()
                             .frame(width: 200, height: 200)
-                            .foregroundColor(.white)
+                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                             .padding(.top, 50)
 
                         if let profileImage {
@@ -58,6 +58,12 @@ struct Profile: View {
                                 .clipShape(Circle())
                                 .padding(.top, 50)
                         }
+                        /*
+                        Circle()
+                            .frame(width: 20, height: 10)
+                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .padding(.leading, 270)
+                         */
                     }
                     
                     // Profile Picture Picker
@@ -65,6 +71,7 @@ struct Profile: View {
                         Text("Change profile picture")
                             .underline()
                             .padding(.top, 10)
+                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                     }
                     .onChange(of: selectedItem) { newItem in
                         if let newItem {
@@ -78,28 +85,28 @@ struct Profile: View {
                             }
                         }
                     }
-                    
+
                     // Buttons & User Info
                     HStack(spacing: 10) {
                         NavigationLink(destination: MyHikes()) {
                             Text("My hikes")
                                 .frame(width: 120, height: 50)
-                                .background(Color.white)
-                                .foregroundColor(Color.black)
+                                .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme)) // Box
+                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme)) // Text
                         }
 
                         NavigationLink(destination: Friends()) {
                             Text("Friends")
                                 .frame(width: 120, height: 50)
-                                .background(Color.white)
-                                .foregroundColor(Color.black)
+                                .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme)) // Box
+                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme)) // Text
                         }
 
                         NavigationLink(destination: Following()) {
                             Text("Following")
                                 .frame(width: 120, height: 50)
-                                .background(Color.white)
-                                .foregroundColor(Color.black)
+                                .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme)) // Box
+                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme)) // Text
                         }
                     }
                     .padding(.top, 20)
@@ -108,40 +115,40 @@ struct Profile: View {
                     ZStack {
                         Rectangle()
                             .frame(width: 380, height: 240)
-                            .foregroundColor(.white)
+                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                             .padding(.top, 20)
 
                         VStack {
                             Rectangle()
                                 .frame(width: 360, height: 3)
-                                .foregroundColor(.darkBeige)
+                                .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
                                 .padding(.top, 10)
 
                             Text("Username")
                                 .frame(width: 360, height: 30)
-                                .background(Color.white)
+                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
 
                             TextField("Bob", text: $username)
-                                .background(Color.mainLightBackground)
+                                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                                 .frame(width: 360)
                                 .multilineTextAlignment(.center)
 
                             Rectangle()
                                 .frame(width: 360, height: 3)
-                                .foregroundColor(.darkBeige)
+                                .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
 
                             Text("E-mail")
                                 .frame(width: 360, height: 30)
-                                .background(Color.white)
+                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
 
                             TextField("bob@mail.no", text: $email)
-                                .background(Color.mainLightBackground)
+                                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                                 .frame(width: 360)
                                 .multilineTextAlignment(.center)
 
                             Rectangle()
                                 .frame(width: 360, height: 3)
-                                .foregroundColor(.darkBeige)
+                                .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
 
                             ChangePassword()
                         }
@@ -156,7 +163,7 @@ struct Profile: View {
                         }
                         .padding()
                         .frame(width: 200, height: 50)
-                        .background(Color.white)
+                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
 
                     Spacer()

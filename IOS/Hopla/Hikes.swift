@@ -9,7 +9,8 @@ import SwiftUI
 
 struct Hikes: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    @State private var selectedFilter = "Map" // Track selected filter
+    // Track selected filter
+    @State private var selectedFilter: String = "location"
 
     let hikes = [
         Hike(name: "Gjøvikrunden", imageName: "Gjøvik.jpg"),
@@ -19,6 +20,27 @@ struct Hikes: View {
         Hike(name: "Våganes", imageName: "Gjøvik.jpg"),
         Hike(name: "Bob", imageName: "Preikestolen.jpg")
     ]
+    
+    // To select a filter
+    enum FilterOption: String, CaseIterable, Identifiable {
+            case map
+            case location
+            case heart
+            case star
+            case arrow
+
+            var id: String { self.rawValue }
+
+            var systemImage: String {
+                switch self {
+                case .map: return "map"
+                case .location: return "location"
+                case .heart: return "heart"
+                case .star: return "star"
+                case .arrow: return "chevron.down"
+                }
+            }
+        }
     
 
     var body: some View {
@@ -62,21 +84,21 @@ struct Hikes: View {
 
     }
     // MARK: - Filter Bar Below Logo
-        private var filterBar: some View {
-            HStack {
-                Picker("Filter", selection: $selectedFilter) {
-                    Text("Map").tag("Map")
-                    Text("Location").tag("Location")
-                    Text("Liked").tag("Liked")
-                    Text("Popular").tag("Popular")
-                    Text("More").tag("More")
-                }
-                .padding(.top, 30)
-                .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
+    private var filterBar: some View {
+        HStack {
+            Picker("Filter", selection: $selectedFilter) {
+                Image(systemName: "map").tag("map")
+                Image(systemName: "location").tag("location")
+                Image(systemName: "heart").tag("heart")
+                Image(systemName: "star").tag("star")
+                Image(systemName: "chevron.down").tag("chevron.down")
             }
-            .frame(height: 60)
-            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+            .padding(.top, 30)
+            .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
         }
+        .frame(height: 60)
+        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+    }
 }
 
 #Preview("English") {

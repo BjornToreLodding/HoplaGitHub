@@ -2,19 +2,28 @@
   "sourceLanguage" : "en",
   "strings" : {
     "All Posts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle innlegg"
+            "value" : "Alle"
           }
         }
       }
     },
     "Antall" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antall"
+          }
+        }
+      }
     },
     "Area" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -162,6 +171,9 @@
         }
       }
     },
+    "Example?" : {
+
+    },
     "Filter" : {
       "localizations" : {
         "nb" : {
@@ -192,6 +204,9 @@
         }
       }
     },
+    "Halla" : {
+
+    },
     "Hikes" : {
       "localizations" : {
         "nb" : {
@@ -214,6 +229,7 @@
       }
     },
     "Liked" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -224,6 +240,7 @@
       }
     },
     "Location" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -233,7 +250,11 @@
         }
       }
     },
+    "Log in" : {
+
+    },
     "Map" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -244,6 +265,7 @@
       }
     },
     "More" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -264,15 +286,7 @@
       }
     },
     "My Hikes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mine turer"
-          }
-        }
-      }
+
     },
     "New Hike" : {
       "localizations" : {
@@ -285,12 +299,27 @@
       }
     },
     "Norwegian" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Norsk"
+          }
+        }
+      }
+    },
+    "Not a member? Sign up" : {
+
+    },
+    "Password" : {
 
     },
     "Pil tilbake" : {
 
     },
     "Popular" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -345,9 +374,17 @@
       }
     },
     "The app must reload to apply language change" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appen må lastes inn på nytt etter språkendring"
+          }
+        }
+      }
     },
     "Updates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {

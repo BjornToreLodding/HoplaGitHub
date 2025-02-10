@@ -12,17 +12,19 @@ struct Following: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Display")) {
-                    Toggle(isOn: .constant(true), label: {
-                        Text("Dark mode")
-                    })
-                    Toggle(isOn: .constant(true), label: {
-                        Text("English")
-                    })
+            VStack {
+                ZStack {
+                    Rectangle()
+                        .frame(width: 370, height: 70)
+                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                    Rectangle()
+                        .frame(width: 350, height: 50)
+                        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                 }
+                Spacer()
+                Text("Halla")
+                    .underline()
             }
-            .navigationTitle("Following")
         }
     }
 }

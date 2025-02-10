@@ -119,3 +119,6 @@ func setupTabBarAppearance(for colorScheme: ColorScheme) {
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 
+
+// Send mail betalinginfo - ikke legg inn ennå! Mail til it!
+// Legg inn bilder

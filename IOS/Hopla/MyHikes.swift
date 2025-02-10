@@ -20,26 +20,35 @@ struct MyHikes: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Rectangle()
-                    .fill(AdaptiveColor.background.color(for: colorScheme))
-                    .ignoresSafeArea()
+                // Background
+                AdaptiveColor.background.color(for: colorScheme)
+                    .ignoresSafeArea(edges: .all)
                 
                 VStack {
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(posts, id: \.image) { post in
-                                PostContainer(imageName: post.image, comment: post.comment, colorScheme: colorScheme)
-                            }
+                    // Top of screen is green
+                    Rectangle()
+                        .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                        .frame(height: 110)
+                        .edgesIgnoringSafeArea(.top)
+                        .padding(.top, -430)
+                }
+                // ScrollView with Posts
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(posts, id: \.image) { post in
+                            PostContainer(imageName: post.image, comment: post.comment, colorScheme: colorScheme)
                         }
-                        .padding()
                     }
+                    .padding()
                 }
             }
+            .padding(.top, 20)
         }
-
-        .navigationTitle("My hikes") // This comes from ContentView's NavigationStack
+        .navigationTitle("My Hikes") // Keeps navigation title
     }
 }
+
+
 
 
 #Preview("English") {

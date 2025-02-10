@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ChangePassword: View {
+    @Environment(\.colorScheme) var colorScheme
     @State private var isShowingSheet = false // True when clicking on text
     @State private var oldPassword = ""
     @State private var newPassword = ""
@@ -11,7 +12,7 @@ struct ChangePassword: View {
         VStack {
             Text("Change password")
                 .frame(width: 360, height: 30)
-                .background(Color.white)
+                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                 .underline(true)
                 .padding(.top, 10)
                 .onTapGesture { // When clicking on change password
