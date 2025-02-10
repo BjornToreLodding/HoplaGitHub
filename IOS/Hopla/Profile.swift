@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI // To select photos
+import UIKit
 
 struct Profile: View {
     @Environment(\.colorScheme) var colorScheme

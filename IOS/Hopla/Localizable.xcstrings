@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "All Posts" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle"
-          }
-        }
-      }
-    },
     "Antall" : {
       "localizations" : {
         "nb" : {
@@ -22,13 +11,26 @@
         }
       }
     },
-    "Area" : {
+    "Are you sure you want to delete your user?" : {
+
+    },
+    "Are you sure you want to delete your user? You will need to confirm your password." : {
       "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Område"
+            "value" : "Sikker på at du vil slette brukeren din?"
+          }
+        }
+      }
+    },
+    "Are you sure you want to log out?" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sikker på at du vil logge ut?"
           }
         }
       }
@@ -90,6 +92,16 @@
         }
       }
     },
+    "Confirm" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekreft"
+          }
+        }
+      }
+    },
     "Confirm new password" : {
       "localizations" : {
         "nb" : {
@@ -110,13 +122,12 @@
         }
       }
     },
-    "Dark Mode" : {
-      "extractionState" : "stale",
+    "Delete User" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mørk-modus"
+            "value" : "Slett bruker"
           }
         }
       }
@@ -171,8 +182,25 @@
         }
       }
     },
-    "Example?" : {
-
+    "Enter your password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn passord"
+          }
+        }
+      }
+    },
+    "Enter your username" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn brukernavn"
+          }
+        }
+      }
     },
     "Filter" : {
       "localizations" : {
@@ -228,49 +256,22 @@
         }
       }
     },
-    "Liked" : {
-      "extractionState" : "stale",
+    "Log In" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Liker"
+            "value" : "Logg inn"
           }
         }
       }
     },
-    "Location" : {
-      "extractionState" : "stale",
+    "Log Out" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Posisjon"
-          }
-        }
-      }
-    },
-    "Log in" : {
-
-    },
-    "Map" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kart"
-          }
-        }
-      }
-    },
-    "More" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mer"
+            "value" : "Logg ut"
           }
         }
       }
@@ -286,7 +287,14 @@
       }
     },
     "My Hikes" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine turer"
+          }
+        }
+      }
     },
     "New Hike" : {
       "localizations" : {
@@ -298,36 +306,28 @@
         }
       }
     },
-    "Norwegian" : {
-      "extractionState" : "stale",
+    "Not a member? Sign up" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Norsk"
+            "value" : "Ikke medlem? Ny bruker"
           }
         }
       }
     },
-    "Not a member? Sign up" : {
-
-    },
     "Password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passord"
+          }
+        }
+      }
     },
     "Pil tilbake" : {
 
-    },
-    "Popular" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Populært"
-          }
-        }
-      }
     },
     "Posts" : {
       "localizations" : {
@@ -379,17 +379,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appen må lastes inn på nytt etter språkendring"
-          }
-        }
-      }
-    },
-    "Updates" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oppdateringer"
           }
         }
       }

@@ -1,5 +1,3 @@
-// File to view everything together
-
 import SwiftUI
 
 // Struct with hikes
@@ -12,6 +10,7 @@ struct Hike: Identifiable {
 struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("isDarkMode") private var isDarkMode = false // Global dark mode setting
+    @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
     
     var body: some View {
         NavigationStack {
@@ -29,53 +28,59 @@ struct ContentView: View {
                         .ignoresSafeArea(edges: .bottom) // Ensures it covers all bottom area
                 }
                 
-                // Tab Bar and Content
-                TabView {
-                    Home()
-                        .tabItem {
-                            Image(systemName: "house")
-                            Text("Home")
-                        }
+                // Conditional View Display
+                if isLoggedIn {
+                    // Home screen if logged in
+                    TabView {
+                        Home()
+                            .tabItem {
+                                Image(systemName: "house")
+                                Text("Home")
+                            }
+                        
+                        Hikes()
+                            .tabItem {
+                                Image(systemName: "map")
+                                Text("Hikes")
+                            }
+                        
+                        NewHike()
+                            .tabItem {
+                                Image(systemName: "plus.circle")
+                                Text("New Hike")
+                            }
+                        
+                        Community()
+                            .tabItem {
+                                Image(systemName: "person.2.circle")
+                                Text("Community")
+                            }
+                        Profile()
+                            .tabItem {
+                                Image(systemName: "person")
+                                Text("Profile")
+                            }
+                        
+                    }
+                    .tint(colorScheme == .dark ? .white : .black)
+                    .onAppear {
+                        setupTabBarAppearance(for: colorScheme) // Apply correct tab bar color
+                    }
                     
-                    Hikes()
-                        .tabItem {
-                            Image(systemName: "map")
-                            Text("Hikes")
-                        }
-                    
-                    NewHike()
-                        .tabItem {
-                            Image(systemName: "plus.circle")
-                            Text("New Hike")
-                        }
-                    
-                    Community()
-                        .tabItem {
-                            Image(systemName: "person.2.circle")
-                            Text("Community")
-                        }
-                    
-                    Profile()
-                        .tabItem {
-                            Image(systemName: "person")
-                            Text("Profile")
-                        }
+                    // Overlay Logo
+                    VStack {
+                        Image("LogoUtenBakgrunn")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 40)
+                            .padding(.top, -10)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                } else {
+                    // Login screen if not logged in
+                    Login() // Your login screen
                 }
-                .tint(colorScheme == .dark ? .white : .black)
-                .onAppear {
-                    setupTabBarAppearance(for: colorScheme) // Apply correct tab bar color
-                }
-                
-                // Overlay Logo
-                VStack {
-                    Image("LogoUtenBakgrunn")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 40)
-                        .padding(.top, -10)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
             }
             .onAppear {
                 setupNavigationBar(for: colorScheme)
@@ -89,8 +94,6 @@ struct ContentView: View {
         }
     }
 }
-
-
 
 #Preview("English") {
     ContentView()

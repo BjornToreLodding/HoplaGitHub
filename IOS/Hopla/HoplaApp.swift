@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct HoplaApp: App {
+    @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if isLoggedIn == true {
+                ContentView() // Go to Home if logged in
+            } else {
+                Login() // Go to Login if not logged in
+            }
         }
     }
 }
