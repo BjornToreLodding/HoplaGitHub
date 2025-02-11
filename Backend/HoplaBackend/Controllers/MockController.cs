@@ -24,7 +24,7 @@ public class MockController : ControllerBase
         _context.Messages.RemoveRange(_context.Messages);
         _context.Stables.RemoveRange(_context.Stables);
         _context.StableMessages.RemoveRange(_context.StableMessages);
-        //_context.Friendrequests.RemoveRange(_context.Friendrequests);
+        _context.FriendRequests.RemoveRange(_context.FriendRequests);
         //_context.Rides.RemoveRange(_context.Rides); 
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);

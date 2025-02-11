@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250210193550_InitialCreate")]
+    [Migration("20250211134840_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -125,6 +125,10 @@ namespace HoplaBackend.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RUserId");
+
+                    b.HasIndex("SUserId");
 
                     b.ToTable("Messages");
                 });
@@ -311,6 +315,25 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Message", b =>
+                {
+                    b.HasOne("MyApp.Models.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("RUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("MyApp.Models.StableMessage", b =>

@@ -123,6 +123,10 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RUserId");
+
+                    b.HasIndex("SUserId");
+
                     b.ToTable("Messages");
                 });
 
@@ -308,6 +312,25 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Message", b =>
+                {
+                    b.HasOne("MyApp.Models.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("RUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("MyApp.Models.StableMessage", b =>

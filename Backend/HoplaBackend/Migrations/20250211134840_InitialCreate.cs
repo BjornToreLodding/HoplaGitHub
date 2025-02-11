@@ -44,21 +44,6 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SUserId = table.Column<int>(type: "integer", nullable: false),
-                    RUserId = table.Column<int>(type: "integer", nullable: false),
-                    MessageText = table.Column<string>(type: "text", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RideDetails",
                 columns: table => new
                 {
@@ -160,6 +145,33 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SUserId = table.Column<int>(type: "integer", nullable: false),
+                    RUserId = table.Column<int>(type: "integer", nullable: false),
+                    MessageText = table.Column<string>(type: "text", nullable: false),
+                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_RUserId",
+                        column: x => x.RUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_SUserId",
+                        column: x => x.SUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StableMessages",
                 columns: table => new
                 {
@@ -191,6 +203,16 @@ namespace HoplaBackend.Migrations
                 name: "IX_Horses_UserId",
                 table: "Horses",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_RUserId",
+                table: "Messages",
+                column: "RUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_SUserId",
+                table: "Messages",
+                column: "SUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StableMessages_StableId",
