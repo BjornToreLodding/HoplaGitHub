@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<Stable> Stables { get; set; }
     //public DbSet<StableUser> StableUsers { get; set; } 
     public DbSet<StableMessage> StableMessages { get; set; }
+    public DbSet<Trail> Trails { get; set; }
 
 
 

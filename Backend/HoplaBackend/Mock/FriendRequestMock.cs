@@ -4,7 +4,7 @@ using MyApp.Models;
 
 public static class FriendRequestMock 
 {
-    public static List<FriendRequest> GetFriendRequests(List<User> existingUsers){
+    public static List<FriendRequest> CreateFriendRequestsMock(List<User> existingUsers){
         return [
             new FriendRequest {
                 FromUserId = 1, ToUserId = 2, Status = "Accepted" //, CreatedAt = 

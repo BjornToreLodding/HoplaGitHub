@@ -2,9 +2,9 @@ using MyApp.Models;  // Dette må matche `using`-direktivet i controlleren
 
 public static class StableMessageMock
 {
-    public static List<StableMessage> GetStableMessages()  
+    public static List<StableMessage> CreateStableMessagesMock()  
     {
-        return new List<StableMessage>  // ✅ Riktig syntaks!
+        return new List<StableMessage>  // Riktig syntaks!
         {          
             new StableMessage { UserId = 1, StableId = 1, SentAt = DateTime.UtcNow.AddDays(-9), Message = "Vil noen ri idag?" },
             new StableMessage { UserId = 2, StableId = 1, SentAt = DateTime.UtcNow.AddDays(-8), Message = "Vil noen ri imorgen?" },

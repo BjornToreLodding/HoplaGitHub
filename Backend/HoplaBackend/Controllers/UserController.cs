@@ -65,11 +65,11 @@ namespace MyApp.Controllers
         //}
             var existingUsers = _context.Users.ToList();
             //legger til Horses
-            // 🔹 3. Legg til hester med eksisterende brukere
+            // 3. Legg til hester med eksisterende brukere
             var horses = HorseMock.GetHorses(existingUsers);
             _context.Horses.AddRange(horses);
 
-            // 🔹 4. Legg til andre relasjoner (Friendrequests, Messages, etc.)
+            // 4. Legg til andre relasjoner (Friendrequests, Messages, etc.)
             var friendRequests = FriendRequestMock.GetFriendRequests();
             _context.FriendRequests.AddRange(friendRequests);
             /*var horses = HorseMock.GetHorses();

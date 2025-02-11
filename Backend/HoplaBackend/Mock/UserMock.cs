@@ -2,7 +2,7 @@ using MyApp.Models;
 
 public static class UserMock 
 {
-    public static List<User> GetUsers(){
+    public static List<User> CreateUsersMock(){
         return [
             
             new User { Id = 1, Name = "Bjørn Tore Lødding", Email = "bjortlod@stud.ntnu.no", PasswordHash = "hashed_pw1", Admin = true, Premium = true, VerifiedTrail = true },

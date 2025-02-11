@@ -25,10 +25,10 @@ public class MockController : ControllerBase
         _context.Stables.RemoveRange(_context.Stables);
         _context.StableMessages.RemoveRange(_context.StableMessages);
         _context.FriendRequests.RemoveRange(_context.FriendRequests);
-        //_context.Rides.RemoveRange(_context.Rides); 
+        _context.Rides.RemoveRange(_context.Rides); 
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);
-        //_context.Trails.RemoveRange(_context.Trails);
+        _context.Trails.RemoveRange(_context.Trails);
         //_context.TrailReviews(_context.TrailReviews);
         //_context.Filters(_context.Filters);
 
@@ -41,7 +41,7 @@ public class MockController : ControllerBase
     {
         if (_context.Users.Any()) { return NoContent(); }
 
-        var users = UserMock.GetUsers();
+        var users = UserMock.CreateUsersMock();
         _context.Users.AddRange(users);
         await _context.SaveChangesAsync();
 
@@ -54,7 +54,7 @@ public class MockController : ControllerBase
         if (_context.Horses.Any()) { return NoContent(); }
 
         var existingUsers = _context.Users.ToList();
-        var horses = HorseMock.GetHorses(existingUsers);
+        var horses = HorseMock.CreateHorsesMock(existingUsers);
         _context.Horses.AddRange(horses);
         await _context.SaveChangesAsync();
 
@@ -66,7 +66,7 @@ public class MockController : ControllerBase
         if (_context.FriendRequests.Any()) { return NoContent(); }
 
         var existingUsers = _context.Users.ToList();
-        var friendRequests = FriendRequestMock.GetFriendRequests(existingUsers);
+        var friendRequests = FriendRequestMock.CreateFriendRequestsMock(existingUsers);
         _context.FriendRequests.AddRange(friendRequests);
         await _context.SaveChangesAsync();
 
@@ -88,7 +88,7 @@ public class MockController : ControllerBase
     public async Task<IActionResult> CreateStables()
     {
         if (_context.Stables.Any()) { return NoContent(); }
-        var stables = StableMock.GetStables();
+        var stables = StableMock.GetStablesMock();
         _context.Stables.AddRange(stables);
         await _context.SaveChangesAsync();
 
@@ -99,12 +99,51 @@ public class MockController : ControllerBase
     public async Task<IActionResult> CreateStableMessages()
     {
         if (_context.StableMessages.Any()) { return NoContent(); }
-        var stableMessages = StableMessageMock.GetStableMessages();
+        //Av en eller annen grunn så er det rød strek under StableMessageMock
+        var stableMessages = StableMessageMock.CreateStableMessagesMock();
         _context.StableMessages.AddRange(stableMessages);
         await _context.SaveChangesAsync();
 
         return Created();
     }
+
+    [HttpPost("createrides")]
+    public async Task<IActionResult> CreateRides()
+    {
+        if (_context.Rides.Any()) { return NoContent(); }
+        var rides = RideMock.CreateRidesMock();
+        _context.Rides.AddRange(rides);
+        await _context.SaveChangesAsync();
+
+        return Created();
+    }
+
+    
+    [HttpPost("createtrails")]
+public async Task<IActionResult> CreateTrails()
+{
+    if (_context.Trails.Any()) 
+    { 
+        return NoContent(); 
+    }
+
+    // 🟢 Hent eksisterende rides fra databasen
+    var existingRides = _context.Rides.ToList();
+
+    if (!existingRides.Any())
+    {
+        return BadRequest("Cannot create trails because there are no rides in the database.");
+    }
+
+    // 🟢 Opprett mock trails basert på eksisterende rides
+    var trails = TrailMock.CreateTrailsMock(existingRides);
+
+    _context.Trails.AddRange(trails);
+    await _context.SaveChangesAsync();
+
+    return Created();
+}
+
 
     [HttpGet("testdist")] // Bare en test
     public IActionResult GetDistances( 
@@ -148,10 +187,10 @@ public class MockController : ControllerBase
         await CreateStables();
         //await CreateStableUSers();
         await CreateStableMessages();
-        //await CreateRides();
+        await CreateRides();
         //await CreateRideDetails();
         //await CreateRideReviews();
-        //await CreateTrails();
+        await CreateTrails();
         //await CreateTrailReviews();
         //await CreateFilters;
 

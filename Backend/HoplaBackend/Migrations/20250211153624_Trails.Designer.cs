@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211153624_Trails")]
+    partial class Trails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -292,8 +295,6 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RideId");
-
                     b.ToTable("Trails");
                 });
 
@@ -381,17 +382,6 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Stable");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MyApp.Models.Trail", b =>
-                {
-                    b.HasOne("MyApp.Models.Ride", "Ride")
-                        .WithMany()
-                        .HasForeignKey("RideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ride");
                 });
 
             modelBuilder.Entity("MyApp.Models.User", b =>
