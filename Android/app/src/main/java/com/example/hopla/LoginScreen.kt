@@ -14,20 +14,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
-import okhttp3.internal.http2.Header
 
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+    var showForgottenPasswordDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -77,7 +76,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
             fontSize = 12.sp,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .clickable { showDialog = true },
+                .clickable { showForgottenPasswordDialog = true },
         )
 
         Button(
@@ -102,6 +101,92 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
             onCreateUser()
             onLogin()
         })
+    }
+
+    if (showForgottenPasswordDialog) {
+        ForgottenPasswordDialog(onDismiss = { showForgottenPasswordDialog = false })
+    }
+}
+
+
+@Composable
+fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var showInfoDialog by remember { mutableStateOf(false) }
+
+    if (showInfoDialog) {
+        InfoDialog(onDismiss = {
+            showInfoDialog = false
+            onDismiss()
+        })
+    } else {
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.background,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.forgot_password),
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Text(text = stringResource(R.string.forgotten_password_description))
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text(text = stringResource(R.string.email)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(onClick = onDismiss) {
+                            Text(text = stringResource(R.string.cancel))
+                        }
+                        Button(onClick = {
+                            showInfoDialog = true
+                        }) {
+                            Text(text = stringResource(R.string.send))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InfoDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.verification_explanation),
+                    style = TextStyle(fontSize = 16.sp),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Button(onClick = onDismiss) {
+                    Text(text = "Close")
+                }
+            }
+        }
     }
 }
 
