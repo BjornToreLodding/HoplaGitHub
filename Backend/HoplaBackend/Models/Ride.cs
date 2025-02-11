@@ -6,17 +6,17 @@ namespace MyApp.Models;
 
 public partial class Ride
 {
-    public int Id { get; set; }
+    public int Id { get; set; } //byttes fra int til Guid når det virker
 
-    public int? UserId { get; set; }
+    public int? UserId { get; set; } //Relasjon til Users-tabellen, for å kunne få opp navner på user.
 
-    public int? HorseId { get; set; }
+    public int? HorseId { get; set; } //Relasjon til Horses-tabellen, for å kunne få opp hestens navn
 
-    public DateTime Date { get; set; } = DateTime.UtcNow;
+    public DateTime Date { get; set; } = DateTime.UtcNow; //kan kalles noe annet, f.eks RideDate?
 
-    public double? Length { get; set; }
+    public double? Length { get; set; } //burde kanskje være float.
 
-    public int? Duration { get; set; }
+    public int? Duration { get; set; } //burde være float.
 
     public double? LatMean { get; set; }
 
