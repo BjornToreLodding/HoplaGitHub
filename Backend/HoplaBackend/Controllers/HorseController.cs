@@ -22,6 +22,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetHorse(int id)
         {
             //var horse = await _context.Horses.FindAsync(id);
+            //hestekommentar;
             var horse = await _context.Horses
                 .Include(h => h.User) // Henter brukerdata også
                 .FirstOrDefaultAsync(h => h.Id == id);
