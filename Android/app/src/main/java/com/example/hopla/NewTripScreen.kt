@@ -15,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +27,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun NewTripScreen() {
     var isRunning by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
     var time by remember { mutableIntStateOf(0) }
     var distance by remember { mutableStateOf(0.0) }
     var lastLocation by remember { mutableStateOf<Location?>(null) }
@@ -46,13 +44,20 @@ fun NewTripScreen() {
             if (isRunning) {
                 val newLocation = locationResult.lastLocation
                 if (newLocation != null) {
+                    Log.d("NewTripScreen", "New location: ${newLocation.latitude}, ${newLocation.longitude}")
                     lastLocation?.let {
                         val distanceIncrement = it.distanceTo(newLocation) / 1000.0
                         distance += distanceIncrement
                         Log.d("NewTripScreen", "Distance increment: $distanceIncrement km, Total distance: $distance km")
+                    } ?: run {
+                        Log.d("NewTripScreen", "Initializing lastLocation")
                     }
                     lastLocation = newLocation
+                } else {
+                    Log.d("NewTripScreen", "New location is null")
                 }
+            } else {
+                Log.d("NewTripScreen", "Location callback called but isRunning is false")
             }
         }
     }
@@ -74,8 +79,10 @@ fun NewTripScreen() {
                 )
                 return@LaunchedEffect
             }
+            Log.d("NewTripScreen", "Requesting location updates")
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         } else {
+            Log.d("NewTripScreen", "Removing location updates")
             fusedLocationClient.removeLocationUpdates(locationCallback)
         }
     }
@@ -84,11 +91,8 @@ fun NewTripScreen() {
         while (isRunning) {
             delay(1000L)
             time++
+            Log.d("NewTripScreen", "Timer incremented: $time seconds")
         }
-    }
-
-    if (showDialog) {
-        showDialog = TripDialogue(showDialog, time, distance)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -123,12 +127,7 @@ fun NewTripScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = {
-                            if (isRunning) {
-                                showDialog = true
-                            }
-                            isRunning = !isRunning
-                        },
+                        onClick = { isRunning = !isRunning },
                         shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
                         modifier = Modifier.size(85.dp)
                     ) {
@@ -150,35 +149,4 @@ fun NewTripScreen() {
             }
         }
     }
-}
-
-@Composable
-private fun TripDialogue(showDialog: Boolean, time: Int, distance: Double): Boolean {
-    var showDialog1 = showDialog
-    AlertDialog(
-        onDismissRequest = { showDialog1 = false },
-        title = { Text(text = stringResource(R.string.trip_summary)) },
-        text = {
-            Column {
-                TextField(
-                    value = stringResource(R.string.time) + ": " + String.format("%02d:%02d:%02d", time / 3600, (time % 3600) / 60, time % 60) + " | " + stringResource(R.string.distance) + ": ${String.format("%.2f km", distance)}",
-                    onValueChange = {},
-                    readOnly = true
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = "",
-                    onValueChange = {},
-                    label = { Text("Comments") }
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { showDialog1 = false }) {
-                Text("OK")
-            }
-        },
-        shape = RectangleShape
-    )
-    return showDialog1
 }
