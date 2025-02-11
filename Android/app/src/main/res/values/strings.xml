@@ -69,4 +69,10 @@
     <string name="time">Tid</string>
     <string name="distance">Distanse</string>
 
+    <string name="trip_summary">Tur sammendrag</string>
+    <string name="trip_name">Navn på turen</string>
+    <string name="description">Beskrivelse</string>
+    <string name="save">Lagre</string>
+    <string name="forgot_password">Glemt passord</string>
+
 </resources>

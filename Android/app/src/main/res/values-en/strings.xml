@@ -70,4 +70,10 @@
     <string name="time">Time</string>
     <string name="distance">Distance</string>
 
+    <string name="trip_summary">Trip summary</string>
+    <string name="trip_name">Trip name</string>
+    <string name="description">Description</string>
+    <string name="save">Save</string>
+    <string name="forgot_password">Forgot password</string>
+
 </resources>

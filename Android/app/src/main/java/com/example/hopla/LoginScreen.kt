@@ -14,10 +14,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import okhttp3.internal.http2.Header
 
@@ -52,7 +54,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text(text = stringResource(R.string.username)) },
+            label = { Text(text = stringResource(R.string.email)) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -68,6 +70,16 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 8.dp)
         )
+        Text(
+            text = stringResource(R.string.forgot_password),
+            color = PrimaryBlack,
+            textDecoration = TextDecoration.Underline,
+            fontSize = 12.sp,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable { showDialog = true },
+        )
+
         Button(
             onClick = onLogin,
             modifier = Modifier
