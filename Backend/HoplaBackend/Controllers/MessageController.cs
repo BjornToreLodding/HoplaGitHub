@@ -17,7 +17,7 @@ namespace MyApp.Controllers
         {
             _context = context;
         }
-
+        /*
         [HttpGet("all/{id}")] //returnerer alle meldinger til bruker sortert på sist sendte melding.
         //Denne lages senere
         public async Task<IActionResult> GetAllMessages(int id)
@@ -37,30 +37,61 @@ namespace MyApp.Controllers
                 
             });
         }
-        [HttpGet("{userId}")] // Returnerer meldinger mellom 2 brukere, sortert på tidspunkt
+        */
+        [HttpGet("{userId}")] // Returnerer meldinger mellom to brukere eller siste melding per bruker
         public async Task<IActionResult> GetMessagesBetweenUsers(
             int userId,
-            [FromQuery] int? id
-            ) 
+            [FromQuery] int? id) // id er optional
         {
-            var messages = await _context.Messages
-            .Include(m => m.Sender)  // ✅ Henter brukerobjektet for avsender
-            .Include(m => m.Receiver) // ✅ Henter brukerobjektet for mottaker
-            .Where(m => (m.SUserId == userId || m.RUserId == userId) && (m.SUserId == id || m.RUserId == id))
-            .OrderBy(m => m.SentAt)
-            .Select(m => new 
+            // 🟢 Hvis id er spesifisert: Hent ALLE meldinger mellom userId og id
+            if (id.HasValue)
             {
-                //Id = m.Id,
-                Content = m.MessageText,
-                Timestamp = m.SentAt,
-                SenderId = m.SUserId,
-                SenderName = m.Sender.Name,  // ✅ Henter navn på avsender
-                ReceiverId = m.RUserId,
-                ReceiverName = m.Receiver.Name  // ✅ Henter navn på mottaker
-            })
-            .ToListAsync();
+                var messages = await _context.Messages
+                    .Include(m => m.Sender)  
+                    .Include(m => m.Receiver) 
+                    .Where(m => (m.SUserId == userId || m.RUserId == userId) && 
+                                (m.SUserId == id.Value || m.RUserId == id.Value))
+                    .OrderBy(m => m.SentAt)
+                    .Select(m => new 
+                    {
+                        Content = m.MessageText,
+                        Timestamp = m.SentAt,
+                        SenderId = m.SUserId,
+                        SenderName = m.Sender.Name,
+                        ReceiverId = m.RUserId,
+                        ReceiverName = m.Receiver.Name
+                    })
+                    .ToListAsync();
 
-            return Ok(messages);
+                return Ok(messages);
+            }
+
+            // 🟢 Hvis id IKKE er spesifisert: Hent siste melding per unike samtalepartner
+            var lastMessages = await _context.Messages
+                .Where(m => m.SUserId == userId || m.RUserId == userId) // 🔹 Finn meldinger til/fra bruker
+                .OrderByDescending(m => m.SentAt)  // 🔹 Sorter etter nyeste melding først
+                .GroupBy(m => m.SUserId == userId ? m.RUserId : m.SUserId) // 🔹 Grupper etter samtalepartner
+                .Select(g => g.OrderByDescending(m => m.SentAt).First()) //  // 🔹 Velg kun den nyeste meldingen i hver gruppe
+                .ToListAsync(); // 🔹 Hent resultatet før vi inkluderer brukere
+
+            // Nå kan vi hente avsender- og mottakerinfo via en ny query
+            var messagesWithUsers = await _context.Messages
+                .Where(m => lastMessages.Select(lm => lm.Id).Contains(m.Id)) // 🔹 Finn meldingene vi akkurat fant
+                .Include(m => m.Sender) // ✅ Henter brukerinfo
+                .Include(m => m.Receiver)
+                .OrderByDescending(m => m.SentAt)
+                .Select(m => new
+                {
+                    Content = m.MessageText,
+                    Timestamp = m.SentAt,
+                    SenderId = m.SUserId,
+                    SenderName = m.Sender.Name,
+                    ReceiverId = m.RUserId,
+                    ReceiverName = m.Receiver.Name
+                })
+                .ToListAsync();
+
+            return Ok(messagesWithUsers);
         }
 
         /*[HttpGet("{userId}/{id}")] //returnerer alle meldinger som er sendt mellom 2 brukere. Trenger bedre navn
