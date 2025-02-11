@@ -46,3 +46,36 @@ public class ApiController : ControllerBase
         }
     }
 }
+/*
+   [Route("api2/[controller]")]
+    [ApiController]
+    public class UsersController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public UsersController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // 🔹 TEST-ENDPOINT: Hent alle brukere fra `users`-tabellen
+        [HttpGet("test-db")]
+        public IActionResult TestDatabase()
+        {
+            try
+            {
+                var users = _context.Users.ToList();
+                if (users.Any())
+                {
+                    return Ok(users); // ✅ Returnerer brukerne som JSON
+                }
+                return NotFound("Ingen brukere funnet.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Feil ved tilkobling til databasen: {ex.Message}");
+            }
+        }
+    }
+
+*/

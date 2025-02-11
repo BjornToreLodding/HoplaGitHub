@@ -1,0 +1,42 @@
+using System.Net.NetworkInformation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyApp.Data;
+using MyApp.Models;
+
+namespace MyApp.Controllers
+{
+ 
+    [Route("horses")]
+    [ApiController]
+    public class HorseController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public HorseController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetHorse(int id)
+        {
+            //var horse = await _context.Horses.FindAsync(id);
+            var horse = await _context.Horses
+                .Include(h => h.User) // Henter brukerdata også
+                .FirstOrDefaultAsync(h => h.Id == id);
+            if (horse == null)
+            {
+                return NotFound(); // Returnerer 404 hvis hesten ikke finnes
+            }
+
+            return Ok(new
+            {
+                id = horse.Id,
+                name = horse.Name,
+                userId = horse.UserId,
+                userName = horse.User.Name // Henter brukerens navn
+            });
+        }
+    }
+}
