@@ -22,6 +22,8 @@ struct Profile: View {
     
     @State private var email: String = "" // e-mail
     
+    @State private var navigationPath = NavigationPath()
+    
     var body: some View {
         ZStack {
             // Ensure the whole background is green
@@ -156,7 +158,7 @@ struct Profile: View {
                     }
 
                     // Settings Button
-                    NavigationLink(destination: Settings()) {
+                    NavigationLink(destination: Settings(navigationPath: $navigationPath)) {
                         HStack {
                             Image(systemName: "gearshape")
                                 .font(.system(size: 20))

@@ -11,6 +11,7 @@ struct Settings: View {
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login status
     @AppStorage("isEnglishSelected") private var isEnglishSelected = false
+    @Binding var navigationPath: NavigationPath // Receive path from ContentView
     
     // State to manage the showing of the alert
     @State private var showLogoutAlert = false
@@ -108,6 +109,7 @@ struct Settings: View {
     // Log out function
     private func logOut() {
         isLoggedIn = false // Change login status to false
+        navigationPath.removeLast(navigationPath.count) // Navigate to root (LoginView)
         print("User logged out successfully.") // Debugging log
     }
 

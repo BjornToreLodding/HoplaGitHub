@@ -13,7 +13,7 @@ struct HoplaApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if isLoggedIn == true {
+            if isLoggedIn {
                 ContentView() // Go to Home if logged in
             } else {
                 Login() // Go to Login if not logged in

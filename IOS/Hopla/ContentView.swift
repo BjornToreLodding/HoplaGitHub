@@ -11,6 +11,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("isDarkMode") private var isDarkMode = false // Global dark mode setting
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
+    @State private var path = NavigationPath() // Manage navigation manually
     
     var body: some View {
         NavigationStack {
