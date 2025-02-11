@@ -27,13 +27,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.background
-import androidx.compose.material3.TextField
+//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -467,6 +467,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = username,
                 onValueChange = { username = it },
                 label = {  },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
@@ -475,7 +476,8 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = email,
                 onValueChange = { email = it },
                 label = { },
-                modifier = Modifier.fillMaxWidth()
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
             )
             HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
             Text(
