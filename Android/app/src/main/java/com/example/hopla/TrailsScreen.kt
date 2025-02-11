@@ -46,19 +46,22 @@ fun TrailsScreen() {
     var isFavoriteClicked by remember { mutableStateOf(false) }
     var isFollowingClicked by remember { mutableStateOf(false) }
     var isFiltersClicked by remember { mutableStateOf(false) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
     var starRating by remember { mutableIntStateOf(3) }
     var numRoutes by remember { mutableIntStateOf(5) }
     var heartStates by remember { mutableStateOf(List(numRoutes) { false }) }
     var isRouteClicked by remember { mutableStateOf(false) }
+    val selectedItems = remember { mutableStateOf(setOf<String>()) }
 
-
+    // Whole page
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(bottom = 8.dp)
     ) {
+        // If the user has not clicked a specific trail
         if (!isRouteClicked) {
-            // Top box with icons
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,10 +69,12 @@ fun TrailsScreen() {
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(vertical = 8.dp)
             ) {
+                // Row to display the different icons next to each other
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
+                    // First icon: List or Map, everything else is set to false
                     IconButton(onClick = {
                         isMapClicked = !isMapClicked
                         if (isMapClicked) {
@@ -77,6 +82,7 @@ fun TrailsScreen() {
                             isFavoriteClicked = false
                             isFollowingClicked = false
                             isFiltersClicked = false
+                            isDropdownExpanded = false
                         }
                     }) {
                         Icon(
@@ -84,6 +90,7 @@ fun TrailsScreen() {
                             contentDescription = null
                         )
                     }
+                    // Second icon: Location/close to you, everything else is set to false
                     IconButton(onClick = {
                         isCloseByClicked = !isCloseByClicked
                         if (isCloseByClicked) {
@@ -91,6 +98,7 @@ fun TrailsScreen() {
                             isFavoriteClicked = false
                             isFollowingClicked = false
                             isFiltersClicked = false
+                            isDropdownExpanded = false
                         }
                     }) {
                         Icon(
@@ -98,6 +106,7 @@ fun TrailsScreen() {
                             contentDescription = null
                         )
                     }
+                    // Third icon: Favorite, everything else is set to false
                     IconButton(onClick = {
                         isFavoriteClicked = !isFavoriteClicked
                         if (isFavoriteClicked) {
@@ -105,6 +114,7 @@ fun TrailsScreen() {
                             isCloseByClicked = false
                             isFollowingClicked = false
                             isFiltersClicked = false
+                            isDropdownExpanded = false
                         }
                     }) {
                         Icon(
@@ -112,6 +122,7 @@ fun TrailsScreen() {
                             contentDescription = null
                         )
                     }
+                    // Fourth icon: Following, everything else is set to false
                     IconButton(onClick = {
                         isFollowingClicked = !isFollowingClicked
                         if (isFollowingClicked) {
@@ -119,6 +130,7 @@ fun TrailsScreen() {
                             isCloseByClicked = false
                             isFavoriteClicked = false
                             isFiltersClicked = false
+                            isDropdownExpanded = false
                         }
                     }) {
                         Icon(
@@ -126,26 +138,64 @@ fun TrailsScreen() {
                             contentDescription = null
                         )
                     }
-                    IconButton(onClick = {
-                        isFiltersClicked = !isFiltersClicked
-                        if (isFiltersClicked) {
-                            isMapClicked = false
-                            isCloseByClicked = false
-                            isFavoriteClicked = false
-                            isFollowingClicked = false
+                    // Fifth icon: Filters. Column->Box with a dropdown menu
+                    Column {
+                        Box {
+                            IconButton(onClick = { isDropdownExpanded = !isDropdownExpanded }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.KeyboardArrowDown,
+                                    contentDescription = "Filters"
+                                )
+                            }
+                            // Create the dropdown menu
+                            DropdownMenu(
+                                expanded = isDropdownExpanded,
+                                onDismissRequest = { isDropdownExpanded = false }
+                            ) {
+                                val items = listOf("Parkering", "Lite trafikk", "Asfalt", "Grus") // All items in the dropdown menue
+                                items.forEach { item ->
+                                    val isSelected = selectedItems.value.contains(item)
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                if (isSelected) {
+                                                    Icon(
+                                                        imageVector = Icons.Outlined.Check,
+                                                        contentDescription = null,
+                                                        tint = Color.Black,
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                }
+                                                Text(
+                                                    text = item,
+                                                    color = if (isSelected) Color.Black else Color.DarkGray
+                                                )
+                                            }
+                                        },
+                                        onClick = {
+                                            val newSet = selectedItems.value.toMutableSet()
+                                            if (newSet.contains(item)) {
+                                                newSet.remove(item)
+                                            } else {
+                                                newSet.add(item)
+                                            }
+                                            selectedItems.value = newSet
+                                        }
+                                    )
+                                }
+                            }
                         }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Outlined.KeyboardArrowDown,
-                            contentDescription = null
-                        )
                     }
                 }
             }
         }
-
+        // If the user has clicked a specific trail, display the function RouteClicked
         if (isRouteClicked) {
             RouteClicked(onBackClick = { isRouteClicked = false })
+        // If the user has clicked the map icon, display the map
         } else if (isMapClicked) {
             Box(
                 modifier = Modifier
@@ -155,11 +205,12 @@ fun TrailsScreen() {
             ) {
                 Text(text = "Map", color = Color.Black, fontWeight = FontWeight.Bold)
             }
+        // If the user has clicked the location icon, display the trails close to you
         } else {
             val favoriteRoutes = heartStates.mapIndexedNotNull { index, isFavorite ->
                 if (isFavorite) index else null
             }
-
+            // Display the trails
             LazyColumn {
                 val routesToDisplay = if (isFavoriteClicked) favoriteRoutes else (0 until numRoutes).toList()
 
@@ -183,6 +234,7 @@ fun TrailsScreen() {
     }
 }
 
+// Function to display the content of the trails (main page for all trails)
 @Composable
 fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Unit, onBoxClick: () -> Unit) {
     Box(
@@ -202,14 +254,20 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     .height(95.dp)
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Text(
-                    "Boredalstien",
-                    color = MaterialTheme.colorScheme.tertiary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(5.dp)
+                //Image of the trip
+                Image(
+                    painter = painterResource(id = R.drawable.stockimg1),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
                 )
+                // Semi transparent overlay for easier visibility of icons on top of the image
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                )
+                // Heart icon (clickable)
                 IconButton(
                     onClick = onHeartClick,
                     modifier = Modifier
@@ -222,6 +280,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                         tint = PrimaryWhite
                     )
                 }
+                // Star rating of the trails
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -236,7 +295,7 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     }
                 }
             }
-            // SmallBox
+            // Text box below the image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -244,13 +303,13 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                     .height(45.dp)
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Asfalt, Grus, Parkering", color = PrimaryWhite)
+                Text("Boredalstien", color = PrimaryWhite, modifier = Modifier.padding(5.dp))
             }
         }
     }
 }
 
-
+// Function to display the trail that have been clicked
 @Composable
 fun RouteClicked(onBackClick: () -> Unit) {
     var currentImageIndex by remember { mutableIntStateOf(0) }
@@ -266,6 +325,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                 .height(60.dp)
                 .background(MaterialTheme.colorScheme.secondary)
         ) {
+            // Inner box header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -273,17 +333,20 @@ fun RouteClicked(onBackClick: () -> Unit) {
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.primary)
             ) {
+                // Row in header to display items next to eachother
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    // Back button that takes the user back to the main page of trails
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
+                    // Text in the header
                     Text(
                         text = "Boredalstien",
                         modifier = Modifier.align(Alignment.CenterVertically)
@@ -300,7 +363,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                 .padding(bottom = 10.dp)
         ) {
             item {
-                // Pictures + description
+                // Pictures + description box
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -308,6 +371,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                         .height(250.dp)
                         .background(MaterialTheme.colorScheme.secondary)
                 ) {
+                    // Column for the picture
                     Column {
                         Box(
                             modifier = Modifier
