@@ -56,6 +56,42 @@ namespace MyApp.Controllers
             }
             return Ok(friendrequests);
         }
+        [HttpPut("status/{friendRequestId}")]
+        public async Task<IActionResult> UpdateFriendRequestStatus(Guid friendRequestId, [FromBody] UpdateFriendRequestStatusDto requestDto)
+        {
+            var friendRequest = await _context.FriendRequests.FindAsync(friendRequestId);
+
+            if (friendRequest == null)
+            {
+                return NotFound(new { message = "FriendRequest not found" });
+            }
+
+            // Rens og konverter status til små bokstaver
+            string currentStatus = friendRequest.Status.Trim().ToLower();
+            string newStatus = requestDto.Status.Trim().ToLower();
+
+            // Definer GYLDIGE statusendringer (fra -> til)
+            var validStatusChanges = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "pending", new HashSet<string> { "accepted", "declined" } },
+                { "accepted", new HashSet<string> { "deleted" } },
+                { "declined", new HashSet<string> { "pending" } },
+                { "deleted", new HashSet<string> { "pending" } }
+            };
+
+            // Sjekk om NÅVÆRENDE status har lovlige endringer
+            if (!validStatusChanges.ContainsKey(currentStatus) || !validStatusChanges[currentStatus].Contains(newStatus))
+            {
+                return BadRequest(new { message = $"Invalid status change from '{currentStatus}' to '{newStatus}'." });
+            }
+
+            // Oppdater statusen
+            friendRequest.Status = newStatus;
+            _context.FriendRequests.Update(friendRequest);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"FriendRequest status updated to '{newStatus}' successfully", friendRequest });
+        }
 
     }
 }
