@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250211161806_Trails-Ride-relation")]
-    partial class TrailsRiderelation
+    [Migration("20250211202717_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -247,7 +247,7 @@ namespace HoplaBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Message")
+                    b.Property<string>("MessageText")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -267,6 +267,41 @@ namespace HoplaBackend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("StableMessages");
+                });
+
+            modelBuilder.Entity("MyApp.Models.StableUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("NotifyNewMessage")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("StableAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("StableId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("StableModerator")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StableId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StableUsers");
                 });
 
             modelBuilder.Entity("MyApp.Models.Trail", b =>
@@ -368,6 +403,25 @@ namespace HoplaBackend.Migrations
                 });
 
             modelBuilder.Entity("MyApp.Models.StableMessage", b =>
+                {
+                    b.HasOne("MyApp.Models.Stable", "Stable")
+                        .WithMany()
+                        .HasForeignKey("StableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stable");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.StableUser", b =>
                 {
                     b.HasOne("MyApp.Models.Stable", "Stable")
                         .WithMany()

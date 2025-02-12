@@ -122,6 +122,29 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Trails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RideId = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Beskrivelse = table.Column<string>(type: "text", nullable: true),
+                    FilterId = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Trails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Trails_Rides_RideId",
+                        column: x => x.RideId,
+                        principalTable: "Rides",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Horses",
                 columns: table => new
                 {
@@ -179,7 +202,7 @@ namespace HoplaBackend.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     StableId = table.Column<int>(type: "integer", nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: false),
+                    MessageText = table.Column<string>(type: "text", nullable: false),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -193,6 +216,36 @@ namespace HoplaBackend.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_StableMessages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StableUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    StableId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    StableAdmin = table.Column<bool>(type: "boolean", nullable: false),
+                    StableModerator = table.Column<bool>(type: "boolean", nullable: false),
+                    NotifyNewMessage = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StableUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StableUsers_Stables_StableId",
+                        column: x => x.StableId,
+                        principalTable: "Stables",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StableUsers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -223,6 +276,21 @@ namespace HoplaBackend.Migrations
                 name: "IX_StableMessages_UserId",
                 table: "StableMessages",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StableUsers_StableId",
+                table: "StableUsers",
+                column: "StableId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StableUsers_UserId",
+                table: "StableUsers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Trails_RideId",
+                table: "Trails",
+                column: "RideId");
         }
 
         /// <inheritdoc />
@@ -244,16 +312,22 @@ namespace HoplaBackend.Migrations
                 name: "RideDetails");
 
             migrationBuilder.DropTable(
-                name: "Rides");
+                name: "StableMessages");
 
             migrationBuilder.DropTable(
-                name: "StableMessages");
+                name: "StableUsers");
+
+            migrationBuilder.DropTable(
+                name: "Trails");
 
             migrationBuilder.DropTable(
                 name: "Stables");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Rides");
         }
     }
 }

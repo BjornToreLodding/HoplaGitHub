@@ -25,7 +25,7 @@ public class TrailController : ControllerBase
         var trails = await _context.Trails
             .Include(t => t.Ride)
             .Where(t => t.Ride != null && t.Ride.LatMean.HasValue && t.Ride.LongMean.HasValue) // Fjerner null-verdier
-            .ToListAsync(); // 🔹 Flytter dataene til minnet (C#)
+            .ToListAsync(); // Flytter dataene til minnet (C#)
 
         // Beregn avstand i minnet med LINQ
         var sortedTrails = trails
@@ -34,7 +34,7 @@ public class TrailController : ControllerBase
                 t.Id,
                 t.Name,
                 t.Beskrivelse,
-                RideId = t.RideId,
+                //RideId = t.RideId,
                 Distance = GetDistance(latitude, longitude, t.Ride.LatMean.Value, t.Ride.LongMean.Value) // Nå fungerer det
             })
             .OrderBy(t => t.Distance) // Sortering skjer i minnet, ikke i SQL

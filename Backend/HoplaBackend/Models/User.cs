@@ -10,6 +10,7 @@ public class User
     [Key] //Denne er unødvendig tror jeg, fordi Id blir automatisk som PK hvis ikke man bruker [key] et annet sted.
     public int Id { get; set; } 
     //public guid Id { get; set; } //Bruker kanskje denne senere
+    public string? Alias { get; set; }
     public string? Name { get; set; }
 
     public string? Email { get; set; }

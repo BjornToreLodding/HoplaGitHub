@@ -68,6 +68,10 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("ToUserId");
+
                     b.ToTable("FriendRequests");
                 });
 
@@ -244,7 +248,7 @@ namespace HoplaBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Message")
+                    b.Property<string>("MessageText")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -264,6 +268,41 @@ namespace HoplaBackend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("StableMessages");
+                });
+
+            modelBuilder.Entity("MyApp.Models.StableUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("NotifyNewMessage")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("StableAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("StableId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("StableModerator")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StableId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StableUsers");
                 });
 
             modelBuilder.Entity("MyApp.Models.Trail", b =>
@@ -308,6 +347,9 @@ namespace HoplaBackend.Migrations
                     b.Property<bool>("Admin")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Alias")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -332,6 +374,25 @@ namespace HoplaBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MyApp.Models.FriendRequest", b =>
+                {
+                    b.HasOne("MyApp.Models.User", "FromUser")
+                        .WithMany()
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "ToUser")
+                        .WithMany()
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("ToUser");
                 });
 
             modelBuilder.Entity("MyApp.Models.Horse", b =>
@@ -365,6 +426,25 @@ namespace HoplaBackend.Migrations
                 });
 
             modelBuilder.Entity("MyApp.Models.StableMessage", b =>
+                {
+                    b.HasOne("MyApp.Models.Stable", "Stable")
+                        .WithMany()
+                        .HasForeignKey("StableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stable");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.StableUser", b =>
                 {
                     b.HasOne("MyApp.Models.Stable", "Stable")
                         .WithMany()

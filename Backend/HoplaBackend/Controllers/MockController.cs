@@ -100,6 +100,7 @@ public class MockController : ControllerBase
     {
         if (_context.StableMessages.Any()) { return NoContent(); }
         //Av en eller annen grunn så er det rød strek under StableMessageMock
+        //Oisann, nå er den borte. Kanskje det hjalp med reboot?
         var stableMessages = StableMessageMock.CreateStableMessagesMock();
         _context.StableMessages.AddRange(stableMessages);
         await _context.SaveChangesAsync();

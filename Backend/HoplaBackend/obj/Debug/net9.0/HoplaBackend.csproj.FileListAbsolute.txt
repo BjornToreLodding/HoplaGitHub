@@ -1,10 +1,3 @@
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.csproj.AssemblyReference.cache
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.AssemblyInfoInputs.cache
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.AssemblyInfo.cs
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.csproj.CoreCompileInputs.cache
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net9.0\appsettings copy.json
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net9.0\appsettings.json
@@ -105,6 +98,13 @@ C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net9.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.csproj.AssemblyReference.cache
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.AssemblyInfoInputs.cache
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.AssemblyInfo.cs
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.csproj.CoreCompileInputs.cache
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\HoplaBackend.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\scopedcss\bundle\HoplaBackend.styles.css
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\bjorn\projects\bacheloroppgave\hopla\Backend\HoplaBackend\obj\Debug\net9.0\staticwebassets.development.json

@@ -37,17 +37,6 @@ namespace MyApp.Controllers
                 created_at = user.CreatedAt
             });
         }
-        [HttpGet("{userId}/friends")]
-        public async Task<IActionResult> GetFriends(int userId)
-        {
-        
-            var friends = await _context.FriendRequests
-                .Where(fr => (fr.Status == "Accepted" || fr.Status == "accepted") && (fr.FromUserId == userId || fr.ToUserId == userId))
-                .Select(fr => fr.FromUserId == userId ? fr.ToUserId : fr.FromUserId)
-                .ToListAsync();
-
-            return Ok(friends);
-        }
 
         //Denne er flyttet til api/mock/createcontent i MockController.cs
         /*

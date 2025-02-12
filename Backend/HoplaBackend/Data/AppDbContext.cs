@@ -20,7 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<Ride> Rides { get; set; }
     public DbSet<RideDetail> RideDetails { get; set; }
     public DbSet<Stable> Stables { get; set; }
-    //public DbSet<StableUser> StableUsers { get; set; } 
+    public DbSet<StableUser> StableUsers { get; set; } 
     public DbSet<StableMessage> StableMessages { get; set; }
     public DbSet<Trail> Trails { get; set; }
 
@@ -30,6 +30,7 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         // Relasjon: En bruker kan ha mange hester
+        // ?Dette er ikke nødvendig, da EF forstår dette automatisk, men må brukes hvis man bruker Fluent API
         modelBuilder.Entity<Horse>()
             .HasOne(h => h.User) // En hest har én eier (User)
             .WithMany(u => u.Horses) // En bruker kan ha flere hester

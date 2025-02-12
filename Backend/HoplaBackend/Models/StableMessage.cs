@@ -18,7 +18,7 @@ public class StableMessage
 
     [ForeignKey("StableId")]
     public Stable? Stable { get; set; }
-    public string Message { get; set; } = null!;
+    public string MessageText { get; set; } = null!;
 
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
