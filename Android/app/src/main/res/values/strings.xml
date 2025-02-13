@@ -76,5 +76,6 @@
     <string name="forgot_password">Glemt passord</string>
     <string name="forgotten_password_description">Skriv inn e-posten din for å motta en lenke for å tilbakestille passordet ditt</string>
     <string name="verification_explanation">Sjekk mailen din for å verifisere kontoen din</string>
+    <string name="confirm_logout">Trykk bekreft for å logge ut</string>
 
 </resources>

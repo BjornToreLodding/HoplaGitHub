@@ -103,6 +103,7 @@ fun SettingsScreen(
     var showReportDialog by remember { mutableStateOf(false) }
     var reportTitle by remember { mutableStateOf("") }
     var reportText by remember { mutableStateOf("") }
+    var showLogOutDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -112,7 +113,7 @@ fun SettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp) // Add horizontal padding
+                .padding(horizontal = 8.dp)
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(8.dp)
         ) {
@@ -168,7 +169,7 @@ fun SettingsScreen(
             text = stringResource(R.string.log_out),
             modifier = Modifier
                 .padding(start = 8.dp, bottom = 8.dp)
-                .clickable { userViewModel.logOut() },
+                .clickable { showLogOutDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
 
@@ -223,6 +224,26 @@ fun SettingsScreen(
                     Text(text = stringResource(R.string.cancel), color = PrimaryWhite)
                     reportTitle = ""
                     reportText = ""
+                }
+            }
+        )
+    }
+    if (showLogOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogOutDialog = false },
+            title = { Text(text = stringResource(R.string.log_out)) },
+            text = { Text(text = stringResource(R.string.confirm_logout)) },
+            confirmButton = {
+                Button(onClick = {
+                    userViewModel.logOut()
+                    showLogOutDialog = false
+                }) {
+                    Text(text = stringResource(R.string.confirm), color = PrimaryWhite)
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showLogOutDialog = false }) {
+                    Text(text = stringResource(R.string.cancel), color = PrimaryWhite)
                 }
             }
         )
