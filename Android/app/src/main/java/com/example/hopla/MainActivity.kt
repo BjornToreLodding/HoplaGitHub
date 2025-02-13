@@ -94,14 +94,13 @@ class MainActivity : ComponentActivity() {
                             composable("my_trips") { MyTripsScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("following") { FollowingScreen(navController) }
-                            // Update the composable block in MainActivity.kt
                             composable(
                                 "communityDetail/{communityName}",
                                 arguments = listOf(navArgument("communityName") { type = NavType.StringType })
                             ) { backStackEntry ->
                                 val communityName = backStackEntry.arguments?.getString("communityName")
                                 val communityGroup = communityName?.let { getCommunityGroupByName(it) }
-                                communityGroup?.let { CommunityDetailScreen(it) }
+                                communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
                         }
                     }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,17 +32,17 @@ fun CommunityScreen(navController: NavController) {
     val groups = listOf(
         CommunityGroup(
             painterResource(R.drawable.stockimg1),
-            "This is the first group.",
+            "Horse community",
             "A modern stable with excellent facilities."
         ),
         CommunityGroup(
             painterResource(R.drawable.stockimg2),
-            "This is the second group.",
+            "Ponny community",
             "SANDNES OG JÆREN RIDEKLUBB"
         ),
         CommunityGroup(
             painterResource(R.drawable.stockimg1),
-            "This is the third group.",
+            "Donkey community",
             "BÆRUM RIDEKLUBB"
         )
     )
@@ -56,23 +58,21 @@ fun CommunityScreen(navController: NavController) {
                 .padding(top = 8.dp)
         ) {
             items(groups) { group ->
-                CommunityCard(group) {
-                    navController.navigate("communityDetail/${group.name}")
-                }
+                CommunityCard(group, navController)
             }
         }
     }
 }
 
 @Composable
-fun CommunityCard(group: CommunityGroup, onClick: () -> Unit) {
+fun CommunityCard(group: CommunityGroup, navController: NavController) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onClick() }
+            .clickable { navController.navigate("communityDetail/${group.name}") }
     ) {
         Column {
             Image(
@@ -133,23 +133,42 @@ fun TopTextCommunity() {
 }
 
 @Composable
-fun CommunityDetailScreen(communityGroup: CommunityGroup) {
+fun CommunityDetailScreen(navController: NavController, communityGroup: CommunityGroup) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = communityGroup.name,
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(
+                    text = communityGroup.name,
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = communityGroup.description,
             fontSize = 16.sp
         )
     }
 }
+
 @Composable
 // Function to retrieve the CommunityGroup object based on the communityName
 fun getCommunityGroupByName(name: String): CommunityGroup? {

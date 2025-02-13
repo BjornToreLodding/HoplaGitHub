@@ -21,6 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Hopla"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD7mCIMyuLWziayrLuPc62PUOTW3-SD76s"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
