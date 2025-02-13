@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
+using MyApp.DTOs;
 using MyApp.Models;
 
 namespace MyApp.Controllers;
@@ -73,43 +74,60 @@ public class MessageController : ControllerBase
 
         return Ok(messagesWithUsers);
     }
-    /*
+    
     [HttpPost("send")]
-    public async Task<IActionResult> SendMessage([FromBody] MessageDto messageDto)
+    public async Task<IActionResult> SendMessage([FromBody] CreateMessageDto requestDto)
     {
-        // Sjekk om avsender og mottaker eksisterer i databasen
-        var senderExists = await _context.Users.AnyAsync(u => u.Id == messageDto.SenderId);
-        var receiverExists = await _context.Users.AnyAsync(u => u.Id == messageDto.ReceiverId);
-
-        if (!senderExists || !receiverExists)
+        if (requestDto.SenderId == requestDto.ReceiverId)
         {
-            return BadRequest("Sender or Receiver does not exist.");
+            return BadRequest(new { message = "You cannot send a message to yourself." });
         }
 
-        // Opprett en ny melding basert på input fra `messageDto`
-        var message = new Message
-        {
-            SUserId = messageDto.SenderId,
-            RUserId = messageDto.ReceiverId,
-            MessageText = messageDto.Content,
-            SentAt = DateTime.UtcNow // Setter tidspunkt automatisk
-        };
+        var sender = await _context.Users.FindAsync(requestDto.SenderId);
+        var receiver = await _context.Users.FindAsync(requestDto.ReceiverId);
 
-        // Lagre meldingen i databasen
-        _context.Messages.Add(message);
+        if (sender == null || receiver == null)
+        {
+            return NotFound(new { message = "Sender or receiver not found." });
+        }
+        Console.WriteLine("milestone1");
+        var newMessage = new Message
+        {
+            Id = Guid.NewGuid(),
+            SUserId = requestDto.SenderId,
+            RUserId = requestDto.ReceiverId,
+            MessageText = requestDto.Content,
+            SentAt = DateTime.UtcNow
+        };
+        Console.WriteLine("milestone2");
+        _context.Messages.Add(newMessage);
         await _context.SaveChangesAsync();
 
-        // Returner en suksessrespons med den lagrede meldingen
-        return CreatedAtAction(nameof(GetMessageById), new { id = message.Id }, new
+        // Hent meldingen på nytt med `Include()` for å få med `Sender` og `Receiver`
+        var savedMessage = await _context.Messages
+            .Include(m => m.Sender)   // Sørg for at senderens info lastes inn
+            .Include(m => m.Receiver) // Sørg for at mottakerens info lastes inn
+            .FirstOrDefaultAsync(m => m.Id == newMessage.Id);
+
+        if (savedMessage == null)
+            {
+                return StatusCode(500, new { message = "Error retrieving saved message from database." });
+            }
+        return Ok(new
         {
-            //MessageId = message.Id,
-            SenderId = message.SUserId,
-            ReceiverId = message.RUserId,
-            Content = message.MessageText,
-            Timestamp = message.SentAt
+            id = savedMessage.Id,
+            senderId = savedMessage.Sender.Id,
+            senderName = savedMessage.Sender?.Name,
+            senderAlias = savedMessage.Sender?.Alias,
+            reveiverId = savedMessage.Receiver.Id,
+            receiverName = savedMessage.Receiver?.Name,
+            receiverAlias = savedMessage.Receiver?.Alias,
+            messageText = savedMessage.MessageText,
+            sentAt = savedMessage.SentAt
         });
     }
-    */
+
+    
     /*
     // Hjelpemetode for å hente en melding etter meldingsID, når det sendes melding.
     [HttpGet("{id}")] //Skrives om til query og integreres kanskje i den andre funksjonen.

@@ -1,6 +1,6 @@
 namespace MyApp.DTOs;
 
-public class MessageDto
+public class CreateMessageDto
 {
     public int SenderId { get; set; }
     public int ReceiverId { get; set; }

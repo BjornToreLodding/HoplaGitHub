@@ -83,4 +83,5 @@ public class StableMessageController : ControllerBase
         */
         return Ok(stablemessages);
     }
+    //Sletting av meldinger i stall. Kan kun gjøres hvis userID den som forsøker å slette er admin/moderator for stallen.
 }

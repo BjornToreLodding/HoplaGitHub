@@ -12,7 +12,9 @@ public class Stable
     public string Name { get; set; } = null!;
 
     public string? Location { get; set; }
-
+    public bool PrivateGroup { get; set; } =false; // krever godkjenning av admin/moderator før man medlem
+    public bool ModeratedMessages { get; set; } = false; // melding sendt til stall, må godkjennes av admin
+    public bool SecretGroup { get; set; } = false; //stallen vises ikke på søk.
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     //public virtual ICollection<Stablemessage> Stablemessages { get; set; } = new List<Stablemessage>();
