@@ -1,6 +1,6 @@
 namespace MyApp.DTOs;
 
-public class CreateFriendRequestDto
+public class CreateUserRelationDto
 {
     //public required Guid FromUserId { get; set; }
     //public required Guid ToUserId { get; set; }
@@ -13,7 +13,7 @@ public class CreateFriendRequestDto
 }
 
 // Eventuell annen DTO for FriendRequest
-public class FriendRequestDto
+public class UserRelationDto
 {
     public Guid Id { get; set; }
     //public Guid FromUserId { get; set; }
@@ -23,7 +23,7 @@ public class FriendRequestDto
     
     public string Status { get; set; } = string.Empty;
 }
-public class UpdateFriendRequestStatusDto
+public class UpdateUserRelationStatusDto
 {
     public required string Status { get; set; }  // For eksempel "accepted" eller "declined"
     public int? FromUserId { get; set; } //brukes ved blokkering

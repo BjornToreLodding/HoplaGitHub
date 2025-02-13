@@ -20,11 +20,11 @@ public class MockController : ControllerBase
     {
         _context.Users.RemoveRange(_context.Users);
         _context.Horses.RemoveRange(_context.Horses);
-        _context.FriendRequests.RemoveRange(_context.FriendRequests);
+        _context.UserRelations.RemoveRange(_context.UserRelations);
         _context.Messages.RemoveRange(_context.Messages);
         _context.Stables.RemoveRange(_context.Stables);
         _context.StableMessages.RemoveRange(_context.StableMessages);
-        _context.FriendRequests.RemoveRange(_context.FriendRequests);
+        _context.UserRelations.RemoveRange(_context.UserRelations);
         _context.Rides.RemoveRange(_context.Rides); 
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);
@@ -60,14 +60,14 @@ public class MockController : ControllerBase
 
         return Created();
     }
-    [HttpPost("createfriendrequests")]
-    public async Task<IActionResult> CreateFriendRequests()
+    [HttpPost("createuserrelations")]
+    public async Task<IActionResult> CreateUserRelations()
     {
-        if (_context.FriendRequests.Any()) { return NoContent(); }
+        if (_context.UserRelations.Any()) { return NoContent(); }
 
         var existingUsers = _context.Users.ToList();
-        var friendRequests = FriendRequestMock.CreateFriendRequestsMock(existingUsers);
-        _context.FriendRequests.AddRange(friendRequests);
+        var friendRequests = UserRelationMock.CreateUserRelationMock(existingUsers);
+        _context.UserRelations.AddRange(friendRequests);
         await _context.SaveChangesAsync();
 
         return Created();
@@ -128,7 +128,7 @@ public async Task<IActionResult> CreateTrails()
         return NoContent(); 
     }
 
-    // 🟢 Hent eksisterende rides fra databasen
+    // Hent eksisterende rides fra databasen
     var existingRides = _context.Rides.ToList();
 
     if (!existingRides.Any())
@@ -136,7 +136,7 @@ public async Task<IActionResult> CreateTrails()
         return BadRequest("Cannot create trails because there are no rides in the database.");
     }
 
-    // 🟢 Opprett mock trails basert på eksisterende rides
+    // Opprett mock trails basert på eksisterende rides
     var trails = TrailMock.CreateTrailsMock(existingRides);
 
     _context.Trails.AddRange(trails);
@@ -183,7 +183,7 @@ public async Task<IActionResult> CreateTrails()
         //await ClearDatabase();
         await CreateUsers();
         await CreateHorses();
-        await CreateFriendRequests();
+        await CreateUserRelations();
         await CreateMessages();
         await CreateStables();
         //await CreateStableUSers();

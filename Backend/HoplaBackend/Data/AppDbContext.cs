@@ -13,7 +13,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<FriendRequest> FriendRequests { get; set; } // Endret fra Friendrequest til FriendRequest
+    public DbSet<UserRelation> UserRelations { get; set; } // Endret fra Friendrequest til FriendRequest
     public DbSet<Message> Messages { get; set; }
     public DbSet<Filter> Filters { get; set; }
     public DbSet<Horse> Horses { get; set; }

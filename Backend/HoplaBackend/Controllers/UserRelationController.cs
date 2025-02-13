@@ -8,22 +8,22 @@ using MyApp.DTOs;
 namespace MyApp.Controllers
 {
  
-    [Route("friends")]
+    [Route("userrelations")]
     [ApiController]
-        public class FriendsController : ControllerBase
+        public class UserRelationsController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public FriendsController(AppDbContext context)
+        public UserRelationsController(AppDbContext context)
         {
             _context = context;
         }
 
 
-        [HttpGet("{userId}")]
+        [HttpGet("friends/{userId}")]
         public async Task<IActionResult> GetFriends(int userId)
         {
-            var friends = await _context.FriendRequests
+            var friends = await _context.UserRelations
                 .Where(fr => (fr.Status == "Accepted" || fr.Status == "accepted") && (fr.FromUserId == userId || fr.ToUserId == userId))
                 .Select(fr => new
                 {
@@ -39,7 +39,7 @@ namespace MyApp.Controllers
         [HttpGet("requests/{userId}")]
         public async Task<IActionResult> GetFriendRequestss(int userId)
         {
-            var friendrequests = await _context.FriendRequests
+            var friendrequests = await _context.UserRelations
                 //.Include(fr => fr.FromUserId)
                 .Where(fr => (fr.Status == "pending" || fr.Status == "Pending") && fr.ToUserId == userId)
                 .Select(fr => new
@@ -60,7 +60,7 @@ namespace MyApp.Controllers
         [HttpGet("blocked/{userId}")]
         public async Task<IActionResult> GetBlockedUsers(int userId)
         {
-            var blockedUsers = await _context.FriendRequests
+            var blockedUsers = await _context.UserRelations
                 .Where(fr => fr.FromUserId == userId && fr.Status == "blocked")
                 .Select(fr => new 
                 {
@@ -71,8 +71,8 @@ namespace MyApp.Controllers
             return Ok(blockedUsers);
         }
 
-        [HttpPost("setstatus/{userId}")]
-        public async Task<IActionResult> CreateFriendRequest([FromBody] CreateFriendRequestDto requestDto)
+        [HttpPost("new/{userId}")]
+        public async Task<IActionResult> CreateFriendRequest([FromBody] CreateUserRelationDto requestDto)
         {
             if (requestDto.FromUserId == requestDto.ToUserId)
             {
@@ -80,7 +80,7 @@ namespace MyApp.Controllers
             }
 
             // Sjekk om det allerede finnes en FriendRequest mellom brukerne
-            var existingRequest = await _context.FriendRequests
+            var existingRequest = await _context.UserRelations
                 .Where(fr => (fr.FromUserId == requestDto.FromUserId && fr.ToUserId == requestDto.ToUserId)
                         || (fr.FromUserId == requestDto.ToUserId && fr.ToUserId == requestDto.FromUserId))
                 .FirstOrDefaultAsync();
@@ -91,7 +91,7 @@ namespace MyApp.Controllers
             }
 
             // Oppretter en ny FriendRequest eller blokkering
-            var newFriendRequest = new FriendRequest
+            var newFriendRequest = new UserRelation
             {
                 Id = Guid.NewGuid(),
                 FromUserId = requestDto.FromUserId,
@@ -105,16 +105,16 @@ namespace MyApp.Controllers
                 (newFriendRequest.FromUserId, newFriendRequest.ToUserId) = (newFriendRequest.ToUserId, newFriendRequest.FromUserId);
             }
 
-            _context.FriendRequests.Add(newFriendRequest);
+            _context.UserRelations.Add(newFriendRequest);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = newFriendRequest.Status == "blocked" ? "User has been blocked." : "FriendRequest sent successfully.", newFriendRequest });
         }
 
         [HttpPut("status/{friendRequestId}")] //kan også blokkere brukere med denne.
-        public async Task<IActionResult> UpdateFriendRequestStatus(Guid friendRequestId, [FromBody] UpdateFriendRequestStatusDto requestDto)
+        public async Task<IActionResult> UpdateFriendRequestStatus(Guid friendRequestId, [FromBody] UpdateUserRelationStatusDto requestDto)
         {
-            var friendRequest = await _context.FriendRequests.FindAsync(friendRequestId);
+            var friendRequest = await _context.UserRelations.FindAsync(friendRequestId);
 
             if (friendRequest == null)
             {
@@ -161,7 +161,7 @@ namespace MyApp.Controllers
 
             // Oppdater statusen
             friendRequest.Status = newStatus;
-            _context.FriendRequests.Update(friendRequest);
+            _context.UserRelations.Update(friendRequest);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = $"FriendRequest status updated to '{newStatus}' successfully", friendRequest });

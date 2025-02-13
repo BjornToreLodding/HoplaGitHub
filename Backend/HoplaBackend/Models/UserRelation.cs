@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MyApp.Models;
 
 //Fjerne partial?
-public partial class FriendRequest
+public partial class UserRelation
 {
     //[Key]
     public Guid Id { get; set; }
