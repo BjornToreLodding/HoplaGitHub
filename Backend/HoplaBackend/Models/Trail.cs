@@ -11,7 +11,7 @@ public partial class Trail
 
     public required int RideId { get; set; }
     [ForeignKey("RideId")]
-    public required Ride Ride { get; set; }
+    public Ride Ride { get; set; } = null!;
     public required string Name { get; set; }
     public string? Beskrivelse { get; set; }
 
