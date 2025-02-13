@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 //using HoplaBackend.Models;
 
@@ -7,6 +8,7 @@ namespace MyApp.Models;
 
 public partial class Trail
 {
+    [Key]
     public int Id { get; set; }
 
     public required int RideId { get; set; }

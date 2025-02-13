@@ -29,21 +29,6 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FriendRequests",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FromUserId = table.Column<int>(type: "integer", nullable: false),
-                    ToUserId = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FriendRequests", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RideDetails",
                 columns: table => new
                 {
@@ -107,6 +92,7 @@ namespace HoplaBackend.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Alias = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Email = table.Column<string>(type: "text", nullable: true),
                     PasswordHash = table.Column<string>(type: "text", nullable: true),
@@ -252,6 +238,33 @@ namespace HoplaBackend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserRelations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FromUserId = table.Column<int>(type: "integer", nullable: false),
+                    ToUserId = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRelations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserRelations_Users_FromUserId",
+                        column: x => x.FromUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRelations_Users_ToUserId",
+                        column: x => x.ToUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Horses_UserId",
                 table: "Horses",
@@ -291,6 +304,16 @@ namespace HoplaBackend.Migrations
                 name: "IX_Trails_RideId",
                 table: "Trails",
                 column: "RideId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRelations_FromUserId",
+                table: "UserRelations",
+                column: "FromUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRelations_ToUserId",
+                table: "UserRelations",
+                column: "ToUserId");
         }
 
         /// <inheritdoc />
@@ -298,9 +321,6 @@ namespace HoplaBackend.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Filters");
-
-            migrationBuilder.DropTable(
-                name: "FriendRequests");
 
             migrationBuilder.DropTable(
                 name: "Horses");
@@ -321,13 +341,16 @@ namespace HoplaBackend.Migrations
                 name: "Trails");
 
             migrationBuilder.DropTable(
+                name: "UserRelations");
+
+            migrationBuilder.DropTable(
                 name: "Stables");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Rides");
 
             migrationBuilder.DropTable(
-                name: "Rides");
+                name: "Users");
         }
     }
 }

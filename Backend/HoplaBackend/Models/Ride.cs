@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 //using HoplaBackend.Models;
 
 namespace MyApp.Models;
 
 public partial class Ride
 {
+    [Key]
     public int Id { get; set; } //byttes fra int til Guid når det virker
 
     public int? UserId { get; set; } //Relasjon til Users-tabellen, for å kunne få opp navner på user.

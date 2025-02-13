@@ -1,5 +1,6 @@
 //using MyApp.Mock;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 
 namespace MyApp.Models;
@@ -33,8 +34,23 @@ public class MockController : ControllerBase
         //_context.Filters(_context.Filters);
 
         await _context.SaveChangesAsync();
-        return Ok("Database tømt!");
-    }
+
+        //En merkelig feil, gjør at sekvensene for Id på Stables og Rides ikke starter på 1 etter cleardatabase og createcontent. 
+        // Da blir det feil når Mock skal opprettes for StableMessages og Trails, da Id refererer til noe som ikke eksisterer
+        //Det er ikke nødvendig og kjøre dette på Users og Horses, men de er med da det virker mest logisk.
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Stables\" RESTART IDENTITY CASCADE");
+
+        // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk)
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
+
+        return Ok("Database cleared and IDs reset.");    
+        }
 
     [HttpPost("createusers")]
     public async Task<IActionResult> CreateUsers()
@@ -121,29 +137,29 @@ public class MockController : ControllerBase
 
     
     [HttpPost("createtrails")]
-public async Task<IActionResult> CreateTrails()
-{
-    if (_context.Trails.Any()) 
-    { 
-        return NoContent(); 
-    }
-
-    // Hent eksisterende rides fra databasen
-    var existingRides = _context.Rides.ToList();
-
-    if (!existingRides.Any())
+    public async Task<IActionResult> CreateTrails()
     {
-        return BadRequest("Cannot create trails because there are no rides in the database.");
+        if (_context.Trails.Any()) 
+        { 
+            return NoContent(); 
+        }
+
+        // Hent eksisterende rides fra databasen
+        var existingRides = _context.Rides.ToList();
+
+        if (!existingRides.Any())
+        {
+            return BadRequest("Cannot create trails because there are no rides in the database.");
+        }
+
+        // Opprett mock trails basert på eksisterende rides
+        var trails = TrailMock.CreateTrailsMock(existingRides);
+
+        _context.Trails.AddRange(trails);
+        await _context.SaveChangesAsync();
+
+        return Created();
     }
-
-    // Opprett mock trails basert på eksisterende rides
-    var trails = TrailMock.CreateTrailsMock(existingRides);
-
-    _context.Trails.AddRange(trails);
-    await _context.SaveChangesAsync();
-
-    return Created();
-}
 
 
     [HttpGet("testdist")] // Bare en test

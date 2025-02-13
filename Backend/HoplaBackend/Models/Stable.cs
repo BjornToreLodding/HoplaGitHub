@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Models;
 
 public class Stable
 {
+    [Key]
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;

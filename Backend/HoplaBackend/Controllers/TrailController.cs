@@ -26,34 +26,33 @@ public class TrailController : ControllerBase
             .Include(t => t.Ride)
             .ToListAsync(); 
 
+        Console.WriteLine($"Antall trails hentet fra databasen: {trails.Count}");
+
         List<object> validTrails = new List<object>();
         int excludedCount = 0;
-        string logFilePath = "logs/trail_errors.log"; // Loggfilplassering
+        string logFilePath = "logs/trail_errors.log";
         string? logDirectory = Path.GetDirectoryName(logFilePath);
 
-        // Sørg for at loggmappen finnes
         if (!string.IsNullOrEmpty(logDirectory))
         {
-        // Sørg for at loggmappen finnes
-             Directory.CreateDirectory(logDirectory);
+            Directory.CreateDirectory(logDirectory);
         }
+
         using (StreamWriter logFile = new StreamWriter(logFilePath, true))
         {
             foreach (var t in trails)
             {
-                // Sjekk om Ride eller koordinater er null
                 if (t.Ride == null || !t.Ride.LatMean.HasValue || !t.Ride.LongMean.HasValue)
                 {
                     excludedCount++;
                     string errorMessage = $"Trail '{t.Name}' (ID: {t.Id}) har ugyldige koordinater eller mangler Ride-data.";
 
                     Console.WriteLine("Warning: " + errorMessage);
-                    logFile.WriteLine($"{DateTime.UtcNow}: {errorMessage}"); // Skriv til loggfil
+                    logFile.WriteLine($"{DateTime.UtcNow}: {errorMessage}");
 
-                    continue; // Hopper over denne trailen og går til neste
+                    continue;
                 }
 
-                // Beregn avstand og legg til listen over gyldige trails
                 validTrails.Add(new
                 {
                     t.Id,
@@ -64,15 +63,13 @@ public class TrailController : ControllerBase
             }
         }
 
-        if (excludedCount > 0)
-        {
-            Console.WriteLine($"Warning: {excludedCount} trails ble utelatt på grunn av manglende data. Se loggfil for detaljer.");
-        }
+        Console.WriteLine($"Antall trails filtrert ut pga. manglende Ride/koordinater: {excludedCount}");
+        Console.WriteLine($"Antall gyldige trails som sendes til frontend: {validTrails.Count}");
 
-        // Returner de sorterte og gyldige trailsene
         var sortedTrails = validTrails.OrderBy(t => ((dynamic)t).Distance).ToList();
         return Ok(sortedTrails);
     }
+
     /*
     [HttpGet("closest")]
     public async Task<IActionResult> GetClosestTrails(
