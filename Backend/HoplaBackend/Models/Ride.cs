@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 //using HoplaBackend.Models;
 
 namespace MyApp.Models;
@@ -8,15 +9,21 @@ namespace MyApp.Models;
 public class Ride
 {
     public int Id { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public double Length { get; set; }
     public double Duration { get; set; }
 
-    public int? TrailId { get; set; }
-    public Trail? Trail { get; set; }
+    public int? UserId { get; set; }
+    [ForeignKey("UserId")]
+    public User? User { get; set; }
 
     public int? HorseId { get; set; }
+    [ForeignKey("HorseId")]
     public Horse? Horse { get; set; }
+
+    public int? TrailId { get; set; }
+    [ForeignKey("RideId")]
+    public Trail? Trail { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public RideDetail RideDetails { get; set; } = null!;
     public RideTrackingData RideTrackingDatas { get; set; } = null!;

@@ -31,8 +31,10 @@ public class MockController : ControllerBase
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);
         _context.Trails.RemoveRange(_context.Trails);
-        //_context.TrailReviews(_context.TrailReviews);
-        //_context.Filters(_context.Filters);
+        //_context.TrailReviews.RemoveRange(_context.TrailReviews);
+        //_context.TrailFilters(_context.TrailFilters);
+
+
 
         await _context.SaveChangesAsync();
 
@@ -52,8 +54,8 @@ public class MockController : ControllerBase
         // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"UserRelations_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Messages_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"UserRelations_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Messages_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableMessages_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableUsers_Id_seq\" RESTART WITH 1");
@@ -219,9 +221,11 @@ public class MockController : ControllerBase
         await CreateRides();
         //await CreateRideDetails();
         //await CreateRideReviews();
+        //await CreateRideDetailsDatas();
         await CreateTrails();
+        //await CreateTrailDetails();
         //await CreateTrailReviews();
-        //await CreateFilters;
+        //await CreateTrailFilters;
 
         return Created();
     }

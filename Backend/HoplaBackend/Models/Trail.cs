@@ -15,6 +15,8 @@ public class Trail
 
 
     public int RideId { get; set; } // FK til Ride (for å kopiere data)
+ 
+    [ForeignKey("RideId")]
     public Ride Ride { get; set; } = null!;
 
     public TrailDetail TrailDetails { get; set; } = null!;
