@@ -9,8 +9,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -18,7 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hopla.ui.theme.HoplaTheme
 import androidx.navigation.NavController
 
 data class CommunityGroup(
@@ -29,6 +33,7 @@ data class CommunityGroup(
 
 @Composable
 fun CommunityScreen(navController: NavController) {
+    var searchQuery by remember { mutableStateOf("") }
     val groups = listOf(
         CommunityGroup(
             painterResource(R.drawable.stockimg1),
@@ -46,18 +51,37 @@ fun CommunityScreen(navController: NavController) {
             "BÆRUM RIDEKLUBB"
         )
     )
+    val filteredGroups = groups.filter { it.name.contains(searchQuery, ignoreCase = true) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
+        // Filtering groups based on position and liked
         TopTextCommunity()
+        // Search bar
+        TextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text(text = stringResource(R.string.search)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(R.string.search)
+                )
+            },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+        // Displaying the groups with a scrollview
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-            items(groups) { group ->
+            items(filteredGroups) { group ->
                 CommunityCard(group, navController)
             }
         }
