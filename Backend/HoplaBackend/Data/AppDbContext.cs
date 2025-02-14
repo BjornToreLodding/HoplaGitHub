@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<Ride> Rides { get; set; }
     public DbSet<RideDetail> RideDetails { get; set; }
     public DbSet<RideTrackingData> RideTrackingDatas { get; set; }
+    public DbSet<TrackingPoint> TrackingPoints { get; set; }
     public DbSet<RideReview> RideReviews { get; set; }
     public DbSet<Stable> Stables { get; set; }
     public DbSet<StableUser> StableUsers { get; set; } 

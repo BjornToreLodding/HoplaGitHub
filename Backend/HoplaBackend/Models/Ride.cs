@@ -25,7 +25,7 @@ public class Ride
     public Trail? Trail { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public RideDetail RideDetails { get; set; } = null!;
+    public RideDetail? RideDetails { get; set; }
     public RideTrackingData RideTrackingDatas { get; set; } = null!;
     public RideReview? RideReviews { get; set; } //kan være null, hvis man ikke legger inn review
 }
