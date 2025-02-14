@@ -5,6 +5,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Models;
 
+public class Ride
+{
+    public int Id { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public double Length { get; set; }
+    public double Duration { get; set; }
+
+    public int? TrailId { get; set; }
+    public Trail? Trail { get; set; }
+
+    public int? HorseId { get; set; }
+    public Horse? Horse { get; set; }
+
+    public RideDetail RideDetails { get; set; } = null!;
+    public RideTrackingData RideTrackingDatas { get; set; } = null!;
+    public RideReview? RideReviews { get; set; } //kan være null, hvis man ikke legger inn review
+}
+/*
 public partial class Ride
 {
     [Key]
@@ -19,6 +37,9 @@ public partial class Ride
     public double? Length { get; set; } //burde kanskje være float.
 
     public int? Duration { get; set; } //burde være float.
+    public string? Description { get; set; }
+    public List<EntityImage> Images { get; set; } = new(); // Henter via EntityImageId
+
 
     public double? LatMean { get; set; }
 
@@ -37,18 +58,5 @@ public partial class Ride
 
     public string? CoordinatesAll { get; set; }
 
-    public byte[]? Picturethumb { get; set; }
-
-    public byte[]? Picturefull { get; set; }
-
-
-
-/*
-    public virtual Horse? Horse { get; set; }
-
-    public virtual RideDetail? RideDetail { get; set; }
-
-    public virtual User? User { get; set; }
-
-*/
 }
+*/

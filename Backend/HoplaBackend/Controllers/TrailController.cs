@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 using MyApp.Models;
 using System.IO;
+using HoplaBackend;
 
 namespace MyApp.Controllers;
 
@@ -23,10 +24,11 @@ public class TrailController : ControllerBase
         [FromQuery] double longitude)
     {
         var trails = await _context.Trails
-            .Include(t => t.Ride)
-            .ToListAsync(); 
+            .Include(t => t.Ride)         // Hvis Ride fortsatt finnes
+            .Include(t => t.Ride.RideDetails)    // Legger til RideDetail
+    .ToListAsync();
 
-        Console.WriteLine($"Antall trails hentet fra databasen: {trails.Count}");
+        //Console.WriteLine($"Antall trails hentet fra databasen: {trails.Count}");
 
         List<object> validTrails = new List<object>();
         int excludedCount = 0;
@@ -42,14 +44,13 @@ public class TrailController : ControllerBase
         {
             foreach (var t in trails)
             {
-                if (t.Ride == null || !t.Ride.LatMean.HasValue || !t.Ride.LongMean.HasValue)
+                if (t.Ride == null || !t.Ride.RideDetails.LatMean.HasValue || !t.Ride.RideDetails.LatMean.HasValue)
                 {
                     excludedCount++;
-                    string errorMessage = $"Trail '{t.Name}' (ID: {t.Id}) har ugyldige koordinater eller mangler Ride-data.";
+                    string errorMessage = $"Trail '{t.Name}' (ID: {t.Id}) har ugyldige koordinater eller mangler RideData.";
 
                     Console.WriteLine("Warning: " + errorMessage);
                     logFile.WriteLine($"{DateTime.UtcNow}: {errorMessage}");
-
                     continue;
                 }
 
@@ -57,18 +58,19 @@ public class TrailController : ControllerBase
                 {
                     t.Id,
                     t.Name,
-                    t.Beskrivelse,
-                    Distance = GetDistance(latitude, longitude, t.Ride.LatMean.Value, t.Ride.LongMean.Value)
+                    t.TrailDetails.Description, 
+                    Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.Ride.RideDetails.LatMean.Value, t.Ride.RideDetails.LatMean.Value)
                 });
             }
         }
 
-        Console.WriteLine($"Antall trails filtrert ut pga. manglende Ride/koordinater: {excludedCount}");
+        Console.WriteLine($"Antall trails filtrert ut pga. manglende RideData/koordinater: {excludedCount}");
         Console.WriteLine($"Antall gyldige trails som sendes til frontend: {validTrails.Count}");
 
         var sortedTrails = validTrails.OrderBy(t => ((dynamic)t).Distance).ToList();
         return Ok(sortedTrails);
     }
+
 
     /*
     [HttpGet("closest")]

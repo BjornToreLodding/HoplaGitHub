@@ -1,4 +1,5 @@
 //using MyApp.Mock;
+using HoplaBackend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
@@ -175,22 +176,22 @@ public class MockController : ControllerBase
 
     [HttpGet("testdist")] // Bare en test
     public IActionResult GetDistances( 
-        [FromQuery] float? lat1, 
-        [FromQuery] float? long1, 
-        [FromQuery] float? lat2,
-        [FromQuery] float? long2)
+        [FromQuery] double? lat1, 
+        [FromQuery] double? long1, 
+        [FromQuery] double? lat2,
+        [FromQuery] double? long2)
     {
         // Standardverdier hvis ingen query parameters er gitt
-        float defaultLat1 = 60.7925f;
-        float defaultLong1 = 10.695f;
-        float defaultLat2 = 60.95558f;
-        float defaultLong2 = 10.6115f;
+        double defaultLat1 = 60.7925f;
+        double defaultLong1 = 10.695f;
+        double defaultLat2 = 60.95558f;
+        double defaultLong2 = 10.6115f;
 
         // Bruk verdiene fra query parameters. Hvis de ikke er oppgitt brukes standardverdiene som oppgitt ovenfor.
-        float lat1Value = lat1 ?? defaultLat1;
-        float long1Value = long1 ?? defaultLong1;
-        float lat2Value = lat2 ?? defaultLat2;
-        float long2Value = long2 ?? defaultLong2;
+        double lat1Value = lat1 ?? defaultLat1;
+        double long1Value = long1 ?? defaultLong1;
+        double lat2Value = lat2 ?? defaultLat2;
+        double long2Value = long2 ?? defaultLong2;
 
         // Beregn avstandene med DistanceCalc-klassen
         var distances = new

@@ -16,6 +16,7 @@ public class User
     public string? Email { get; set; }
 
     public string? PasswordHash { get; set; }
+    public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL
 
     public bool Admin { get; set; } = false;
     public bool Premium { get; set; } = false;
@@ -25,7 +26,7 @@ public class User
     
     //[Required]
     public DateTime? Dob { get; set; } = DateTime.UtcNow;
-
+    public List<EntityImage> Images { get; set; } = new(); // Henter via EntityImageId
     public ICollection<Horse> Horses { get; set; } = new List<Horse>();
 
     //public ICollection<Friendrequest>? FriendRequests {get;set;}

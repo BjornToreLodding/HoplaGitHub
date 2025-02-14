@@ -6,6 +6,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyApp.Models;
 
+public class Trail
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public double LatMean { get; set; }
+    public double LongMean { get; set; }
+
+
+    public int RideId { get; set; } // FK til Ride (for å kopiere data)
+    public Ride Ride { get; set; } = null!;
+
+    public TrailDetail TrailDetails { get; set; } = null!;
+    public TrailAllCoordinate TrailAllCoordinates { get; set; } = null!;
+    public TrailFilter TrailFilters { get; set; } = null!;
+    public List<TrailReview> TrailReviews { get; set; } = new();
+}
+/*
 public partial class Trail
 {
     [Key]
@@ -25,3 +42,4 @@ public partial class Trail
 
     //public virtual TrailDetail? TrailDetail { get; set; }
 }
+*/
