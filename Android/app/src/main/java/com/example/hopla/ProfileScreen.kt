@@ -56,6 +56,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.compose.runtime.mutableStateOf
 
 
 @Composable
@@ -100,10 +103,15 @@ fun SettingsScreen(
     userViewModel: UserViewModel,
     navController: NavController
 ) {
+    // State variables for sending a report
     var showReportDialog by remember { mutableStateOf(false) }
     var reportTitle by remember { mutableStateOf("") }
     var reportText by remember { mutableStateOf("") }
+    // State variables for logging out
     var showLogOutDialog by remember { mutableStateOf(false) }
+    // State variables for deleting user
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -177,7 +185,7 @@ fun SettingsScreen(
             text = stringResource(R.string.delete_user),
             modifier = Modifier
                 .padding(start = 8.dp)
-                .clickable { userViewModel.deleteUser() },
+                .clickable { showDeleteDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
     }
@@ -248,12 +256,42 @@ fun SettingsScreen(
             }
         )
     }
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(text = stringResource(R.string.delete_user)) },
+            text = {
+                Column {
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(text = stringResource(R.string.confirm_password)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    // Handle delete user logic here
+                    userViewModel.deleteUser()
+                    showDeleteDialog = false
+                }) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 class LanguageViewModel(
-    private val context: Context,
+    application: Application,
     private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _selectedLanguage = mutableStateOf(savedStateHandle.get<String>("language") ?: "Norwegian")
     val selectedLanguage: State<String> = _selectedLanguage
@@ -261,15 +299,15 @@ class LanguageViewModel(
     fun setLanguage(language: String) {
         _selectedLanguage.value = language
         savedStateHandle["language"] = language
-        setLocale(context, if (language == "Norwegian") "no" else "en")
+        setLocale(getApplication(), if (language == "Norwegian") "no" else "en")
     }
 
     private fun setLocale(context: Context, languageCode: String) {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
-        val config = Configuration()
+        val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        context.createConfigurationContext(config)
     }
 }
 
