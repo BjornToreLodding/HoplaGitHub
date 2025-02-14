@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -39,10 +40,9 @@ data class CommunityGroup(
 // Composable function to display the community screen
 @Composable
 fun CommunityScreen(navController: NavController) {
-    var searchQuery by remember { mutableStateOf("") }              // Search query for filtering the groups
-    var showLikedOnly by remember { mutableStateOf(false) }         // Boolean to show only liked groups
-    val likedGroups = remember { mutableStateListOf<CommunityGroup>() }   // List of liked groups
-    // List of community groups
+    var searchQuery by remember { mutableStateOf("") }
+    var showLikedOnly by remember { mutableStateOf(false) }
+    val likedGroups = remember { mutableStateListOf<CommunityGroup>() }
     val groups = listOf(
         CommunityGroup(
             painterResource(R.drawable.stockimg1),
@@ -60,44 +60,49 @@ fun CommunityScreen(navController: NavController) {
             "BÆRUM RIDEKLUBB"
         )
     )
-    // Filter the groups based on the search query and liked groups
     val filteredGroups = groups.filter {
         it.name.contains(searchQuery, ignoreCase = true) &&
                 (!showLikedOnly || likedGroups.contains(it))
     }
 
-    // Display the community screen
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        // Top text for filtering the groups
-        TopTextCommunity(showLikedOnly) { showLikedOnly = it }
-        // Search bar for filtering the groups
-        TextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            label = { Text(text = stringResource(R.string.search)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.search)
-                )
-            },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
-        // Scroll view for displaying the groups
-        LazyColumn(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp)
         ) {
-            items(filteredGroups) { group ->
-                CommunityCard(group, navController, likedGroups)
+            TopTextCommunity(showLikedOnly) { showLikedOnly = it }
+            TextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text(text = stringResource(R.string.search)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = stringResource(R.string.search)
+                    )
+                },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 8.dp)
+            ) {
+                items(filteredGroups) { group ->
+                    CommunityCard(group, navController, likedGroups)
+                }
             }
+        }
+        FloatingActionButton(
+            onClick = { navController.navigate("addCommunityScreen") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
     }
 }
@@ -207,7 +212,6 @@ fun TopTextCommunity(showLikedOnly: Boolean, onShowLikedOnlyChange: (Boolean) ->
     }
 }
 
-// Detail screen for a community group
 @Composable
 fun CommunityDetailScreen(navController: NavController, communityGroup: CommunityGroup) {
     Column(
@@ -268,3 +272,35 @@ fun getCommunityGroupByName(name: String): CommunityGroup? {
     return groups.find { it.name == name }
 }
 
+// Add a new community group screen
+@Composable
+fun AddCommunityScreen(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(
+                    text = "Add",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+        }
+    }
+}

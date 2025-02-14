@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
                                 val communityGroup = communityName?.let { getCommunityGroupByName(it) }
                                 communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
+                            composable("addCommunityScreen") { AddCommunityScreen(navController) }
                         }
                     }
                 } else {
