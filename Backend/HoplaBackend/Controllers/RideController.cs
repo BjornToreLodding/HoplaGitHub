@@ -120,9 +120,14 @@ public class RideController : ControllerBase
                 _context.RideReviews.Update(ride.RideReviews);
             }
         }
+
+        //
+        // Det er en feil i denne delen som må rettes opp.
+        //
         //if (request.Images != null && request.Images.Any())
         //    ride.Images = request.Images; // Anta at Images er en liste av URL-er 
 
+        /*
         if (request.Images != null && request.Images.Any())
         {
             if (ride.RideDetails == null)
@@ -138,12 +143,13 @@ public class RideController : ControllerBase
             // Opprett nye EntityImages for de nye bildene
             var newEntityImages = request.Images.Select(img => new EntityImages
             {
-                RideDetailsId = ride.RideDetails.Id, // ✅ Knytter til riktig RideDetails
+                RideDetailsId = ride.RideDetails.Id, // Knytter til riktig RideDetails
                 ImageUrl = img  // Anta at `request.Images` er en liste med URL-er
             }).ToList();
 
             _context.EntityImages.AddRange(newEntityImages);
         }
+        */
 
         _context.Rides.Update(ride);
         await _context.SaveChangesAsync();
