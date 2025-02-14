@@ -602,6 +602,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
         )
     }
 }
+
 @Composable
 fun MyTripsScreen(navController: NavController) {
     Column(
@@ -612,11 +613,13 @@ fun MyTripsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .border(10.dp, MaterialTheme.colorScheme.primary)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -624,10 +627,14 @@ fun MyTripsScreen(navController: NavController) {
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.my_trips),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 24.sp
                 )
             }
         }
@@ -644,11 +651,13 @@ fun FriendsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .border(10.dp, MaterialTheme.colorScheme.primary)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -656,10 +665,14 @@ fun FriendsScreen(navController: NavController) {
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.friends),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 24.sp
                 )
             }
         }
@@ -676,11 +689,13 @@ fun FollowingScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .border(10.dp, MaterialTheme.colorScheme.primary)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -688,10 +703,14 @@ fun FollowingScreen(navController: NavController) {
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.following),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 24.sp
                 )
             }
         }
