@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
@@ -57,9 +56,8 @@ import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
-import androidx.compose.runtime.mutableStateOf
-
 
 @Composable
 fun ProfileScreen(
@@ -145,30 +143,39 @@ fun SettingsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
-            ) {
-                Text(text = stringResource(R.string.language))
-                Text(text = stringResource(R.string.mode))
-            }
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-            ) {
-                LanguageSelection(languageViewModel)
-                ModeSelection(themeViewModel)
-            }
+            Text(text = stringResource(R.string.language))
+            LanguageSelection(languageViewModel)
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            thickness = 1.dp,
+            color = PrimaryBlack
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = stringResource(R.string.mode))
+            ModeSelection(themeViewModel)
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            thickness = 1.dp,
+            color = PrimaryBlack
+        )
 
         Text(
             text = stringResource(R.string.send_a_report),
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, bottom = 8.dp, top = 8.dp)
                 .clickable { showReportDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
@@ -176,7 +183,7 @@ fun SettingsScreen(
         Text(
             text = stringResource(R.string.log_out),
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, bottom = 8.dp)
                 .clickable { showLogOutDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
@@ -184,7 +191,7 @@ fun SettingsScreen(
         Text(
             text = stringResource(R.string.delete_user),
             modifier = Modifier
-                .padding(start = 8.dp)
+                .padding(start = 16.dp)
                 .clickable { showDeleteDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
@@ -313,8 +320,11 @@ class LanguageViewModel(
 
 @Composable
 fun LanguageSelection(languageViewModel: LanguageViewModel) {
-    Column {
-        Row {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column {
             Text(
                 text = "Norsk",
                 modifier = Modifier
@@ -324,6 +334,7 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
             Text(
                 text = "English",
                 modifier = Modifier
+                    .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("English") }
             )
         }
@@ -332,8 +343,11 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
 
 @Composable
 fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
-    Column {
-        Row {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column {
             Text(
                 text = stringResource(R.string.light),
                 modifier = Modifier
