@@ -64,6 +64,7 @@
     <string name="community">Community</string>
     <string name="position">Position</string>
     <string name="liked">Liked</string>
+    <string name="not_liked">Not liked</string>
 
     <string name="start">Start</string>
     <string name="stop">Stop</string>

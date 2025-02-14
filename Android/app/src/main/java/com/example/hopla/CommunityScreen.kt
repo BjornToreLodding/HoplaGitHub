@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,15 +29,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+// Data class to represent a community group
 data class CommunityGroup(
     val image: Painter,
     val name: String,
     val description: String
 )
 
+// Composable function to display the community screen
 @Composable
 fun CommunityScreen(navController: NavController) {
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf("") }              // Search query for filtering the groups
+    var showLikedOnly by remember { mutableStateOf(false) }         // Boolean to show only liked groups
+    val likedGroups = remember { mutableStateListOf<CommunityGroup>() }   // List of liked groups
+    // List of community groups
     val groups = listOf(
         CommunityGroup(
             painterResource(R.drawable.stockimg1),
@@ -51,15 +60,20 @@ fun CommunityScreen(navController: NavController) {
             "BÆRUM RIDEKLUBB"
         )
     )
-    val filteredGroups = groups.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    // Filter the groups based on the search query and liked groups
+    val filteredGroups = groups.filter {
+        it.name.contains(searchQuery, ignoreCase = true) &&
+                (!showLikedOnly || likedGroups.contains(it))
+    }
 
+    // Display the community screen
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Filtering groups based on position and liked
-        TopTextCommunity()
-        // Search bar
+        // Top text for filtering the groups
+        TopTextCommunity(showLikedOnly) { showLikedOnly = it }
+        // Search bar for filtering the groups
         TextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -75,21 +89,25 @@ fun CommunityScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(8.dp)
         )
-        // Displaying the groups with a scrollview
+        // Scroll view for displaying the groups
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
             items(filteredGroups) { group ->
-                CommunityCard(group, navController)
+                CommunityCard(group, navController, likedGroups)
             }
         }
     }
 }
 
+// Composable function to display a community group card
 @Composable
-fun CommunityCard(group: CommunityGroup, navController: NavController) {
+fun CommunityCard(group: CommunityGroup, navController: NavController, likedGroups: MutableList<CommunityGroup>) {
+    var isLiked by remember { mutableStateOf(likedGroups.contains(group)) }
+
+    // Display the community group card
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -98,25 +116,58 @@ fun CommunityCard(group: CommunityGroup, navController: NavController) {
             .padding(vertical = 8.dp)
             .clickable { navController.navigate("communityDetail/${group.name}") }
     ) {
-        Column {
-            Image(
-                painter = group.image,
-                contentDescription = group.name,
+        // Inner box for the group card
+        Box {
+            Column {
+                // The image of the group
+                Image(
+                    painter = group.image,
+                    contentDescription = group.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+                // The name of the group
+                Text(
+                    text = group.name,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+            // Box for the like button
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-            )
-            Text(
-                text = group.name,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(8.dp)
-            )
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .background(MaterialTheme.colorScheme.background, shape = CircleShape)
+            ) {
+                // Like button icon
+                IconButton(
+                    onClick = {
+                        isLiked = !isLiked
+                        if (isLiked) {
+                            likedGroups.add(group)
+                        } else {
+                            likedGroups.remove(group)
+                        }
+                    }
+                ) {
+                    // Icon changing from outlined to filled based on the like status
+                    Icon(
+                        imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = if (isLiked) stringResource(R.string.liked) else stringResource(R.string.not_liked),
+                        tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
         }
     }
 }
 
+// Top text for filtering the groups based on position and liked status
 @Composable
-fun TopTextCommunity() {
+fun TopTextCommunity(showLikedOnly: Boolean, onShowLikedOnlyChange: (Boolean) -> Unit) {
+    // Column for the top text
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +183,7 @@ fun TopTextCommunity() {
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .clickable { /* Handle click action */ },
+                    .clickable { onShowLikedOnlyChange(false) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -144,7 +195,7 @@ fun TopTextCommunity() {
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .clickable { /* Handle click action */ },
+                    .clickable { onShowLikedOnlyChange(true) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -156,6 +207,7 @@ fun TopTextCommunity() {
     }
 }
 
+// Detail screen for a community group
 @Composable
 fun CommunityDetailScreen(navController: NavController, communityGroup: CommunityGroup) {
     Column(

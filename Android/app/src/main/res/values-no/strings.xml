@@ -64,6 +64,7 @@
     <string name="community">Fellesskap</string>
     <string name="position">Posisjon</string>
     <string name="liked">Liker</string>
+    <string name="not_liked">Ikke likt</string>
 
     <string name="start">Start</string>
     <string name="stop">Stopp</string>
