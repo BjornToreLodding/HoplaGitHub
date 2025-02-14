@@ -14,7 +14,14 @@ public class TrailDetail
 
     public Trail Trail { get; set; } = null!;
 
-    public string? JsonCoordinates50 { get; set; } // 50 koordinater for forhåndsvisning
+    public string? PictureThumbURL { get; set; }
+    public string? PictureFullURL { get; set; }
+    public double? LatMin { get; set; }
+    public double? LongMin { get; set; }
+    public double? LatMax { get; set; }
+    public double? LongMax { get; set; }
+
+    public string? JsonCoordinates50 { get; set; } // 50 koordinater for forhåndsvisning, bør kanskje forrandres til Liste som under.
     public List<EntityImage> Images { get; set; } = new();
     public string? Description { get; set; } 
     public string Notes { get; set; } = string.Empty;
