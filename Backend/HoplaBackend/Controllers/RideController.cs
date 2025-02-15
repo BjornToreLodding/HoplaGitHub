@@ -10,7 +10,7 @@ using MyApp.Data;
 
 namespace MyApp.Controllers;
 
-[Route("api/rides")]
+[Route("rides")]
 [ApiController]
 public class RideController : ControllerBase
 {
@@ -21,30 +21,39 @@ public class RideController : ControllerBase
         _context = context;
     }
 
-    [HttpPost]
+    [HttpPost("new")]
     public async Task<IActionResult> CreateRide([FromBody] RideRequestDto request)
     {
         if (request == null || request.Coordinates == null || !request.Coordinates.Any())
             return BadRequest("Ride must include at least one coordinate.");
 
-        // Finn min, max, og mean
+        // Henter ut verdier for min, max og gjennomsnitt for koordinatene.
         var latitudes = request.Coordinates.Select(c => c.Latitude).ToList();
-        var longitudes = request.Coordinates.Select(c => c.Longitude).ToList();
-
         double latMin = latitudes.Min();
         double latMax = latitudes.Max();
         double latMean = latitudes.Average();
-
+        
+        var longitudes = request.Coordinates.Select(c => c.Longitude).ToList();
         double longMin = longitudes.Min();
         double longMax = longitudes.Max();
         double longMean = longitudes.Average();
 
         // Reduser antall koordinater til maks 50
-        //var reducedCoordinates = ReduceCoordinates(request.Coordinates);
-        var reducedCoordinates = RideCoordinatesTrim.ReduceCoordinates(request.Coordinates); //Rød linje under RideCoordinatesTrim
+        var reducedTo50Coordinates = RideCoordinatesTrim.ReduceTo50Coordinates(request.Coordinates); 
+
+
+        //
+        // Dette testes senere når en liste på en lengde over 3333 eksisterer
+        //
         // Hvis over 3333 tupler, fjern ekstra koordinater og legg til tidsverdier
-        if (reducedCoordinates.Count > 3333) //Rød linje under reducedCoordinates.Count
+        
+        var reducedCoordinates = request.Coordinates;
+        if (request.Coordinates.Count > 3333) //Rød linje under reducedCoordinates.Count
             reducedCoordinates = RideCoordinatesTrim.AdjustForTupleLimit(reducedCoordinates); //rød linje under AdjustForTupleLimit
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("checkpoint4");
+        Console.ResetColor();
+
 
         // Opprett Ride og RideDetails
         var ride = new Ride
@@ -64,9 +73,14 @@ public class RideController : ControllerBase
                 LatMean = latMean,
                 LongMin = longMin,
                 LongMax = longMax,
-                LongMean = longMean
+                LongMean = longMean,
+                //JsonCoordinates50 = reducedTo50Coordinates //Forsøkte å legge til denne, men da får jeg rød strek under
+                JsonCoordinates50 = System.Text.Json.JsonSerializer.Serialize(reducedTo50Coordinates)
             }
         };
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("checkpoint4");
+        Console.ResetColor();
 
         // Lagre Ride og RideDetails
         _context.Rides.Add(ride);
@@ -74,6 +88,7 @@ public class RideController : ControllerBase
 
         // Lagre RideTrackDatas
         //var trackDataList = reducedCoordinates.Select(c => new RideTrackingData //rød strek under RideTrackData
+        /*
         var rideTrackingData = new RideTrackingData
         {
             //Id = Guid.NewGuid(),
@@ -81,7 +96,7 @@ public class RideController : ControllerBase
             Ride = ride,
             TrackingPoints = reducedCoordinates.Select(c => new TrackingPoint
             {
-                Lat = c.Latitude,  // ✅ Bruk TrackingPoint sine felter
+                Lat = c.Latitude,  // Bruk TrackingPoint sine felter
                 Long = c.Longitude,
                 TimeSinceLast = c.TimeSinceLast ?? 0,  // Håndterer null-verdi
             }).ToList()
@@ -91,7 +106,26 @@ public class RideController : ControllerBase
         _context.RideTrackingDatas.Add(rideTrackingData);
         await _context.SaveChangesAsync();
         return Ok(new { ride.Id, message = "Ride successfully created!" });
+    */
+        var rideTrackingData = new RideTrackingData
+        {
+            //Id = Guid.NewGuid(),
+            Id = ride.Id,
+            Ride = ride,
+            TrackingPoints = request.Coordinates.Select(c => new TrackingPoint
+            {
+                Lat = c.Latitude,
+                Long = c.Longitude,
+                TimeSinceLast = c.TimeSinceLast ?? 0
+            }).ToList()
+        };
+
+        _context.RideTrackingDatas.Add(rideTrackingData);
+        await _context.SaveChangesAsync();
+        return Ok(new { ride.Id, message = "Ride successfully created!" });
+
     }
+    
 
     [HttpPut("{rideId}")]
     public async Task<IActionResult> UpdateRide(Guid rideId, [FromBody] RideUpdateDto request)

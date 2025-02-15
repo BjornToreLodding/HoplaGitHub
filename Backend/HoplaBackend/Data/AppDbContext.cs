@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Text.RegularExpressions;
+using System.Text.Json;
 
 namespace MyApp.Data;
 
@@ -73,6 +74,13 @@ public class AppDbContext : DbContext
             .HasForeignKey(ei => ei.RideDetailId)
             .OnDelete(DeleteBehavior.Cascade); // Sletter bilder hvis RideDetails slettes
 
+        modelBuilder.Entity<RideTrackingData>()
+            .Property(r => r.TrackingPoints)
+            .HasColumnType("json")  // 🚀 Bruker JSON (ikke JSONB)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),  // Konverterer til JSON
+                v => JsonSerializer.Deserialize<List<TrackingPoint>>(v, new JsonSerializerOptions()) ?? new List<TrackingPoint>()
+            );
         //
         // Trail
         //

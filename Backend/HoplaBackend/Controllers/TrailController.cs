@@ -23,10 +23,11 @@ public class TrailController : ControllerBase
         [FromQuery] double latitude, 
         [FromQuery] double longitude)
     {
+        //Må skrives om pga omstrukturering av database.
         var trails = await _context.Trails
-            .Include(t => t.Ride)         // Hvis Ride fortsatt finnes
+            .Include(t => t.Ride)           // Hvis Ride fortsatt finnes
             .Include(t => t.Ride.RideDetails)    // Legger til RideDetail
-    .ToListAsync();
+            .ToListAsync();
 
         //Console.WriteLine($"Antall trails hentet fra databasen: {trails.Count}");
 

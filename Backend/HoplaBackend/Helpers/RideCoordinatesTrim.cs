@@ -4,7 +4,7 @@ namespace HoplaBackend.Helpers
 {
     public static class RideCoordinatesTrim
     {
-        public static List<RideCoordinateDto> ReduceCoordinates(List<RideCoordinateDto> coordinates)
+        public static List<RideCoordinateDto> ReduceTo50Coordinates(List<RideCoordinateDto> coordinates)
         {
             if (coordinates.Count <= 50)
                 return coordinates;

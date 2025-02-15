@@ -21,7 +21,7 @@ public class Ride
     public Horse? Horse { get; set; }
 
     public int? TrailId { get; set; }
-    [ForeignKey("RideId")]
+    [ForeignKey("TrailId")]
     public Trail? Trail { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

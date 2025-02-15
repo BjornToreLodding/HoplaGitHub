@@ -14,6 +14,7 @@ public class RideTrackingData
 
     public Ride Ride { get; set; } = null!;
 
+    [Column(TypeName = "json")]  // Bruker JSON i stedet for JSONB
     public List<TrackingPoint> TrackingPoints { get; set; } = new();
 }
 
