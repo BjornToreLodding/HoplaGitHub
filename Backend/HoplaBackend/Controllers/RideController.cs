@@ -20,8 +20,97 @@ public class RideController : ControllerBase
     {
         _context = context;
     }
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetUserRides(int userId)
+    {
+        var rides = await _context.Rides
+            .Where(r => r.UserId == userId)
+            .OrderByDescending(r => r.CreatedAt) // Sorterer synkende på dato
+            .Select(r => new
+            {
+                r.Id,
+                r.CreatedAt,
+                r.Length,
+                r.Duration,
+                HorseName = r.Horse != null ? r.Horse.Name : "" // Hvis ikke hest registrert, vises "" istedenfor null
+            })
+            .ToListAsync();
 
-    [HttpPost("new")]
+        return Ok(rides);
+    }
+
+    [HttpGet("{rideId}/details")]
+    public async Task<IActionResult> GetRideDetails(int rideId)
+    {
+        var rideDetails = await _context.RideDetails
+            .Where(rd => rd.Id == rideId)
+            .Select(rd => new
+            {
+                rd.LatMin,
+                rd.LatMax,
+                rd.LatMean,
+                rd.LongMin,
+                rd.LongMax,
+                rd.LongMean,
+                Coordinates50 = rd.JsonCoordinates50 // JSON-streng med 50 koordinater
+            })
+            .FirstOrDefaultAsync();
+
+        if (rideDetails == null)
+            return NotFound("Ride details not found.");
+
+        return Ok(rideDetails);
+    }
+    
+    [HttpGet("{rideId}/trackingdata")]
+    public async Task<IActionResult> GetRideTrackingData(int rideId)
+    {
+    /*
+        var trackingData = await _context.RideTrackingDatas
+            .Where(rt => rt.Id == rideId)
+            .Select(rt => new
+            {
+                rt.Id,
+              //TrackingPoints = rt.TrackingPoints.Select(tp => new
+                TrackingPoints = rt.TrackingPoints.AsEnumerable().Select(tp => new
+                {
+                    tp.Lat,
+                    tp.Long,
+                    tp.TimeSinceLast
+                })
+            })
+            .FirstOrDefaultAsync();
+
+        if (trackingData == null)
+            return NotFound("Ride tracking data not found.");
+
+        return Ok(trackingData);
+    }
+    */
+        var rideTrackingData = await _context.RideTrackingDatas
+            .AsNoTracking()
+            .Where(rt => rt.Id == rideId)
+            .FirstOrDefaultAsync();
+
+        if (rideTrackingData == null)
+            return NotFound("Ride tracking data not found.");
+
+        // 🚀 Returnerer TrackingPoints fra JSON-kolonnen
+        var result = new
+        {
+            rideTrackingData.Id,
+            TrackingPoints = rideTrackingData.TrackingPoints.Select(tp => new
+            {
+                tp.Lat,
+                tp.Long,
+                tp.TimeSinceLast
+            }).ToList() // Dette vil nå fungere som en liste
+        };
+
+        return Ok(result);
+    }
+
+    [HttpPost]
     public async Task<IActionResult> CreateRide([FromBody] RideRequestDto request)
     {
         if (request == null || request.Coordinates == null || !request.Coordinates.Any())
@@ -46,7 +135,7 @@ public class RideController : ControllerBase
         // Dette testes senere når en liste på en lengde over 3333 eksisterer
         //
         // Hvis over 3333 tupler, fjern ekstra koordinater og legg til tidsverdier
-        
+
         var reducedCoordinates = request.Coordinates;
         if (request.Coordinates.Count > 3333) //Rød linje under reducedCoordinates.Count
             reducedCoordinates = RideCoordinatesTrim.AdjustForTupleLimit(reducedCoordinates); //rød linje under AdjustForTupleLimit
