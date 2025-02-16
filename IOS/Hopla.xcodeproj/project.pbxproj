@@ -29,9 +29,22 @@
 		B706E9802D3FE03D008496F9 /* HoplaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HoplaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B737B5EB2D5B932E00876688 /* Exceptions for "Hopla" folder in "Hopla" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B706E9652D3FE03A008496F9 /* Hopla */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B706E9682D3FE03A008496F9 /* Hopla */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B737B5EB2D5B932E00876688 /* Exceptions for "Hopla" folder in "Hopla" target */,
+			);
 			path = Hopla;
 			sourceTree = "<group>";
 		};

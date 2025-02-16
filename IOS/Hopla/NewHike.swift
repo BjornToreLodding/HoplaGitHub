@@ -22,7 +22,7 @@ struct NewHike: View {
                         .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                         .frame(height: 110)
                         .edgesIgnoringSafeArea(.top)
-                        .padding(.top, -435)
+                        .padding(.top, -420)
                 }
             }
             .navigationTitle("New Hike") // Title of nav bar

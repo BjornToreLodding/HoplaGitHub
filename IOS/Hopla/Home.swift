@@ -66,7 +66,7 @@ struct Home: View {
     // MARK: - Filter Bar Below Logo
     private var filterBar: some View {
         HStack {
-            Picker("Filter", selection: $selectedFilter) {
+            SwiftUI.Picker("Filter", selection: $selectedFilter) {
                 Image(systemName: "location").tag("location")
                 Image(systemName: "person.2").tag("person.2")
                 Image(systemName: "star").tag("star")

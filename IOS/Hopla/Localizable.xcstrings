@@ -12,10 +12,6 @@
       }
     },
     "Are you sure you want to delete your user?" : {
-
-    },
-    "Are you sure you want to delete your user? You will need to confirm your password." : {
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -40,6 +36,16 @@
     },
     "bob@mail.no" : {
 
+    },
+    "Camera" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -67,16 +73,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Endre passord"
-          }
-        }
-      }
-    },
-    "Change profile picture" : {
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Endre profilbilde"
           }
         }
       }
@@ -322,6 +318,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Passord"
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
           }
         }
       }
