@@ -47,36 +47,10 @@ struct Hikes: View {
         NavigationStack {
             VStack(spacing: 0) { // Ensure no extra spacing
                 filterBar
-                ZStack {
-                    AdaptiveColor.background.color(for: colorScheme)
-                        .ignoresSafeArea()
-
-                    List(hikes) { hike in
-                        HStack {
-                            if let uiImage = UIImage(named: hike.imageName) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                            } else {
-                                Image(systemName: hike.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                    .foregroundColor(.green)
-                            }
-                            Text(hike.name)
-                                .font(.headline)
-                                .padding(.horizontal, 20)
-                            Spacer()
-                        }
-                        .padding()
-                        .listRowBackground(AdaptiveColor.background.color(for: colorScheme))
-                        .onTapGesture {
-                            print(hike.name)
-                        }
-                    }
-                    .scrollContentBackground(.hidden)
+                ScrollView {
+                    Rectangle()
+                        .fill(AdaptiveColor(light: .white, dark: .mainDarkBackground).color(for: colorScheme))
+                        .frame(width: 300, height: 80)
                 }
             }
             .navigationTitle("Hikes")
