@@ -21,10 +21,54 @@ public class TrailController : ControllerBase
     [HttpGet("closest")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 
-        [FromQuery] double longitude)
+        [FromQuery] double longitude,
+        [FromQuery] bool filter = false, // Hvis "filter" er false, returner alle trails
+        [FromQuery] string? difficulty = null,
+        [FromQuery] bool? riverBridge = null,
+        [FromQuery] bool? cart = null,
+        [FromQuery] bool? roadCrossing = null,
+        [FromQuery] bool? traficRoads = null,
+        [FromQuery] bool? peopleTraffic = null,
+        [FromQuery] double? lengthMin = null,
+        [FromQuery] double? lengthMax = null)
     {
+        // Start med alle trails
+        var query = _context.Trails.AsQueryable();
+
+        if (filter)
+        {
+            //if (!string.IsNullOrEmpty(difficulty))
+            //    query = query.Where(t => t.Difficulty == difficulty);
+                // Length { get; set; }
+                // HasBridge { get; set; }
+                // Season { get; set; } = string.Empty; // F.eks. "Summer, Winter"
+                // Cart { get; set; } // Kan man bruke hest og vogn?
+                // TrafficRoads { get; set; } // Går den langs bilvei?
+                // PeopleTraffic { get; set; } // Mye folk?
+                // Other { get; set; } = string.Empty; // Annen info
+            if (cart.HasValue)
+                query = query.Where(t => t.TrailFilters.Cart == cart.Value);
+
+            //if (roadCrossing.HasValue)
+            //    query = query.Where(t => t.RoadCrossing == roadCrossing.Value);
+
+            if (traficRoads.HasValue)
+                query = query.Where(t => t.TrailFilters.TrafficRoads == traficRoads.Value);
+
+            if (peopleTraffic.HasValue)
+                query = query.Where(t => t.TrailFilters.PeopleTraffic == peopleTraffic.Value);
+
+            if (lengthMin.HasValue)
+                query = query.Where(t => t.TrailFilters.Length >= lengthMin.Value);
+
+            if (lengthMax.HasValue)
+                query = query.Where(t => t.TrailFilters.Length <= lengthMax.Value);
+        }
+
+        
         // Henter trails direkte fra databasen uten referanser til Rides
-        var trails = await _context.Trails.ToListAsync();
+        //var trails = await _context.Trails.ToListAsync();
+        var trails = await query.ToListAsync(); // Bruker queryet med filtrene
 
         List<object> validTrails = new List<object>();
         int excludedCount = 0;
