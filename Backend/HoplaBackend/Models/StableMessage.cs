@@ -12,13 +12,13 @@ public class StableMessage
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public User? User { get; set; }
+    public User User { get; set; } = null!;
 
     public int StableId { get; set; }
 
     [ForeignKey("StableId")]
-    public Stable? Stable { get; set; }
-    public string Message { get; set; } = null!;
+    public Stable Stable { get; set; } = null!;
+    public string MessageText { get; set; } = null!;
 
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 

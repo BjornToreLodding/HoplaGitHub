@@ -22,7 +22,7 @@ namespace HoplaBackend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MyApp.Models.Filter", b =>
+            modelBuilder.Entity("MyApp.Models.EntityImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,45 +30,32 @@ namespace HoplaBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<bool?>("Bridge")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("Cart")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Difficulty")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Traffic")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Filters");
-                });
-
-            modelBuilder.Entity("MyApp.Models.FriendRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("FromUserId")
+                    b.Property<int?>("ImageId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int?>("RideDetailId")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("ToUserId")
+                    b.Property<int?>("TrailDetailsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("FriendRequests");
+                    b.HasIndex("ImageId");
+
+                    b.HasIndex("RideDetailId");
+
+                    b.HasIndex("TrailDetailsId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EntityImages");
                 });
 
             modelBuilder.Entity("MyApp.Models.Horse", b =>
@@ -102,6 +89,34 @@ namespace HoplaBackend.Migrations
                     b.ToTable("Horses");
                 });
 
+            modelBuilder.Entity("MyApp.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ThumbnailUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("MyApp.Models.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -123,6 +138,10 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RUserId");
+
+                    b.HasIndex("SUserId");
+
                     b.ToTable("Messages");
                 });
 
@@ -134,52 +153,31 @@ namespace HoplaBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CoordinatesAll")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CoordinateslistShort")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("Duration")
-                        .HasColumnType("integer");
+                    b.Property<double>("Duration")
+                        .HasColumnType("double precision");
 
                     b.Property<int?>("HorseId")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("LatEnd")
+                    b.Property<double>("Length")
                         .HasColumnType("double precision");
 
-                    b.Property<double?>("LatMean")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("LatStart")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("Length")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("LongEnd")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("LongMean")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("LongStart")
-                        .HasColumnType("double precision");
-
-                    b.Property<byte[]>("Picturefull")
-                        .HasColumnType("bytea");
-
-                    b.Property<byte[]>("Picturethumb")
-                        .HasColumnType("bytea");
+                    b.Property<int?>("TrailId")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HorseId");
+
+                    b.HasIndex("TrailId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Rides");
                 });
@@ -187,26 +185,75 @@ namespace HoplaBackend.Migrations
             modelBuilder.Entity("MyApp.Models.RideDetail", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CoordinatesAll")
+                    b.Property<string>("JsonCoordinates50")
                         .HasColumnType("text");
 
-                    b.Property<string>("CoordinateslistShort")
+                    b.Property<double?>("LatMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LatMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LatMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<byte[]>("Picturefull")
-                        .HasColumnType("bytea");
-
-                    b.Property<byte[]>("Picturethumb")
-                        .HasColumnType("bytea");
 
                     b.HasKey("Id");
 
                     b.ToTable("RideDetails");
+                });
+
+            modelBuilder.Entity("MyApp.Models.RideReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RideReviews");
+                });
+
+            modelBuilder.Entity("MyApp.Models.RideTrackingData", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TrackingPoints")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RideTrackingDatas");
                 });
 
             modelBuilder.Entity("MyApp.Models.Stable", b =>
@@ -223,9 +270,18 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("Location")
                         .HasColumnType("text");
 
+                    b.Property<bool>("ModeratedMessages")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("PrivateGroup")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("SecretGroup")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -240,7 +296,7 @@ namespace HoplaBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Message")
+                    b.Property<string>("MessageText")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -262,6 +318,239 @@ namespace HoplaBackend.Migrations
                     b.ToTable("StableMessages");
                 });
 
+            modelBuilder.Entity("MyApp.Models.StableUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsModerator")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotifyNewMessage")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("StableId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StableId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StableUsers");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrackingPoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Lat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Long")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("RideTrackingDataId")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("TimeSinceLast")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RideTrackingDataId");
+
+                    b.ToTable("TrackingPoints");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Trail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("LatMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("LongMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RideId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RideId");
+
+                    b.ToTable("Trails");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailAllCoordinate", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrailAllCoordinates");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailCoordinate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Lat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Long")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("TrailAllCoordinatesId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrailAllCoordinatesId");
+
+                    b.ToTable("TrailCoordinate");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("JsonCoordinates50")
+                        .HasColumnType("text");
+
+                    b.Property<double?>("LatMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LatMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PictureFullURL")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PictureThumbURL")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrailDetails");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailFilter", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Cart")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("HasBridge")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("Length")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Other")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PeopleTraffic")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Season")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TrafficRoads")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrailFilters");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TrailId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrailId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TrailReview");
+                });
+
             modelBuilder.Entity("MyApp.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -272,6 +561,9 @@ namespace HoplaBackend.Migrations
 
                     b.Property<bool>("Admin")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -291,12 +583,70 @@ namespace HoplaBackend.Migrations
                     b.Property<bool>("Premium")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("text");
+
                     b.Property<bool>("VerifiedTrail")
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MyApp.Models.UserRelation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FromUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ToUserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("ToUserId");
+
+                    b.ToTable("UserRelations");
+                });
+
+            modelBuilder.Entity("MyApp.Models.EntityImage", b =>
+                {
+                    b.HasOne("MyApp.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
+                    b.HasOne("MyApp.Models.RideDetail", "RideDetails")
+                        .WithMany("Images")
+                        .HasForeignKey("RideDetailId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MyApp.Models.TrailDetail", "TrailDetails")
+                        .WithMany("Images")
+                        .HasForeignKey("TrailDetailsId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MyApp.Models.User", null)
+                        .WithMany("Images")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Image");
+
+                    b.Navigation("RideDetails");
+
+                    b.Navigation("TrailDetails");
                 });
 
             modelBuilder.Entity("MyApp.Models.Horse", b =>
@@ -308,6 +658,86 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Message", b =>
+                {
+                    b.HasOne("MyApp.Models.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("RUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Ride", b =>
+                {
+                    b.HasOne("MyApp.Models.Horse", "Horse")
+                        .WithMany()
+                        .HasForeignKey("HorseId");
+
+                    b.HasOne("MyApp.Models.Trail", "Trail")
+                        .WithMany()
+                        .HasForeignKey("TrailId");
+
+                    b.HasOne("MyApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Horse");
+
+                    b.Navigation("Trail");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.RideDetail", b =>
+                {
+                    b.HasOne("MyApp.Models.Ride", "Ride")
+                        .WithOne("RideDetails")
+                        .HasForeignKey("MyApp.Models.RideDetail", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
+                });
+
+            modelBuilder.Entity("MyApp.Models.RideReview", b =>
+                {
+                    b.HasOne("MyApp.Models.Ride", "Ride")
+                        .WithOne("RideReviews")
+                        .HasForeignKey("MyApp.Models.RideReview", "Id")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MyApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.RideTrackingData", b =>
+                {
+                    b.HasOne("MyApp.Models.Ride", "Ride")
+                        .WithOne("RideTrackingDatas")
+                        .HasForeignKey("MyApp.Models.RideTrackingData", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
                 });
 
             modelBuilder.Entity("MyApp.Models.StableMessage", b =>
@@ -329,9 +759,173 @@ namespace HoplaBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MyApp.Models.StableUser", b =>
+                {
+                    b.HasOne("MyApp.Models.Stable", "Stable")
+                        .WithMany()
+                        .HasForeignKey("StableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stable");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrackingPoint", b =>
+                {
+                    b.HasOne("MyApp.Models.RideTrackingData", "RideTrackingData")
+                        .WithMany()
+                        .HasForeignKey("RideTrackingDataId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RideTrackingData");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Trail", b =>
+                {
+                    b.HasOne("MyApp.Models.Ride", "Ride")
+                        .WithMany()
+                        .HasForeignKey("RideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailAllCoordinate", b =>
+                {
+                    b.HasOne("MyApp.Models.Trail", "Trail")
+                        .WithOne("TrailAllCoordinates")
+                        .HasForeignKey("MyApp.Models.TrailAllCoordinate", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trail");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailCoordinate", b =>
+                {
+                    b.HasOne("MyApp.Models.TrailAllCoordinate", "TrailAllCoordinates")
+                        .WithMany("Coordinates")
+                        .HasForeignKey("TrailAllCoordinatesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrailAllCoordinates");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailDetail", b =>
+                {
+                    b.HasOne("MyApp.Models.Trail", "Trail")
+                        .WithOne("TrailDetails")
+                        .HasForeignKey("MyApp.Models.TrailDetail", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trail");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailFilter", b =>
+                {
+                    b.HasOne("MyApp.Models.Trail", "Trail")
+                        .WithOne("TrailFilters")
+                        .HasForeignKey("MyApp.Models.TrailFilter", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trail");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailReview", b =>
+                {
+                    b.HasOne("MyApp.Models.Trail", "Trail")
+                        .WithMany("TrailReviews")
+                        .HasForeignKey("TrailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trail");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Models.UserRelation", b =>
+                {
+                    b.HasOne("MyApp.Models.User", "FromUser")
+                        .WithMany()
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Models.User", "ToUser")
+                        .WithMany()
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("ToUser");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Ride", b =>
+                {
+                    b.Navigation("RideDetails");
+
+                    b.Navigation("RideReviews");
+
+                    b.Navigation("RideTrackingDatas")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MyApp.Models.RideDetail", b =>
+                {
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("MyApp.Models.Trail", b =>
+                {
+                    b.Navigation("TrailAllCoordinates")
+                        .IsRequired();
+
+                    b.Navigation("TrailDetails")
+                        .IsRequired();
+
+                    b.Navigation("TrailFilters")
+                        .IsRequired();
+
+                    b.Navigation("TrailReviews");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailAllCoordinate", b =>
+                {
+                    b.Navigation("Coordinates");
+                });
+
+            modelBuilder.Entity("MyApp.Models.TrailDetail", b =>
+                {
+                    b.Navigation("Images");
+                });
+
             modelBuilder.Entity("MyApp.Models.User", b =>
                 {
                     b.Navigation("Horses");
+
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

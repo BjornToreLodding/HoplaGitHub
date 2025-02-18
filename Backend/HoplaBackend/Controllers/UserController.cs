@@ -37,17 +37,6 @@ namespace MyApp.Controllers
                 created_at = user.CreatedAt
             });
         }
-        [HttpGet("{userId}/friends")]
-        public async Task<IActionResult> GetFriends(int userId)
-        {
-        
-            var friends = await _context.FriendRequests
-                .Where(fr => (fr.Status == "Accepted" || fr.Status == "accepted") && (fr.FromUserId == userId || fr.ToUserId == userId))
-                .Select(fr => fr.FromUserId == userId ? fr.ToUserId : fr.FromUserId)
-                .ToListAsync();
-
-            return Ok(friends);
-        }
 
         //Denne er flyttet til api/mock/createcontent i MockController.cs
         /*
@@ -65,11 +54,11 @@ namespace MyApp.Controllers
         //}
             var existingUsers = _context.Users.ToList();
             //legger til Horses
-            // 🔹 3. Legg til hester med eksisterende brukere
+            // 3. Legg til hester med eksisterende brukere
             var horses = HorseMock.GetHorses(existingUsers);
             _context.Horses.AddRange(horses);
 
-            // 🔹 4. Legg til andre relasjoner (Friendrequests, Messages, etc.)
+            // 4. Legg til andre relasjoner (Friendrequests, Messages, etc.)
             var friendRequests = FriendRequestMock.GetFriendRequests();
             _context.FriendRequests.AddRange(friendRequests);
             /*var horses = HorseMock.GetHorses();

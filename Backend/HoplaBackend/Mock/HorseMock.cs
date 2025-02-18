@@ -2,7 +2,7 @@ using MyApp.Models;
 
 public static class HorseMock 
 {
-    public static List<Horse> GetHorses(List<User> existingUsers)
+    public static List<Horse> CreateHorsesMock(List<User> existingUsers)
     {
         return new List<Horse> 
         {

@@ -20,7 +20,8 @@ public class StableUser
     public required Stable Stable { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public bool StableAdmin { get; set; } = false;
-    public bool StableModerator { get; set; } = false;
+    public bool IsOwner { get; set; } = false;
+    public bool IsAdmin { get; set; } = false;
+    public bool IsModerator { get; set; } = false;
     public bool NotifyNewMessage { get; set; } = true;
 }

@@ -2,20 +2,19 @@ using MyApp.Models;
 
 public static class UserMock 
 {
-    public static List<User> GetUsers(){
+    public static List<User> CreateUsersMock(){
         return [
             
-            new User { Id = 1, Name = "Bjørn Tore Lødding", Email = "bjortlod@stud.ntnu.no", PasswordHash = "hashed_pw1", Admin = true, Premium = true, VerifiedTrail = true },
-            new User { Id = 2, Name = "Ane Marie", Email = "amjohnse@stud.ntnu.no", PasswordHash = "hashed_pw2", Admin = true, Premium = true, VerifiedTrail = true },
-            new User { Id = 3, Name = "Vilde", Email = "vakvaer@stud.ntnu.no", PasswordHash = "hashed_pw3", Admin = true, Premium = true, VerifiedTrail = true },
-            new User { Id = 4, Name = "Thea Dyring", Email = "td@hopla.no", PasswordHash = "hashed_pw4", Admin = true, Premium = true, VerifiedTrail = true },
-            new User { Id = 5, Name = "Ann Iren Haakenstad", Email = "aih@hopla.no", PasswordHash = "hashed_pw4", Admin = true, Premium = true, VerifiedTrail = true  },
-            new User { Id = 6, Name = "Anna Louise Sedolfsen", Email = "als@hopla.no", PasswordHash = "hashed_pw4", Admin = true, Premium = true, VerifiedTrail = true  },
-            
-            new User { Id = 7, Name = "Helle Kopter", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
-            new User { Id = 8, Name = "Heli Kopeter", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
-            new User { Id = 9, Name = "Finn Biff", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
-            new User { Id = 10, Name = "Kari Usel", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
+            new User { Id = 1, Name = "Bjørn Tore Lødding", Alias = "Shredlord", Email = "bjortlod@stud.ntnu.no", PasswordHash = "hashed_pw1", Admin = true, Premium = true, VerifiedTrail = true },
+            new User { Id = 2, Name = "Ane Marie", Alias = "Utvikler Anmajo" ,Email = "amjohnse@stud.ntnu.no", PasswordHash = "hashed_pw2", Admin = true, Premium = true, VerifiedTrail = true },
+            new User { Id = 3, Name = "Vilde", Alias = "Utvikler Vildesk" ,Email = "vakvaer@stud.ntnu.no", PasswordHash = "hashed_pw3", Admin = true, Premium = true, VerifiedTrail = true },
+            new User { Id = 4, Name = "Thea Dyring", Alias = "Jockey Thea", Email = "td@hopla.no", PasswordHash = "hashed_pw4", Admin = true, Premium = true, VerifiedTrail = true },
+            new User { Id = 5, Name = "Ann Iren Haakenstad", Alias = "Jockey Ann Iren", Email = "aih@hopla.no", PasswordHash = "hashed_pw4", Admin = true, Premium = true, VerifiedTrail = true  },
+            new User { Id = 6, Name = "Anna Louise Sedolfsen", Alias = "Jockey Anna Louise", Email = "als@hopla.no", PasswordHash = "hashed_pw4", Admin = true, Premium = true, VerifiedTrail = true  },
+            new User { Id = 7, Name = "Helle Kopter", Alias = "Rotor snurror", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
+            new User { Id = 8, Name = "Heli Kopeter", Alias = "HeliKo-Peter", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
+            new User { Id = 9, Name = "Finn Biff", Alias = "FantBiff", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
+            new User { Id = 10, Name = "Kari Usel", Alias = "Karusell Kari", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
             new User { Id = 11, Name = "Fred Løs", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
             new User { Id = 12, Name = "Knugen Kneggason", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },
             new User { Id = 13, Name = "Kjell T. Ringen", Email = "thea@hopla.no", PasswordHash = "hashed_pw4" },

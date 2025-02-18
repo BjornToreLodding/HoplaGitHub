@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 [ApiController]
-[Route("api")]
+[Route("div")]
 public class ApiController : ControllerBase
 {
     private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();

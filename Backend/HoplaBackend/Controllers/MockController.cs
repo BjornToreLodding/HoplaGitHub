@@ -1,11 +1,13 @@
 //using MyApp.Mock;
+using HoplaBackend;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 
 namespace MyApp.Models;
 
 [ApiController]
-[Route("api/mock")]
+[Route("mock")]
 public class MockController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -20,28 +22,56 @@ public class MockController : ControllerBase
     {
         _context.Users.RemoveRange(_context.Users);
         _context.Horses.RemoveRange(_context.Horses);
-        _context.FriendRequests.RemoveRange(_context.FriendRequests);
+        _context.UserRelations.RemoveRange(_context.UserRelations);
         _context.Messages.RemoveRange(_context.Messages);
         _context.Stables.RemoveRange(_context.Stables);
         _context.StableMessages.RemoveRange(_context.StableMessages);
-        //_context.Friendrequests.RemoveRange(_context.Friendrequests);
-        //_context.Rides.RemoveRange(_context.Rides); 
+        _context.StableUsers.RemoveRange(_context.StableUsers);
+        _context.Rides.RemoveRange(_context.Rides); 
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);
-        //_context.Trails.RemoveRange(_context.Trails);
-        //_context.TrailReviews(_context.TrailReviews);
-        //_context.Filters(_context.Filters);
+        _context.Trails.RemoveRange(_context.Trails);
+        //_context.TrailReviews.RemoveRange(_context.TrailReviews);
+        //_context.TrailFilters(_context.TrailFilters);
+
+
 
         await _context.SaveChangesAsync();
-        return Ok("Database tømt!");
-    }
+
+        //En merkelig feil, gjør at sekvensene for Id på Stables og Rides ikke starter på 1 etter cleardatabase og createcontent. 
+        // Da blir det feil når Mock skal opprettes for StableMessages og Trails, da Id refererer til noe som ikke eksisterer
+        //Det er ikke nødvendig og kjøre dette på Users og Horses, men de er med da det virker mest logisk.
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserRelations\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Messages\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Stables\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableMessages\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
+
+        // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"UserRelations_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Messages_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableMessages_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableUsers_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
+
+        return Ok("Database cleared and IDs reset.");    
+        }
 
     [HttpPost("createusers")]
     public async Task<IActionResult> CreateUsers()
     {
         if (_context.Users.Any()) { return NoContent(); }
 
-        var users = UserMock.GetUsers();
+        var users = UserMock.CreateUsersMock();
         _context.Users.AddRange(users);
         await _context.SaveChangesAsync();
 
@@ -54,20 +84,20 @@ public class MockController : ControllerBase
         if (_context.Horses.Any()) { return NoContent(); }
 
         var existingUsers = _context.Users.ToList();
-        var horses = HorseMock.GetHorses(existingUsers);
+        var horses = HorseMock.CreateHorsesMock(existingUsers);
         _context.Horses.AddRange(horses);
         await _context.SaveChangesAsync();
 
         return Created();
     }
-    [HttpPost("createfriendrequests")]
-    public async Task<IActionResult> CreateFriendRequests()
+    [HttpPost("createuserrelations")]
+    public async Task<IActionResult> CreateUserRelations()
     {
-        if (_context.FriendRequests.Any()) { return NoContent(); }
+        if (_context.UserRelations.Any()) { return NoContent(); }
 
         var existingUsers = _context.Users.ToList();
-        var friendRequests = FriendRequestMock.GetFriendRequests(existingUsers);
-        _context.FriendRequests.AddRange(friendRequests);
+        var friendRequests = UserRelationMock.CreateUserRelationMock(existingUsers);
+        _context.UserRelations.AddRange(friendRequests);
         await _context.SaveChangesAsync();
 
         return Created();
@@ -88,7 +118,7 @@ public class MockController : ControllerBase
     public async Task<IActionResult> CreateStables()
     {
         if (_context.Stables.Any()) { return NoContent(); }
-        var stables = StableMock.GetStables();
+        var stables = StableMock.GetStablesMock();
         _context.Stables.AddRange(stables);
         await _context.SaveChangesAsync();
 
@@ -99,41 +129,83 @@ public class MockController : ControllerBase
     public async Task<IActionResult> CreateStableMessages()
     {
         if (_context.StableMessages.Any()) { return NoContent(); }
-        var stableMessages = StableMessageMock.GetStableMessages();
+        //Av en eller annen grunn så er det rød strek under StableMessageMock
+        //Oisann, nå er den borte. Kanskje det hjalp med reboot?
+        var stableMessages = StableMessageMock.CreateStableMessagesMock();
         _context.StableMessages.AddRange(stableMessages);
         await _context.SaveChangesAsync();
 
         return Created();
     }
 
-    [HttpGet("testdist")]
-    public float testdistance() 
+    [HttpPost("createrides")]
+    public async Task<IActionResult> CreateRides()
     {
-        //Gjøvik lat1 60.7925, long1 10.695 
-        //Biri Lat2 = 60.95558, Long2 = 10.6115
-        var lat1 = 60.7925;
-        var long1 = 10.695;
-        var lat2 = 60.95558;
-        var long2 = 10.6115;
-        var degreeDist = 40000/360; //avstanden mellom lat rundt ekvator
-        //A^2 + B^2 = C^2
-        //Avstanden mellom lat vil variere ut i fra hvilken long man befinner seg på. LatNordpolen = 0. LatEkvator = 90
-        var sideA = Math.Cos((long1+long2)/2) * Math.Abs(lat1-lat2) * degreeDist;
-        var sideB = Math.Abs(long2-long1)*degreeDist;
-        //var earthRadius = 6371.0; // i km
+        if (_context.Rides.Any()) { return NoContent(); }
+        var rides = RideMock.CreateRidesMock();
+        _context.Rides.AddRange(rides);
+        await _context.SaveChangesAsync();
 
-        // Grader til radianer
-        double latMid = (lat1 + lat2) / 2.0 * Math.PI / 180.0;  
-
-        // Avstand per breddegrad (varierer med cosinus)
-        double latDist = 111.132 * Math.Cos(latMid);
-        double longDist = 111.320;  
-
-        // Beregn avstand mellom punktene
-        double sideA2 = latDist * Math.Abs(lat1 - lat2);
-        double sideB2 = longDist * Math.Abs(long1 - long2);
-        return (float)Math.Sqrt(Math.Pow(sideA2,2) + Math.Pow(sideB2,2));
+        return Created();
     }
+
+    
+    [HttpPost("createtrails")]
+    public async Task<IActionResult> CreateTrails()
+    {
+        if (_context.Trails.Any()) 
+        { 
+            return NoContent(); 
+        }
+
+        // Hent eksisterende rides fra databasen
+        var existingRides = _context.Rides.ToList();
+
+        if (!existingRides.Any())
+        {
+            return BadRequest("Cannot create trails because there are no rides in the database.");
+        }
+
+        // Opprett mock trails basert på eksisterende rides
+        var trails = TrailMock.CreateTrailsMock(existingRides);
+
+        _context.Trails.AddRange(trails);
+        await _context.SaveChangesAsync();
+
+        return Created();
+    }
+
+
+    [HttpGet("testdist")] // Bare en test
+    public IActionResult GetDistances( 
+        [FromQuery] double? lat1, 
+        [FromQuery] double? long1, 
+        [FromQuery] double? lat2,
+        [FromQuery] double? long2)
+    {
+        // Standardverdier hvis ingen query parameters er gitt
+        double defaultLat1 = 60.7925f;
+        double defaultLong1 = 10.695f;
+        double defaultLat2 = 60.95558f;
+        double defaultLong2 = 10.6115f;
+
+        // Bruk verdiene fra query parameters. Hvis de ikke er oppgitt brukes standardverdiene som oppgitt ovenfor.
+        double lat1Value = lat1 ?? defaultLat1;
+        double long1Value = long1 ?? defaultLong1;
+        double lat2Value = lat2 ?? defaultLat2;
+        double long2Value = long2 ?? defaultLong2;
+
+        // Beregn avstandene med DistanceCalc-klassen
+        var distances = new
+        {
+            SimplePythagoras = DistanceCalc.SimplePytagoras(lat1Value, long1Value, lat2Value, long2Value),
+            ImprovedPythagoras = DistanceCalc.ImprovedPytagoras(lat1Value, long1Value, lat2Value, long2Value),
+            Haversine = DistanceCalc.Haversine(lat1Value, long1Value, lat2Value, long2Value)
+        };
+
+        return Ok(distances);  // Returnerer som JSON
+    }
+
 
     [HttpPost("createcontent")]
     public async Task<IActionResult> CreateDbContent()
@@ -141,17 +213,19 @@ public class MockController : ControllerBase
         //await ClearDatabase();
         await CreateUsers();
         await CreateHorses();
-        await CreateFriendRequests();
+        await CreateUserRelations();
         await CreateMessages();
         await CreateStables();
         //await CreateStableUSers();
         await CreateStableMessages();
-        //await CreateRides();
+        await CreateRides();
         //await CreateRideDetails();
         //await CreateRideReviews();
-        //await CreateTrails();
+        //await CreateRideDetailsDatas();
+        await CreateTrails();
+        //await CreateTrailDetails();
         //await CreateTrailReviews();
-        //await CreateFilters;
+        //await CreateTrailFilters;
 
         return Created();
     }
