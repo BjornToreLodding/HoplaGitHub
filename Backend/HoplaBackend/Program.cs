@@ -11,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Prøver å hente database-url fra miljøvariabelen DATABASE_URL
 string? databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
+// Logger hva som skjer (se i Render logs)
+Console.WriteLine("DATABASE_URL fra miljøvariabel: " + (databaseUrl ?? "IKKE FUNNET"));
+
 string connectionString;
 
 if (!string.IsNullOrEmpty(databaseUrl))
@@ -21,16 +24,18 @@ if (!string.IsNullOrEmpty(databaseUrl))
 
     connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
                        $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=True;";
+
+    Console.WriteLine("Bruker DATABASE_URL fra miljøvariabel.");
 }
 else
 {
-    // Fallback til appsettings.json hvis DATABASE_URL ikke er satt
+    // Fallback til lokal database fra appsettings.json
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new Exception("Database connection string is missing!");
+
+    Console.WriteLine("Miljøvariabel IKKE funnet – bruker DefaultConnection fra appsettings.json.");
 }
-Console.ForegroundColor = ConsoleColor.Blue;
-Console.WriteLine(connectionString);
-Console.ResetColor();
+
 // Konfigurer Entity Framework med riktig connection-string
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -40,6 +45,7 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
+
 
 /*
 using Microsoft.AspNetCore.Builder;
