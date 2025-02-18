@@ -15,7 +15,7 @@ string connectionString;
 
 if (!string.IsNullOrEmpty(databaseUrl))
 {
-    // Konverterer Render sin DATABASE_URL til riktig format for Npgsql
+    // Konverterer Render PostgreSQL URL til et gyldig format for Npgsql
     var uri = new Uri(databaseUrl);
     var userInfo = uri.UserInfo.Split(':');
 
@@ -24,7 +24,7 @@ if (!string.IsNullOrEmpty(databaseUrl))
 }
 else
 {
-    // Bruker fallback fra appsettings.json hvis DATABASE_URL ikke er satt
+    // Fallback til appsettings.json hvis DATABASE_URL ikke er satt
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new Exception("Database connection string is missing!");
 }
@@ -33,11 +33,8 @@ else
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Legger til API-kontrollere
 builder.Services.AddControllers();
-
 var app = builder.Build();
-
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
