@@ -17,14 +17,15 @@
 
 | 🔄 | Metode | Endpoint | Beskrivelse/Parameters |
 |------|--------|-------------------------------|-------------|
-| ✅ | **GET** | [`/div/helloworld`](#get-divhelloworld) | Sjekke om APIet svarer |
-| ✅ | **GET** | [`/div/status`](#get-divstatus) | - oppetid, requestcount + errorcount. |
-| ❌ | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker |
-| ❌ | POST | [`/users`](#post-users) | - opprette ny bruker |
-| ❌ | PUT | [`/users/{userid}`](#put-usersuserid) | - endre noe på en bruker |
-| ❌ | DELETE | [`/users/{userid}`](#delete-usersuserid) | - slette en bruker |
-| ✅ | GET | [`/horses/{userId}`](#get-horsesuserid) | - liste en brukers hester |
-| ❌ | POST | [`/horses`](#post-horses) | - registrere ny hest |
+| ✅ | GET | [`/div/helloworld`](#get-divhelloworld) | Sjekke om APIet svarer |
+| ✅ | GET | [`/div/status`](#get-divstatus) | - oppetid, requestcount + errorcount. |
+| ❌ | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
+| ✅ | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker |
+| ✅ | POST | [`/users`](#post-users) | Oppretter ny bruker |
+| ⚠️ | PUT | [`/users/{userid}`](#put-usersuserid) | Litt mangelfull |
+| ✅ | DELETE | [`/users/{userid}`](#delete-usersuserid) | - slette en bruker |
+| ✅ | GET | [`/horses/{userId}`](#get-horsesuserid) | Liste en brukers hester |
+| ❌ | POST | [`/horses`](#post-horses) | Registrere ny hest på bruker |
 | ❌ | PUT | [`/horses`](#put-horses) | |
 | ❌ | DELETE | [`/horses`](#delete-horses) | |
 | ✅ | GET | [`/userrelations/friends/{userid}`](#get-userrelationsfriendsuserid) | |
@@ -173,42 +174,157 @@ curl -X GET "https://hopla.onrender.com/div/status"
 
 ---
 
-## API-detaljer
-
-### GET /users/{userid}
+### GET /users
 
 🚧🚧🚧 *Under utvikling, kommer senere*
 
+**Beskrivelse:** Henter alle brukere registrert i databasen.
+
+---
+
+### GET /users/{userid}
+
 **Beskrivelse:** Henter informasjon om en spesifikk bruker.
+
+📌 **Path-parametere:**
+| Parameter | Type   | Påkrevd | Beskrivelse |
+|-----------|--------|---------|-------------|
+| `userId`  | Guid string | ✅ Ja   | ID-en til brukeren |
+
+📌 **Syntax:**
+```bash
+GET "https://hopla.onrender.com/users/{userId}"
+```
+
+**Eksempel**
+```bash
+curl -X GET "https://hopla.onrender.com/users/12345678-0000-0000-0001-123456780001"
+```
+
+📌 **Eksempel på respons:**
+```json
+{
+  "id": "12345678-0000-0000-0001-123456780001",
+    "name": "Knugen Kneggason",
+    "alias": "Kneggern",
+    "email": "kneggeknug",
+    "passwordHash": "HashedPassword",
+    "profilePictureUrl": null,
+    "admin": false,
+    "premium": false,
+    "verifiedTrail": false,
+    "createdAt": "2025-02-18T18:39:20.5969544Z",
+    "dob": "2025-02-18T18:39:20.5969547Z",
+    "images": [],
+    "horses": []
+}
+```
+📌 **Mulige statuskoder:**
+- ✅ `200 OK` – Bruker ble hentet.
+- ❌ `404 Not Found` – Ingen bruker ble funnet.
+
 
 ---
 
 ### POST /users
 
-🚧🚧🚧 *Under utvikling, kommer senere*
-
 **Beskrivelse:** Oppretter en ny bruker.
+
+
+📌 **Request Body:**
+```json
+{
+    "Name": "Knugen Kneggason",
+    "Alias": "Kneggern",
+    "Email": "kneggeknug",
+    "PasswordHash": "HashedPassword"
+}
+```
+📌 **Eksempel:**
+```bash
+curl -X POST "https://hopla.onrender.com/users/new" \
+     -H "Content-Type: application/json" \
+     -d '{"Name": "Knugen Kneggason", "Alias": "Kneggern", "Email": "kneggeknug","PasswordHash": "HashedPassword"}'
+```
+**Eksempel på response:**
+```bash
+{
+    "id": "b57f4c5c-aff5-44b2-8b1e-bec55ebb8719",
+    "name": "Knugen Kneggason",
+    "alias": "Kneggern",
+    "email": "kneggeknug",
+    "passwordHash": "HashedPassword",
+    "profilePictureUrl": null,
+    "admin": false,
+    "premium": false,
+    "verifiedTrail": false,
+    "createdAt": "2025-02-18T18:39:20.5969544Z",
+    "dob": "2025-02-18T18:39:20.5969547Z",
+    "images": [],
+    "horses": []
+}
+```
+
+📌 **Mulige statuskoder:**
+- ✅ `201 Created` – Forespørsel sendt.
+- ❌ `400 Bad Request` – Feil input.
 
 ---
 
 ### PUT /users/{userid}
 
-🚧🚧🚧 *Under utvikling, kommer senere*
-
 **Beskrivelse:** Endrer informasjon om en bruker.
+
+📌 **Path-parametere:**
+| Parameter | Type   | Påkrevd | Beskrivelse |
+|-----------|--------|---------|-------------|
+| `userId`  | Guid String | ✅ Ja   | ID-en til brukeren som skal endres |
+
+📌 **Eksempel:**
+```bash
+{
+    "Name": "Knuten Knaggesen",
+    "Alias": "KnutKnagg",
+    "Email": "knut@knagg.no",
+    "PasswordHash": "HashedpassW0rd"
+}
+```
+**Eksempel:**
+```bash
+curl -X PUT "https://hopla.onrender.com/users/{}" \
+     -H "Content-Type: application/json" \
+     -d '{"Name": "Knuten Knaggesen", "Alias": "KuntKnagg", "Email": "knut@knagg.no","PasswordHash": "HashedpassW0rd"}'
+```
+
+📌 **Mulige statuskoder:**
+- ✅ `201 Created` – Forespørsel sendt.
+- ❌ `400 Bad Request` – Feil input.
 
 ---
 
 ### DELETE /users/{userid}
 
-🚧🚧🚧 *Under utvikling, kommer senere*
-
 **Beskrivelse:** Sletter en bruker.
 
+📌 **Path-parametere:**
+| Parameter | Type   | Påkrevd | Beskrivelse |
+|-----------|--------|---------|-------------|
+| `userId`  | Guid String | ✅ Ja   | ID-en til brukeren som sletter brukeren |
+
+📌 **Syntax:**
+```bash
+DELETE "https://hopla.onrender.com/users/delete/{UserId}"
+```
+**Eksempel på response**
+```bash
+curl -X DELETE "https://hopla.onrender.com/users/delete/b57f4c5c-aff5-44b2-8b1e-bec55ebb8719"
+```
+
+📌 **Mulige statuskoder:**
+- ✅ `200 OK` – Relasjonen ble slettet.
+- ❌ `404 Not Found` – Relasjonen eksisterer ikke.
 
 ---
-
-## API-detaljer
 
 ### GET /horses/{userId}
 **Beskrivelse:** Henter en liste over en brukers hester.
