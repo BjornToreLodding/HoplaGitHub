@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 using MyApp.Models;
@@ -5,7 +7,8 @@ using MyApp.Models;
 public static class UserRelationMock 
 {
     public static List<UserRelation> CreateUserRelationMock(List<User> existingUsers){
-        return [
+        return new List<UserRelation> 
+        {
             new UserRelation {
                 FromUserId = 1, ToUserId = 2, Status = "accepted" //, CreatedAt = 
             },
@@ -71,6 +74,6 @@ public static class UserRelationMock
             new UserRelation { FromUserId = 28, ToUserId = 1, Status = "pending" },
             new UserRelation { FromUserId = 29, ToUserId = 1, Status = "pending" },
 
-        ];
+        };
     }
 }

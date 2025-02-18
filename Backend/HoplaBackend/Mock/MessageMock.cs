@@ -1,11 +1,12 @@
-using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
 using MyApp.Models;
 
 public static class MessageMock 
 {
     public static List<Message> CreateMessagesMock(){ 
-        return [
-            
+        return new List<Message>
+        {   
             new Message { SUserId = 1 , RUserId = 2, SentAt = DateTime.UtcNow.AddDays(-9), MessageText = "Hei! Er du interessert i å selge hesten din? Hvor mye selger du den eventuelt for?" },
             new Message { SUserId = 2 , RUserId = 1, SentAt = DateTime.UtcNow.AddDays(-8), MessageText = "Kom med et bud" },
             new Message { SUserId = 1 , RUserId = 2, SentAt = DateTime.UtcNow.AddDays(-7), MessageText = "Jeg har en 10Liters bøtte fra KFC, som er veldig sjeldent. Snakker vi en deal?"},
@@ -25,6 +26,6 @@ public static class MessageMock
             new Message { SUserId = 2 , RUserId = 3, SentAt = DateTime.UtcNow.AddDays(-5), MessageText = "Du må gjerne forsøke å sende regninga hit, men den kommer ikke til å bli betalt av meg. "},
             new Message { SUserId = 3 , RUserId = 2, SentAt = DateTime.UtcNow.AddDays(-4), MessageText = "Hvis du ikke betaler regninga, ringer jeg politiet" }
 
-        ];
+        };
     }
 }

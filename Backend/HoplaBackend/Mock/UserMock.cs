@@ -1,10 +1,13 @@
+using System.Linq;
+using System;
+using System.Collections.Generic;
 using MyApp.Models;
 
 public static class UserMock 
 {
     public static List<User> CreateUsersMock(){
-        return [
-            
+        return new List<User>
+        {            
             new User { Id = 1, Name = "Bjørn Tore Lødding", Alias = "Shredlord", Email = "bjortlod@stud.ntnu.no", PasswordHash = "hashed_pw1", Admin = true, Premium = true, VerifiedTrail = true },
             new User { Id = 2, Name = "Ane Marie", Alias = "Utvikler Anmajo" ,Email = "amjohnse@stud.ntnu.no", PasswordHash = "hashed_pw2", Admin = true, Premium = true, VerifiedTrail = true },
             new User { Id = 3, Name = "Vilde", Alias = "Utvikler Vildesk" ,Email = "vakvaer@stud.ntnu.no", PasswordHash = "hashed_pw3", Admin = true, Premium = true, VerifiedTrail = true },
@@ -47,6 +50,6 @@ public static class UserMock
             
             
 
-        ];
+        };
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MyApp.Models;  // Dette må matche `using`-direktivet i controlleren
 
 public static class StableMessageMock

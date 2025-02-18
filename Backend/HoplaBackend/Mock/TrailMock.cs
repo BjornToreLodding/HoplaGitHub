@@ -1,10 +1,14 @@
+using System.Linq;
+using System;
+using System.Collections.Generic;
 using System.Runtime.Intrinsics.Arm;
 using MyApp.Models;
 
 public static class TrailMock 
 {
     public static List<Trail> CreateTrailsMock(List<Ride> existingRides){ 
-        return [
+        return new List<Trail>
+        {
             
             new Trail { RideId = 1, Ride = existingRides.First(r => r.Id == 1), Name = "Biriløypa", TrailDetails = new TrailDetail { Description = "Flott Løype" }, LatMean = existingRides.First(r => r.Id == 1).RideDetails?.LatMean ?? 0, LongMean = existingRides.First(r => r.Id == 1).RideDetails?.LongMean ?? 0 },
             new Trail { RideId = 2, Ride = existingRides.First(r => r.Id == 2), Name = "Gjøviksruta", TrailDetails = new TrailDetail { Description = "Koselig tur langs forlatte fabrikker" }, LatMean = existingRides.First(r => r.Id == 2).RideDetails?.LatMean ?? 0, LongMean = existingRides.First(r => r.Id == 2).RideDetails?.LongMean ?? 0 },
@@ -14,7 +18,7 @@ public static class TrailMock
             new Trail { RideId = 6, Ride = existingRides.First(r => r.Id == 6), Name = "Motorveiløypa", TrailDetails = new TrailDetail { Description = "Hyggelig tur langs tungt trafikkert vei" } , LatMean = existingRides.First(r => r.Id == 6).RideDetails?.LatMean ?? 0, LongMean = existingRides.First(r => r.Id == 6).RideDetails?.LongMean ?? 0}
 
        
-        ];
+        };
     }
 }
 

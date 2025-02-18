@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using MyApp.Models;
 
 public static class StableMock 
 {
     public static List<Stable> GetStablesMock(){
-        return [
+        return new List<Stable> 
+        {
             new Stable { Name = "Den Kongelige Stall", Location = "Slottsparken"},
             new Stable { Name = "Lommedalen Samdrift", Location = "Lommedalen"},
             new Stable { Name = "Gjøvik Hestesamling", Location = "Gjøvik"},
@@ -11,6 +13,6 @@ public static class StableMock
             new Stable { Name = "Biri Travbane", Location = "Biri"},
             new Stable { Name = "Sørkedalen Stalldrift", Location = "Sørkedalen"}
 
-        ];
+        };
     }
 }

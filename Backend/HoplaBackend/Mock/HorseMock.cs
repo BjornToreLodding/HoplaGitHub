@@ -1,3 +1,6 @@
+using System.Linq;
+using System;
+using System.Collections.Generic;
 using MyApp.Models;
 
 public static class HorseMock 
@@ -7,7 +10,7 @@ public static class HorseMock
         return new List<Horse> 
         {
             new Horse { Id = 1, Name = "Flodhest", UserId = 1, User = existingUsers.First(u => u.Id == 1) },
-            new Horse { Id = 2, Name = "Enhjørning", UserId = 2, User = existingUsers.First(u => u.Id == 2) },
+            new Horse { Id = 2, Name = "Enhjørning", UserId = 2, User = existingUsers.First(u => u.Id == 2) }, //rød strek under First
             new Horse { Id = 3, Name = "Zebra", UserId = 3, User = existingUsers.First(u => u.Id == 3) },
             new Horse { Id = 4, Name = "Sjøhest", UserId = 2, User = existingUsers.First(u => u.Id == 2) },
             new Horse { Id = 5, Name = "Gyngehest", UserId = 4, User = existingUsers.First(u => u.Id == 4) },

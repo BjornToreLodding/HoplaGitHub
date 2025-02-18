@@ -1,4 +1,8 @@
 //using MyApp.Mock;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 using HoplaBackend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -67,28 +71,32 @@ public class MockController : ControllerBase
         }
 
     [HttpPost("createusers")]
-    public async Task<IActionResult> CreateUsers()
+    public async Task<IActionResult> CreateUsers() //rød strek under Task<IActionResult>
     {
-        if (_context.Users.Any()) { return NoContent(); }
+        if (_context.Users.Any()) { return NoContent(); } 
 
         var users = UserMock.CreateUsersMock();
         _context.Users.AddRange(users);
         await _context.SaveChangesAsync();
 
-        return Created();
+        return Created("", new { message = "Success!" }); // Hvis URL ikke trengs
+    
     }
 
     [HttpPost("createhorses")]
     public async Task<IActionResult> CreateHorses()
     {
-        if (_context.Horses.Any()) { return NoContent(); }
+        if (_context.Horses.Any()) { return NoContent(); } //rød strek under .Any
 
-        var existingUsers = _context.Users.ToList();
+        var existingUsers = _context.Users.ToList(); //rød strek under .ToList
         var horses = HorseMock.CreateHorsesMock(existingUsers);
         _context.Horses.AddRange(horses);
         await _context.SaveChangesAsync();
-
-        return Created();
+    
+        return Created("", new { message = "Hester opprettet!", horses });
+        //return Created(nameof(GetHorseById), new { message = "Hester opprettet!", horses });
+    
+        //return Created(); // versjon 12+
     }
     [HttpPost("createuserrelations")]
     public async Task<IActionResult> CreateUserRelations()
@@ -100,7 +108,9 @@ public class MockController : ControllerBase
         _context.UserRelations.AddRange(friendRequests);
         await _context.SaveChangesAsync();
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!", friendRequests });
+
     }
     [HttpPost("createmessages")]
     public async Task<IActionResult> CreateMessages()
@@ -110,7 +120,9 @@ public class MockController : ControllerBase
         _context.Messages.AddRange(messages);
         await _context.SaveChangesAsync();
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!", messages });
+
     }
 
 
@@ -122,7 +134,9 @@ public class MockController : ControllerBase
         _context.Stables.AddRange(stables);
         await _context.SaveChangesAsync();
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!", stables });
+
     }
 
     [HttpPost("createstablemessages")]
@@ -135,7 +149,9 @@ public class MockController : ControllerBase
         _context.StableMessages.AddRange(stableMessages);
         await _context.SaveChangesAsync();
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!", stableMessages });
+
     }
 
     [HttpPost("createrides")]
@@ -146,7 +162,9 @@ public class MockController : ControllerBase
         _context.Rides.AddRange(rides);
         await _context.SaveChangesAsync();
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!", rides });
+
     }
 
     
@@ -172,7 +190,9 @@ public class MockController : ControllerBase
         _context.Trails.AddRange(trails);
         await _context.SaveChangesAsync();
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!", trails });
+
     }
 
 
@@ -203,7 +223,9 @@ public class MockController : ControllerBase
             Haversine = DistanceCalc.Haversine(lat1Value, long1Value, lat2Value, long2Value)
         };
 
-        return Ok(distances);  // Returnerer som JSON
+        //return Ok(distances);  // Returnerer som JSON
+        return Created("", new { message = "opprettet!", distances });
+
     }
 
 
@@ -227,6 +249,8 @@ public class MockController : ControllerBase
         //await CreateTrailReviews();
         //await CreateTrailFilters;
 
-        return Created();
+        //return Created();
+        return Created("", new { message = "opprettet!"});
+
     }
 }

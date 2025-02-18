@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MyApp.Models;
 
 public static class RideMock 
@@ -39,7 +41,8 @@ public static class RideMock
     */
 
     // Gammel kode for backup, hvis koden ovenfor skulle feile.
-        return [
+        return new List<Ride>
+        {
             new Ride { UserId = 1, HorseId = 1, Length = 15.536, Duration = 50, RideDetails = new RideDetail { LatMean = 60.7925,  LongMean = 10.695  }, CreatedAt = DateTime.UtcNow.AddDays(-9) }, //Gjøvik lat 60.7925, long 10.695 
             new Ride { UserId = 1, HorseId = 1, Length = 12.536, Duration = 50, RideDetails = new RideDetail { LatMean = 60.95558, LongMean = 10.6115 }, CreatedAt = DateTime.UtcNow.AddDays(-8) }, //Biri //LatMean = 60.95558, LongMean = 10.6115
             new Ride { UserId = 1, HorseId = 1, Length = 10.536, Duration = 50, RideDetails = new RideDetail { LatMean = 59.95  , LongMean = 10.466667}, CreatedAt = DateTime.UtcNow.AddDays(-7) }, //Lommedalen
@@ -72,7 +75,7 @@ public static class RideMock
             new Ride { UserId = 3, HorseId = 3, Length = 15.536, Duration = 50, RideDetails = new RideDetail { LatMean = 60.7925,  LongMean = 10.695 }, CreatedAt = DateTime.UtcNow.AddDays(-1) },
             new Ride { UserId = 3, HorseId = 3, Length = 15.536, Duration = 50, RideDetails = new RideDetail { LatMean = 60.7925,  LongMean = 10.695 }, CreatedAt = DateTime.UtcNow.AddDays(-0) },
             
-        ];
+        };
         
     }
 }

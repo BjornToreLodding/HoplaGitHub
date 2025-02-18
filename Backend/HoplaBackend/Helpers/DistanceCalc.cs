@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.StaticAssets;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.StaticFiles;
 using System;
 
 namespace HoplaBackend;
