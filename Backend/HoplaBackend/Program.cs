@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-
+//"DefaultConnection": "Host=localhost;Port=5432;Database=hopla3;Username=postgres;Password=Hopla"
+    
 // Legg til nødvendige tjenester (ingen database kreves her)
 builder.Services.AddControllers();
 
