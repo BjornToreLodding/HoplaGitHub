@@ -21,6 +21,8 @@ import androidx.compose.ui.window.Dialog
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 
+// Legge til navn og etternavn i innlogging / profil
+
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var username by remember { mutableStateOf("") }
