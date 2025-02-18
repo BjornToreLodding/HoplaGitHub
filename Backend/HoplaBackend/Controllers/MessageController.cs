@@ -8,7 +8,7 @@ using MyApp.Models;
 namespace MyApp.Controllers;
 
 
-[Route("message")]
+[Route("messages")]
 [ApiController]
 public class MessageController : ControllerBase
 {

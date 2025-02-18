@@ -7,7 +7,7 @@ using MyApp.Data;
 namespace MyApp.Models;
 
 [ApiController]
-[Route("api/mock")]
+[Route("mock")]
 public class MockController : ControllerBase
 {
     private readonly AppDbContext _context;

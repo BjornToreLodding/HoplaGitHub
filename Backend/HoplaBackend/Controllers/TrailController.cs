@@ -7,7 +7,7 @@ using HoplaBackend;
 
 namespace MyApp.Controllers;
 
-[Route("trail")]
+[Route("trails")]
 [ApiController]
 public class TrailController : ControllerBase
 {
@@ -19,6 +19,106 @@ public class TrailController : ControllerBase
     }
 
     [HttpGet("closest")]
+    public async Task<IActionResult> GetClosestTrails(
+        [FromQuery] double latitude, 
+        [FromQuery] double longitude)
+    {
+        // Henter trails direkte fra databasen uten referanser til Rides
+        var trails = await _context.Trails.ToListAsync();
+
+        List<object> validTrails = new List<object>();
+        int excludedCount = 0;
+        string logFilePath = "logs/trail_errors.log";
+        string? logDirectory = Path.GetDirectoryName(logFilePath);
+
+        if (!string.IsNullOrEmpty(logDirectory))
+        {
+            Directory.CreateDirectory(logDirectory);
+        }
+
+        using (StreamWriter logFile = new StreamWriter(logFilePath, true))
+        {
+            foreach (var t in trails)
+            {
+                //if (!t.LatMean.Value || !t.LongMean.HasValue) //fungerer ikke. Nødløsning nedenfor
+                if (t.LatMean == 0 || t.LongMean == 0)
+
+                {
+                    excludedCount++;
+                    string errorMessage = $"Trail '{t.Name}' (ID: {t.Id}) har ugyldige koordinater.";
+
+                    Console.WriteLine("Warning: " + errorMessage);
+                    logFile.WriteLine($"{DateTime.UtcNow}: {errorMessage}");
+                    continue;
+                }
+
+                validTrails.Add(new
+                {
+                    t.Id,
+                    t.Name,
+                    //t.TrailDetails.Description, 
+                    Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean)
+                });
+            }
+        }
+
+        Console.WriteLine($"Antall trails filtrert ut pga. manglende koordinater: {excludedCount}");
+        Console.WriteLine($"Antall gyldige trails som sendes til frontend: {validTrails.Count}");
+
+        var sortedTrails = validTrails.OrderBy(t => ((dynamic)t).Distance).ToList();
+        return Ok(sortedTrails);
+    }
+
+    [HttpGet("list")]
+    public async Task<IActionResult> CreateTrailsList(
+        [FromQuery] double latitude, 
+        [FromQuery] double longitude,
+        [FromQuery] double? Width ,
+        [FromQuery] double? Height,
+        [FromQuery] int zoomlevel) //
+    {
+        //Width og Height er optional. Hvis de ikke er oppgitt, settes de til følgende standardverdier
+        double screenPixelsWidth = Width ?? 1080;
+        double screenPixelsHeight = Height ?? 2400;
+
+        // beregne hvilke verdier skjermen har ut i fra zoomlevel. 
+        var (latMin, latMax, longMin, longMax) = CoordinateCalculator.MapZoomLevel(latitude, longitude, screenPixelsWidth, screenPixelsHeight, zoomlevel);
+
+        // Henter trails direkte fra databasen uten referanser til Rides
+        //var trails = await _context.Trails.ToListAsync();
+
+        
+        Console.ForegroundColor = ConsoleColor.Blue; // Endrer tekstfarge til lilla
+        Console.WriteLine($"latMin {latMin}");
+        Console.WriteLine($"latMax {latMax}");
+        Console.WriteLine($"longMin {longMin}");
+        Console.WriteLine($"longMax {longMax}");
+        Console.ResetColor();
+        List<object> validTrails = new List<object>();
+        
+        // Finne ruter som kan tegnes inn på kartet.
+        // Dette gjøres på en veldig enkel måte, men medfører at den også finner noen ruter utenfor kartet.
+        // Dette er til hjelp når man skal flytte kartutsnittet.
+        // Denne metoden medfører minimalt med regneoperasjoner som gir bedre responstid
+        // Planen er også caching av det som allerede er tegnet opp, slik at man slipper å hente samme data igjen og igjen.
+        //
+        // Finne alle ruter som kan touche kartet ved å bruke latMean og longMean og t.distance / 2
+        // Dette kan kun skje hvis ruta går på perfekt rett linje enten vertikalt eller horisontalt.
+        // Så benyttes enkle kollisjonsdeteksjons-teknikker. 
+        //først sjekke mot latitude og om løypa kan ligge innenfor kartutsnittet. 
+        // Det gjør ingen ting å ta det med hvis det ligger litt utenfor. 
+        // Det er bedre å tegne opp lit for mye som ligger uten for kartutsnittet enn at backend skal gjøre unødvendig mye beregninger
+    
+        // Filtrerer trails som er innenfor kartgrensene
+        var trails = await _context.Trails
+            .Where(t => t.LatMean >= latMin && t.LatMean <= latMax 
+                    && t.LongMean >= longMin && t.LongMean <= longMax)
+            .ToListAsync();
+
+        return Ok(trails);   
+         }
+
+    /*[HttpGet("closest")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 
         [FromQuery] double longitude)
@@ -71,6 +171,7 @@ public class TrailController : ControllerBase
         var sortedTrails = validTrails.OrderBy(t => ((dynamic)t).Distance).ToList();
         return Ok(sortedTrails);
     }
+    */
 
 
     /*
@@ -103,8 +204,10 @@ public class TrailController : ControllerBase
     */
 
 
+    // Erstattet med enklere formel.
+    // Beregner avstand mellom to koordinater med Haversine-formelen. Ikke i bruk lenger.
 
-    // Beregner avstand mellom to koordinater med Haversine-formelen
+    /*
     private static double GetDistance(double lat1, double lon1, double lat2, double lon2)
     {
         var R = 6371.0; // Jordens radius i km
@@ -116,4 +219,5 @@ public class TrailController : ControllerBase
         var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
         return R * c; // Avstand i km
     }
+    */
 }

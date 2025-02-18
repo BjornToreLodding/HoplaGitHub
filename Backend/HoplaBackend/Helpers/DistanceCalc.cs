@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.StaticAssets;
 using System;
 
 namespace HoplaBackend;
+
+// Vurder å bytt navn på denne fila til CoordinatesCalc, men rename evt CoorinateCalculator-klassen
 public static class DistanceCalc
 {
         //Avstanden mellom longitude vil variere ut i fra hvilken Latitude man befinner seg på. LatNordpolen = 0. LatEkvator = 90. Mulig jeg har blandet sammen hva som er hva av Lat og Long.
@@ -55,3 +57,39 @@ public static class DistanceCalc
 
     }
 }
+    public static class CoordinateCalculator
+    {
+        public static (double latMin, double latMax, double longMin, double longMax) MapZoomLevel(double latitude, double longitude, double screenPixelsWidth, double screenPixelsHeight, int zoomlevel)
+        {
+            // Zoom-regel: Kartbredde/høyde = 360° / 2^zoomLevel
+            double mapHeightDegrees = 360.0 / Math.Pow(2, zoomlevel) * (screenPixelsHeight / screenPixelsWidth);
+            //Itilfelle man har zoomet veldig langt ut, justerer man for bredden øverst på skjermen.
+            double mapWidthDegrees = 360.0 / Math.Pow(2, zoomlevel) * Math.Cos((latitude + mapHeightDegrees) / 2 * Math.PI / 180);
+
+            Console.ForegroundColor = ConsoleColor.Magenta; // Endrer tekstfarge til lilla
+            Console.WriteLine($"mapHeightDegresse {mapHeightDegrees}");
+            Console.WriteLine($"mapWidthDegrees {mapWidthDegrees}");
+            Console.WriteLine($"Zoomlevel {zoomlevel}");
+            Console.WriteLine($"pixelsheigth {screenPixelsHeight}");
+            Console.WriteLine($"pixelswidth {screenPixelsWidth}");
+            
+            Console.ResetColor();
+        //List<object> validTrails = new List<object>();
+
+            double latMin = latitude - mapHeightDegrees / 2;
+            double latMax = latitude + mapHeightDegrees / 2;
+            double longMin = longitude - mapWidthDegrees / 2;
+            double longMax = longitude + mapWidthDegrees / 2;
+
+            //Feil under her. Det skal være 360/2^zoomlevel og ikke 360 / (2 * zoomlevel).
+            /*
+            double latMin = latitude - 360 * screenPixelsHeight / screenPixelsWidth * 360 / 2 / 2 / zoomlevel ;
+            // Jeg mener denne bør være lik som den ovenfor. Jeg liker å skrive tydelig i paranteres for å markere, men C# liker ikke det.
+            double latMax = latitude + screenPixelsHeight / screenPixelsWidth * 360 / (2 * 2 * zoomlevel ) ;
+            double longMin = longitude - Math.Cos(latitude) * 360 / (2 * 2 * zoomlevel );
+            double longMax = longitude + Math.Cos(latitude) * 360 / (2 * 2 * zoomlevel );
+            */
+            return (latMin, latMax, longMin, longMax);
+            
+        }
+    }

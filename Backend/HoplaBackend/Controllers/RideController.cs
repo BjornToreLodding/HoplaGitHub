@@ -23,6 +23,8 @@ public class RideController : ControllerBase
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetUserRides(int userId)
     {
+        //Burde kanskje lage noen querys. Dette kan være ?limit og ?next.
+        //Når man har bladd ned til bunnen, burde frontend spørre om neste 20 rides
         var rides = await _context.Rides
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.CreatedAt) // Sorterer synkende på dato
@@ -95,7 +97,7 @@ public class RideController : ControllerBase
         if (rideTrackingData == null)
             return NotFound("Ride tracking data not found.");
 
-        // 🚀 Returnerer TrackingPoints fra JSON-kolonnen
+        // Returnerer TrackingPoints fra JSON-kolonnen
         var result = new
         {
             rideTrackingData.Id,

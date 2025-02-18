@@ -12,6 +12,7 @@ public class Trail
     public string? Name { get; set; }
     public double LatMean { get; set; }
     public double LongMean { get; set; }
+    //public double? Length { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int RideId { get; set; } // FK til Ride (for å kopiere data)
