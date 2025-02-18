@@ -1,10 +1,82 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "All Posts" : {
+    "Antall" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antall"
+          }
+        }
+      }
+    },
+    "Are you sure you want to delete your user?" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sikker på at du vil slette brukeren din?"
+          }
+        }
+      }
+    },
+    "Are you sure you want to log out?" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sikker på at du vil logge ut?"
+          }
+        }
+      }
+    },
+    "Bob" : {
 
     },
-    
+    "bob@mail.no" : {
+
+    },
+    "Camera" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avbryt"
+          }
+        }
+      }
+    },
+    "Change password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre passord"
+          }
+        }
+      }
+    },
+    "Change Password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre passord"
+          }
+        }
+      }
+    },
     "Community" : {
       "comment" : "Community tab",
       "localizations" : {
@@ -16,10 +88,147 @@
         }
       }
     },
+    "Confirm" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekreft"
+          }
+        }
+      }
+    },
+    "Confirm new password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekreft nytt passord"
+          }
+        }
+      }
+    },
+    "Dark mode" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mørk-modus"
+          }
+        }
+      }
+    },
+    "Delete User" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett bruker"
+          }
+        }
+      }
+    },
+    "Display" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visning"
+          }
+        }
+      }
+    },
+    "E-mail" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-post"
+          }
+        }
+      }
+    },
+    "English" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engelsk"
+          }
+        }
+      }
+    },
+    "Enter new password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv nytt passord"
+          }
+        }
+      }
+    },
+    "Enter old password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv gammelt passord"
+          }
+        }
+      }
+    },
+    "Enter your password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn passord"
+          }
+        }
+      }
+    },
+    "Enter your username" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn brukernavn"
+          }
+        }
+      }
+    },
     "Filter" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        }
+      }
+    },
+    "Following" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Følger"
+          }
+        }
+      }
     },
     "Friends" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venner"
+          }
+        }
+      }
+    },
+    "Halla" : {
 
     },
     "Hikes" : {
@@ -43,37 +252,98 @@
         }
       }
     },
-    "Liked" : {
-
-    },
-    "Location" : {
-
-    },
-    "Map" : {
-
-    },
-    "More" : {
-
-    },
-    "New hike" : {
-      "comment" : "New hike tab",
+    "Log In" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ny tur"
+            "value" : "Logg inn"
+          }
+        }
+      }
+    },
+    "Log Out" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logg ut"
+          }
+        }
+      }
+    },
+    "My hikes" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine turer"
+          }
+        }
+      }
+    },
+    "My Hikes" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine turer"
           }
         }
       }
     },
     "New Hike" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny Tur"
+          }
+        }
+      }
     },
-    "Popular" : {
+    "Not a member? Sign up" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ikke medlem? Ny bruker"
+          }
+        }
+      }
+    },
+    "Password" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passord"
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        }
+      }
+    },
+    "Pil tilbake" : {
 
     },
     "Posts" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Innlegg"
+          }
+        }
+      }
     },
     "Profile" : {
       "comment" : "Profile tab",
@@ -86,8 +356,48 @@
         }
       }
     },
-    "Updates" : {
+    "Search bar" : {
 
+    },
+    "Settings" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Innstillinger"
+          }
+        }
+      }
+    },
+    "Submit" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send inn"
+          }
+        }
+      }
+    },
+    "The app must reload to apply language change" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appen må lastes inn på nytt etter språkendring"
+          }
+        }
+      }
+    },
+    "Username" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brukernavn"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

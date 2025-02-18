@@ -9,7 +9,23 @@ import SwiftUI
 
 struct Community: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    @State private var selectedFilter = "Location" // Track selected filter
+    // Track selected filter
+    @State private var selectedFilter: String = "location"
+    
+    // To select a filter
+    enum FilterOption: String, CaseIterable, Identifiable {
+            case location
+            case heart
+
+            var id: String { self.rawValue }
+
+            var systemImage: String {
+                switch self {
+                case .location: return "location"
+                case .heart: return "heart"
+                }
+            }
+        }
     
     // Sample data
     let groups = [
@@ -19,38 +35,41 @@ struct Community: View {
     ]
     
     var body: some View {
-        NavigationStack { // Navigation
-            filterBar
-            ZStack {
-                // Background color for the entire app
-                AdaptiveColor.background.color(for: colorScheme)
-                    .ignoresSafeArea()
-                VStack {
-                    // Groups list
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(groups, id: \.image) { post in
-                                GroupContainer(imageName: post.image, comment: post.comment)
+        NavigationStack {
+            VStack(spacing: 0) { // Ensure no extra spacing
+                filterBar
+                ZStack {
+                    // Background color for the entire app
+                    AdaptiveColor.background.color(for: colorScheme)
+                        .ignoresSafeArea()
+                    VStack {
+                        // Groups list
+                        ScrollView {
+                            VStack(spacing: 10) {
+                                ForEach(groups, id: \.image) { post in
+                                    GroupContainer(imageName: post.image, comment: post.comment)
+                                }
                             }
+                            .padding()
                         }
-                        .padding()
                     }
-                    
                 }
             }
         }
     }
     // MARK: - Filter Bar Below Logo
-        private var filterBar: some View {
-            HStack {
-                Picker("Filter", selection: $selectedFilter) {
-                    Text("Location").tag("Location")
-                    Text("Liked").tag("Liked")
-                }
-                .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
+    private var filterBar: some View {
+        HStack {
+            SwiftUI.Picker("Filter", selection: $selectedFilter) {
+                Image(systemName: "location").tag("location")
+                Image(systemName: "heart").tag("heart")
             }
-            .background(Color.lighterGreen)
+            .padding(.top, 30)
+            .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
         }
+        .frame(height: 60)
+        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+    }
 }
 
 
