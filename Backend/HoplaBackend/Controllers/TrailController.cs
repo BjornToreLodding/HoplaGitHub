@@ -4,6 +4,10 @@ using MyApp.Data;
 using MyApp.Models;
 using System.IO;
 using HoplaBackend;
+using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyApp.Controllers;
 

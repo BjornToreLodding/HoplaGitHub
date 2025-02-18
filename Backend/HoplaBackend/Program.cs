@@ -28,7 +28,9 @@ else
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new Exception("Database connection string is missing!");
 }
-
+Console.ForegroundColor = ConsoleColor.Blue;
+Console.WriteLine(connectionString);
+Console.ResetColor();
 // Konfigurer Entity Framework med riktig connection-string
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
