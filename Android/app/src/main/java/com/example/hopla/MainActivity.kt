@@ -1,17 +1,21 @@
 package com.example.hopla
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,64 +29,155 @@ import androidx.lifecycle.ViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import java.util.Locale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.sp
+import com.example.hopla.ui.theme.PrimaryWhite
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+
 
 class MainActivity : ComponentActivity() {
 
-    private val languageViewModel: LanguageViewModel by viewModels()
+    private val languageViewModel: LanguageViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return LanguageViewModel(applicationContext, SavedStateHandle()) as T
+            }
+        }
+    }
+
     private val themeViewModel: ThemeViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
+            val currentLanguage = languageViewModel.selectedLanguage.value
+            setLocale(this, if (currentLanguage == "Norwegian") "no" else "en")
+
             HoplaTheme {
                 val navController = rememberNavController()
                 val isLoggedIn by userViewModel.isLoggedIn
+
                 if (isLoggedIn) {
                     Scaffold(
-                        bottomBar = { BottomNavigationBar(navController, languageViewModel) }
+                        topBar = { TopBar() },
+                        bottomBar = { BottomNavigationBar(navController) }
                     ) { innerPadding ->
                         NavHost(
                             navController = navController,
                             startDestination = Screen.Home.route,
                             modifier = Modifier.padding(innerPadding)
                         ) {
-                            composable(Screen.Home.route) { HomeScreen(languageViewModel) }
-                            composable(Screen.Profile.route) { ProfileScreen(languageViewModel) }
-                            composable(Screen.Settings.route) {
-                                SettingsScreen(
-                                    languageViewModel,
-                                    themeViewModel,
-                                    userViewModel
-                                )
+                            composable(Screen.Home.route) { HomeScreen() }
+                            composable(Screen.Trails.route) { TrailsScreen() }
+                            composable(Screen.NewTrip.route) { NewTripScreen() }
+                            composable(Screen.Community.route) { CommunityScreen(navController) }
+                            composable(Screen.Profile.route) { ProfileScreen( navController) }
+                            composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
+                            composable("my_trips") { MyTripsScreen(navController) }
+                            composable("friends") { FriendsScreen(navController) }
+                            composable("following") { FollowingScreen(navController) }
+                            // Update the composable block in MainActivity.kt
+                            composable(
+                                "communityDetail/{communityName}",
+                                arguments = listOf(navArgument("communityName") { type = NavType.StringType })
+                            ) { backStackEntry ->
+                                val communityName = backStackEntry.arguments?.getString("communityName")
+                                val communityGroup = communityName?.let { getCommunityGroupByName(it) }
+                                communityGroup?.let { CommunityDetailScreen(it) }
                             }
                         }
                     }
                 } else {
-                    LoginScreen(languageViewModel = languageViewModel) { userViewModel.logIn() }
+                    LoginScreen(
+                        onLogin = { userViewModel.logIn() },
+                        onCreateUser = { /* Handle create user action */ }
+                    )
                 }
             }
         }
     }
+
+    private fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = context.resources.configuration
+        config.setLocale(locale)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar(navController: NavHostController, languageViewModel: LanguageViewModel) {
+fun TopBar() {
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo1), // Load the image
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .height(40.dp) // Adjust size
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    )
+}
+
+
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         Screen.Home,
-        Screen.Profile,
-        Screen.Settings
+        Screen.Trails,
+        Screen.NewTrip,
+        Screen.Community,
+        Screen.Profile
     )
-    val language = languageViewModel.selectedLanguage.value
+    val context = LocalContext.current
     BottomNavigation(
-        modifier = Modifier.height(100.dp)
+        modifier = Modifier.height(100.dp),
+        backgroundColor = MaterialTheme.colorScheme.primary
     ) {
         val currentRoute = navController.currentBackStackEntry?.destination?.route
         items.forEach { screen ->
             BottomNavigationItem(
-                icon = { /* Add your icon here */ },
-                label = { Text(screen.titleProvider(language)) },
+                icon = {
+                    when(screen) {
+                        Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null)
+                        Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null)
+                        Screen.NewTrip -> Icon(Icons.Outlined.Add, contentDescription = null)
+                        Screen.Trails -> Icon(Icons.Outlined.LocationOn, contentDescription = null)
+                        Screen.Community -> Icon(Icons.Outlined.Face, contentDescription = null)
+                    }
+                },
+                label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
@@ -94,20 +189,6 @@ fun BottomNavigationBar(navController: NavHostController, languageViewModel: Lan
                     }
                 }
             )
-        }
-    }
-}
-
-@Composable
-fun LoginScreen(languageViewModel: LanguageViewModel, onLogin: () -> Unit) {
-    val language = languageViewModel.selectedLanguage.value
-    val loginText = if (language == "Norwegian") "Vennligst logg inn" else "Please log in"
-    val buttonText = if (language == "Norwegian") "Logg Inn" else "Log In"
-
-    Column {
-        Text(loginText)
-        Button(onClick = onLogin) {
-            Text(buttonText)
         }
     }
 }
@@ -128,8 +209,12 @@ class UserViewModel : ViewModel() {
     }
 }
 
-sealed class Screen(val route: String, val titleProvider: (String) -> String) {
-    data object Home : Screen("home", { language -> if (language == "Norwegian") "Hjem" else "Home" })
-    data object Profile : Screen("profile", { language -> if (language == "Norwegian") "Profil" else "Profile" })
-    data object Settings : Screen("settings", { language -> if (language == "Norwegian") "Innstillinger" else "Settings" })
+sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
+    data object Home : Screen("home", { context -> context.getString(R.string.home) })
+    data object Trails : Screen("trails", { context -> context.getString(R.string.trails) })
+    data object NewTrip : Screen("new_trip", { context -> context.getString(R.string.new_trip) })
+    data object Community : Screen("community", { context -> context.getString(R.string.community) })
+    data object Profile : Screen("profile", { context -> context.getString(R.string.profile) })
 }
+
+

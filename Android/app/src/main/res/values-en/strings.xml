@@ -1,0 +1,79 @@
+<resources>
+    <string name="hello_world">Hello English!</string>
+    <string name="app_name">Hopla</string>
+    <string name="home_screen">Home Screen</string>
+    <string name="profile_screen">Profile Screen</string>
+    <string name="settings_screen">Settings</string>
+    <string name="language">Language</string>
+    <string name="norwegian">Norwegian</string>
+    <string name="english">English</string>
+    <string name="settings">Settings</string>
+    <string name="log_out">Log out</string>
+    <string name="log_in">Log in</string>
+    <string name="delete_user">Delete user</string>
+    <string name="mode">Mode</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+
+    <string name="home">Home</string>
+    <string name="routes">Routes</string>
+    <string name="map">Map</string>
+    <string name="stables">Stables</string>
+    <string name="profile">Profile</string>
+
+    <string name="back">Back</string>
+    <string name="change_profile_picture">Change profile picture</string>
+
+    <string name="my_trips">My trips</string>
+    <string name="friends">Friends</string>
+    <string name="following">Following</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="create_user">Create user</string>
+    <string name="email">E-mail</string>
+    <string name="change_password">Change password</string>
+    <string name="take_a_picture">Take a picture</string>
+    <string name="choose_from_library">Choose from library</string>
+    <string name="cancel">Cancel</string>
+    <string name="profile_pic_description">Choose between taking a picture or choosing from library to change profile picture</string>
+
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
+    <string name="confirm_password">Confirm password</string>
+
+    <string name="send_a_report">Send a report</string>
+    <string name="report">Report</string>
+    <string name="title">Title</string>
+    <string name="confirm">Confirm</string>
+    <string name="send">Send</string>
+
+    <string name="start_trip">Start trip</string>
+    <string name="new_updates">New updates</string>
+    <string name="easy_trip_for_everyone_Parking">Easy trip for everyone. Parking</string>
+    <string name="assessment">Assessment:</string>
+    <string name="my_assessment">My assessment:</string>
+    <string name="latest_update_about_the_route">Latest update about the route</string>
+
+    <string name="all">All</string>
+    <string name="area">Area</string>
+    <string name="popular">Popular</string>
+    <string name="updates">Updates</string>
+    <string name="new_trip">New trip</string>
+    <string name="trails">Trails</string>
+    <string name="community">Community</string>
+    <string name="position">Position</string>
+    <string name="liked">Liked</string>
+
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="time">Time</string>
+    <string name="distance">Distance</string>
+
+    <string name="trip_summary">Trip summary</string>
+    <string name="trip_name">Trip name</string>
+    <string name="description">Description</string>
+    <string name="save">Save</string>
+    <string name="forgot_password">Forgot password</string>
+
+</resources>

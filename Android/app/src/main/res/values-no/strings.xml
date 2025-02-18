@@ -1,16 +1,16 @@
 <resources>
+    <string name="hello_world">Hello Norsk!</string>
     <string name="app_name">Hopla</string>
-    <string name="home_screen">Home Screen</string>
+    <string name="home_screen">Hjemskjerm</string>
     <string name="profile_screen">Profile Screen</string>
     <string name="settings_screen">Settings</string>
     <string name="language">Språk</string>
     <string name="norwegian">Norwegian</string>
     <string name="english">English</string>
     <string name="settings">Innstillinger</string>
-    <string name="hello_world">Hello Default!</string>
-    <string name="log_out">Logg ut default</string>
-    <string name="log_in">Log in</string>
-    <string name="delete_user">Slett bruker default</string>
+    <string name="log_out">Logg ut</string>
+    <string name="log_in">Logg in</string>
+    <string name="delete_user">Slett bruker</string>
     <string name="mode">Modus</string>
     <string name="light">Lys</string>
     <string name="dark">Mørk</string>
@@ -37,13 +37,14 @@
     <string name="choose_from_library">Velg fra bibliotek</string>
     <string name="cancel">Avslutt</string>
     <string name="profile_pic_description">Velg mellom å ta bilde eller velge fra bibliotek for å endre profilbilde</string>
+
     <string name="current_password">Nåværende passord</string>
     <string name="new_password">Nytt passord</string>
     <string name="confirm_password">Bekreft passord</string>
 
     <string name="send_a_report">Send en rapport</string>
     <string name="report">Rapport</string>
-    <string name="title">Tittel</string>
+    <string name="title">TIttel</string>
     <string name="send">Send</string>
     <string name="confirm">Bekreft</string>
 
@@ -74,5 +75,6 @@
     <string name="description">Beskrivelse</string>
     <string name="save">Lagre</string>
     <string name="forgot_password">Glemt passord</string>
+
 
 </resources>
