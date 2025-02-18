@@ -56,7 +56,16 @@ import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.lifecycle.AndroidViewModel
+
+data class Trip(
+    val name: String,
+    val date: String,
+    val length: String,
+    val time: String
+)
 
 @Composable
 fun ProfileScreen(
@@ -605,6 +614,12 @@ fun UserChanges(modifier: Modifier = Modifier) {
 
 @Composable
 fun MyTripsScreen(navController: NavController) {
+    val trips = listOf(
+        Trip("Trip to the mountains", "2023-10-01", "10 km", "2 hours"),
+        Trip("City walk", "2023-09-15", "5 km", "1 hour"),
+        Trip("Beach run", "2023-08-20", "8 km", "1.5 hours")
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -637,6 +652,33 @@ fun MyTripsScreen(navController: NavController) {
                     fontSize = 24.sp
                 )
             }
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(trips) { trip ->
+                TripItem(trip)
+            }
+        }
+    }
+}
+
+@Composable
+fun TripItem(trip: Trip) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .clickable { /* Handle click event */ }
+            .padding(16.dp)
+    ) {
+        Column {
+            Text(text = trip.name, style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Date: ${trip.date}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Length: ${trip.length}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Time: ${trip.time}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
