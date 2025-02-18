@@ -8,7 +8,7 @@ namespace MyApp.Models;
 public class TrailAllCoordinate
 {
     [Key, ForeignKey("Trail")]
-    public int Id { get; set; } // Samme som Trail.Id
+    public Guid Id { get; set; } // Samme som Trail.Id
 
     public Trail Trail { get; set; } = null!;
 
@@ -18,7 +18,7 @@ public class TrailAllCoordinate
 public class TrailCoordinate
 {
     public int Id { get; set; }
-    public int TrailAllCoordinatesId { get; set; } // FK til TrailAllCoordinates
+    public Guid TrailAllCoordinatesId { get; set; } // FK til TrailAllCoordinates
     public TrailAllCoordinate TrailAllCoordinates { get; set; } = null!;
 
     public double Lat { get; set; }

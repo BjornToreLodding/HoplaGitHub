@@ -16,8 +16,7 @@ namespace HoplaBackend.Migrations
                 name: "Images",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
                     ThumbnailUrl = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
@@ -32,8 +31,7 @@ namespace HoplaBackend.Migrations
                 name: "Stables",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: true),
                     PrivateGroup = table.Column<bool>(type: "boolean", nullable: false),
@@ -50,10 +48,9 @@ namespace HoplaBackend.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Alias = table.Column<string>(type: "text", nullable: true),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
+                    Alias = table.Column<string>(type: "text", nullable: true),
                     Email = table.Column<string>(type: "text", nullable: true),
                     PasswordHash = table.Column<string>(type: "text", nullable: true),
                     ProfilePictureUrl = table.Column<string>(type: "text", nullable: true),
@@ -72,12 +69,11 @@ namespace HoplaBackend.Migrations
                 name: "Horses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Breed = table.Column<string>(type: "text", nullable: true),
-                    Age = table.Column<int>(type: "integer", nullable: true),
+                    Dob = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -96,8 +92,8 @@ namespace HoplaBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SUserId = table.Column<int>(type: "integer", nullable: false),
-                    RUserId = table.Column<int>(type: "integer", nullable: false),
+                    SUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     MessageText = table.Column<string>(type: "text", nullable: false),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -122,10 +118,9 @@ namespace HoplaBackend.Migrations
                 name: "StableMessages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    StableId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StableId = table.Column<Guid>(type: "uuid", nullable: false),
                     MessageText = table.Column<string>(type: "text", nullable: false),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -150,10 +145,9 @@ namespace HoplaBackend.Migrations
                 name: "StableUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    StableId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StableId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsOwner = table.Column<bool>(type: "boolean", nullable: false),
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
@@ -182,8 +176,8 @@ namespace HoplaBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FromUserId = table.Column<int>(type: "integer", nullable: false),
-                    ToUserId = table.Column<int>(type: "integer", nullable: false),
+                    FromUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ToUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -208,13 +202,12 @@ namespace HoplaBackend.Migrations
                 name: "EntityImages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ImageId = table.Column<int>(type: "integer", nullable: true),
-                    RideDetailId = table.Column<int>(type: "integer", nullable: true),
-                    TrailDetailsId = table.Column<int>(type: "integer", nullable: true),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ImageId = table.Column<Guid>(type: "uuid", nullable: true),
+                    RideDetailId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TrailDetailsId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: true)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -235,7 +228,7 @@ namespace HoplaBackend.Migrations
                 name: "RideDetails",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     LatMean = table.Column<double>(type: "double precision", nullable: true),
                     LongMean = table.Column<double>(type: "double precision", nullable: true),
                     LatMin = table.Column<double>(type: "double precision", nullable: true),
@@ -254,8 +247,8 @@ namespace HoplaBackend.Migrations
                 name: "RideReviews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false),
                     ReviewText = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -275,14 +268,12 @@ namespace HoplaBackend.Migrations
                 name: "Rides",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Length = table.Column<double>(type: "double precision", nullable: false),
                     Duration = table.Column<double>(type: "double precision", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
-                    HorseId = table.Column<int>(type: "integer", nullable: true),
-                    TrailId = table.Column<int>(type: "integer", nullable: true),
-                    RideId = table.Column<int>(type: "integer", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    HorseId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TrailId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -304,7 +295,8 @@ namespace HoplaBackend.Migrations
                 name: "RideTrackingDatas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TrackingPoints = table.Column<string>(type: "json", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -321,12 +313,12 @@ namespace HoplaBackend.Migrations
                 name: "Trails",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
                     LatMean = table.Column<double>(type: "double precision", nullable: false),
                     LongMean = table.Column<double>(type: "double precision", nullable: false),
-                    RideId = table.Column<int>(type: "integer", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RideId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -340,21 +332,21 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrackingPoint",
+                name: "TrackingPoints",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RideTrackingDataId = table.Column<int>(type: "integer", nullable: false),
+                    RideTrackingDataId = table.Column<Guid>(type: "uuid", nullable: false),
                     Lat = table.Column<double>(type: "double precision", nullable: false),
                     Long = table.Column<double>(type: "double precision", nullable: false),
                     TimeSinceLast = table.Column<double>(type: "double precision", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrackingPoint", x => x.Id);
+                    table.PrimaryKey("PK_TrackingPoints", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrackingPoint_RideTrackingDatas_RideTrackingDataId",
+                        name: "FK_TrackingPoints_RideTrackingDatas_RideTrackingDataId",
                         column: x => x.RideTrackingDataId,
                         principalTable: "RideTrackingDatas",
                         principalColumn: "Id",
@@ -365,7 +357,7 @@ namespace HoplaBackend.Migrations
                 name: "TrailAllCoordinates",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -382,7 +374,13 @@ namespace HoplaBackend.Migrations
                 name: "TrailDetails",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PictureThumbURL = table.Column<string>(type: "text", nullable: true),
+                    PictureFullURL = table.Column<string>(type: "text", nullable: true),
+                    LatMin = table.Column<double>(type: "double precision", nullable: true),
+                    LongMin = table.Column<double>(type: "double precision", nullable: true),
+                    LatMax = table.Column<double>(type: "double precision", nullable: true),
+                    LongMax = table.Column<double>(type: "double precision", nullable: true),
                     JsonCoordinates50 = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     Notes = table.Column<string>(type: "text", nullable: false)
@@ -402,7 +400,7 @@ namespace HoplaBackend.Migrations
                 name: "TrailFilters",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Length = table.Column<double>(type: "double precision", nullable: false),
                     HasBridge = table.Column<bool>(type: "boolean", nullable: false),
                     Season = table.Column<string>(type: "text", nullable: false),
@@ -426,10 +424,9 @@ namespace HoplaBackend.Migrations
                 name: "TrailReview",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TrailId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TrailId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false),
                     ReviewText = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -457,7 +454,7 @@ namespace HoplaBackend.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TrailAllCoordinatesId = table.Column<int>(type: "integer", nullable: false),
+                    TrailAllCoordinatesId = table.Column<Guid>(type: "uuid", nullable: false),
                     Lat = table.Column<double>(type: "double precision", nullable: false),
                     Long = table.Column<double>(type: "double precision", nullable: false)
                 },
@@ -518,9 +515,9 @@ namespace HoplaBackend.Migrations
                 column: "HorseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rides_RideId",
+                name: "IX_Rides_TrailId",
                 table: "Rides",
-                column: "RideId");
+                column: "TrailId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rides_UserId",
@@ -548,8 +545,8 @@ namespace HoplaBackend.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrackingPoint_RideTrackingDataId",
-                table: "TrackingPoint",
+                name: "IX_TrackingPoints_RideTrackingDataId",
+                table: "TrackingPoints",
                 column: "RideTrackingDataId");
 
             migrationBuilder.CreateIndex(
@@ -615,9 +612,9 @@ namespace HoplaBackend.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Rides_Trails_RideId",
+                name: "FK_Rides_Trails_TrailId",
                 table: "Rides",
-                column: "RideId",
+                column: "TrailId",
                 principalTable: "Trails",
                 principalColumn: "Id");
         }
@@ -653,7 +650,7 @@ namespace HoplaBackend.Migrations
                 name: "StableUsers");
 
             migrationBuilder.DropTable(
-                name: "TrackingPoint");
+                name: "TrackingPoints");
 
             migrationBuilder.DropTable(
                 name: "TrailCoordinate");

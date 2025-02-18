@@ -8,19 +8,19 @@ namespace MyApp.Models;
 
 public class Ride
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public double Length { get; set; }
     public double Duration { get; set; }
 
-    public int? UserId { get; set; }
+    public Guid? UserId { get; set; }
     [ForeignKey("UserId")]
     public User? User { get; set; }
 
-    public int? HorseId { get; set; }
+    public Guid? HorseId { get; set; }
     [ForeignKey("HorseId")]
     public Horse? Horse { get; set; }
 
-    public int? TrailId { get; set; }
+    public Guid? TrailId { get; set; }
     [ForeignKey("TrailId")]
     public Trail? Trail { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -21,7 +21,7 @@ namespace MyApp.Controllers
 
 
         [HttpGet("friends/{userId}")]
-        public async Task<IActionResult> GetFriends(int userId)
+        public async Task<IActionResult> GetFriends(Guid userId)
         {
             var friends = await _context.UserRelations
                 .Where(ur => (ur.Status == "Accepted" || ur.Status == "accepted") && (ur.FromUserId == userId || ur.ToUserId == userId))
@@ -37,7 +37,7 @@ namespace MyApp.Controllers
         }
 
         [HttpGet("requests/{userId}")]
-        public async Task<IActionResult> GetFriendRequestss(int userId)
+        public async Task<IActionResult> GetFriendRequestss(Guid userId)
         {
             var friendrequests = await _context.UserRelations
                 //.Include(fr => fr.FromUserId)
@@ -58,7 +58,7 @@ namespace MyApp.Controllers
             return Ok(friendrequests);
         }
         [HttpGet("blocked/{userId}")]
-        public async Task<IActionResult> GetBlockedUsers(int userId)
+        public async Task<IActionResult> GetBlockedUsers(Guid userId)
         {
             var blockedUsers = await _context.UserRelations
                 .Where(ur => ur.FromUserId == userId && ur.Status == "blocked")
@@ -73,6 +73,10 @@ namespace MyApp.Controllers
             return Ok(blockedUsers);
         }
 
+        //
+        //Det ble mye feil på denne ved endring fra id til Guid. Deaktiverer den enn så lenge for å gjøre resten av konverteringen ferdig
+        //
+        
         [HttpPost("friendrequest")]
         public async Task<IActionResult> CreateFriendRequest([FromBody] CreateUserRelationDto requestDto)
         {
@@ -106,7 +110,6 @@ namespace MyApp.Controllers
             return Ok(newRelation);
             //return CreatedAtAction(nameof(GetRelationById), new { id = newRelation.Id }, newRelation);
         }
-
         [HttpPost("block")]
         public async Task<IActionResult> BlockUser([FromBody] CreateUserRelationDto requestDto)
         {
@@ -168,7 +171,7 @@ namespace MyApp.Controllers
             return Ok(newBlockRelation);
             //return CreatedAtAction(nameof(GetRelationById), new { id = newBlockRelation.Id }, newBlockRelation);
         }
-
+        
         /*
         [HttpPost("new/{userId}")]
         public async Task<IActionResult> CreateFriendRequest([FromBody] CreateUserRelationDto requestDto)
@@ -370,7 +373,7 @@ namespace MyApp.Controllers
         }
         */
         [HttpDelete("{fromUserId}/{toUserId}")]
-        public async Task<IActionResult> UnblockUser(int fromUserId, int toUserId)
+        public async Task<IActionResult> UnblockUser(Guid fromUserId, Guid toUserId)
         {
             var relation = await _context.UserRelations
                 .FirstOrDefaultAsync(ur => ur.FromUserId == fromUserId && ur.ToUserId == toUserId && ur.Status == "blocked");

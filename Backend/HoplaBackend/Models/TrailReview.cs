@@ -8,12 +8,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MyApp.Models;
 public class TrailReview
 {
-    public int Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)
+    public Guid Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)
 
-    public int TrailId { get; set; } // FK til Trail
+    public Guid TrailId { get; set; } // FK til Trail
     public Trail Trail { get; set; } = null!;
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
     public int Rating { get; set; } // 1-5 stjerner

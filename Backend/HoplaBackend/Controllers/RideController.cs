@@ -21,7 +21,7 @@ public class RideController : ControllerBase
         _context = context;
     }
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetUserRides(int userId)
+    public async Task<IActionResult> GetUserRides(Guid userId)
     {
         //Burde kanskje lage noen querys. Dette kan være ?limit og ?next.
         //Når man har bladd ned til bunnen, burde frontend spørre om neste 20 rides
@@ -42,7 +42,7 @@ public class RideController : ControllerBase
     }
 
     [HttpGet("{rideId}/details")]
-    public async Task<IActionResult> GetRideDetails(int rideId)
+    public async Task<IActionResult> GetRideDetails(Guid rideId)
     {
         var rideDetails = await _context.RideDetails
             .Where(rd => rd.Id == rideId)
@@ -65,7 +65,7 @@ public class RideController : ControllerBase
     }
     
     [HttpGet("{rideId}/trackingdata")]
-    public async Task<IActionResult> GetRideTrackingData(int rideId)
+    public async Task<IActionResult> GetRideTrackingData(Guid rideId)
     {
     /*
         var trackingData = await _context.RideTrackingDatas
@@ -149,8 +149,8 @@ public class RideController : ControllerBase
         // Opprett Ride og RideDetails
         var ride = new Ride
         {
-            //Id = Guid.NewGuid(),
-            Id = 0,
+            Id = Guid.NewGuid(),
+            //Id = 0,
             UserId = request.UserId,
             HorseId = request.HorseId,
             TrailId = request.TrailId,
@@ -225,7 +225,7 @@ public class RideController : ControllerBase
             .Include(r => r.RideDetails)
             .Include(r => r.RideReviews)
             //.FirstOrDefaultAsync(r => r.Id == rideId); //Rød Strek under RideDetail Feilmelding: 'Ride' does not contain a definition for 'RideDetail' and no accessible extension method 'RideDetail' accepting a first argument of type 'Ride' could be found (are you missing a using directive or an assembly reference?)CS1061
-           .FirstOrDefaultAsync(r => r.Id == rideId.GetHashCode()); 
+           .FirstOrDefaultAsync(r => r.Id == rideId); 
         if (ride == null)
             return NotFound("Ride not found");
 

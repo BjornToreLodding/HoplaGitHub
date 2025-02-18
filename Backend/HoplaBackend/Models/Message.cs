@@ -10,11 +10,11 @@ public partial class Message
     public Guid Id { get; set; }
 
     [ForeignKey("Sender")]
-    public int SUserId { get; set; }
+    public Guid SUserId { get; set; }
     public User Sender { get; set; } = null!;
 
     [ForeignKey("Receiver")]
-    public int RUserId { get; set; }
+    public Guid RUserId { get; set; }
     public User Receiver { get; set; } = null!;
     //Det burde istedenfor vært slik, men jeg vet ikke hvordan jeg gjør det når det er 2 users fra samme tabell?
     //public int UserId { get; set; } //Sender

@@ -5,11 +5,11 @@ namespace MyApp.Models;
 public class RideReview
 {
     [Key, ForeignKey("Ride")]
-    public int Id { get; set; } // Samme som Ride.Id
+    public Guid Id { get; set; } // Samme som Ride.Id
 
     public Ride Ride { get; set; } = null!;
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
     public int Rating { get; set; } // 1-5 stjerner

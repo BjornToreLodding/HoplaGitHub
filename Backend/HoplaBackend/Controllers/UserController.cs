@@ -3,6 +3,7 @@ using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
+using MyApp.DTOs;
 using MyApp.Models;
 
 namespace MyApp.Controllers
@@ -20,7 +21,7 @@ namespace MyApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
+        public async Task<IActionResult> GetUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -37,55 +38,40 @@ namespace MyApp.Controllers
                 created_at = user.CreatedAt
             });
         }
-
-        //Denne er flyttet til api/mock/createcontent i MockController.cs
-        /*
-        [HttpGet("/createcontent")]
-        public async Task<IActionResult> CreateDbContent()
+        [HttpPost("new")]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)
         {
-            if(_context.Users.Any()) {return NoContent();}
-            //legg til innhold her
-            //legger til Users
-            var users = UserMock.GetUsers();
-            //foreach (var user in users)
-        //{
-            _context.Users.AddRange(users);
-            await _context.SaveChangesAsync();  // Viktig! Brukere må eksistere før vi legger til hester.
-        //}
-            var existingUsers = _context.Users.ToList();
-            //legger til Horses
-            // 3. Legg til hester med eksisterende brukere
-            var horses = HorseMock.GetHorses(existingUsers);
-            _context.Horses.AddRange(horses);
+            /*
+            if (requestDto.FromUserId == requestDto.ToUserId)
+            {
+                return BadRequest(new { message = "You cannot send a friend request to yourself." });
+            }
 
-            // 4. Legg til andre relasjoner (Friendrequests, Messages, etc.)
-            var friendRequests = FriendRequestMock.GetFriendRequests();
-            _context.FriendRequests.AddRange(friendRequests);
-            /*var horses = HorseMock.GetHorses();
-            foreach (var horse in horses)
-        {
-            _context.Horses.Add(horse);
-        }
-        
-            //legger til Friendrequets
-            var friendRequets = FriendRequestMock.GetFriendRequests();
-            foreach (var friendrequest in friendRequets)
-        {
-            _context.FriendRequests.Add(friendrequest);
-        }
-            //legger til Messages
-            //legger til Rides
-            //legger til RideDetails
-            //Legger til Trails
-            //legger til Filters
-            //legger til Stable
-            //legger til StableUsers //kan vurdere å kalle det Stablemembers/Members
-            //legger til Stablemessages
+            // Sjekk om relasjonen allerede eksisterer
+            var existingRelation = await _context.UserRelations
+                .FirstOrDefaultAsync(ur => 
+                    (ur.FromUserId == requestDto.FromUserId && ur.ToUserId == requestDto.ToUserId) ||
+                    (ur.FromUserId == requestDto.ToUserId && ur.ToUserId == requestDto.FromUserId));
 
+            if (existingRelation != null)
+            {
+                return Conflict(new { message = "A relation already exists between these users." });
+            }
+            */
+            // Opprett venneforespørsel
+            var userData = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = requestDto.Name,
+                Alias = requestDto.Alias,
+                Email = requestDto.Email,
+                PasswordHash = requestDto.PasswordHash
+            };
+
+            _context.Users.Add(userData);
             await _context.SaveChangesAsync();
-            return Created();
+            return Ok(userData);
         }
-        */
 
     }
 }

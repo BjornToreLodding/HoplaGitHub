@@ -18,10 +18,10 @@ public class StableMessageController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("{stableid}")] // Returnerer meldinger mellom to brukere eller siste melding per bruker
+    [HttpGet("{stableId}")] // Returnerer meldinger mellom to brukere eller siste melding per bruker
     public async Task<IActionResult> GetMessagesBetweenUsers(
-        int stableid,
-        [FromQuery] int? userid) // id er optional, men hvis spesifisert så returneres alle meldinger som user har sendt til stableId
+        Guid stableId,
+        [FromQuery] Guid? userid) // id er optional, men hvis spesifisert så returneres alle meldinger som user har sendt til stableId
     {
         // Hvis id er spesifisert: Hent alle meldinger mellom userId og stableId
         if (userid.HasValue)
@@ -29,7 +29,7 @@ public class StableMessageController : ControllerBase
             var userstablemessages = await _context.StableMessages
                 .Include(s => s.User)  
                 .Include(s => s.Stable) 
-                .Where(s => (s.UserId == userid && s.StableId == stableid)) //&& 
+                .Where(s => s.UserId == userid && s.StableId == stableId) //&& 
                             //(m.SUserId == id.Value || m.RUserId == id.Value))
                 .OrderBy(s => s.SentAt)
                 .Select(s => new 
@@ -48,7 +48,7 @@ public class StableMessageController : ControllerBase
 
         // Hvis userid IKKE er spesifisert: Hent alle meldinger fra stallid
         var stablemessages = await _context.StableMessages
-            .Where(s => s.StableId == stableid ) // Finn meldinger til/fra bruker
+            .Where(s => s.StableId == stableId ) // Finn meldinger til/fra bruker
             .OrderByDescending(s => s.SentAt)  // Sorter etter nyeste melding først
             //.GroupBy(m => m.SUserId == userId ? m.RUserId : m.SUserId) // Grupper etter samtalepartner
             //.Select(g => g.OrderByDescending(s => s.SentAt).First()) // Velg kun den nyeste meldingen i hver gruppe

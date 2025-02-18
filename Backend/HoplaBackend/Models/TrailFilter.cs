@@ -9,7 +9,7 @@ namespace MyApp.Models;
 public class TrailFilter
 {
     [Key, ForeignKey("Trail")]
-    public int Id { get; set; } // Samme som Trail.Id
+    public Guid Id { get; set; } // Samme som Trail.Id
 
     public Trail Trail { get; set; } = null!;
 

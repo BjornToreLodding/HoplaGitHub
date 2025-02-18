@@ -2,9 +2,9 @@ namespace HoplaBackend
 {
     public class RideRequestDto
     {
-        public int UserId { get; set; }
-        public int HorseId { get; set; }
-        public int TrailId { get; set; }
+        public Guid UserId { get; set; }
+        public Guid HorseId { get; set; }
+        public Guid TrailId { get; set; }
         public double Duration { get; set; }
         public double Length { get; set; }
         public List<RideCoordinateDto> Coordinates { get; set; } = null!;

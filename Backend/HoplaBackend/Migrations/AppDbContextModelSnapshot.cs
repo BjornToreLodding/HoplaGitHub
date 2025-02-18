@@ -17,33 +17,31 @@ namespace HoplaBackend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("MyApp.Models.EntityImage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("ImageId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int?>("RideDetailId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("RideDetailId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int?>("TrailDetailsId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("TrailDetailsId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -60,14 +58,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.Horse", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("Age")
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Breed")
                         .HasColumnType("text");
@@ -75,12 +68,15 @@ namespace HoplaBackend.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("Dob")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -91,11 +87,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.Image", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -127,11 +121,11 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("RUserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RUserId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("SUserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("SUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("SentAt")
                         .HasColumnType("timestamp with time zone");
@@ -147,11 +141,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.Ride", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -159,17 +151,17 @@ namespace HoplaBackend.Migrations
                     b.Property<double>("Duration")
                         .HasColumnType("double precision");
 
-                    b.Property<int?>("HorseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("HorseId")
+                        .HasColumnType("uuid");
 
                     b.Property<double>("Length")
                         .HasColumnType("double precision");
 
-                    b.Property<int?>("TrailId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("TrailId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -184,8 +176,8 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.RideDetail", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("JsonCoordinates50")
                         .HasColumnType("text");
@@ -219,8 +211,8 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.RideReview", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -232,8 +224,8 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -244,8 +236,8 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.RideTrackingData", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TrackingPoints")
                         .IsRequired()
@@ -258,11 +250,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.Stable", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -290,11 +280,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.StableMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("MessageText")
                         .IsRequired()
@@ -303,11 +291,11 @@ namespace HoplaBackend.Migrations
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("StableId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("StableId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -320,11 +308,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.StableUser", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -341,11 +327,11 @@ namespace HoplaBackend.Migrations
                     b.Property<bool>("NotifyNewMessage")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("StableId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("StableId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -370,8 +356,8 @@ namespace HoplaBackend.Migrations
                     b.Property<double>("Long")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("RideTrackingDataId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RideTrackingDataId")
+                        .HasColumnType("uuid");
 
                     b.Property<double?>("TimeSinceLast")
                         .HasColumnType("double precision");
@@ -385,11 +371,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.Trail", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -403,8 +387,8 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int>("RideId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RideId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -415,8 +399,8 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.TrailAllCoordinate", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -437,8 +421,8 @@ namespace HoplaBackend.Migrations
                     b.Property<double>("Long")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("TrailAllCoordinatesId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("TrailAllCoordinatesId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -449,8 +433,8 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.TrailDetail", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -487,8 +471,8 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.TrailFilter", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Cart")
                         .HasColumnType("boolean");
@@ -520,11 +504,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.TrailReview", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -536,11 +518,11 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TrailId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("TrailId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -553,11 +535,9 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("MyApp.Models.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Admin")
                         .HasColumnType("boolean");
@@ -600,18 +580,19 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
+                        .IsRequired()
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("FromUserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("FromUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ToUserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ToUserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 

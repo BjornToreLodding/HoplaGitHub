@@ -8,7 +8,7 @@ namespace MyApp.Models;
 public class RideDetail
 {
     [Key, ForeignKey("Ride")]
-    public int Id { get; set; } // Samme som Ride.Id
+    public Guid Id { get; set; } // Samme som Ride.Id
 
     public Ride Ride { get; set; } = null!;
     public double? LatMean { get; set; }

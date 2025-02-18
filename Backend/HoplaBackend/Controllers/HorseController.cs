@@ -19,7 +19,7 @@ namespace MyApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetHorse(int id)
+        public async Task<IActionResult> GetHorse(Guid id)
         {
             //var horse = await _context.Horses.FindAsync(id);
             //hestekommentar;

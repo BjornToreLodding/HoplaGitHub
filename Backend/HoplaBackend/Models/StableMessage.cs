@@ -8,13 +8,13 @@ namespace MyApp.Models;
 public class StableMessage
 {
     [Key]
-    public int Id { get; set; }
-    public int UserId { get; set; }
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
 
     [ForeignKey("UserId")]
     public User User { get; set; } = null!;
 
-    public int StableId { get; set; }
+    public Guid StableId { get; set; }
 
     [ForeignKey("StableId")]
     public Stable Stable { get; set; } = null!;

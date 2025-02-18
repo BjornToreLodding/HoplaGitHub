@@ -21,8 +21,8 @@ public class MessageController : ControllerBase
 
     [HttpGet("{userId}")] // Returnerer meldinger mellom to brukere eller siste melding per bruker
     public async Task<IActionResult> GetMessagesBetweenUsers(
-        int userId,
-        [FromQuery] int? id) // id er optional, men hvis spesifisert så returneres alle meldinger mellom userId og Id
+        Guid userId,
+        [FromQuery] Guid? id) // id er optional, men hvis spesifisert så returneres alle meldinger mellom userId og Id
     {
         // Hvis id er spesifisert: Hent ALLE meldinger mellom userId og id
         if (id.HasValue)

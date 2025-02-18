@@ -10,7 +10,7 @@ namespace MyApp.Models;
 public class RideTrackingData
 {
     [Key, ForeignKey("Ride")]
-    public int Id { get; set; } // Samme som Ride.Id
+    public Guid Id { get; set; } // Samme som Ride.Id
 
     public Ride Ride { get; set; } = null!;
 
@@ -21,7 +21,7 @@ public class RideTrackingData
 public class TrackingPoint
 {
     public int Id { get; set; }
-    public int RideTrackingDataId { get; set; } // FK til RideTrackingData
+    public Guid RideTrackingDataId { get; set; } // FK til RideTrackingData
     public RideTrackingData RideTrackingData { get; set; } = null!;
 
     public double Lat { get; set; }

@@ -10,8 +10,9 @@ public static class UserRelationMock
         return new List<UserRelation> 
         {
             new UserRelation {
-                FromUserId = 1, ToUserId = 2, Status = "accepted" //, CreatedAt = 
-            },
+                FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780002"), Status = "accepted", //, CreatedAt = 
+            }
+            /*
             new UserRelation { FromUserId = 1, ToUserId = 3, Status = "accepted" }, //, CreatedAt = 
             new UserRelation { FromUserId = 1, ToUserId = 4, Status = "accepted" }, //, CreatedAt = 
             new UserRelation { FromUserId = 1, ToUserId = 5, Status = "accepted" },
@@ -73,7 +74,7 @@ public static class UserRelationMock
             new UserRelation { FromUserId = 27, ToUserId = 1, Status = "pending" },
             new UserRelation { FromUserId = 28, ToUserId = 1, Status = "pending" },
             new UserRelation { FromUserId = 29, ToUserId = 1, Status = "pending" },
-
+            */
         };
     }
 }

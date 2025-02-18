@@ -8,14 +8,14 @@ namespace MyApp.Models;
 
 public class Trail
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string? Name { get; set; }
     public double LatMean { get; set; }
     public double LongMean { get; set; }
     //public double? Length { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public int RideId { get; set; } // FK til Ride (for å kopiere data)
+    public Guid RideId { get; set; } // FK til Ride (for å kopiere data)
  
     [ForeignKey("RideId")]
     public Ride Ride { get; set; } = null!;
