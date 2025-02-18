@@ -72,12 +72,14 @@ struct Profile: View {
                         vm.showPhotoPicker()
                     } label: {
                         Text("Camera")
+                            .underline()
                     }
                     Button {
                         vm.source = .library
                         vm.showPhotoPicker()
                     } label: {
                         Text("Photos")
+                            .underline()
                     }
                 }
                 .padding(.bottom, 10)
