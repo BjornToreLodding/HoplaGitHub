@@ -64,6 +64,7 @@
     <string name="community">Fellesskap</string>
     <string name="position">Posisjon</string>
     <string name="liked">Liker</string>
+    <string name="not_liked">Ikke likt</string>
 
     <string name="start">Start</string>
     <string name="stop">Stopp</string>
@@ -75,6 +76,10 @@
     <string name="description">Beskrivelse</string>
     <string name="save">Lagre</string>
     <string name="forgot_password">Glemt passord</string>
+    <string name="forgotten_password_description">Skriv inn e-posten din for å motta en lenke for å tilbakestille passordet ditt</string>
+    <string name="verification_explanation">Sjekk mailen din for å verifisere kontoen din</string>
+    <string name="confirm_logout">Trykk bekreft for å logge ut</string>
+    <string name="search">Søk</string>
 
 
 </resources>

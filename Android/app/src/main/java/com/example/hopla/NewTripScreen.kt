@@ -15,67 +15,125 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.CameraPosition
 import kotlinx.coroutines.delay
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.android.gms.maps.model.LatLng
+
 
 @Preview
 @Composable
 fun NewTripScreen() {
     var isRunning by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
     var time by remember { mutableIntStateOf(0) }
     var distance by remember { mutableStateOf(0.0) }
     var lastLocation by remember { mutableStateOf<Location?>(null) }
 
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
     val locationRequest = LocationRequest.create().apply {
         interval = 1000
         fastestInterval = 500
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
+    val locationCallback = remember {
+        object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                if (isRunning) {
+                    val newLocation = locationResult.lastLocation
+                    if (newLocation != null) {
+                        Log.d(
+                            "NewTripScreen",
+                            "Received location: ${newLocation.latitude}, ${newLocation.longitude}"
+                        )
+                        lastLocation?.let {
+                            val distanceIncrement = it.distanceTo(newLocation) / 1000.0
+                            distance += distanceIncrement
+                            Log.d(
+                                "NewTripScreen",
+                                "Distance increased by $distanceIncrement km, total: $distance km"
+                            )
+                        } ?: run {
+                            Log.d("NewTripScreen", "Initializing lastLocation for first time")
+                        }
 
-    val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            if (isRunning) {
-                val newLocation = locationResult.lastLocation
-                if (newLocation != null) {
-                    lastLocation?.let {
-                        val distanceIncrement = it.distanceTo(newLocation) / 1000.0
-                        distance += distanceIncrement
-                        Log.d("NewTripScreen", "Distance increment: $distanceIncrement km, Total distance: $distance km")
+                        lastLocation = newLocation
+                    } else {
+                        Log.e(
+                            "NewTripScreen",
+                            "Location result received but no new location available"
+                        )
                     }
-                    lastLocation = newLocation
+                } else {
+                    Log.d("NewTripScreen", "Location callback triggered but tracking is stopped")
                 }
             }
         }
     }
 
-    LaunchedEffect(isRunning) {
+    // Ensure permissions are granted before proceeding
+    LaunchedEffect(Unit) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    Log.d(
+                        "NewTripScreen",
+                        "Last known location retrieved: ${location.latitude}, ${location.longitude}"
+                    )
+                    lastLocation = location
+                } else {
+                    Log.w("NewTripScreen", "No last known location available")
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                1
+            )
+            Log.w("NewTripScreen", "Permissions not granted, requesting now")
+        }
+    }
+
+    DisposableEffect(isRunning) {
         if (isRunning) {
             if (ActivityCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
-                ActivityCompat.requestPermissions(
-                    context as Activity,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                    1
+                Log.d("NewTripScreen", "Starting location updates")
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
                 )
-                return@LaunchedEffect
+            } else {
+                Log.e("NewTripScreen", "Location updates requested but permissions are missing")
             }
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         } else {
+            Log.d("NewTripScreen", "Stopping location updates")
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        }
+
+        onDispose {
+            Log.d("NewTripScreen", "Removing location updates on disposal")
             fusedLocationClient.removeLocationUpdates(locationCallback)
         }
     }
@@ -87,11 +145,17 @@ fun NewTripScreen() {
         }
     }
 
-    if (showDialog) {
-        showDialog = TripDialogue(showDialog, time, distance)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(37.7749, -122.4194), 10f)
     }
 
+    // UI Layout
     Box(modifier = Modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = true)
+        )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -114,7 +178,14 @@ fun NewTripScreen() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = String.format("%02d:%02d:%02d", time / 3600, (time % 3600) / 60, time % 60))
+                        Text(
+                            text = String.format(
+                                "%02d:%02d:%02d",
+                                time / 3600,
+                                (time % 3600) / 60,
+                                time % 60
+                            )
+                        )
                         Text(text = stringResource(R.string.time))
                     }
                 }
@@ -123,16 +194,15 @@ fun NewTripScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = {
-                            if (isRunning) {
-                                showDialog = true
-                            }
-                            isRunning = !isRunning
-                        },
+                        onClick = { isRunning = !isRunning },
                         shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
                         modifier = Modifier.size(85.dp)
                     ) {
-                        Text(text = if (isRunning) stringResource(R.string.stop) else stringResource(R.string.start))
+                        Text(
+                            text = if (isRunning) stringResource(R.string.stop) else stringResource(
+                                R.string.start
+                            )
+                        )
                     }
                 }
                 Box(
@@ -150,35 +220,4 @@ fun NewTripScreen() {
             }
         }
     }
-}
-
-@Composable
-private fun TripDialogue(showDialog: Boolean, time: Int, distance: Double): Boolean {
-    var showDialog1 = showDialog
-    AlertDialog(
-        onDismissRequest = { showDialog1 = false },
-        title = { Text(text = stringResource(R.string.trip_summary)) },
-        text = {
-            Column {
-                TextField(
-                    value = stringResource(R.string.time) + ": " + String.format("%02d:%02d:%02d", time / 3600, (time % 3600) / 60, time % 60) + " | " + stringResource(R.string.distance) + ": ${String.format("%.2f km", distance)}",
-                    onValueChange = {},
-                    readOnly = true
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = "",
-                    onValueChange = {},
-                    label = { Text("Comments") }
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { showDialog1 = false }) {
-                Text("OK")
-            }
-        },
-        shape = RectangleShape
-    )
-    return showDialog1
 }

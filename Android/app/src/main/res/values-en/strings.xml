@@ -64,6 +64,7 @@
     <string name="community">Community</string>
     <string name="position">Position</string>
     <string name="liked">Liked</string>
+    <string name="not_liked">Not liked</string>
 
     <string name="start">Start</string>
     <string name="stop">Stop</string>
@@ -75,5 +76,9 @@
     <string name="description">Description</string>
     <string name="save">Save</string>
     <string name="forgot_password">Forgot password</string>
+    <string name="forgotten_password_description">Please enter your email address to reset your password</string>
+    <string name="verification_explanation">Please check your email to verify your account</string>
+    <string name="confirm_logout">Press confirm to logg out</string>
+    <string name="search">Search</string>
 
 </resources>

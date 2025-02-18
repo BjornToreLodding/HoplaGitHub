@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Hopla">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-01-20T12:02:42.379348800Z">
+        <DropdownSelection timestamp="2025-02-11T17:23:07.970718800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\vilde\.android\avd\Pixel_7_Pro_API_31.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=AQH7N17B02006077" />
             </handle>
           </Target>
         </DropdownSelection>

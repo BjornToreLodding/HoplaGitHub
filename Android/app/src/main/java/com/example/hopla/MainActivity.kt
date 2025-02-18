@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +29,6 @@ import androidx.lifecycle.ViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import java.util.Locale
@@ -43,7 +42,6 @@ import androidx.compose.material.icons.outlined.Face
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
-import com.example.hopla.ui.theme.PrimaryWhite
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
@@ -53,7 +51,7 @@ class MainActivity : ComponentActivity() {
     private val languageViewModel: LanguageViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return LanguageViewModel(applicationContext, SavedStateHandle()) as T
+                return LanguageViewModel(application as Application, SavedStateHandle()) as T
             }
         }
     }
@@ -94,15 +92,15 @@ class MainActivity : ComponentActivity() {
                             composable("my_trips") { MyTripsScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("following") { FollowingScreen(navController) }
-                            // Update the composable block in MainActivity.kt
                             composable(
                                 "communityDetail/{communityName}",
                                 arguments = listOf(navArgument("communityName") { type = NavType.StringType })
                             ) { backStackEntry ->
                                 val communityName = backStackEntry.arguments?.getString("communityName")
                                 val communityGroup = communityName?.let { getCommunityGroupByName(it) }
-                                communityGroup?.let { CommunityDetailScreen(it) }
+                                communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
+                            composable("addCommunityScreen") { AddCommunityScreen(navController) }
                         }
                     }
                 } else {

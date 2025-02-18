@@ -120,12 +120,12 @@ fun PostList() {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         items(3) { index ->
             PostItem(
                 imageRes = R.drawable.stockimg1, // Replace with your image resource
-                text = "Post #$index"
+                text = "Example text $index"
             )
         }
     }
@@ -152,11 +152,18 @@ fun PostItem(imageRes: Int, text: String) {
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = text,
-                fontSize = 16.sp,
-                color = PrimaryBlack
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.tertiary)
+                    .height(40.dp),
+            ) {
+                Text(
+                    text = text,
+                    fontSize = 16.sp,
+                    color = PrimaryBlack
+                )
+            }
         }
     }
 }

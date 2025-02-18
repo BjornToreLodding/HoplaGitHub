@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.ThemeViewModel
@@ -27,13 +26,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.background
-import androidx.compose.material3.TextField
+//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -56,7 +55,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
-
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 
 @Composable
 fun ProfileScreen(
@@ -100,9 +100,15 @@ fun SettingsScreen(
     userViewModel: UserViewModel,
     navController: NavController
 ) {
+    // State variables for sending a report
     var showReportDialog by remember { mutableStateOf(false) }
     var reportTitle by remember { mutableStateOf("") }
     var reportText by remember { mutableStateOf("") }
+    // State variables for logging out
+    var showLogOutDialog by remember { mutableStateOf(false) }
+    // State variables for deleting user
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -112,7 +118,7 @@ fun SettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp) // Add horizontal padding
+                .padding(horizontal = 8.dp)
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(8.dp)
         ) {
@@ -136,30 +142,39 @@ fun SettingsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
-            ) {
-                Text(text = stringResource(R.string.language))
-                Text(text = stringResource(R.string.mode))
-            }
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-            ) {
-                LanguageSelection(languageViewModel)
-                ModeSelection(themeViewModel)
-            }
+            Text(text = stringResource(R.string.language))
+            LanguageSelection(languageViewModel)
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            thickness = 1.dp,
+            color = PrimaryBlack
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = stringResource(R.string.mode))
+            ModeSelection(themeViewModel)
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            thickness = 1.dp,
+            color = PrimaryBlack
+        )
 
         Text(
             text = stringResource(R.string.send_a_report),
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, bottom = 8.dp, top = 8.dp)
                 .clickable { showReportDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
@@ -167,16 +182,16 @@ fun SettingsScreen(
         Text(
             text = stringResource(R.string.log_out),
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 8.dp)
-                .clickable { userViewModel.logOut() },
+                .padding(start = 16.dp, bottom = 8.dp)
+                .clickable { showLogOutDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
 
         Text(
             text = stringResource(R.string.delete_user),
             modifier = Modifier
-                .padding(start = 8.dp)
-                .clickable { userViewModel.deleteUser() },
+                .padding(start = 16.dp)
+                .clickable { showDeleteDialog = true },
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
     }
@@ -227,12 +242,62 @@ fun SettingsScreen(
             }
         )
     }
+    if (showLogOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogOutDialog = false },
+            title = { Text(text = stringResource(R.string.log_out)) },
+            text = { Text(text = stringResource(R.string.confirm_logout)) },
+            confirmButton = {
+                Button(onClick = {
+                    userViewModel.logOut()
+                    showLogOutDialog = false
+                }) {
+                    Text(text = stringResource(R.string.confirm), color = PrimaryWhite)
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showLogOutDialog = false }) {
+                    Text(text = stringResource(R.string.cancel), color = PrimaryWhite)
+                }
+            }
+        )
+    }
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(text = stringResource(R.string.delete_user)) },
+            text = {
+                Column {
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(text = stringResource(R.string.confirm_password)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    // Handle delete user logic here
+                    userViewModel.deleteUser()
+                    showDeleteDialog = false
+                }) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 class LanguageViewModel(
-    private val context: Context,
+    application: Application,
     private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _selectedLanguage = mutableStateOf(savedStateHandle.get<String>("language") ?: "Norwegian")
     val selectedLanguage: State<String> = _selectedLanguage
@@ -240,22 +305,25 @@ class LanguageViewModel(
     fun setLanguage(language: String) {
         _selectedLanguage.value = language
         savedStateHandle["language"] = language
-        setLocale(context, if (language == "Norwegian") "no" else "en")
+        setLocale(getApplication(), if (language == "Norwegian") "no" else "en")
     }
 
     private fun setLocale(context: Context, languageCode: String) {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
-        val config = Configuration()
+        val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        context.createConfigurationContext(config)
     }
 }
 
 @Composable
 fun LanguageSelection(languageViewModel: LanguageViewModel) {
-    Column {
-        Row {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column {
             Text(
                 text = "Norsk",
                 modifier = Modifier
@@ -265,6 +333,7 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
             Text(
                 text = "English",
                 modifier = Modifier
+                    .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("English") }
             )
         }
@@ -273,8 +342,11 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
 
 @Composable
 fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
-    Column {
-        Row {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column {
             Text(
                 text = stringResource(R.string.light),
                 modifier = Modifier
@@ -467,6 +539,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = username,
                 onValueChange = { username = it },
                 label = {  },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
@@ -475,7 +548,8 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = email,
                 onValueChange = { email = it },
                 label = { },
-                modifier = Modifier.fillMaxWidth()
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
             )
             HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
             Text(
@@ -528,6 +602,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
         )
     }
 }
+
 @Composable
 fun MyTripsScreen(navController: NavController) {
     Column(
@@ -538,11 +613,13 @@ fun MyTripsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .border(10.dp, MaterialTheme.colorScheme.primary)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -550,10 +627,14 @@ fun MyTripsScreen(navController: NavController) {
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.my_trips),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 24.sp
                 )
             }
         }
@@ -570,11 +651,13 @@ fun FriendsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .border(10.dp, MaterialTheme.colorScheme.primary)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -582,10 +665,14 @@ fun FriendsScreen(navController: NavController) {
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.friends),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 24.sp
                 )
             }
         }
@@ -602,11 +689,13 @@ fun FollowingScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .border(10.dp, MaterialTheme.colorScheme.primary)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -614,10 +703,14 @@ fun FollowingScreen(navController: NavController) {
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.following),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 24.sp
                 )
             }
         }
