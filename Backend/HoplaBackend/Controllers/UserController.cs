@@ -1,4 +1,5 @@
 // Plassering: Controllers/UserController.cs
+using System.Drawing;
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,70 @@ namespace MyApp.Controllers
             await _context.SaveChangesAsync();
             return Ok(userData);
         }
+        [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
+        public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
+        {
+            var userData = await _context.Users.FindAsync(userId);
+            Console.ForegroundColor = ConsoleColor.Red;
+            if (userData == null)
+            {
+                return NotFound(new { message = "User is doesn't exist" });
+            }
+            var newUserData = requestDto;
+            if (newUserData.Name != userData.Name && newUserData.Name != "" && newUserData.Name != null)
+            {
+                Console.WriteLine("different Name");
+                userData.Name = newUserData.Name;
+            }
+            if (newUserData.Alias != userData.Alias && newUserData.Alias != "" && newUserData.Alias != null)
+            {
+                Console.WriteLine("different Alias");
+                userData.Alias = newUserData.Alias;
+            } 
+            if (newUserData.Email != userData.Email && newUserData.Email != "" && newUserData.Email != null)
+            {
+                Console.WriteLine("different Email");
+                userData.Email = newUserData.Email;
+            }
+            if (newUserData.PasswordHash != userData.PasswordHash && newUserData.PasswordHash != "" && newUserData.PasswordHash != null)
+            {
+                Console.WriteLine("different PW");
+                //Sjekk om diverse betingelser for passord er oppfylt kommer evt senere.
+                userData.PasswordHash = newUserData.PasswordHash;
+            }
+            Console.ResetColor();
+            // Oppdater informasjonen om brukeren.
+            // Name
+            // Alias
+            // Email
+            // PasswordHash 
+            // ProfilePictureUrl 
+            // Admin = false
+            // Premium = false
+            // VerifiedTrail = false
+            
+            _context.Users.Update(userData);
+            await _context.SaveChangesAsync();
 
+            return Ok(new { message = $"User userId was updated", userData });
+        }
+
+        [HttpDelete("delete/{userId}")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            var userData = await _context.Users.FindAsync(userId);
+
+            // Sjekk om brukeren finnes
+            if (userData == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            // Slett brukeren
+            _context.Users.Remove(userData);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User removed successfully." });
+        }
     }
 }
