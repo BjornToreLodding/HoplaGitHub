@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                 communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
-                            composable("update_screen") { UpdateScreen() }
+                            composable("update_screen") { UpdateScreen(navController) }
                         }
                     }
                 } else {

@@ -85,4 +85,7 @@
     <string name="parking">Parkering</string>
     <string name="asphalt">Asfalt</string>
 
+    <string name="comment">Kommentar:</string>
+    <string name="publish">Publiser</string>
+
 </resources>

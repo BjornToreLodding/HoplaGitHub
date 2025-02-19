@@ -31,11 +31,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.PrimaryBlack
@@ -581,7 +581,7 @@ fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
 
 // Function to display the update screen where user can add their own update about the route
 @Composable
-fun UpdateScreen() {
+fun UpdateScreen(navController: NavController) {
     var location by remember { mutableStateOf("Boredalstien") }
     var comment by remember { mutableStateOf("") }
 
@@ -605,15 +605,15 @@ fun UpdateScreen() {
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* Handle Back Action */ }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = "Back",
                         tint = Color.Black
                     )
                 }
                 Text(
-                    text = "Ny oppdatering",
+                    text = stringResource(R.string.new_updates),
                     color = Color.White,
                     modifier = Modifier.weight(1f)
                 )
@@ -646,7 +646,7 @@ fun UpdateScreen() {
                     .fillMaxSize()
                     .padding(8.dp)
             ) {
-                Text(text = "Kommentar:", color = Color.Gray)
+                Text(text = stringResource(R.string.comment), color = Color.Gray)
                 TextField(
                     value = comment,
                     onValueChange = { comment = it },
@@ -658,8 +658,9 @@ fun UpdateScreen() {
                 onClick = { /* Handle Add Action */ },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(8.dp),
-                containerColor = Color(0xFFD9CFC4) // Slightly transparent button color
+                    .padding(8.dp)
+                    .size(40.dp),
+                containerColor = Color(0xFFD9CFC4)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Comment")
             }
@@ -669,14 +670,16 @@ fun UpdateScreen() {
 
         // Publish Button
         Button(
-            onClick = { /* Handle Publish Action */ },
+            onClick = {
+                comment = "" // Clear the comment box
+                navController.popBackStack() // Navigate back to the previous screen
+            },
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .height(40.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9CFC4))
         ) {
-            Text("Publiser", color = Color.Gray)
+            Text(text = stringResource(R.string.publish), color = Color.Gray)
         }
     }
 }
-
