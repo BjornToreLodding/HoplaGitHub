@@ -1,10 +1,10 @@
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
-using MyApp.Models;
+using HoplaBackend.Data;
+using HoplaBackend.Models;
 
-namespace MyApp.Controllers
+namespace HoplaBackend.Controllers
 {
  
     [Route("horses")]

@@ -1,4 +1,4 @@
-namespace MyApp.DTOs;
+namespace HoplaBackend.DTOs;
 
 public class CreateStableMessageDto
 {

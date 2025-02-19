@@ -3,140 +3,185 @@ using System.Drawing;
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
-using MyApp.DTOs;
-using MyApp.Models;
+using Serilog;
+using HoplaBackend.Data;
+using HoplaBackend.DTOs;
+using HoplaBackend.Models;
+using HoplaBackend.Helpers;
 
-namespace MyApp.Controllers
+
+namespace HoplaBackend.Controllers;
+
+[Route("users")]
+[ApiController]
+public class UserController : ControllerBase
 {
- 
-    [Route("users")]
-    [ApiController]
-    public class UserController : ControllerBase
+    private readonly AppDbContext _context;
+
+    public UserController(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
+    [HttpGet("all")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _context.Users
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                u.Alias
+            })
+            .ToListAsync();
 
-        public UserController(AppDbContext context)
+        if (!users.Any())
         {
-            _context = context;
+            Log.Warning("⚠️ Ingen brukere funnet!");
+            return NotFound(new { message = "No users found." });
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(Guid id)
+        Log.Information("📢 GetAllUsers() ble kalt! Antall brukere: {UserCount}", users.Count);
+
+        return Ok(users);
+    }
+
+    [HttpGet("int/{userId}")] 
+    public async Task<IActionResult> GetIntUser(int userId)
+    {
+        string userGuidString;
+        if (userId < 10)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
-            }
-
-            return Ok(new
-            {
-                name = user.Name,
-                email = user.Email,
-                password_hash = user.PasswordHash,
-                created_at = user.CreatedAt
-            });
+            userGuidString = $"12345678-0000-0000-0001-12345678000{userId}";
+        }else
+        {
+            userGuidString = $"12345678-0000-0000-0001-1234567800{userId}";
         }
-        [HttpPost("new")]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)
+        
+        if (!Guid.TryParse(userGuidString, out Guid userGuid))
         {
-            /*
-            if (requestDto.FromUserId == requestDto.ToUserId)
-            {
-                return BadRequest(new { message = "You cannot send a friend request to yourself." });
-            }
-
-            // Sjekk om relasjonen allerede eksisterer
-            var existingRelation = await _context.UserRelations
-                .FirstOrDefaultAsync(ur => 
-                    (ur.FromUserId == requestDto.FromUserId && ur.ToUserId == requestDto.ToUserId) ||
-                    (ur.FromUserId == requestDto.ToUserId && ur.ToUserId == requestDto.FromUserId));
-
-            if (existingRelation != null)
-            {
-                return Conflict(new { message = "A relation already exists between these users." });
-            }
-            */
-            // Opprett venneforespørsel
-            var userData = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = requestDto.Name,
-                Alias = requestDto.Alias,
-                Email = requestDto.Email,
-                PasswordHash = requestDto.PasswordHash
-            };
-
-            _context.Users.Add(userData);
-            await _context.SaveChangesAsync();
-            return Ok(userData);
-        }
-        [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
-        public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
-        {
-            var userData = await _context.Users.FindAsync(userId);
-            Console.ForegroundColor = ConsoleColor.Red;
-            if (userData == null)
-            {
-                return NotFound(new { message = "User is doesn't exist" });
-            }
-            var newUserData = requestDto;
-            if (newUserData.Name != userData.Name && newUserData.Name != "" && newUserData.Name != null)
-            {
-                Console.WriteLine("different Name");
-                userData.Name = newUserData.Name;
-            }
-            if (newUserData.Alias != userData.Alias && newUserData.Alias != "" && newUserData.Alias != null)
-            {
-                Console.WriteLine("different Alias");
-                userData.Alias = newUserData.Alias;
-            } 
-            if (newUserData.Email != userData.Email && newUserData.Email != "" && newUserData.Email != null)
-            {
-                Console.WriteLine("different Email");
-                userData.Email = newUserData.Email;
-            }
-            if (newUserData.PasswordHash != userData.PasswordHash && newUserData.PasswordHash != "" && newUserData.PasswordHash != null)
-            {
-                Console.WriteLine("different PW");
-                //Sjekk om diverse betingelser for passord er oppfylt kommer evt senere.
-                userData.PasswordHash = newUserData.PasswordHash;
-            }
-            Console.ResetColor();
-            // Oppdater informasjonen om brukeren.
-            // Name
-            // Alias
-            // Email
-            // PasswordHash 
-            // ProfilePictureUrl 
-            // Admin = false
-            // Premium = false
-            // VerifiedTrail = false
-            
-            _context.Users.Update(userData);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = $"User userId was updated", userData });
+            return BadRequest("Ugyldig bruker-ID");
         }
 
-        [HttpDelete("delete/{userId}")]
-        public async Task<IActionResult> DeleteUser(Guid userId)
+        return await GetUser(userGuid, false);
+    }
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUser(
+        Guid userId,
+        [FromQuery] bool changepassword)
+    {
+        
+        var user = await _context.Users.FindAsync(userId);
+
+        if (user == null)
         {
-            var userData = await _context.Users.FindAsync(userId);
-
-            // Sjekk om brukeren finnes
-            if (userData == null)
-            {
-                return NotFound(new { message = "User not found." });
-            }
-
-            // Slett brukeren
-            _context.Users.Remove(userData);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "User removed successfully." });
+            return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
         }
+
+        return Ok(new
+        {
+            name = user.Name,
+            email = user.Email,
+            password_hash = user.PasswordHash,
+            created_at = user.CreatedAt
+        });
+    }
+    [HttpPost("new")]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)
+    {
+        /*
+        if (requestDto.FromUserId == requestDto.ToUserId)
+        {
+            return BadRequest(new { message = "You cannot send a friend request to yourself." });
+        }
+
+        // Sjekk om relasjonen allerede eksisterer
+        var existingRelation = await _context.UserRelations
+            .FirstOrDefaultAsync(ur => 
+                (ur.FromUserId == requestDto.FromUserId && ur.ToUserId == requestDto.ToUserId) ||
+                (ur.FromUserId == requestDto.ToUserId && ur.ToUserId == requestDto.FromUserId));
+
+        if (existingRelation != null)
+        {
+            return Conflict(new { message = "A relation already exists between these users." });
+        }
+        */
+        // Opprett venneforespørsel
+        var userData = new User
+        {
+            Id = Guid.NewGuid(),
+            Name = requestDto.Name,
+            Alias = requestDto.Alias,
+            Email = requestDto.Email,
+            PasswordHash = requestDto.PasswordHash
+        };
+
+        _context.Users.Add(userData);
+        await _context.SaveChangesAsync();
+        return Ok(userData);
+    }
+    [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
+    public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
+    {
+        var userData = await _context.Users.FindAsync(userId);
+        Console.ForegroundColor = ConsoleColor.Red;
+        if (userData == null)
+        {
+            return NotFound(new { message = "User is doesn't exist" });
+        }
+        var newUserData = requestDto;
+        if (newUserData.Name != userData.Name && newUserData.Name != "" && newUserData.Name != null)
+        {
+            Console.WriteLine("different Name");
+            userData.Name = newUserData.Name;
+        }
+        if (newUserData.Alias != userData.Alias && newUserData.Alias != "" && newUserData.Alias != null)
+        {
+            Console.WriteLine("different Alias");
+            userData.Alias = newUserData.Alias;
+        } 
+        if (newUserData.Email != userData.Email && newUserData.Email != "" && newUserData.Email != null)
+        {
+            Console.WriteLine("different Email");
+            userData.Email = newUserData.Email;
+        }
+        if (newUserData.PasswordHash != userData.PasswordHash && newUserData.PasswordHash != "" && newUserData.PasswordHash != null)
+        {
+            Console.WriteLine("different PW");
+            //Sjekk om diverse betingelser for passord er oppfylt kommer evt senere.
+            userData.PasswordHash = newUserData.PasswordHash;
+        }
+        Console.ResetColor();
+        // Oppdater informasjonen om brukeren.
+        // Name
+        // Alias
+        // Email
+        // PasswordHash 
+        // ProfilePictureUrl 
+        // Admin = false
+        // Premium = false
+        // VerifiedTrail = false
+        
+        _context.Users.Update(userData);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = $"User userId was updated", userData });
+    }
+
+    [HttpDelete("delete/{userId}")]
+    public async Task<IActionResult> DeleteUser(Guid userId)
+    {
+        var userData = await _context.Users.FindAsync(userId);
+
+        // Sjekk om brukeren finnes
+        if (userData == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        // Slett brukeren
+        _context.Users.Remove(userData);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "User removed successfully." });
     }
 }

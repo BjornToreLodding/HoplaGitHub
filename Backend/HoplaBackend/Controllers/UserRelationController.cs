@@ -1,11 +1,11 @@
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
-using MyApp.Models;
-using MyApp.DTOs;
+using HoplaBackend.Data;
+using HoplaBackend.Models;
+using HoplaBackend.DTOs;
 
-namespace MyApp.Controllers
+namespace HoplaBackend.Controllers
 {
  
     [Route("userrelations")]

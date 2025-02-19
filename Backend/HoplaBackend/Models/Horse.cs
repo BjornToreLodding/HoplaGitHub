@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 //using HoplaBackend.Models;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 public partial class Horse
 {

@@ -1,11 +1,11 @@
-//using MyApp.DTOs;
+//using HoplaBackend.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
-using MyApp.DTOs;
-using MyApp.Models;
+using HoplaBackend.Data;
+using HoplaBackend.DTOs;
+using HoplaBackend.Models;
 
-namespace MyApp.Controllers;
+namespace HoplaBackend.Controllers;
 
 
 [Route("messages")]

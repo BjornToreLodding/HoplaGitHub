@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using MyApp.Models;
+using HoplaBackend.Models;
 
 public static class RideMock 
 {

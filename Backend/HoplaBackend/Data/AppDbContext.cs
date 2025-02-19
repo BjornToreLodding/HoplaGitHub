@@ -1,4 +1,4 @@
-using MyApp.Models;
+using HoplaBackend.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Collections.Generic;
 
-namespace MyApp.Data;
+namespace HoplaBackend.Data;
 
 public class AppDbContext : DbContext
 {

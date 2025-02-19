@@ -1,10 +1,10 @@
-//using MyApp.DTOs;
+//using HoplaBackend.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
-using MyApp.Models;
+using HoplaBackend.Data;
+using HoplaBackend.Models;
 
-namespace MyApp.Controllers;
+namespace HoplaBackend.Controllers;
 
 
 [Route("stablemessage")]

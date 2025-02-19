@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 //[Table("users")] // Forteller EF Core at denne modellen er koblet til `users`-tabellen i PostgreSQL
 public class User
@@ -36,7 +36,7 @@ public class User
 using System.Collections.Generic;
 using HoplaBackend.Models;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 public partial class User
 {

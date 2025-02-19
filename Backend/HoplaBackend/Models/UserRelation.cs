@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 //Fjerne partial?
 public partial class UserRelation

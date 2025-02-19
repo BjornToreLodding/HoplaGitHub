@@ -1,81 +1,131 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using HoplaBackend.Data;
+using Serilog;
+using Helpers;
 
 [ApiController]
 [Route("div")]
 public class ApiController : ControllerBase
 {
+    private readonly AppDbContext _context;
+
     private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
     private static int _requestCount = 0;
     private static int _errorCount = 0;
 
-    // GET: /api/helloworld
+    // ✅ Dependency Injection krever nå at AppDbContext ikke er null
+    public ApiController(AppDbContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    // 📌 GET: /div/helloworld
     [HttpGet("helloworld")]
     public IActionResult HelloWorld()
     {
         try
         {
             _requestCount++;
+            Log.Information("📢 HelloWorld-endpoint kalt.");
             return Ok(new { Message = "Hello, World!" });
         }
-        catch
+        catch (Exception ex)
         {
             _errorCount++;
-            return StatusCode(500, new { Error = "An unexpected error occurred." });
+            Log.Error("❌ Feil i HelloWorld-endpoint: {ErrorMessage}", ex.Message);
+            return StatusCode(500, new { Error = "En uventet feil oppstod." });
         }
     }
 
-    // GET: /api/status
+    // 📌 GET: /div/status
     [HttpGet("status")]
     public IActionResult Status()
     {
         try
         {
             _requestCount++;
+            Log.Information("📢 Status-endpoint kalt.");
+
             return Ok(new
             {
-                Uptime = $"{_stopwatch.Elapsed.TotalSeconds:F2} seconds",
+                Uptime = $"{_stopwatch.Elapsed.TotalSeconds:F2} sekunder",
                 RequestCount = _requestCount,
                 ErrorCount = _errorCount
             });
         }
-        catch
+        catch (Exception ex)
         {
             _errorCount++;
-            return StatusCode(500, new { Error = "An unexpected error occurred." });
+            Log.Error("❌ Feil i Status-endpoint: {ErrorMessage}", ex.Message);
+            return StatusCode(500, new { Error = "En uventet feil oppstod." });
         }
     }
-}
-/*
-   [Route("api2/[controller]")]
-    [ApiController]
-    public class UsersController : ControllerBase
+
+    // 📌 GET: /div/database - Sjekker databaseforbindelse
+    [HttpGet("database")]
+    public async Task<IActionResult> CheckDatabaseConnection()
     {
-        private readonly AppDbContext _context;
-
-        public UsersController(AppDbContext context)
+        Log.Information("📢 Database-status-endpoint kalt.");
+        
+        try
         {
-            _context = context;
+            bool canConnect = await _context.Database.CanConnectAsync();
+
+            if (canConnect)
+            {
+                Log.Information("✅ Databaseforbindelsen er OK.");
+                return Ok(new { status = "OK", message = "Databaseforbindelsen er oppe og fungerer." });
+            }
+            else
+            {
+                Log.Warning("⚠️ Klarte ikke å koble til databasen.");
+                return StatusCode(500, new { status = "Feil", message = "Klarte ikke å koble til databasen." });
+            }
         }
-
-        // 🔹 TEST-ENDPOINT: Hent alle brukere fra `users`-tabellen
-        [HttpGet("test-db")]
-        public IActionResult TestDatabase()
+        catch (Exception ex)
         {
-            try
-            {
-                var users = _context.Users.ToList();
-                if (users.Any())
-                {
-                    return Ok(users); // ✅ Returnerer brukerne som JSON
-                }
-                return NotFound("Ingen brukere funnet.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Feil ved tilkobling til databasen: {ex.Message}");
-            }
+            Log.Error("❌ Feil i databaseforbindelsessjekk: {ErrorMessage}", ex.Message);
+            return StatusCode(500, new { status = "Feil", message = "Databaseforbindelsessjekk feilet.", error = ex.Message });
         }
     }
+    [HttpGet("logging")]
+    public IActionResult SetLoggingState([FromQuery] string? global, [FromQuery] string? controller, [FromQuery] string? endpoint)
+    {
+        if (!string.IsNullOrEmpty(global))
+        {
+            if (global.ToLower() == "on")
+            {
+                PutLog.EnableLogging();
+                Log.Information("🟢 Global logging er AKTIVERT!");
+                return Ok(new { status = "OK", message = "Global logging er nå aktivert." });
+            }
+            else if (global.ToLower() == "off")
+            {
+                PutLog.DisableLogging();
+                Log.Information("🔴 Global logging er DEAKTIVERT!");
+                return Ok(new { status = "OK", message = "Global logging er nå deaktivert." });
+            }
+        }
 
-*/
+        if (!string.IsNullOrEmpty(controller))
+        {
+            bool isEnabled = !controller.StartsWith("-");
+            PutLog.SetLoggingForController(controller.TrimStart('-'), isEnabled);
+            Log.Information($"🔍 Logging for controller '{controller.TrimStart('-')}' er {(isEnabled ? "AKTIVERT" : "DEAKTIVERT")}!");
+            return Ok(new { status = "OK", message = $"Logging for controller '{controller.TrimStart('-')}' er {(isEnabled ? "aktivert" : "deaktivert")}" });
+        }
+
+        if (!string.IsNullOrEmpty(endpoint))
+        {
+            bool isEnabled = !endpoint.StartsWith("-");
+            PutLog.SetLoggingForEndpoint(endpoint.TrimStart('-'), isEnabled);
+            Log.Information($"🔍 Logging for endpoint '{endpoint.TrimStart('-')}' er {(isEnabled ? "AKTIVERT" : "DEAKTIVERT")}!");
+            return Ok(new { status = "OK", message = $"Logging for endpoint '{endpoint.TrimStart('-')}' er {(isEnabled ? "aktivert" : "deaktivert")}" });
+        }
+
+        return BadRequest(new { status = "Feil", message = "Ugyldige parametere. Bruk '?global=on|off', '?controller=UserController' eller '?endpoint=GetAllUsers'." });
+    }
+
+
+}

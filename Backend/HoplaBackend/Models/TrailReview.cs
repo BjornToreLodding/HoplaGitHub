@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 //using HoplaBackend.Models;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 public class TrailReview
 {
     public Guid Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)

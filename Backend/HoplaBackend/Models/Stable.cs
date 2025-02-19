@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 public class Stable
 {

@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using MyApp.DTOs;
-using MyApp.Models;
+using HoplaBackend.DTOs;
+using HoplaBackend.Models;
 using HoplaBackend;
 using HoplaBackend.Helpers;
-using MyApp.Data;
+using HoplaBackend.Data;
 
-namespace MyApp.Controllers;
+namespace HoplaBackend.Controllers;
 
 [Route("rides")]
 [ApiController]

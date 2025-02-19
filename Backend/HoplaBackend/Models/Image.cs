@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 
 // Tabell som brukes av ImageEntity..

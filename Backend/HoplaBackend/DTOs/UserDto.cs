@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MyApp.DTOs;
+namespace HoplaBackend.DTOs;
 
 public class CreateUserDto
 {

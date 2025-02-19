@@ -1,4 +1,4 @@
-//using MyApp.Mock;
+//using HoplaBackend.Mock;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,9 +6,9 @@ using System.Linq;
 using HoplaBackend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
+using HoplaBackend.Data;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 [ApiController]
 [Route("mock")]

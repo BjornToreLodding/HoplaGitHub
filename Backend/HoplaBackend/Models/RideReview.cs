@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 public class RideReview
 {
     [Key, ForeignKey("Ride")]

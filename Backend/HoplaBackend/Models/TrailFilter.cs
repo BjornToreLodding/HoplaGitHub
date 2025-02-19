@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 //using HoplaBackend.Models;
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 
 public class TrailFilter
 {

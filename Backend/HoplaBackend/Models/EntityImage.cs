@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace MyApp.Models;
+namespace HoplaBackend.Models;
 //kobling mellom Image og de forskjellige Entitys.
 
 public class EntityImage

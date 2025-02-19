@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-using MyApp.Models;
+using HoplaBackend.Models;
 
 public static class UserRelationMock 
 {
