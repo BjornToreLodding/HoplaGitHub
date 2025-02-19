@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         ) {
                             composable(Screen.Home.route) { HomeScreen() }
-                            composable(Screen.Trails.route) { TrailsScreen() }
+                            composable(Screen.Trails.route) { TrailsScreen(navController) }
                             composable(Screen.NewTrip.route) { NewTripScreen() }
                             composable(Screen.Community.route) { CommunityScreen(navController) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
                                 communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
+                            composable("update_screen") { UpdateScreen() }
                         }
                     }
                 } else {
