@@ -1,9 +1,7 @@
 package com.example.hopla
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
@@ -36,6 +34,9 @@ fun NewTripScreen() {
     var time by remember { mutableIntStateOf(0) }
     var distance by remember { mutableStateOf(0.0) }
     var lastLocation by remember { mutableStateOf<Location?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+    var tripName by remember { mutableStateOf("") }
+    var tripNotes by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -152,7 +153,9 @@ fun NewTripScreen() {
     // UI Layout
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 75.dp),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = true)
         )
@@ -194,7 +197,14 @@ fun NewTripScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = { isRunning = !isRunning },
+                        onClick = {
+                            if (isRunning) {
+                                isRunning = false
+                                showDialog = true
+                            } else {
+                                isRunning = !isRunning
+                            }
+                        },
                         shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
                         modifier = Modifier.size(85.dp)
                     ) {
@@ -219,5 +229,44 @@ fun NewTripScreen() {
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            text = {
+                Column {
+                    TextField(
+                        value = tripName,
+                        onValueChange = { tripName = it },
+                        label = { Text(text = stringResource(R.string.trip_name)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextField(
+                        value = tripNotes,
+                        onValueChange = { tripNotes = it },
+                        label = { Text(text = stringResource(R.string.description)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    ) {
+                        // Add any additional content here
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    // Handle saving trip details here
+                    showDialog = false
+                    time = 0
+                    distance = 0.0
+                }) {
+                    Text(text = stringResource(R.string.save))
+                }
+            }
+        )
     }
 }
