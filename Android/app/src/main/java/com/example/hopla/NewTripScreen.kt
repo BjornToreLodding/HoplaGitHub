@@ -31,6 +31,9 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.ui.graphics.Color
 
 @Preview
@@ -215,6 +218,8 @@ fun NewTripScreen() {
     }
 
     if (showDialog) {
+        var selectedRating by remember { mutableStateOf(0) } // Track selected stars
+
         AlertDialog(
             onDismissRequest = { showDialog = false },
             text = {
@@ -241,17 +246,24 @@ fun NewTripScreen() {
                                     .fillMaxWidth()
                                     .height(200.dp)
                             )
-                            IconButton(
-                                onClick = { /* Handle click */ },
+
+                            // Star Rating Icons (Top-Right Corner)
+                            Row(
                                 modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                                    .padding(4.dp)
+                                    .align(Alignment.TopEnd) // Position at the top-right corner
+                                    .padding(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = null
-                                )
+                                (1..5).forEach { index ->
+                                    Icon(
+                                        imageVector = if (index <= selectedRating) Icons.Filled.Star else Icons.TwoTone.Star,
+                                        contentDescription = "Rating $index",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clickable { selectedRating = index } // Update rating on click
+                                    )
+                                }
                             }
                         }
                     }
@@ -339,9 +351,15 @@ fun NewTripScreen() {
             },
             confirmButton = {
                 Button(onClick = {
+                    // Save the trip / set to 0
                     showDialog = false
                     time = 0
                     distance = 0.0
+                    tripName = ""
+                    tripNotes = ""
+                    filterWords.forEach { word ->
+                        selectedWords = selectedWords - word
+                    }
                 }) {
                     Text(text = stringResource(R.string.save))
                 }
