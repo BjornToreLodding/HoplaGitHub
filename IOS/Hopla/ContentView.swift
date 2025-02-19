@@ -61,7 +61,6 @@ struct ContentView: View {
                                 Image(systemName: "person")
                                 Text("Profile")
                             }
-                        
                     }
                     .tint(colorScheme == .dark ? .white : .black)
                     .onAppear {
@@ -92,9 +91,11 @@ struct ContentView: View {
                 setupTabBarAppearance(for: newColorScheme) // Ensure the tab bar updates
             }
             .preferredColorScheme(isDarkMode ? .dark : .light)
+            .navigationBarHidden(true) // Hide the navigation bar on ContentView
         }
     }
 }
+
 
 #Preview("English") {
     ContentView()

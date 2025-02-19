@@ -55,9 +55,8 @@ struct Login: View {
                         .frame(width: 300)
                         .multilineTextAlignment(.center)
                     
-                    // Log In Button
                     Button(action: {
-                        // Check credentials and set isLoggedIn flag
+                        // Simulating login, replace with actual authentication logic
                         isLoggedIn = true
                     }) {
                         Text("Log In")
@@ -68,6 +67,8 @@ struct Login: View {
                             .cornerRadius(8)
                     }
                     .padding(.top, 30)
+                    .navigationBarBackButtonHidden(true) // Hide the back arrow
+                    
                     
                     Spacer()
                     
@@ -80,16 +81,11 @@ struct Login: View {
                     }
                 }
             }
-            .onChange(of: isLoggedIn) { _ in
-                // Navigate to Home after login
-                if isLoggedIn {
-                    // You can handle any post-login setup here
-                }
-            }
+            .navigationBarHidden(true) // Hide navigation bar on the login screen
         }
-        .navigationBarHidden(true) // Hide navigation bar on this screen
     }
 }
+
 
 #Preview("English") {
     Login()

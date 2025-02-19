@@ -89,6 +89,7 @@
       }
     },
     "Confirm" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -97,6 +98,9 @@
           }
         }
       }
+    },
+    "Confirm Deletion" : {
+
     },
     "Confirm new password" : {
       "localizations" : {
@@ -108,7 +112,11 @@
         }
       }
     },
+    "Continue" : {
+
+    },
     "Dark mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -117,6 +125,9 @@
           }
         }
       }
+    },
+    "Dark Mode" : {
+
     },
     "Delete User" : {
       "localizations" : {
@@ -177,6 +188,9 @@
           }
         }
       }
+    },
+    "Enter topic" : {
+
     },
     "Enter your password" : {
       "localizations" : {
@@ -312,6 +326,17 @@
         }
       }
     },
+    "Other Language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annet språk"
+          }
+        }
+      }
+    },
     "Password" : {
       "localizations" : {
         "nb" : {
@@ -356,7 +381,13 @@
         }
       }
     },
+    "Report an Issue" : {
+
+    },
     "Search bar" : {
+
+    },
+    "Send a Report" : {
 
     },
     "Settings" : {
@@ -389,6 +420,9 @@
         }
       }
     },
+    "This action cannot be undone." : {
+
+    },
     "Username" : {
       "localizations" : {
         "nb" : {
@@ -398,6 +432,9 @@
           }
         }
       }
+    },
+    "You will be logged out of your account." : {
+
     }
   },
   "version" : "1.0"
