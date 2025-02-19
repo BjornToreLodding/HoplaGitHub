@@ -81,4 +81,8 @@
     <string name="confirm_logout">Press confirm to logg out</string>
     <string name="search">Search</string>
 
+    <string name="gravel">Gravel</string>
+    <string name="parking">Parking</string>
+    <string name="asphalt">Asphalt</string>
+
 </resources>

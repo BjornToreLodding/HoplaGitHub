@@ -81,4 +81,8 @@
     <string name="confirm_logout">Trykk bekreft for å logge ut</string>
     <string name="search">Søk</string>
 
+    <string name="gravel">Grus</string>
+    <string name="parking">Parkering</string>
+    <string name="asphalt">Asfalt</string>
+
 </resources>
