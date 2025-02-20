@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -71,20 +70,9 @@ fun CommunityScreen(navController: NavController) {
                 .fillMaxSize()
         ) {
             TopTextCommunity(showLikedOnly) { showLikedOnly = it }
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = { Text(text = stringResource(R.string.search)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = stringResource(R.string.search)
-                    )
-                },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
             )
             LazyColumn(
                 modifier = Modifier
@@ -304,3 +292,4 @@ fun AddCommunityScreen(navController: NavController) {
         }
     }
 }
+

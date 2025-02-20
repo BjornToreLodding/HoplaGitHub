@@ -748,11 +748,18 @@ fun TripItem(trip: Trip) {
 
 @Composable
 fun FriendsScreen(navController: NavController) {
+    var searchQuery by remember { mutableStateOf("") }
     val friends = listOf(
         Friend("Ole", R.drawable.friend1),
         Friend("Dole", R.drawable.friend2),
-        Friend("Doffen", R.drawable.friend3)
+        Friend("Doffen", R.drawable.friend3),
+        Friend("Dolly", R.drawable.friend1),
+        Friend("Langbein", R.drawable.friend2),
+        Friend("Donald", R.drawable.friend3)
     )
+    val filteredFriends = friends.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
 
     Column(
         modifier = Modifier
@@ -788,10 +795,15 @@ fun FriendsScreen(navController: NavController) {
             }
         }
 
+        SearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it }
+        )
+
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(friends) { friend ->
+            items(filteredFriends) { friend ->
                 FriendItem(friend, navController)
             }
         }
