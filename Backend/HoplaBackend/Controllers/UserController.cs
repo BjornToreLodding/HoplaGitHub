@@ -8,6 +8,7 @@ using HoplaBackend.Data;
 using HoplaBackend.DTOs;
 using HoplaBackend.Models;
 using HoplaBackend.Helpers;
+using Helpers;
 
 
 namespace HoplaBackend.Controllers;
@@ -48,21 +49,12 @@ public class UserController : ControllerBase
     [HttpGet("int/{userId}")] 
     public async Task<IActionResult> GetIntUser(int userId)
     {
-        string userGuidString;
-        if (userId < 10)
-        {
-            userGuidString = $"12345678-0000-0000-0001-12345678000{userId}";
-        }else
-        {
-            userGuidString = $"12345678-0000-0000-0001-1234567800{userId}";
-        }
-        
-        if (!Guid.TryParse(userGuidString, out Guid userGuid))
-        {
-            return BadRequest("Ugyldig bruker-ID");
-        }
+        //var endpointName = ControllerContext.ActionDescriptor.ActionName;
+        var controllerName = ControllerContext.ActionDescriptor.ControllerName;
 
-        return await GetUser(userGuid, false);
+        Guid newGuid = CustomConvert.IntToGuid(controllerName, userId);
+    
+        return await GetUser(newGuid, false);
     }
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetUser(
@@ -79,6 +71,7 @@ public class UserController : ControllerBase
 
         return Ok(new
         {
+            id = user.Id,
             name = user.Name,
             email = user.Email,
             password_hash = user.PasswordHash,
