@@ -51,7 +51,6 @@ public class UserController : ControllerBase
     {
         //var endpointName = ControllerContext.ActionDescriptor.ActionName;
         var controllerName = ControllerContext.ActionDescriptor.ControllerName;
-
         Guid newGuid = CustomConvert.IntToGuid(controllerName, userId);
     
         return await GetUser(newGuid, false);
