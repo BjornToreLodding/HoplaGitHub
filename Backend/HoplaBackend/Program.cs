@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using Microsoft.Extensions.Configuration;
 using System.Text;
-using Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using HoplaBackend.Services;
 /*
 using Serilog;
 using System;
@@ -80,8 +80,16 @@ builder.Logging.AddSerilog();
 */
 
 // Legg til JWT-autentisering
-var secretKey = builder.Configuration["Jwt:Key"] ?? "SuperHemmeligNøkkelSomErLang123!"; // Hent fra config eller sett default
+//var secretKey = builder.Configuration["Jwt:Key"] ?? "SuperHemmeligNøkkelSomErLang123!"; // Hent fra config eller sett default
+var secretKey = builder.Configuration["Jwt:Key"];
 
+if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
+{
+    throw new Exception("!!!!    !!!!   Jwt:Key er for kort! Må være minst 32 tegn lang.");
+}
+
+Console.WriteLine(secretKey);
+/*
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -100,9 +108,22 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero // Ingen forsinkelse på token-utløp
     };
 });
+*/
 
-builder.Services.AddAuthorization();
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 // Konfigurer Entity Framework med riktig connection-string
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -111,6 +132,7 @@ builder.Services.AddControllers();//options =>
 //{
 //    options.Filters.Add<PutLog.LogEnricherFilter>(); // Bruk full namespace
 //});
+builder.Services.AddScoped<IUserService, UserService>();  // 🔹 Registrer UserService
 
 var app = builder.Build();
 

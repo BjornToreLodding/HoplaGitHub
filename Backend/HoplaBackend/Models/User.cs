@@ -13,7 +13,7 @@ public class User
     public string? Name { get; set; }
     public string? Alias { get; set; }
 
-    public string? Email { get; set; }
+    public required string Email { get; set; }
 
     public string? PasswordHash { get; set; }
     public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL

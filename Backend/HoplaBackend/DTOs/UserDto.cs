@@ -2,11 +2,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HoplaBackend.DTOs;
 
+
+// Vurdere å legge denne i ny DTO, f.eks AuthenticationDto.cs
 public class LoginRequest
+{
+    public string? Email { get; set; }
+    public string? Password { get; set; }
+}
+
+// Vurdere å legge denne i ny DTO, f.eks AuthenticationDto.cs
+public class RegisterRequest
 {
     public string Email { get; set; }
     public string Password { get; set; }
 }
+
 
 public class UserDto
 {

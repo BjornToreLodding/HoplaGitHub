@@ -7,8 +7,8 @@ using Serilog;
 using HoplaBackend.Data;
 using HoplaBackend.DTOs;
 using HoplaBackend.Models;
-using HoplaBackend.Helpers;
-using Helpers;
+using HoplaBackend.Helpers; //Denne har blitt grå og må legges til med linja under.
+using HoplaBackend.Services;
 
 
 namespace HoplaBackend.Controllers;
@@ -18,26 +18,54 @@ namespace HoplaBackend.Controllers;
 public class UserController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IUserService _userService;
 
-    public UserController(AppDbContext context)
+    public UserController(AppDbContext context, IUserService userService)
     {
         _context = context;
+        _userService = userService;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var user = await _userService.Authenticate(request.Email, request.Password);
-
-        if (user == null)
+        Console.WriteLine(request.Email);
+        if (user == null) //rød strek her: Operator '==' cannot be applied to operands of type 'User?' and '<null>'CS0019 - (local variable) User? user
         {
             return Unauthorized(new { message = "Ugyldig e-post eller passord" });
         }
 
-        var token = Authentication.GenerateJwtToken(user);
+        var token = Authentication.GenerateJwtToken(user); //rød strek under user: Argument 1: cannot convert from 'User?' to 'HoplaBackend.Models.User'CS1503
 
         return Ok(new { token });
+    } 
+
+        [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        // 🔹 Sjekk om e-posten allerede finnes
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (existingUser != null)
+        {
+            return BadRequest(new { message = "E-post er allerede i bruk" });
+        }
+
+        // 🔹 Hashe passordet før vi lagrer det
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        var newUser = new User
+        {
+            Email = request.Email,
+            PasswordHash = hashedPassword // Lagre det hash'ede passordet
+        };
+
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Bruker registrert!" });
     }
+
     //Admin funksjon eller bygges om til søkefunksjon
     [HttpGet("all")]
     public async Task<IActionResult> GetUsers()

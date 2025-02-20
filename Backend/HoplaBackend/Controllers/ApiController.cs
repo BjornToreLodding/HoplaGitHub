@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using HoplaBackend.Data;
 using Serilog;
-using Helpers;
+using HoplaBackend.Helpers;
+
 
 [ApiController]
 [Route("div")]

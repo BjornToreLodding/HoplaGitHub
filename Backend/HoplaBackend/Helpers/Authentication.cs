@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using BCrypt.Net;
 using HoplaBackend.Models;
 
+namespace HoplaBackend.Helpers;
 public static class Authentication
 {
     private static readonly string SecretKey = "hemmelig_nøkkel123"; // Bør hentes fra config

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
 using System;
 
-namespace HoplaBackend;
+namespace HoplaBackend.Helpers;
 
 // Vurder å bytt navn på denne fila til CoordinatesCalc, men rename evt CoorinateCalculator-klassen
 public static class DistanceCalc

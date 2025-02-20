@@ -7,7 +7,6 @@ using HoplaBackend.Models;
 using HoplaBackend;
 using HoplaBackend.Helpers;
 using HoplaBackend.Data;
-using Helpers;
 
 namespace HoplaBackend.Controllers;
 

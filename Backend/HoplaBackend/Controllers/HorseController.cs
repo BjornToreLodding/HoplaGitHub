@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
 using HoplaBackend.Helpers;
-using Helpers;
 
 namespace HoplaBackend.Controllers
 {
