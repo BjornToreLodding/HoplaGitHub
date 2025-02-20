@@ -88,19 +88,15 @@
         }
       }
     },
-    "Confirm" : {
-      "extractionState" : "stale",
+    "Confirm Deletion" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bekreft"
+            "value" : "Slett Bruker"
           }
         }
       }
-    },
-    "Confirm Deletion" : {
-
     },
     "Confirm new password" : {
       "localizations" : {
@@ -113,10 +109,16 @@
       }
     },
     "Continue" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsett"
+          }
+        }
+      }
     },
-    "Dark mode" : {
-      "extractionState" : "stale",
+    "Dark Mode" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -125,9 +127,6 @@
           }
         }
       }
-    },
-    "Dark Mode" : {
-
     },
     "Delete User" : {
       "localizations" : {
@@ -190,7 +189,14 @@
       }
     },
     "Enter topic" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn emne"
+          }
+        }
+      }
     },
     "Enter your password" : {
       "localizations" : {
@@ -326,17 +332,6 @@
         }
       }
     },
-    "Other Language" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annet språk"
-          }
-        }
-      }
-    },
     "Password" : {
       "localizations" : {
         "nb" : {
@@ -382,13 +377,27 @@
       }
     },
     "Report an Issue" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapporter et Problem"
+          }
+        }
+      }
     },
     "Search bar" : {
 
     },
     "Send a Report" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send en Rapport"
+          }
+        }
+      }
     },
     "Settings" : {
       "localizations" : {
@@ -421,7 +430,14 @@
       }
     },
     "This action cannot be undone." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dette kan ikke endres."
+          }
+        }
+      }
     },
     "Username" : {
       "localizations" : {
@@ -434,7 +450,14 @@
       }
     },
     "You will be logged out of your account." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du blir logget ut av kontoen din."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
