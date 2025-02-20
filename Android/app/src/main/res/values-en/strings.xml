@@ -87,5 +87,8 @@
 
     <string name="comment">Comment:</string>
     <string name="publish">Publish</string>
+    <string name="dateString">Date</string>
+    <string name="length">"Length "</string>
+    <string name="hourString">hours</string>
 
 </resources>

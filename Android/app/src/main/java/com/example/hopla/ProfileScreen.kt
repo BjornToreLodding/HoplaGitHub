@@ -58,13 +58,17 @@ import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.sharp.AccountBox
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 
 data class Trip(
     val name: String,
     val date: String,
     val length: String,
-    val time: String
+    val time: String,
+    val imageResource: Int
 )
 
 @Composable
@@ -615,9 +619,9 @@ fun UserChanges(modifier: Modifier = Modifier) {
 @Composable
 fun MyTripsScreen(navController: NavController) {
     val trips = listOf(
-        Trip("Trip to the mountains", "2023-10-01", "10 km", "2 hours"),
-        Trip("City walk", "2023-09-15", "5 km", "1 hour"),
-        Trip("Beach run", "2023-08-20", "8 km", "1.5 hours")
+        Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
+        Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
+        Trip("Beach run", "2023-08-20", "8", "1.5", R.drawable.stockimg2),
     )
 
     Column(
@@ -666,6 +670,9 @@ fun MyTripsScreen(navController: NavController) {
 
 @Composable
 fun TripItem(trip: Trip) {
+    var showDialog by remember { mutableStateOf(false) }
+    var showImage by remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -676,9 +683,60 @@ fun TripItem(trip: Trip) {
     ) {
         Column {
             Text(text = trip.name, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Date: ${trip.date}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Length: ${trip.length}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Time: ${trip.time}", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.dateString) + ": ${trip.date}", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.length) + ": ${trip.length} km", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.hourString) + ": ${trip.time} " + stringResource(R.string.hourString), style = MaterialTheme.typography.bodySmall)
+        }
+        IconButton(
+            onClick = {
+                showDialog = true
+                showImage = true // Reset showImage to true when the icon is clicked
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Sharp.AccountBox,
+                contentDescription = stringResource(R.string.liked)
+            )
+        }
+    }
+
+    if (showDialog && showImage) {
+        Dialog(onDismissRequest = {
+            showDialog = false
+            showImage = true // Reset showImage to true when the dialog is dismissed so image can be cliked several times
+        }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box {
+                    Image(
+                        painter = painterResource(id = trip.imageResource),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                    )
+                    IconButton(
+                        onClick = { showImage = false },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.cancel)
+                        )
+                    }
+                }
+            }
         }
     }
 }
