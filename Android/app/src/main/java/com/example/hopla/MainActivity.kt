@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
                                 communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
+                            composable("addFriendScreen") { AddCommunityScreen(navController) }
                             composable("update_screen") { UpdateScreen(navController) }
                             composable(
                                 "friend_detail/{friendName}/{friendImageResource}",
