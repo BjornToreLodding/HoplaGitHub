@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HoplaBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+26b799c931fcbdfe4ecc5fe891ea4d95ef13e05e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13a1e0c6f982251dba6c8a258163c6ef085dc3f6")]
 [assembly: System.Reflection.AssemblyProductAttribute("HoplaBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HoplaBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
