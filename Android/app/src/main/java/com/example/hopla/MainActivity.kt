@@ -102,6 +102,17 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
                             composable("update_screen") { UpdateScreen(navController) }
+                            composable(
+                                "friend_detail/{friendName}/{friendImageResource}",
+                                arguments = listOf(
+                                    navArgument("friendName") { type = NavType.StringType },
+                                    navArgument("friendImageResource") { type = NavType.IntType }
+                                )
+                            ) { backStackEntry ->
+                                val friendName = backStackEntry.arguments?.getString("friendName") ?: ""
+                                val friendImageResource = backStackEntry.arguments?.getInt("friendImageResource") ?: 0
+                                FriendDetailScreen(navController, friendName, friendImageResource)
+                            }
                         }
                     }
                 } else {

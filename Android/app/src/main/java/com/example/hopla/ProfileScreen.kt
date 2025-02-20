@@ -71,6 +71,11 @@ data class Trip(
     val imageResource: Int
 )
 
+data class Friend(
+    val name: String,
+    val imageResource: Int
+)
+
 @Composable
 fun ProfileScreen(
     navController: NavController
@@ -743,6 +748,12 @@ fun TripItem(trip: Trip) {
 
 @Composable
 fun FriendsScreen(navController: NavController) {
+    val friends = listOf(
+        Friend("Ole", R.drawable.friend1),
+        Friend("Dole", R.drawable.friend2),
+        Friend("Doffen", R.drawable.friend3)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -775,6 +786,72 @@ fun FriendsScreen(navController: NavController) {
                     fontSize = 24.sp
                 )
             }
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(friends) { friend ->
+                FriendItem(friend, navController)
+            }
+        }
+    }
+}
+
+@Composable
+fun FriendItem(friend: Friend, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable { navController.navigate("friend_detail/${friend.name}/${friend.imageResource}") }
+    ) {
+        Image(
+            painter = painterResource(id = friend.imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = friend.name, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun FriendDetailScreen(navController: NavController, friendName: String, friendImageResource: Int) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.back)
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = friendName, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Image(
+                painter = painterResource(id = friendImageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+            )
         }
     }
 }
