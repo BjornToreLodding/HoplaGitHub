@@ -1,9 +1,9 @@
 Backend/HoplaBackend/bin/
 Backend/HoplaBackend/obj/
-*.log
+Backend/*/*.log
 
 
-appsettings.Development.json
-appsettings.Local.json
-secrets.json
-.env
+Backend/HoplaBackend/appsettings.Development.json
+Backend/HoplaBackend/appsettings.Local.json
+Backend/HoplaBackend/secrets.json
+Backend/*/.env
