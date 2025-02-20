@@ -2,7 +2,6 @@ using System;
 //using Serilog;
 using Serilog.Context;
 
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,12 +10,16 @@ using HoplaBackend.Data;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 /*
 using Serilog;
 using System;
 using System.Net.Http;
 */
+
 var builder = WebApplication.CreateBuilder(args);
+
 /*
 
 var logtailUrl = "https://s1209901.eu-nbg-2.betterstackdata.com:443/SqQyvVrV6jWshrdibjNdoKkM";
@@ -39,6 +42,7 @@ Log.Information("🚀 Forsøker å starte programmet ");
 //builder.Host.UseSerilog();
 
 */
+
 // Prøver å hente database-url fra miljøvariabelen DATABASE_URL
 string? databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
@@ -57,8 +61,7 @@ if (!string.IsNullOrEmpty(databaseUrl))
                        $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=True;";
 
     Console.WriteLine("Bruker DATABASE_URL fra miljøvariabel. Programmet kjører på Render.com");
-    //Log.Information("🚀 Forsøker å starte progrmamet på render.com");
-
+    //Log.Information("🚀 Forsøker å starte programmet på Render.com");
 }
 else
 {
@@ -69,73 +72,56 @@ else
     Console.WriteLine("Miljøvariabel IKKE funnet. Kjører programmet lokalt? DefaultConnection fra appsettings.json.");
     //Log.Information("🚀 Forsøker å starte programmet lokalt ");
 }
+
 // ✅ Sikrer at Serilog fungerer for ALLE controllere
-
 /*
-builder.Logging.ClearProviders(); 
-
+builder.Logging.ClearProviders();
 builder.Logging.AddSerilog();
-
 */
-//builder.Services.AddControllers();
+
+// Legg til JWT-autentisering
+var secretKey = builder.Configuration["Jwt:Key"] ?? "SuperHemmeligNøkkelSomErLang123!"; // Hent fra config eller sett default
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // Sett til true i produksjon
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero // Ingen forsinkelse på token-utløp
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// Konfigurer Entity Framework med riktig connection-string
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
 builder.Services.AddControllers();//options =>
 //{
 //    options.Filters.Add<PutLog.LogEnricherFilter>(); // Bruk full namespace
 //});
 
-// Konfigurer Entity Framework med riktig connection-string
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
-    
-
-
-
 var app = builder.Build();
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication(); // Aktiver JWT-autentisering
+app.UseAuthorization();  // Aktiver autorisasjon
+
 app.MapControllers();
+
 app.Run();
+
 //Log.Information("🚀 Programmet startet ");
 //Log.CloseAndFlush();
-
-
-/*
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using HoplaBackend.Data;
-using Microsoft.Extensions.Configuration;
-using System;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Prøver først å hente connection string fra miljøvariabler
-string connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
-    ?? builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new Exception("Database connection string is missing!");
-
-// Konfigurer Entity Framework med riktig connection-string
-builder.Services.AddDbContext<AppDbContext>(options => //Rød strek under MyDbContext
-    options.UseNpgsql(connectionString));
-
-// Les databaseforbindelsen fra appsettings.json
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-//);
-
-//"DefaultConnection": "Host=localhost;Port=5432;Database=hopla3;Username=postgres;Password=Hopla"
-    
-// Legg til nødvendige tjenester (ingen database kreves her)
-builder.Services.AddControllers();
-
-var app = builder.Build();
-
-// Aktiver HTTPS-omdirigering
-app.UseHttpsRedirection();
-
-// Aktiver routing
-app.MapControllers();
-
-app.Run();
-*/

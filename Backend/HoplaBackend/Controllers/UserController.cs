@@ -23,6 +23,22 @@ public class UserController : ControllerBase
     {
         _context = context;
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var user = await _userService.Authenticate(request.Email, request.Password);
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Ugyldig e-post eller passord" });
+        }
+
+        var token = Authentication.GenerateJwtToken(user);
+
+        return Ok(new { token });
+    }
+    //Admin funksjon eller bygges om til søkefunksjon
     [HttpGet("all")]
     public async Task<IActionResult> GetUsers()
     {

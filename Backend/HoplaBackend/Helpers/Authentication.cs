@@ -1,13 +1,29 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using BCrypt.Net;
+using HoplaBackend.Models;
 
-namespace HoplaBackend.Helpers;
-public static class PWHelper
+public static class Authentication
 {
-    // Funksjon for å hashe passord
-    static string HashPassword(string password)
+    private static readonly string SecretKey = "hemmelig_nøkkel123"; // Bør hentes fra config
+
+    public static string GenerateJwtToken(User user)
     {
-        return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12); // workFactor bestemmer sikkerheten
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(SecretKey);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.Email) }),
+            Expires = DateTime.UtcNow.AddHours(1),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
     }
     /*
     //
@@ -25,10 +41,18 @@ public static class PWHelper
     */
 
     // Funksjon for å verifisere passordet
-    static bool VerifyPassword(string password, string hashedPassword)
+
+    public static string HashPassword(string password)
+    {
+        return BCrypt.Net.BCrypt.HashPassword(password);
+    }
+
+    public static bool VerifyPassword(string password, string hashedPassword)
     {
         return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
     }
+
+
     /*
     //
     //  Eksempel på bruk av funksjonen ovenfor
