@@ -37,6 +37,7 @@ public class MockController : ControllerBase
         _context.Trails.RemoveRange(_context.Trails);
         //_context.TrailReviews.RemoveRange(_context.TrailReviews);
         //_context.TrailFilters(_context.TrailFilters);
+        _context.SystemSettings.RemoveRange(_context.SystemSettings); 
 
 
 
@@ -54,6 +55,7 @@ public class MockController : ControllerBase
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
 
         // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
@@ -66,9 +68,20 @@ public class MockController : ControllerBase
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
 
         return Ok("Database cleared and IDs reset.");    
         }
+
+    [HttpPost("createsystemsettings")]
+    public async Task<IActionResult> CreateSystemSettings()
+    {
+        if (_context.SystemSettings.Any()) { return NoContent(); }
+        var systemSettings = SystemSettingMock.SetDefaultSettingsMock();
+        _context.SystemSettings.AddRange(systemSettings);
+        await _context.SaveChangesAsync();
+        return Created("", new { message = "SystemSettings created "});
+    }
 
     [HttpPost("createusers")]
     public async Task<IActionResult> CreateUsers() //rød strek under Task<IActionResult>
@@ -248,6 +261,7 @@ public class MockController : ControllerBase
         //await CreateTrailDetails();
         //await CreateTrailReviews();
         //await CreateTrailFilters;
+        await CreateSystemSettings();
 
         //return Created();
         return Created("", new { message = "opprettet!"});

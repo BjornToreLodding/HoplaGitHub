@@ -137,6 +137,7 @@ builder.Services.AddControllers();//options =>
 //});
 builder.Services.AddScoped<IUserService, UserService>();  // 🔹 Registrer UserService
 builder.Services.AddScoped<Authentication>();
+builder.Services.AddScoped<SystemSettingService>();
 
 
 var app = builder.Build();
