@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using HoplaBackend.Services;
+using HoplaBackend.Helpers;
 /*
 using Serilog;
 using System;
@@ -83,10 +84,12 @@ builder.Logging.AddSerilog();
 //var secretKey = builder.Configuration["Jwt:Key"] ?? "SuperHemmeligNøkkelSomErLang123!"; // Hent fra config eller sett default
 var secretKey = builder.Configuration["Jwt:Key"];
 
+
 if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
 {
     throw new Exception("!!!!    !!!!   Jwt:Key er for kort! Må være minst 32 tegn lang.");
 }
+Console.WriteLine($"🔑 JWT Secret Key: {builder.Configuration["Jwt:Key"]}");
 
 Console.WriteLine(secretKey);
 /*
@@ -133,6 +136,8 @@ builder.Services.AddControllers();//options =>
 //    options.Filters.Add<PutLog.LogEnricherFilter>(); // Bruk full namespace
 //});
 builder.Services.AddScoped<IUserService, UserService>();  // 🔹 Registrer UserService
+builder.Services.AddScoped<Authentication>();
+
 
 var app = builder.Build();
 

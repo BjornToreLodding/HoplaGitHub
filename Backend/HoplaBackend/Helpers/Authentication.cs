@@ -3,33 +3,66 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using BCrypt.Net;
 using HoplaBackend.Models;
+using Microsoft.Extensions.Configuration;
+using BCrypt.Net; 
 
-namespace HoplaBackend.Helpers;
-public static class Authentication
+namespace HoplaBackend.Helpers
 {
-    private static readonly string SecretKey = "hemmelig_nøkkel123"; // Bør hentes fra config
-
-    public static string GenerateJwtToken(User user)
+    public class Authentication
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(SecretKey);
+        private readonly IConfiguration _configuration;
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        public Authentication(IConfiguration configuration)
         {
-            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.Email) }),
-            Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+            _configuration = configuration;
+        }
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        public string GenerateJwtToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var secretKey = _configuration["Jwt:Key"];
+
+            if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
+            {
+                throw new Exception("🚨 Jwt:Key er for kort eller mangler!");
+            }
+
+            var key = Encoding.UTF8.GetBytes(secretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email)
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        // ✅ Beholder `static` her for enkel tilgang uten instans
+        public static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public static bool VerifyPassword(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
     }
+}
+
+
     /*
-    //
-    //
-    //
     var user = new User
     {
         Username = "bruker123",
@@ -39,22 +72,6 @@ public static class Authentication
     dbContext.Users.Add(user);
     dbContext.SaveChanges();
 
-    */
-
-    // Funksjon for å verifisere passordet
-
-    public static string HashPassword(string password)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(password);
-    }
-
-    public static bool VerifyPassword(string password, string hashedPassword)
-    {
-        return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
-    }
-
-
-    /*
     //
     //  Eksempel på bruk av funksjonen ovenfor
     //
@@ -92,4 +109,4 @@ public static class Authentication
     */
 
 
-}
+

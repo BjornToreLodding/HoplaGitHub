@@ -9,6 +9,7 @@ using HoplaBackend.DTOs;
 using HoplaBackend.Models;
 using HoplaBackend.Helpers; //Denne har blitt grå og må legges til med linja under.
 using HoplaBackend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace HoplaBackend.Controllers;
@@ -17,31 +18,30 @@ namespace HoplaBackend.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
+    private readonly Authentication _authentication;
     private readonly AppDbContext _context;
-    private readonly IUserService _userService;
 
-    public UserController(AppDbContext context, IUserService userService)
+    public UserController(Authentication authentication, AppDbContext context)
     {
+        _authentication = authentication;
         _context = context;
-        _userService = userService;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _userService.Authenticate(request.Email, request.Password);
-        Console.WriteLine(request.Email);
-        if (user == null) //rød strek her: Operator '==' cannot be applied to operands of type 'User?' and '<null>'CS0019 - (local variable) User? user
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+        if (user == null || !Authentication.VerifyPassword(request.Password, user.PasswordHash))
         {
             return Unauthorized(new { message = "Ugyldig e-post eller passord" });
         }
 
-        var token = Authentication.GenerateJwtToken(user); //rød strek under user: Argument 1: cannot convert from 'User?' to 'HoplaBackend.Models.User'CS1503
-
+        var token = _authentication.GenerateJwtToken(user);
         return Ok(new { token });
-    } 
+    }
 
-        [HttpPost("register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         // 🔹 Sjekk om e-posten allerede finnes
@@ -67,6 +67,7 @@ public class UserController : ControllerBase
     }
 
     //Admin funksjon eller bygges om til søkefunksjon
+    //[Authorize]
     [HttpGet("all")]
     public async Task<IActionResult> GetUsers()
     {
@@ -89,7 +90,7 @@ public class UserController : ControllerBase
 
         return Ok(users);
     }
-
+    //[Authorize]
     [HttpGet("int/{userId}")] 
     public async Task<IActionResult> GetIntUser(int userId)
     {
@@ -121,6 +122,7 @@ public class UserController : ControllerBase
             created_at = user.CreatedAt
         });
     }
+    //[Authorize]
     [HttpPost("new")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)
     {
@@ -155,6 +157,7 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(userData);
     }
+    //[Authorize]
     [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
     public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
     {
@@ -203,6 +206,7 @@ public class UserController : ControllerBase
         return Ok(new { message = $"User userId was updated", userData });
     }
 
+    //[Authorize]
     [HttpDelete("delete/{userId}")]
     public async Task<IActionResult> DeleteUser(Guid userId)
     {
