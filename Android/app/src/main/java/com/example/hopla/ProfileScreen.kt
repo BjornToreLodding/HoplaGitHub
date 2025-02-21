@@ -892,13 +892,90 @@ fun FollowingScreen(navController: NavController) {
 
 @Composable
 fun MyHorsesScreen(navController: NavController) {
+    val horses = listOf(
+        Horse("Hest1", R.drawable.horse1, "Dølahest", 5),
+        Horse("Hest2", R.drawable.horse2, "Fjording", 7),
+        Horse("Hest3", R.drawable.horse3, "Araber", 3),
+        Horse("Hest4", R.drawable.horse1, "Frieser", 6),
+        Horse("Hest5", R.drawable.horse2, "Shetlandsponni", 10),
+        Horse("Hest6", R.drawable.horse3, "Islandshest", 8)
+    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column {
+            Box(modifier = Modifier.padding(8.dp)) {
+                ScreenHeader(navController, stringResource(R.string.my_horses))
+            }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(horses) { horse ->
+                    HorseItem(horse, navController)
+                }
+            }
+        }
+        AddButton(onClick = { navController.navigate("addHorseScreen") })
+    }
+}
+
+@Composable
+fun HorseDetailScreen(navController: NavController, horseName: String, horseImageResource: Int, horseBreed: String, horseAge: Int) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            ScreenHeader(navController, stringResource(R.string.my_horses))
+            Text(text = horseName, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Image(
+                painter = painterResource(id = horseImageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Breed: $horseBreed", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Age: $horseAge", style = MaterialTheme.typography.bodySmall)
         }
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.back)
+            )
+        }
+    }
+}
+
+@Composable
+fun HorseItem(horse: Horse, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable {
+                navController.navigate("horse_detail/${horse.name}/${horse.imageResource}/${horse.breed}/${horse.age}")
+            }
+    ) {
+        Image(
+            painter = painterResource(id = horse.imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = horse.name, style = MaterialTheme.typography.bodyLarge)
     }
 }

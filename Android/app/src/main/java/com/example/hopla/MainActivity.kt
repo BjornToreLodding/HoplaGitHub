@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
                             composable("addFriendScreen") { AddCommunityScreen(navController) }
+                            composable("addHorseScreen") { AddCommunityScreen(navController) }
                             composable("update_screen") { UpdateScreen(navController) }
                             composable(
                                 "friend_detail/{friendName}/{friendImageResource}",
@@ -114,6 +115,21 @@ class MainActivity : ComponentActivity() {
                                 val friendName = backStackEntry.arguments?.getString("friendName") ?: ""
                                 val friendImageResource = backStackEntry.arguments?.getInt("friendImageResource") ?: 0
                                 FriendDetailScreen(navController, friendName, friendImageResource)
+                            }
+                            composable(
+                                "horse_detail/{horseName}/{horseImageResource}/{horseBreed}/{horseAge}",
+                                arguments = listOf(
+                                    navArgument("horseName") { type = NavType.StringType },
+                                    navArgument("horseImageResource") { type = NavType.IntType },
+                                    navArgument("horseBreed") { type = NavType.StringType },
+                                    navArgument("horseAge") { type = NavType.IntType }
+                                )
+                            ) { backStackEntry ->
+                                val horseName = backStackEntry.arguments?.getString("horseName") ?: ""
+                                val horseImageResource = backStackEntry.arguments?.getInt("horseImageResource") ?: 0
+                                val horseBreed = backStackEntry.arguments?.getString("horseBreed") ?: ""
+                                val horseAge = backStackEntry.arguments?.getInt("horseAge") ?: 0
+                                HorseDetailScreen(navController, horseName, horseImageResource, horseBreed, horseAge)
                             }
                         }
                     }
