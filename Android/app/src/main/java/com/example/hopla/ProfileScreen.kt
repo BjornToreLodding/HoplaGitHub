@@ -776,39 +776,101 @@ fun FriendDetailScreen(navController: NavController, friendName: String, friendI
 
 @Composable
 fun FollowingScreen(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        Box(
+    var searchQuery by remember { mutableStateOf("") }
+
+    val following = listOf(
+        Following("Rachel", R.drawable.friend1),
+        Following("Monica", R.drawable.friend2),
+        Following("Phoebe", R.drawable.friend3),
+        Following("Chandler", R.drawable.friend1),
+        Following("Joey", R.drawable.friend2),
+        Following("Ross", R.drawable.friend3)
+    )
+
+    val filteredFollowing = following.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .background(MaterialTheme.colorScheme.tertiary)
-                .border(10.dp, MaterialTheme.colorScheme.primary)
+                .fillMaxSize()
+                .padding(8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxHeight()
+            ScreenHeader(navController, stringResource(R.string.following))
+
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
+                items(filteredFollowing) { following ->
+                    FollowingItem(following, navController)
                 }
             }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.following),
-                    fontSize = 24.sp
-                )
-            }
         }
+        AddButton(onClick = { navController.navigate("addFriendScreen") })
+    }
+}
+
+@Composable
+fun FollowingDetailScreen(navController: NavController, followingName: String, followingImageResource: Int) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.back)
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = followingName, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Image(
+                painter = painterResource(id = followingImageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+            )
+        }
+    }
+}
+
+@Composable
+fun FollowingItem(following: Following, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable { navController.navigate("friend_detail/${following.name}/${following.imageResource}") }
+    ) {
+        Image(
+            painter = painterResource(id = following.imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = following.name, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

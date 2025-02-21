@@ -121,6 +121,17 @@ class MainActivity : ComponentActivity() {
                                 FriendDetailScreen(navController, friendName, friendImageResource)
                             }
                             composable(
+                                "following_detail/{followingName}/{followingImageResource}",
+                                arguments = listOf(
+                                    navArgument("followingName") { type = NavType.StringType },
+                                    navArgument("followingImageResource") { type = NavType.IntType }
+                                )
+                            ) { backStackEntry ->
+                                val followingName = backStackEntry.arguments?.getString("followingName") ?: ""
+                                val followingImageResource = backStackEntry.arguments?.getInt("followingImageResource") ?: 0
+                                FollowingDetailScreen(navController, followingName, followingImageResource)
+                            }
+                            composable(
                                 "horse_detail/{horseName}/{horseImageResource}/{horseBreed}/{horseAge}",
                                 arguments = listOf(
                                     navArgument("horseName") { type = NavType.StringType },

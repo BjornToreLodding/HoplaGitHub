@@ -15,6 +15,12 @@ data class Friend(
     val imageResource: Int
 )
 
+// Class for the data of a person a user is following
+data class Following(
+    val name: String,
+    val imageResource: Int
+)
+
 // Class for the data of a horse
 data class Horse(
     val name: String,
