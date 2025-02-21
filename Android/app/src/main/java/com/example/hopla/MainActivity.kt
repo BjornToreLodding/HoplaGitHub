@@ -103,7 +103,11 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
                             composable("addFriendScreen") { AddCommunityScreen(navController) }
-                            composable("addHorseScreen") { AddCommunityScreen(navController) }
+                            composable("addHorseScreen") {
+                                AddNewType(navController, "Horse") { name, imageResource, breed, age ->
+                                    // Handle adding a new horse
+                                }
+                            }
                             composable("update_screen") { UpdateScreen(navController) }
                             composable(
                                 "friend_detail/{friendName}/{friendImageResource}",

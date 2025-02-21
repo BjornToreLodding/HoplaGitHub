@@ -979,3 +979,83 @@ fun HorseItem(horse: Horse, navController: NavController) {
         Text(text = horse.name, style = MaterialTheme.typography.bodyLarge)
     }
 }
+
+@Composable
+fun AddNewType(
+    navController: NavController,
+    type: String,
+    onAdd: (String, Int, String, Int) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var imageResource by remember { mutableStateOf(0) }
+    var breedOrFriendType by remember { mutableStateOf("") }
+    var ageOrFriendAge by remember { mutableStateOf(0) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        TextField(
+            value = imageResource.toString(),
+            onValueChange = { imageResource = it.toIntOrNull() ?: 0 },
+            label = { Text("Image Resource") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        if (type == "Horse") {
+            TextField(
+                value = breedOrFriendType,
+                onValueChange = { breedOrFriendType = it },
+                label = { Text("Breed") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = ageOrFriendAge.toString(),
+                onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
+                label = { Text("Age") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else if (type == "Friend") {
+            TextField(
+                value = breedOrFriendType,
+                onValueChange = { breedOrFriendType = it },
+                label = { Text("Friend Type") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = ageOrFriendAge.toString(),
+                onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
+                label = { Text("Friend Age") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else if (type == "Following") {
+            TextField(
+                value = breedOrFriendType,
+                onValueChange = { breedOrFriendType = it },
+                label = { Text("Following Type") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            onAdd(name, imageResource, breedOrFriendType, ageOrFriendAge)
+            navController.popBackStack()
+        }) {
+            Text(text = "Add $type")
+        }
+    }
+}
