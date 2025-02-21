@@ -36,19 +36,10 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -369,115 +360,46 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
     }
 }
 
+// Function to update the profile picture of the user
 @Composable
 fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var permissionGranted by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    // Camera launcher
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        imageBitmap = bitmap
-    }
-
-    // Content picker launcher
-    val contentPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            val inputStream = context.contentResolver.openInputStream(it)
-            imageBitmap = BitmapFactory.decodeStream(inputStream)
-        }
-    }
-
-    // Permission launcher
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        permissionGranted = isGranted
-        if (isGranted) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(null)
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // Check and request for camera permission
-    LaunchedEffect(Unit) {
-        when {
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                permissionGranted = true
-            }
-            else -> {
-                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }
-    }
-
-    // Display the current profile picture (either the captured or default image)
-    if (imageBitmap != null) {
-        Image(
-            bitmap = imageBitmap!!.asImageBitmap(),
-            contentDescription = "Captured Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-        )
-    } else {
-        Image(
-            painter = painterResource(id = imageResource),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-        )
-    }
-
-    // Text to trigger camera action
-    Text(
-        text = stringResource(R.string.change_profile_picture),
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .clickable { showDialog = true },
-        style = TextStyle(textDecoration = TextDecoration.Underline)
+    ImagePicker(
+        onImageSelected = { bitmap -> imageBitmap = bitmap },
+        text = stringResource(R.string.change_profile_picture)
     )
 
-    // Dialog to confirm taking a picture
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = stringResource(R.string.change_profile_picture)) },
-            text = { Text(text = stringResource(R.string.profile_pic_description)) },
-            confirmButton = {
-                Column {
-                    Button(onClick = {
-                        if (permissionGranted) {
-                            cameraLauncher.launch(null)
-                        }
-                        showDialog = false
-                    }) {
-                        Text(text = stringResource(R.string.take_a_picture))
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        contentPickerLauncher.launch("image/*")
-                        showDialog = false
-                    }) {
-                        Text(text = stringResource(R.string.choose_from_library))
-                    }
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
+    // Display the current profile picture (either the selected or default image)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .size(200.dp)
+            .clip(CircleShape)
+            .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .clip(CircleShape)
+                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+        ) {
+            if (imageBitmap != null) {
+                Image(
+                    bitmap = imageBitmap!!.asImageBitmap(),
+                    contentDescription = "Profile Picture",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
-        )
+        }
     }
 }
 
@@ -1059,3 +981,4 @@ fun AddNewType(
         }
     }
 }
+
