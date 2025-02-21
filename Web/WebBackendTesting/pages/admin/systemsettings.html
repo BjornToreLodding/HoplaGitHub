@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div id="topbar"></div>
+        <script>
+            async function loadTopbar() {
+            const response = await fetch('../top.html');
+            const html = await response.text();
+            document.getElementById('topbar').innerHTML = html;
+            }
+        loadTopbar();
+    </script>
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li onclick="loadSystemSettings()">Generelle innstillinger</li>
+            </ul>
+        </div>
+        <div class="content" id="content">
+            <h2>Generelle innstillinger</h2>
+        </div>
+    </div>
+
+    <script src="../js/systemsettings.js"></script>
+</body>
+</html>

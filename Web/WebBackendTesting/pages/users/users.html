@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+    <div id="topbar"></div>
+
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li onclick="loadUserPage('users_all.html')">Vis Alle Brukere</li>
+                <li onclick="loadUserPage('register.html')">Registrer</li>
+                <li onclick="loadUserPage('login.html')">Login</li>
+                <li onclick="loadUserPage('turer.html')">Turer</li>
+                <li onclick="loadUserPage('friends.html')">Venner</li>
+                <li onclick="loadUserPage('requests.html')">Venneforespørsler</li>
+                <li onclick="loadUserPage('blocked.html')">Blokkert</li>
+                <li onclick="loadUserPage('follows.html')">Følger</li>
+                <li onclick="loadUserPage('meldinger.html')">Meldinger</li>
+
+                <p>Andre brukere
+                <li onclick="loadUserPage('friends.html')">Venner</li>
+                <li onclick="loadUserPage('follows.html')">Følger</li>
+                </p>
+            </ul>
+        </div>
+        <div class="content" id="user-content">
+            <h2>Velg en kategori fra menyen</h2>
+        </div>
+    </div>
+
+    <script src="../../js/users.js"></script>
+    <script>
+        async function loadTopbar() {
+            const response = await fetch('../../top.html');
+            const html = await response.text();
+            document.getElementById('topbar').innerHTML = html;
+        }
+        loadTopbar();
+    </script>
+</body>
+</html>

@@ -138,11 +138,40 @@ builder.Services.AddControllers();//options =>
 builder.Services.AddScoped<IUserService, UserService>();  // 🔹 Registrer UserService
 builder.Services.AddScoped<Authentication>();
 builder.Services.AddScoped<SystemSettingService>();
+/*
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy.WithOrigins("http://localhost:3000", "https://adminhopla.render.com") // Erstatt med riktig frontend-URL
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+*/
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 
 
 var app = builder.Build();
-
 app.UseHttpsRedirection();
+
+app.UseRouting();
+//app.UseCors("AllowFrontend"); // Aktiver CORS-policyen
+app.UseCors("AllowAll");
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 200;
+        return;
+    }
+    await next();
+});
 
 app.UseAuthentication(); // Aktiver JWT-autentisering
 app.UseAuthorization();  // Aktiver autorisasjon

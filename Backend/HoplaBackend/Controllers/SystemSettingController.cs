@@ -27,10 +27,10 @@ public class SettingsController : ControllerBase
         }
 
         var systemSettings = await _context.SystemSettings
+            //.OrderBy(s => s.Id) //For sortering på Id
+            .OrderBy(s => s.Key) //For sortering på Key
             .Select(s => new ListSettings
             {
-                // Det er fortstt røde streker under venstre Key, Value og Type.
-                // Feilmelding: 'SystemSettingDto' does not contain a definition for 'Key'CS0117
                 Key = s.Key,
                 Value = s.Value,
                 Type = s.Type

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brukerliste</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        li:hover {
+            background-color: #f0f0f0;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>Brukerliste</h1>
+    <ul id="userList"></ul>
+    
+    <script>
+        
+        async function fetchUsers() {
+            try {
+                console.error('🔥 Henter brukere fra API...');
+                const response = await fetch('https://localhost:7128/users/all');
+                console.log('Responsstatus:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const responseText = await response.text();
+                console.log('Rå JSON-respons:', responseText);
+                
+                let users;
+                try {
+                    users = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error("Feil ved parsing av JSON: " + parseError.message);
+                }
+                
+                if (!Array.isArray(users)) {
+                    throw new Error("Forventet en liste, men fikk noe annet.");
+                }
+                
+                console.log('Brukerliste hentet:', users);
+                //const userList = document.getElementById('userList');
+                //userList.innerHTML = "<li>Test Bruker (Alias)</li>";
+                const userList = document.getElementById('userList');
+                userList.innerHTML = "";
+                
+                users.forEach(user => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${user.name} (${user.alias})`;
+                    listItem.addEventListener('click', () => {
+                        window.location.href = `https://localhost:7128/users/${user.id}`;
+                    });
+                    userList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Feil ved henting av brukere:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', fetchUsers);
+        //const userList = document.getElementById('userList');
+        //userList.innerHTML = "<li>Test Bruker (Alias)</li>";
+    </script>
+</body>
+</html>

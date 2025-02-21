@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+    <div id="topbar"></div>
+
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li onclick="loadStablesPage('stables_all.html')">Vis alle staller</li>
+                <li onclick="loadStablesPage('stable_select.html')">Velg en stall</li>
+                </p>
+            </ul>
+        </div>
+        <div class="content" id="user-content">
+            Her finner du oversikt over turene du har gått
+            <h2>Velg en kategori fra menyen</h2>
+        </div>
+    </div>
+
+    <script src="../../js/turer.js"></script>
+    <script>
+        async function loadTopbar() {
+            const response = await fetch('../../top.html');
+            const html = await response.text();
+            document.getElementById('topbar').innerHTML = html;
+        }
+        loadTopbar();
+    </script>
+</body>
+</html>
