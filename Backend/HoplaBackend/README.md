@@ -2,14 +2,16 @@
 
 
 
+
 # API Endpoints
 
 ## Oversikt over APIets Endpoints og hvordan man bruker det.
 
-- Hva man kan sende med av path, parametere, body
-- Hva det returnerer
+- Tilgjengelige paths, query, parametere og body ??
+- Syntaks
+- JSON-response
 - Eksempel med curl
-- Hvilke feilkoder de kan returnere
+- Hvilke statuskoder som kan returnere
 
 ---
 
@@ -19,7 +21,15 @@
 |------|--------|-------------------------------|-------------|
 | ✅ | GET | [`/div/helloworld`](#get-divhelloworld) | Sjekke om APIet svarer |
 | ✅ | GET | [`/div/status`](#get-divstatus) | - oppetid, requestcount + errorcount. |
-| ❌ | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
+| ✅ | GET | [`/admin/settings/all`](#get-adminsettingsall) | Alle Innstillinger og deres verdier |
+| ✅ | GET | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | verdien på en innstilling |
+| ✅ | PUT | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | Endre en innstilling |
+| ✅ | POST | [`/users/register`](#get-usersuserid) | Registrer ny bruker brukere |
+| ✅ | POST | [`/users/login`](#get-usersuserid) |  |
+| ❌ | POST | [`/users/changepassword`](#get-usersuserid) |  |
+| ❌ | POST | [`/users/forgotpassword`](#get-usersuserid) |  |
+| ✅ | POST | [`/users/login`](#get-usersuserid) |  |
+| ✅ | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
 | ✅ | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker |
 | ✅ | POST | [`/users`](#post-users) | Oppretter ny bruker |
 | ⚠️ | PUT | [`/users/{userid}`](#put-usersuserid) | Litt mangelfull |
@@ -35,8 +45,8 @@
 | ✅ | POST | [`/userrelations/block`](#post-userrelationsblock) | |
 | ✅ | PUT | [`/userrelations/{userrelationid}`](#put-userrelationsuserrelationid) | |
 | ✅ | DELETE | [`/userrelations/{fromUserId}/{toUserId}`](#delete-userrelationsfromuseridtouserid) | |
-| ⚠️ | GET | [`/trail/closest`](#get-trailclosest) | Query=?latitude=x&longitude=y&limit=n&offset=m |
-| ⚠️ | GET | [`/trail/list`](#get-traillist) | - Query= ?zoomlevel&filters |
+| ⚠️ | GET | [`/trail/list`](#get-traillist) | Liste over løyper sortert etter næreste først |
+| ⚠️ | GET | [`/trail/map`](#get-trailmap) | Løyper som passer inni kartutsnittet |
 | ❌ | POST | [`/trail`](#post-trail) | Bruker data fra en Ride og lager en løype av det. |
 | ❌ | PUT | [`/trail/{trailId}`](#put-trailtrailid) | evt endre en trail |
 | ❌ | DELETE | [`/trail/{trailId}`](#delete-trailtrailid) | |
@@ -83,6 +93,7 @@ Ved å kjøre APIene under, så opprettes mockdata som er hardkodet i egne mock-
 | ❌ | POST | `/mock/createtraildetails` | Oppretter detaljer om løyper |
 | ❌ | POST | `/mock/createtrailreviews` | Oppretter anmeldelser av løyper |
 | ❌ | POST | `/mock/createtrailfilters` | Oppretter filtre for løyper |
+| ✅ | POST | `/mock/createsettings` | Oppretter test-løyper |
 
 ✅ = Fullført
 <br>⚠️ = Utviklet, men har feil eller at ikke alle queries er utviklet. 
@@ -522,7 +533,7 @@ curl -X DELETE "https://hopla.onrender.com/userrelations/123/456"
 
 ---
 
-### GET /trail/closest
+### GET /trail/list
 🚧🚧🚧 *Under utvikling. Filtere er ikke utviklet. kommer senere*
 
 **Beskrivelse:** Henter nærmeste tilgjengelige løyper basert på posisjon.
@@ -557,7 +568,7 @@ curl -X GET "https://hopla.onrender.com/trail/closest?latitude=59.9139&longitude
 ---
 
 
-### GET /trail/list
+### GET /trail/map
 🚧🚧🚧 *Under utvikling, Filtere er ikke utviklet. kommer senere*
 
 **Beskrivelse:** Henter nærmeste tilgjengelige løyper basert på posisjon.
