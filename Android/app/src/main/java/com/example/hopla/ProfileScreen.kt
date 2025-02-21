@@ -63,53 +63,41 @@ import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 
-data class Trip(
-    val name: String,
-    val date: String,
-    val length: String,
-    val time: String,
-    val imageResource: Int
-)
-
-data class Friend(
-    val name: String,
-    val imageResource: Int
-)
-
 @Composable
-fun ProfileScreen(
-    navController: NavController
-) {
+fun ProfileScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(3.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            IconButton(
-                onClick = { navController.navigate("settings") },
-                modifier = Modifier
-                    .padding(6.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings)
-                )
-            }
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(3.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = { navController.navigate("settings") },
+                    modifier = Modifier.padding(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
+                }
+            }
             ProfilePicture()
             ProfileButtons(navController)
-            UserChanges(modifier = Modifier.weight(1f))
+            UserChanges(modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth())
         }
     }
 }
+
 
 @Composable
 fun SettingsScreen(
@@ -495,41 +483,61 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
 
 @Composable
 fun ProfileButtons(navController: NavController) {
-    Row(
+    Column(
         modifier = Modifier
             .padding(top = 8.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Button(
-            onClick = { navController.navigate("my_trips") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(2.dp)
-                .height(50.dp),
-            shape = RectangleShape
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = stringResource(R.string.my_trips), color = PrimaryWhite)
+            Button(
+                onClick = { navController.navigate("my_trips") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.my_trips), color = PrimaryWhite)
+            }
+            Button(
+                onClick = { navController.navigate("my_horses") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.my_horses), color = PrimaryWhite)
+            }
         }
-        Button(
-            onClick = { navController.navigate("friends") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(2.dp)
-                .height(50.dp),
-            shape = RectangleShape
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = stringResource(R.string.friends), color = PrimaryWhite)
-        }
-        Button(
-            onClick = { navController.navigate("following") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(2.dp)
-                .height(50.dp),
-            shape = RectangleShape
-        ) {
-            Text(text = stringResource(R.string.following),color = PrimaryWhite)
+            Button(
+                onClick = { navController.navigate("friends") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.friends), color = PrimaryWhite)
+            }
+            Button(
+                onClick = { navController.navigate("following") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.following), color = PrimaryWhite)
+            }
         }
     }
 }
@@ -711,7 +719,7 @@ fun TripItem(trip: Trip) {
     if (showDialog && showImage) {
         Dialog(onDismissRequest = {
             showDialog = false
-            showImage = true // Reset showImage to true when the dialog is dismissed so image can be cliked several times
+            showImage = true // Reset showImage to true when the dialog is dismissed so image can be clicked several times
         }) {
             Box(
                 modifier = Modifier
@@ -767,34 +775,7 @@ fun FriendsScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .background(MaterialTheme.colorScheme.tertiary)
-                    .border(10.dp, MaterialTheme.colorScheme.primary)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxHeight()
-                ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.friends),
-                        fontSize = 24.sp
-                    )
-                }
-            }
+            ScreenHeader(navController, stringResource(R.string.friends))
 
             SearchBar(
                 searchQuery = searchQuery,
@@ -905,6 +886,19 @@ fun FollowingScreen(navController: NavController) {
                     fontSize = 24.sp
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun MyHorsesScreen(navController: NavController) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            ScreenHeader(navController, stringResource(R.string.my_horses))
         }
     }
 }

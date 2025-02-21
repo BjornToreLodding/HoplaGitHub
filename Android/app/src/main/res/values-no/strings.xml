@@ -90,5 +90,6 @@
     <string name="dateString">Dato</string>
     <string name="length">Lengde</string>
     <string name="hourString">timer</string>
+    <string name="my_horses">Mine hester</string>
 
 </resources>
