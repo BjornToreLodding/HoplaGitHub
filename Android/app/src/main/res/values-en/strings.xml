@@ -91,5 +91,9 @@
     <string name="length">"Length "</string>
     <string name="hourString">hours</string>
     <string name="my_horses">My horses</string>
+    <string name="add_image">Add image</string>
+    <string name="name">Name</string>
+    <string name="breed">Breed</string>
+    <string name="age">Age</string>
 
 </resources>

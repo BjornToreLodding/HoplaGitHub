@@ -906,10 +906,10 @@ fun HorseItem(horse: Horse, navController: NavController) {
 fun AddNewType(
     navController: NavController,
     type: String,
-    onAdd: (String, Int, String, Int) -> Unit
+    onAdd: (String, Bitmap?, String, Int) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
-    var imageResource by remember { mutableStateOf(0) }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var breedOrFriendType by remember { mutableStateOf("") }
     var ageOrFriendAge by remember { mutableStateOf(0) }
 
@@ -925,30 +925,56 @@ fun AddNewType(
         TextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = imageResource.toString(),
-            onValueChange = { imageResource = it.toIntOrNull() ?: 0 },
-            label = { Text("Image Resource") },
+            label = { Text(text = stringResource(R.string.name)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         if (type == "Horse") {
-            TextField(
-                value = breedOrFriendType,
-                onValueChange = { breedOrFriendType = it },
-                label = { Text("Breed") },
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    TextField(
+                        value = breedOrFriendType,
+                        onValueChange = { breedOrFriendType = it },
+                        label = { Text(text = stringResource(R.string.breed)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = ageOrFriendAge.toString(),
+                        onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
+                        label = { Text(text = stringResource(R.string.age)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+            if (imageBitmap != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        bitmap = imageBitmap!!.asImageBitmap(),
+                        contentDescription = "Selected Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(64.dp)
+                    )
+                    IconButton(onClick = { imageBitmap = null }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Remove Image"
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(
-                value = ageOrFriendAge.toString(),
-                onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
-                label = { Text("Age") },
-                modifier = Modifier.fillMaxWidth()
+            ImagePicker(
+                onImageSelected = { bitmap -> imageBitmap = bitmap },
+                text = stringResource(R.string.add_image)
             )
         } else if (type == "Friend") {
             TextField(
@@ -974,11 +1000,10 @@ fun AddNewType(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            onAdd(name, imageResource, breedOrFriendType, ageOrFriendAge)
+            onAdd(name, imageBitmap, breedOrFriendType, ageOrFriendAge)
             navController.popBackStack()
         }) {
             Text(text = "Add $type")
         }
     }
 }
-
