@@ -88,6 +88,8 @@ public class UserController : ControllerBase
             {
                 u.Id,
                 u.Name,
+                ProfilePictureUrl = u.ProfilePictureUrl != null ? u.ProfilePictureUrl + "?h=100" : "",
+                //u.ProfilePictureUrl + (u.ProfilePictureUrl.Contains("?") ? "&h=100" : "?h=100"),
                 u.Alias
             })
             .ToListAsync();
