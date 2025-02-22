@@ -1,0 +1,25 @@
+/project-root
+│── /public            # Offentlige filer (HTML, CSS, bilder)
+│   │── index.html     # Hovedsiden
+│   │── styles.css     # CSS for styling
+│   │── index.js       # Hoved-JavaScript for navigasjon & innlasting
+│
+│── /pages             # JavaScript-moduler for hver seksjon
+│   │── /admin         # Admin-moduler
+│   │   │── systemsettings.js
+│   │   │── rapporter.js
+│   │   │── statistikker.js
+│   │
+│   │── /users         # Bruker-relaterte moduler
+│   │   │── login.js
+│   │   │── register.js
+│   │   │── profile.js
+│   │   │── horses.js
+│   │
+│   │── /stables       # Stall-moduler
+│   │   │── stables.js
+│   │   │── medlemmer.js
+│
+│── /utils             # Hjelpefunksjoner
+│   │── auth.js        # Håndtering av autentisering
+│   │── helpers.js     # Generelle hjelpefunksjoner
