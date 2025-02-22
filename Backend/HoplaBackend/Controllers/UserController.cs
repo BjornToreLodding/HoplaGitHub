@@ -40,7 +40,19 @@ public class UserController : ControllerBase
         var token = _authentication.GenerateJwtToken(user);
         return Ok(new { token });
     }
+    [HttpPost("login/test")]
+    public async Task<IActionResult> Logintest([FromBody] LoginTest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
 
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Feil bruker" });
+        }
+
+        var token = _authentication.GenerateJwtToken(user);
+        return Ok(new { token });
+    }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {

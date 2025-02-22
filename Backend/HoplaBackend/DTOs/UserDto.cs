@@ -9,7 +9,10 @@ public class LoginRequest
     public string? Email { get; set; }
     public string? Password { get; set; }
 }
-
+public class LoginTest
+{
+    public Guid? Id { get; set; }
+}
 // Vurdere å legge denne i ny DTO, f.eks AuthenticationDto.cs
 public class RegisterRequest
 {

@@ -25,7 +25,8 @@
 | ✅ | GET | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | verdien på en innstilling |
 | ✅ | PUT | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | Endre en innstilling |
 | ✅ | POST | [`/users/register`](#get-usersuserid) | Registrer ny bruker brukere |
-| ✅ | POST | [`/users/login`](#get-usersuserid) |  |
+| ✅ | POST | [`/users/login`](#get-userslogin) |  |
+| ✅ | POST | [`/users/login/test`](#get-userslogintest) |  |
 | ❌ | POST | [`/users/changepassword`](#get-usersuserid) |  |
 | ❌ | POST | [`/users/forgotpassword`](#get-usersuserid) |  |
 | ✅ | POST | [`/users/login`](#get-usersuserid) |  |
