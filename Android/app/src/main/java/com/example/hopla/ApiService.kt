@@ -3,11 +3,10 @@ package com.example.hopla
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 // For user data (profile)
 interface ApiService {
-    @GET("users/int/3")
+    @GET("users/int/$baseID")
     suspend fun getUser(): User
 }
 

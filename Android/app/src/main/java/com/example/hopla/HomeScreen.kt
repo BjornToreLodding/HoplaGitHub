@@ -26,7 +26,7 @@ import com.example.hopla.ui.theme.PrimaryBlack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
@@ -51,7 +51,7 @@ fun TopTextColumn() {
         R.string.popular,
         R.string.updates
     )
-    var selectedItem by remember { mutableStateOf(items[0]) }
+    var selectedItem by remember { mutableIntStateOf(items[0]) }
 
     Column(
         modifier = Modifier

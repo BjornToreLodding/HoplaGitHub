@@ -1,6 +1,7 @@
 package com.example.hopla
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.location.Location
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.ui.graphics.Color
 
+@SuppressLint("DefaultLocale")
 @Preview
 @Composable
 fun NewTripScreen() {
