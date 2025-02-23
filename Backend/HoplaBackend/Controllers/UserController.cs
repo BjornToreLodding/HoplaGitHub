@@ -10,6 +10,7 @@ using HoplaBackend.Models;
 using HoplaBackend.Helpers; //Denne har blitt grå og må legges til med linja under.
 using HoplaBackend.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 namespace HoplaBackend.Controllers;
@@ -41,14 +42,18 @@ public class UserController : ControllerBase
         {
             return Unauthorized(new { message = "Ugyldig e-post eller passord" });
         }
+        Console.WriteLine($"Mottatt forespørsel for ID: {request.Email}");
+        Console.WriteLine(user);
+        Console.WriteLine(user.Id);
 
         var token = _authentication.GenerateJwtToken(user);
-        //return Ok(new { token });
+        Console.WriteLine(token);        //return Ok(new { token });
         return Ok(new 
     { 
         token,
+        userId = user.Id,
         //skulle vært name ikke navn, men må rette opp i js for loging osv..
-        navn = user.Name,
+        name = user.Name,
         alias = user.Alias,
         profilePictureURL = user.ProfilePictureUrl + "?w=50&h=50&fit=crop"
     });
@@ -57,6 +62,9 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Logintest([FromBody] LoginTest request)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
+        Console.WriteLine($"Mottatt forespørsel for ID: {request.Id}");
+        Console.WriteLine(user);
+        Console.WriteLine(user.Id);
 
         if (user == null)
         {
@@ -64,7 +72,17 @@ public class UserController : ControllerBase
         }
 
         var token = _authentication.GenerateJwtToken(user);
-        return Ok(new { token });
+        Console.WriteLine(token);
+        Console.WriteLine(user.Name);
+        Console.WriteLine(user.Alias);
+        Console.WriteLine(user.ProfilePictureUrl);
+        return Ok(new { 
+            token,
+            userId = user.Id,
+            name = user.Name,
+            alias = user.Alias,
+            profilePictureURL = user.ProfilePictureUrl + "?w=50&h=50&fit=crop"
+            });
     }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -210,15 +228,21 @@ public class UserController : ControllerBase
     [HttpPut("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
-        // Hent brukerens ID fra JWT-tokenet
-        var userIdString = User.FindFirst("id")?.Value;
-        
-        if (!Guid.TryParse(userIdString, out Guid userId))
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet ved å bruke `ClaimTypes.NameIdentifier`
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
         {
             return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
         }
 
-        // Finn brukeren i databasen basert på GUID
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null)
@@ -226,18 +250,17 @@ public class UserController : ControllerBase
             return Unauthorized(new { message = "Bruker ikke funnet" });
         }
 
-        // Verifiser om det gamle passordet er riktig
         if (!Authentication.VerifyPassword(request.OldPassword, user.PasswordHash))
         {
             return Unauthorized(new { message = "Feil passord" });
         }
 
-        // Hash det nye passordet og lagre det i databasen
         user.PasswordHash = Authentication.HashPassword(request.NewPassword);
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Passordet er endret!" });
     }
+
 
     [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
     public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)

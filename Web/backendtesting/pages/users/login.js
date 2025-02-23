@@ -26,6 +26,7 @@ async function login() {
         const data = await response.json();
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("userInfo", JSON.stringify({
+            id: data.userId,
             name: data.name,
             alias: data.alias,
             profilePictureURL: data.profilePictureURL

@@ -45,47 +45,77 @@ export async function render(container) {
             }
 
             input.id = key;
-            const originalValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
+            // Endret fra const til let for at verdien kan oppdateres senere
+            let originalValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
 
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Lagre';
             saveButton.className = 'save-button hidden';
 
+            console.log("Oppretter lagre-knapp for:", key);
+            console.log(saveButton);
+
+
+            // Opprett en container for input og knapp for å unngå layout-skift
+            const inputContainer = document.createElement('div');
+            inputContainer.style.display = 'flex';
+            inputContainer.style.alignItems = 'center';
+            inputContainer.style.gap = '8px';
+
             input.addEventListener('input', () => {
                 const currentValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
+                console.log(`Endrer ${key}: ${originalValue} → ${currentValue}`);
+            
                 if (currentValue !== originalValue) {
-                    saveButton.classList.remove('hidden'); // Vis knappen
+                    console.log("Viser lagre-knappen!");
+                    saveButton.classList.remove('hidden'); // Fjern hidden hvis den finnes
+                    saveButton.classList.add('show');
                 } else {
-                    saveButton.classList.add('hidden'); // Skjul knappen
+                    console.log("Skjuler lagre-knappen!");
+                    saveButton.classList.remove('show');
+                    saveButton.classList.add('hidden');
                 }
             });
+            
+            
+            
 
             saveButton.addEventListener('click', async () => {
                 const newValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
-
+            
                 try {
-                    const putResponse = await fetch(`https://localhost:7128//admin/settings/${key}`, {
+                    console.log(`Sender PUT-request til serveren med key: ${key} og value: ${newValue}`);
+            
+                    const putResponse = await fetch(`https://localhost:7128/admin/settings/${key}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ value: newValue }) // Send ny verdi
+                        body: JSON.stringify({ value: newValue }) // Send ny verdi til serveren
                     });
-
+            
+                    const responseData = await putResponse.json();
+                    console.log('PUT response:', responseData);
+            
                     if (!putResponse.ok) {
-                        throw new Error(`HTTP error! Status: ${putResponse.status}`);
+                        throw new Error(`HTTP error! Status: ${putResponse.status}, message: ${responseData.message || "Unknown error"}`);
                     }
-
-                    console.log(`Updated setting: ${key} = ${newValue}`);
-                    saveButton.classList.add('hidden'); // Skjul knappen etter lagring
+            
+                    // Oppdater originalverdien slik at knappens synlighet oppdateres korrekt
+                    originalValue = newValue;
+                    saveButton.classList.remove('show'); // Skjul knappen
+                    console.log(`✅ Setting oppdatert: ${key} = ${newValue}`);
                 } catch (error) {
-                    console.error(`Error updating setting ${key}:`, error);
+                    console.error(`❌ Feil ved oppdatering av setting ${key}:`, error);
                 }
             });
+            
+
+            inputContainer.appendChild(input);
+            inputContainer.appendChild(saveButton);
 
             settingDiv.appendChild(label);
-            settingDiv.appendChild(input);
-            settingDiv.appendChild(saveButton);
+            settingDiv.appendChild(inputContainer);
             settingsContainer.appendChild(settingDiv);
         });
     } catch (error) {

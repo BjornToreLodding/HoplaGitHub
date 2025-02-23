@@ -26,9 +26,9 @@ export async function render(container) {
 
             // Opprett bilde-element
             const profileImage = document.createElement("img");
-            profileImage.src = user.profilePictureUrl || "default-profile.png"; // Fallback hvis ingen URL
+            profileImage.src = user.profilePictureUrl ? user.profilePictureUrl : "default-profile.png"; 
             profileImage.alt = `${user.name}'s profilbilde`;
-            profileImage.className = "profile-picture"; // Bruk en CSS-klasse for styling
+            profileImage.className = "profile-picture";
 
             // Opprett tekst med navn og alias
             const userText = document.createElement("span");
@@ -40,47 +40,69 @@ export async function render(container) {
             loginButton.className = "login-btn hidden";
 
             // Hover-effekt: Marker brukeren
-            userItem.addEventListener("mouseover", () => {
-                userItem.classList.add("hover");
-            });
-            userItem.addEventListener("mouseout", () => {
-                userItem.classList.remove("hover");
-            });
+            userItem.addEventListener("mouseover", () => userItem.classList.add("hover"));
+            userItem.addEventListener("mouseout", () => userItem.classList.remove("hover"));
 
-            // Klikk på bruker: Vis login-knapp
+            // Klikk på bruker: Vis/skjul login-knapp
             userItem.addEventListener("click", () => {
+                const isVisible = !loginButton.classList.contains("hidden");
+
                 document.querySelectorAll(".login-btn").forEach(btn => btn.classList.add("hidden"));
-                loginButton.classList.remove("hidden");
+                if (!isVisible) {
+                    loginButton.classList.remove("hidden");
+                }
             });
 
             // Logg inn-knappens funksjonalitet
             loginButton.addEventListener("click", async () => {
                 try {
-                    console.log(`Logging in as ${user.name}...`);
+                    console.log(`➡️  Prøver å logge inn som: ${user.name} (ID: ${user.id})`);
 
                     const loginResponse = await fetch("https://localhost:7128/users/login/test", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ id: user.id })  // Sender bruker-ID i body
                     });
 
+                    console.log("⬅️  Statuskode fra API:", loginResponse.status);
+
                     if (!loginResponse.ok) {
-                        throw new Error(`Login failed! Status: ${loginResponse.status}`);
+                        throw new Error(`🚨 Login feilet! Status: ${loginResponse.status}`);
                     }
 
                     const loginData = await loginResponse.json();
-                    console.log("Login successful! Token received:", loginData.token);
+                    console.log("✅ Login-data mottatt:", loginData);
+
+                    // Sjekk om nødvendig data finnes
+                    if (!loginData.token || !loginData.name || !loginData.alias) {
+                        throw new Error("🚨 Feil: Manglende data i responsen!");
+                    }
 
                     // Lagrer token i localStorage
                     localStorage.setItem("authToken", loginData.token);
+                    localStorage.setItem("userInfo", JSON.stringify({
+                        id: loginData.userId,
+                        name: loginData.name,
+                        alias: loginData.alias,
+                        profilePictureURL: loginData.profilePictureURL
+                    }));
 
-                    alert(`Logget inn som ${user.name}`);
+                    console.log("🛠️  Oppdatert localStorage:", localStorage.getItem("userInfo"));
+
+                    // Oppdater UI etter innlogging
+                    console.log("🔄 Oppdaterer brukergrensesnitt...");
+                    updateUserUI();
+
+                    // Naviger til dashboardet etter kort forsinkelse
+                    setTimeout(() => {
+                        loadContent('users', 'dashboard');
+                    }, 500);
+
                 } catch (error) {
-                    console.error("Error logging in:", error);
-                    alert("Kunne ikke logge inn.");
+                    console.error("❌ Feil ved innlogging:", error.message || error);
+                    alert("Kunne ikke logge inn. Sjekk konsollen for detaljer.");
                 }
+                
             });
 
             // Legg til elementer i brukerlisten
@@ -90,10 +112,11 @@ export async function render(container) {
             userList.appendChild(userItem);
         });
     } catch (error) {
-        console.error("Feil ved henting av brukere:", error);
+        console.error("❌ Feil ved henting av brukere:", error);
         container.innerHTML += "<p>Kunne ikke laste brukere.</p>";
     }
 }
+
 /*export async function render(container) {
     container.innerHTML = "<h2>Alle brukere</h2><ul id='user-list'></ul>";
 

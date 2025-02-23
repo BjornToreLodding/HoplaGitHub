@@ -48,10 +48,83 @@ document.getElementById("logout-button").addEventListener("click", logout);
 
 // Oppdater visning basert på om brukeren er logget inn eller ikke
 function updateUserUI() {
+    console.log("🛠️ Kjører updateUserUI...");
+
+    const token = localStorage.getItem("authToken");
+    const userInfo = localStorage.getItem("userInfo");
+
+    console.log("🔍 Henter fra localStorage:");
+    console.log("🔹 Token:", token);
+    console.log("🔹 User Info (JSON):", userInfo);
+
+    if (!token || !userInfo) {
+        console.log("❌ Ingen gyldig brukerdata funnet.");
+
+        const loginButton = document.getElementById("login-button");
+        const userInfoElement = document.getElementById("user-info");
+
+        if (loginButton) loginButton.classList.remove("hidden");
+        else console.warn("⚠️ 'login-button' ikke funnet i HTML!");
+
+        if (userInfoElement) userInfoElement.classList.add("hidden");
+        else console.warn("⚠️ 'user-info' ikke funnet i HTML!");
+
+        return;
+    }
+
+    let user;
+    try {
+        user = JSON.parse(userInfo);
+        console.log("👤 Brukerdata etter parsing:", user);
+    } catch (error) {
+        console.error("❌ Feil ved parsing av userInfo:", error);
+        return;
+    }
+
+    // Sjekk at nødvendige elementer finnes
+    const loginButton = document.getElementById("login-button");
+    const userInfoElement = document.getElementById("user-info");
+    const logoutButton = document.getElementById("logout-button");
+    const userText = document.getElementById("user-text");
+    const userAvatar = document.getElementById("user-avatar");
+
+    if (!userInfoElement || !logoutButton || !userText) {
+        console.error("❌ UI-elementer mangler! Sjekk HTML-strukturen.");
+        return;
+    }
+
+    // Oppdater UI for innlogget bruker
+    if (loginButton) loginButton.classList.add("hidden");
+    userInfoElement.classList.remove("hidden");
+    logoutButton.classList.remove("hidden");
+
+    if (user.alias && user.name) {
+        userText.textContent = `Logget inn som: ${user.alias} (${user.name})`;
+    } else {
+        console.warn("⚠️ Mangler navn eller alias for bruker.");
+    }
+
+    if (userAvatar && user.profilePictureURL) {
+        userAvatar.src = user.profilePictureURL;
+        userAvatar.classList.remove("hidden");
+    } else {
+        console.warn("⚠️ Mangler profilbilde.");
+    }
+
+    console.log("✅ updateUserUI fullført!");
+}
+
+/*function updateUserUI() {
+    console.log("🛠️ Kjører updateUserUI...");
     const token = localStorage.getItem("authToken");
     const user = JSON.parse(localStorage.getItem("userInfo"));
+    console.log("🔍 Henter fra localStorage:");
+    console.log("🔹 Token:", token);
+    console.log("🔹 User Info (JSON):", userInfo);
 
-    if (token && user) {
+    //if (token && user) {
+    if (token || user) {
+        console.log("❌ Ingen gyldig brukerdata funnet.");
         document.getElementById("login-button").classList.add("hidden");
         document.getElementById("user-info").classList.remove("hidden");
         document.getElementById("logout-button").classList.remove("hidden");
@@ -71,6 +144,7 @@ function updateUserUI() {
         document.getElementById("user-info").classList.add("hidden");
     }
 }
+*/
 
 
 // Laster inn sidemenyen basert på valgt toppmeny
@@ -111,7 +185,7 @@ function loadSideMenu(section) {
                 { name: "Bytte Passord", action: "loadContent('users', 'changepw')" },
                 { name: "Horses", action: "loadContent('users', 'horses')" },
                 { name: "TurHistorikk", action: "loadContent('users', 'turhistorikk')" },
-                { name: "Meldinger", action: "loadContent('users', 'meldinger')" },
+                { name: "Meldinger", action: "loadContent('users', 'messages_all')" },
                 { name: "Venneforespørsler", action: "loadContent('users', 'venneforesporsler')" },
                 { name: "Venner", action: "loadContent('users', 'venner')" },
                 { name: "Følger", action: "loadContent('users', 'folger')" },
