@@ -89,11 +89,12 @@
     <string name="publish">Publiser</string>
     <string name="dateString">Dato</string>
     <string name="length">Lengde</string>
-    <string name="hourString">timer</string>
+    <string name="hourString">Timer</string>
     <string name="my_horses">Mine hester</string>
     <string name="add_image">Legg til bilde</string>
     <string name="name">Navn</string>
     <string name="breed">Rase</string>
     <string name="age">Alder</string>
+    <string name="trips_added">Løyper lagt til</string>
 
 </resources>

@@ -51,6 +51,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.sharp.AccountBox
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 
@@ -741,6 +742,12 @@ fun FriendItem(friend: Friend, navController: NavController) {
 
 @Composable
 fun FriendDetailScreen(navController: NavController, friendName: String, friendImageResource: Int) {
+    val trips = listOf(
+        Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
+        Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
+        Trip("Beach run", "2023-08-20", "8", "1.5", R.drawable.stockimg2)
+    )
+
     Box(modifier = Modifier.fillMaxSize()) {
         IconButton(
             onClick = { navController.popBackStack() },
@@ -757,19 +764,36 @@ fun FriendDetailScreen(navController: NavController, friendName: String, friendI
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = friendName, style = MaterialTheme.typography.bodySmall)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = friendImageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .border(5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(text = friendName, style = MaterialTheme.typography.headlineLarge)
+                    Text(text = stringResource(R.string.friends) + " : 5", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(R.string.trips_added) + " : 3", style = MaterialTheme.typography.bodySmall)
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = friendImageResource),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-            )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(trips) { trip ->
+                    TripItem(trip)
+                }
+            }
         }
     }
 }
@@ -973,7 +997,7 @@ fun AddNewType(
     var name by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var breedOrFriendType by remember { mutableStateOf("") }
-    var ageOrFriendAge by remember { mutableStateOf(0) }
+    var ageOrFriendAge by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -991,74 +1015,78 @@ fun AddNewType(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        if (type == "Horse") {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    TextField(
-                        value = breedOrFriendType,
-                        onValueChange = { breedOrFriendType = it },
-                        label = { Text(text = stringResource(R.string.breed)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = ageOrFriendAge.toString(),
-                        onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
-                        label = { Text(text = stringResource(R.string.age)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-            if (imageBitmap != null) {
+        when (type) {
+            "Horse" -> {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Image(
-                        bitmap = imageBitmap!!.asImageBitmap(),
-                        contentDescription = "Selected Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(64.dp)
-                    )
-                    IconButton(onClick = { imageBitmap = null }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Remove Image"
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextField(
+                            value = breedOrFriendType,
+                            onValueChange = { breedOrFriendType = it },
+                            label = { Text(text = stringResource(R.string.breed)) },
+                            modifier = Modifier.fillMaxWidth()
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TextField(
+                            value = ageOrFriendAge.toString(),
+                            onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
+                            label = { Text(text = stringResource(R.string.age)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
+                if (imageBitmap != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            bitmap = imageBitmap!!.asImageBitmap(),
+                            contentDescription = "Selected Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(64.dp)
+                        )
+                        IconButton(onClick = { imageBitmap = null }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Remove Image"
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                ImagePicker(
+                    onImageSelected = { bitmap -> imageBitmap = bitmap },
+                    text = stringResource(R.string.add_image)
+                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            ImagePicker(
-                onImageSelected = { bitmap -> imageBitmap = bitmap },
-                text = stringResource(R.string.add_image)
-            )
-        } else if (type == "Friend") {
-            TextField(
-                value = breedOrFriendType,
-                onValueChange = { breedOrFriendType = it },
-                label = { Text("Friend Type") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextField(
-                value = ageOrFriendAge.toString(),
-                onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
-                label = { Text("Friend Age") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else if (type == "Following") {
-            TextField(
-                value = breedOrFriendType,
-                onValueChange = { breedOrFriendType = it },
-                label = { Text("Following Type") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            "Friend" -> {
+                TextField(
+                    value = breedOrFriendType,
+                    onValueChange = { breedOrFriendType = it },
+                    label = { Text("Friend Type") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = ageOrFriendAge.toString(),
+                    onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
+                    label = { Text("Friend Age") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            "Following" -> {
+                TextField(
+                    value = breedOrFriendType,
+                    onValueChange = { breedOrFriendType = it },
+                    label = { Text("Following Type") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
