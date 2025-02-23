@@ -102,7 +102,11 @@ class MainActivity : ComponentActivity() {
                                 communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
                             composable("addCommunityScreen") { AddCommunityScreen(navController) }
-                            composable("addFriendScreen") { AddCommunityScreen(navController) }
+                            composable("addFriendScreen") {
+                                AddNewType(navController, "Friend") { name, imageBitmap, friendType, friendAge ->
+                                    // Handle adding a new friend
+                                }
+                            }
                             composable("addHorseScreen") {
                                 AddNewType(navController, "Horse") { name, imageResource, breed, age ->
                                     // Handle adding a new horse

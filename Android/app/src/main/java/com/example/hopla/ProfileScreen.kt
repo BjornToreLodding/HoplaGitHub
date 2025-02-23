@@ -1037,17 +1037,17 @@ fun AddNewType(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text(text = stringResource(R.string.name)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
         when (type) {
             "Horse" -> {
+                Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(text = stringResource(R.string.name)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -1094,37 +1094,17 @@ fun AddNewType(
                     onImageSelected = { bitmap -> imageBitmap = bitmap },
                     text = stringResource(R.string.add_image)
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    onAdd(name, imageBitmap, breedOrFriendType, ageOrFriendAge)
+                    navController.popBackStack()
+                }) {
+                    Text(text = "Add $type")
+                }
             }
-            "Friend" -> {
-                TextField(
-                    value = breedOrFriendType,
-                    onValueChange = { breedOrFriendType = it },
-                    label = { Text("Friend Type") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = ageOrFriendAge.toString(),
-                    onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
-                    label = { Text("Friend Age") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            else -> {
+                Text(text = "Adding...", style = MaterialTheme.typography.bodySmall)
             }
-            "Following" -> {
-                TextField(
-                    value = breedOrFriendType,
-                    onValueChange = { breedOrFriendType = it },
-                    label = { Text("Following Type") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            onAdd(name, imageBitmap, breedOrFriendType, ageOrFriendAge)
-            navController.popBackStack()
-        }) {
-            Text(text = "Add $type")
         }
     }
 }
