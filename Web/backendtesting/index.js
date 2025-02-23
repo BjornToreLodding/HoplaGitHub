@@ -1,8 +1,19 @@
+// Kjør ved siden lasting for å sjekke om bruker er innlogget
+document.addEventListener("DOMContentLoaded", () => {
+    updateUserUI();      // Oppdater brukergrensesnittet basert på om bruker er logget inn
+    //checkUserStatus();   // Sjekk om brukeren er admin eller har spesifikke roller
+    checkAuthStatus();   // Sjekker om brukeren har en aktiv sesjon
+});
+function checkUserStatus() {
+    console.log("checkUserStatus() ikke implementert ennå.");
+}
+/*
+document.addEventListener("DOMContentLoaded", updateUserUI);
 document.addEventListener("DOMContentLoaded", () => {
     checkUserStatus(); // Sjekk om bruker er logget inn/admin
     checkAuthStatus(); // Sjekker om brukeren er innlogget ved start
 });
-
+*/
 function checkAuthStatus() {
     const token = localStorage.getItem("authToken");
     const logoutButton = document.getElementById("logout-button");
@@ -14,13 +25,53 @@ function checkAuthStatus() {
     }
 }
 
+
+function goToLogin() {
+    loadContent('users', 'login');
+}
+
+// Logg ut bruker
+function logout() {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userInfo");
+    updateUserUI(); // Oppdater UI etter utlogging
+}
+/*
 function logout() {
     localStorage.removeItem("authToken"); // Fjern token
     alert("Du er nå logget ut!");
     checkAuthStatus(); // Oppdater UI etter logout
 }
+*/
 
 document.getElementById("logout-button").addEventListener("click", logout);
+
+// Oppdater visning basert på om brukeren er logget inn eller ikke
+function updateUserUI() {
+    const token = localStorage.getItem("authToken");
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (token && user) {
+        document.getElementById("login-button").classList.add("hidden");
+        document.getElementById("user-info").classList.remove("hidden");
+        document.getElementById("logout-button").classList.remove("hidden");
+
+        // Oppdater tekst med alias og navn
+        document.getElementById("user-text").textContent = `Logget inn som: ${user.alias} (${user.name})`;
+
+        // Sett profilbilde hvis tilgjengelig
+        if (user.profilePictureURL) {
+            const avatar = document.getElementById("user-avatar");
+            avatar.src = user.profilePictureURL;
+            avatar.classList.remove("hidden");
+        }
+    } else {
+        // Vis kun login-knappen hvis bruker ikke er logget inn
+        document.getElementById("login-button").classList.remove("hidden");
+        document.getElementById("user-info").classList.add("hidden");
+    }
+}
+
 
 // Laster inn sidemenyen basert på valgt toppmeny
 function loadSideMenu(section) {
@@ -57,7 +108,7 @@ function loadSideMenu(section) {
                 { name: "Login", action: "loadContent('users', 'login')" },
                 { name: "Glemt Passord", action: "loadContent('users', 'glemtpassord')" },
                 { name: "Register", action: "loadContent('users', 'register')" },
-                { name: "Bytte Passord", action: "loadContent('users', 'byttepassord')" },
+                { name: "Bytte Passord", action: "loadContent('users', 'changepw')" },
                 { name: "Horses", action: "loadContent('users', 'horses')" },
                 { name: "TurHistorikk", action: "loadContent('users', 'turhistorikk')" },
                 { name: "Meldinger", action: "loadContent('users', 'meldinger')" },
@@ -95,7 +146,34 @@ function loadSideMenu(section) {
     });
 }
 
+
+
 // Laster innhold i hovedområdet
+async function loadContent(section, page) {
+    const mainContent = document.getElementById("main-content");
+
+    try {
+        // Last HTML først (hvis den finnes)
+        const htmlResponse = await fetch(`./pages/${section}/${page}.html`);
+        if (htmlResponse.ok) {
+            mainContent.innerHTML = await htmlResponse.text();
+        } else {
+            mainContent.innerHTML = `<h2>Kunne ikke finne ${page}.html</h2>`;
+        }
+
+        // Deretter, last JavaScript-modulen (dersom den finnes)
+        const module = await import(`./pages/${section}/${page}.js`);
+        if (module.render) {
+            module.render(mainContent); // Kall render-funksjonen i modulen
+        }
+    } catch (error) {
+        console.error("Feil ved lasting av siden:", error);
+        mainContent.innerHTML = `<h2>Kunne ikke laste inn ${page}.</h2>`;
+    }
+}
+
+/*
+
 function loadContent(section, page) {
     const mainContent = document.getElementById("main-content");
     mainContent.innerHTML = `<h2>Loading ${page}...</h2>`;
@@ -110,3 +188,4 @@ function loadContent(section, page) {
             mainContent.innerHTML = "<h2>Kunne ikke laste inn siden.</h2>";
         });
 }
+*/

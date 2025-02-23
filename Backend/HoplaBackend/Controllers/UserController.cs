@@ -31,6 +31,11 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        Console.WriteLine(request.Email);
+        Console.WriteLine(user.Email);
+        Console.WriteLine(request.Password);
+        Console.WriteLine(user.PasswordHash);
+        Console.WriteLine(Authentication.VerifyPassword(request.Password, user.PasswordHash));
 
         if (user == null || !Authentication.VerifyPassword(request.Password, user.PasswordHash))
         {
@@ -38,7 +43,15 @@ public class UserController : ControllerBase
         }
 
         var token = _authentication.GenerateJwtToken(user);
-        return Ok(new { token });
+        //return Ok(new { token });
+        return Ok(new 
+    { 
+        token,
+        //skulle vært name ikke navn, men må rette opp i js for loging osv..
+        navn = user.Name,
+        alias = user.Alias,
+        profilePictureURL = user.ProfilePictureUrl + "?w=50&h=50&fit=crop"
+    });
     }
     [HttpPost("login/test")]
     public async Task<IActionResult> Logintest([FromBody] LoginTest request)
@@ -83,13 +96,25 @@ public class UserController : ControllerBase
     [HttpGet("all")]
     public async Task<IActionResult> GetUsers()
     {
+        var settingsDict = await _context.SystemSettings
+            .Where(s => s.Key == "UserProfilePictureList-height" || s.Key == "UserProfilePictureList-width")
+            .ToDictionaryAsync(s => s.Key, s => s.Value);
+
+        settingsDict.TryGetValue("UserProfilePictureList-height", out var heightValue);
+        settingsDict.TryGetValue("UserProfilePictureList-width", out var widthValue);
+
+        // Konverter til int med fallback-verdi
+        var pictureHeight = int.TryParse(heightValue, out var height) ? height : 200;
+        var pictureWidth = int.TryParse(widthValue, out var width) ? width : 200;
+
         var users = await _context.Users
             .Select(u => new
             {
                 u.Id,
                 u.Name,
-                ProfilePictureUrl = u.ProfilePictureUrl != null ? u.ProfilePictureUrl + "?h=100&w=80" : "",
-                //u.ProfilePictureUrl + (u.ProfilePictureUrl.Contains("?") ? "&h=100" : "?h=100"),
+                ProfilePictureUrl = !string.IsNullOrEmpty(u.ProfilePictureUrl) 
+                    ? $"{u.ProfilePictureUrl}?h={pictureHeight}&w={pictureWidth}&fit=crop"
+                    : "",
                 u.Alias
             })
             .ToListAsync();
@@ -102,11 +127,20 @@ public class UserController : ControllerBase
 
         Log.Information("📢 GetAllUsers() ble kalt! Antall brukere: {UserCount}", users.Count);
 
-        return Ok(users);
-    }
+        return Ok(users);    }
     //[Authorize]
     [HttpGet("int/{userId}")] 
     public async Task<IActionResult> GetIntUser(int userId)
+    {
+        //var endpointName = ControllerContext.ActionDescriptor.ActionName;
+        var controllerName = ControllerContext.ActionDescriptor.ControllerName;
+        Guid newGuid = CustomConvert.IntToGuid(controllerName, userId);
+    
+        return await GetUser(newGuid, false);
+    }
+    [Authorize]
+    [HttpGet("aut/int/{userId}")] 
+    public async Task<IActionResult> CheckAutAndGetIntUser(int userId)
     {
         //var endpointName = ControllerContext.ActionDescriptor.ActionName;
         var controllerName = ControllerContext.ActionDescriptor.ControllerName;
@@ -171,7 +205,40 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(userData);
     }
-    //[Authorize]
+    
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        // Hent brukerens ID fra JWT-tokenet
+        var userIdString = User.FindFirst("id")?.Value;
+        
+        if (!Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        // Finn brukeren i databasen basert på GUID
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+        }
+
+        // Verifiser om det gamle passordet er riktig
+        if (!Authentication.VerifyPassword(request.OldPassword, user.PasswordHash))
+        {
+            return Unauthorized(new { message = "Feil passord" });
+        }
+
+        // Hash det nye passordet og lagre det i databasen
+        user.PasswordHash = Authentication.HashPassword(request.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Passordet er endret!" });
+    }
+
     [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
     public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
     {

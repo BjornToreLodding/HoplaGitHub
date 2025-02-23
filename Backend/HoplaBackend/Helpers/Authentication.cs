@@ -7,59 +7,58 @@ using HoplaBackend.Models;
 using Microsoft.Extensions.Configuration;
 using BCrypt.Net; 
 
-namespace HoplaBackend.Helpers
+namespace HoplaBackend.Helpers;
+public class Authentication
 {
-    public class Authentication
+    private readonly IConfiguration _configuration;
+
+    public Authentication(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public Authentication(IConfiguration configuration)
+    public string GenerateJwtToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var secretKey = _configuration["Jwt:Key"];
+
+        if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
         {
-            _configuration = configuration;
+            throw new Exception("🚨 Jwt:Key er for kort eller mangler!");
         }
 
-        public string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var secretKey = _configuration["Jwt:Key"];
+        var key = Encoding.UTF8.GetBytes(secretKey);
 
-            if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
             {
-                throw new Exception("🚨 Jwt:Key er for kort eller mangler!");
-            }
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
+            }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature
+            )
+        };
 
-            var key = Encoding.UTF8.GetBytes(secretKey);
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature
-                )
-            };
+    // ✅ Beholder `static` her for enkel tilgang uten instans
+    public static string HashPassword(string password)
+    {
+        return BCrypt.Net.BCrypt.HashPassword(password);
+    }
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        // ✅ Beholder `static` her for enkel tilgang uten instans
-        public static string HashPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.HashPassword(password);
-        }
-
-        public static bool VerifyPassword(string password, string hashedPassword)
-        {
-            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
-        }
+    public static bool VerifyPassword(string password, string hashedPassword)
+    {
+        return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
     }
 }
+
 
 
     /*

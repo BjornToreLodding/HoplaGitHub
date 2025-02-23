@@ -27,12 +27,14 @@ public static class SystemSettingMock
             // Hvis aktivert svarer kun Admin/-endpoints.
             new SystemSetting { Key = "EnableAPI", Value = "true", Type = "bool" },
 
-            new SystemSetting { Key = "UserProfilePictureList-height", Value = "50", Type = "int" }, // oppgitt i sekunder
-            new SystemSetting { Key = "UserProfilePictureSelect", Value = "400", Type = "int" }, // oppgitt i sekunder
-            new SystemSetting { Key = "HorsepictureList-height", Value = "100", Type = "int" }, // oppgitt i sekunder
-            new SystemSetting { Key = "Zettings1", Value = "10", Type = "int" }, // oppgitt i sekunder
-            new SystemSetting { Key = "Zettings2", Value = "20", Type = "int" }, // oppgitt i sekunder
-            new SystemSetting { Key = "Zettings3", Value = "30", Type = "int" }, // oppgitt i sekunder
+            new SystemSetting { Key = "UserProfilePictureList-height", Value = "100", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureList-width", Value = "100", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "400", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "400", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "HorsepictureList-height", Value = "100", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "Zettings1", Value = "10", Type = "int" }, // oppgitt i ?
+            new SystemSetting { Key = "Zettings2", Value = "20", Type = "int" }, // oppgitt i ?
+            new SystemSetting { Key = "Zettings3", Value = "30", Type = "int" }, // oppgitt i ?
             
             //new SystemSetting { Key = "MaxAPICallsPerMinute", Value = "100", Type = "int" },
             //new SystemSetting { Key = "CacheDuration", Value = "300", Type = "int" },
