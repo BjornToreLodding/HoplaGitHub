@@ -1029,6 +1029,20 @@ fun AddNewType(
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var breedOrFriendType by remember { mutableStateOf("") }
     var ageOrFriendAge by remember { mutableIntStateOf(0) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val persons = listOf(
+        Following("Penny", R.drawable.friend1),
+        Following("Sheldon", R.drawable.friend2),
+        Following("Amy", R.drawable.friend3),
+        Following("Leonard", R.drawable.friend1),
+        Following("Howard", R.drawable.friend2),
+        Following("Bernadette", R.drawable.friend3)
+    )
+
+    val filteredPersons = persons.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
 
     Column(
         modifier = Modifier
@@ -1103,7 +1117,23 @@ fun AddNewType(
                 }
             }
             else -> {
-                Text(text = "Adding...", style = MaterialTheme.typography.bodySmall)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    SearchBar(
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = { searchQuery = it }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(filteredPersons) { persons ->
+                            FollowingItem(persons, navController)
+                        }
+                    }
+                }
             }
         }
     }
