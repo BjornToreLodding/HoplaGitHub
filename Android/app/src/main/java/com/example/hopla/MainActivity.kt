@@ -39,6 +39,9 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
@@ -196,8 +199,6 @@ fun TopBar() {
     )
 }
 
-
-
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
@@ -208,6 +209,10 @@ fun BottomNavigationBar(navController: NavHostController) {
         Screen.Profile
     )
     val context = LocalContext.current
+    // Variables for double pressing to return to start destination og navigation item
+    var lastSelectedItem by remember { mutableStateOf<Screen?>(null) }
+    var lastPressTime by remember { mutableLongStateOf(0L) }
+
     BottomNavigation(
         modifier = Modifier.height(100.dp),
         backgroundColor = MaterialTheme.colorScheme.primary
@@ -227,13 +232,26 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1) },
                 selected = currentRoute == screen.route,
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                    val currentTime = System.currentTimeMillis()
+                    if (lastSelectedItem == screen && currentTime - lastPressTime < 300) {
+                        navController.navigate(screen.route) {
+                            popUpTo(screen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    } else {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
+                    lastSelectedItem = screen
+                    lastPressTime = currentTime
                 }
             )
         }
