@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.res.colorResource
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -24,6 +25,10 @@ import androidx.compose.foundation.Image
 import com.example.hopla.ui.theme.PrimaryBlack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @Composable
 fun HomeScreen() {
@@ -39,76 +44,44 @@ fun HomeScreen() {
 
 @Composable
 fun TopTextColumn() {
+    val items = listOf(
+        R.string.all,
+        R.string.friends,
+        R.string.area,
+        R.string.popular,
+        R.string.updates
+    )
+    var selectedItem by remember { mutableStateOf(items[0]) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(3.dp),
+            .background(MaterialTheme.colorScheme.primary),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(2.dp)
-                    .clickable { /* Handle click action */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.all),
-                    fontSize = 10.sp
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(2.dp)
-                    .clickable { /* Handle click action */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.friends),
-                    fontSize = 10.sp
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(2.dp)
-                    .clickable { /* Handle click action */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.area),
-                    fontSize = 10.sp
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(2.dp)
-                    .clickable { /* Handle click action */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.popular),
-                    fontSize = 10.sp
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(2.dp)
-                    .clickable { /* Handle click action */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.updates),
-                    fontSize = 10.sp
-                )
+            items.forEach { item ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(2.dp)
+                        .background(
+                            if (selectedItem == item) colorResource(id = R.color.transparentWhite)
+                            else MaterialTheme.colorScheme.primary
+                        )
+                        .clickable { selectedItem = item },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(item),
+                        fontSize = 10.sp,
+                        color = if (selectedItem == item) MaterialTheme.colorScheme.onSecondary
+                        else MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
     }
@@ -124,7 +97,7 @@ fun PostList() {
     ) {
         items(3) { index ->
             PostItem(
-                imageRes = R.drawable.stockimg1, // Replace with your image resource
+                imageRes = R.drawable.stockimg1,
                 text = "Example text $index"
             )
         }
