@@ -18,6 +18,8 @@ public class User
     public string? PasswordHash { get; set; }
     public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL
 
+    public string? Description { get ; set; }
+
     public bool Admin { get; set; } = false;
     public bool Premium { get; set; } = false;
     public bool VerifiedTrail { get; set; } = false;
