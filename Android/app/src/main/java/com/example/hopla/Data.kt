@@ -14,16 +14,18 @@ data class Trip(
     val imageResource: Int
 )
 
-// Class for the data of a friend
-data class Friend(
-    val name: String,
-    val imageResource: Int
-)
+enum class PersonStatus {
+    FRIEND,
+    FOLLOWING,
+    NONE,
+    PENDING
+}
 
-// Class for the data of a person a user is following
-data class Following(
+// Class for the data of a person a user is following/friends
+data class Person(
     val name: String,
-    val imageResource: Int
+    val imageResource: Int,
+    val status: PersonStatus
 )
 
 // Class for the data of a horse

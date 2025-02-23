@@ -706,15 +706,15 @@ fun TripItem(trip: Trip) {
 @Composable
 fun FriendsScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
-    val friends = listOf(
-        Friend("Ole", R.drawable.friend1),
-        Friend("Dole", R.drawable.friend2),
-        Friend("Doffen", R.drawable.friend3),
-        Friend("Dolly", R.drawable.friend1),
-        Friend("Langbein", R.drawable.friend2),
-        Friend("Donald", R.drawable.friend3)
+    val people = listOf(
+        Person("Ole", R.drawable.friend1, PersonStatus.FRIEND),
+        Person("Dole", R.drawable.friend2, PersonStatus.FRIEND),
+        Person("Doffen", R.drawable.friend3, PersonStatus.FRIEND),
+        Person("Dolly", R.drawable.friend1, PersonStatus.FRIEND),
+        Person("Langbein", R.drawable.friend2, PersonStatus.FRIEND),
+        Person("Donald", R.drawable.friend3, PersonStatus.FRIEND)
     )
-    val filteredFriends = friends.filter {
+    val filteredFriends = people.filter {
         it.name.contains(searchQuery, ignoreCase = true)
     }
 
@@ -744,17 +744,17 @@ fun FriendsScreen(navController: NavController) {
 }
 
 @Composable
-fun FriendItem(friend: Friend, navController: NavController) {
+fun FriendItem(person: Person, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.secondary)
             .padding(16.dp)
-            .clickable { navController.navigate("friend_detail/${friend.name}/${friend.imageResource}") }
+            .clickable { navController.navigate("friend_detail/${person.name}/${person.imageResource}") }
     ) {
         Image(
-            painter = painterResource(id = friend.imageResource),
+            painter = painterResource(id = person.imageResource),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -762,7 +762,7 @@ fun FriendItem(friend: Friend, navController: NavController) {
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = friend.name, style = MaterialTheme.typography.bodyLarge)
+        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -858,16 +858,16 @@ fun FriendDetailScreen(navController: NavController, friendName: String, friendI
 fun FollowingScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
 
-    val following = listOf(
-        Following("Rachel", R.drawable.friend1),
-        Following("Monica", R.drawable.friend2),
-        Following("Phoebe", R.drawable.friend3),
-        Following("Chandler", R.drawable.friend1),
-        Following("Joey", R.drawable.friend2),
-        Following("Ross", R.drawable.friend3)
+    val people = listOf(
+        Person("Rachel", R.drawable.friend1, PersonStatus.FOLLOWING),
+        Person("Monica", R.drawable.friend2, PersonStatus.FOLLOWING),
+        Person("Phoebe", R.drawable.friend3, PersonStatus.FOLLOWING),
+        Person("Chandler", R.drawable.friend1, PersonStatus.FOLLOWING),
+        Person("Joey", R.drawable.friend2, PersonStatus.FOLLOWING),
+        Person("Ross", R.drawable.friend3, PersonStatus.FOLLOWING)
     )
 
-    val filteredFollowing = following.filter {
+    val filteredFollowing = people.filter {
         it.name.contains(searchQuery, ignoreCase = true)
     }
 
@@ -932,17 +932,17 @@ fun FollowingDetailScreen(navController: NavController, followingName: String, f
 }
 
 @Composable
-fun FollowingItem(following: Following, navController: NavController) {
+fun FollowingItem(person: Person, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.secondary)
             .padding(16.dp)
-            .clickable { navController.navigate("friend_detail/${following.name}/${following.imageResource}") }
+            .clickable { navController.navigate("friend_detail/${person.name}/${person.imageResource}") }
     ) {
         Image(
-            painter = painterResource(id = following.imageResource),
+            painter = painterResource(id = person.imageResource),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -950,7 +950,7 @@ fun FollowingItem(following: Following, navController: NavController) {
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = following.name, style = MaterialTheme.typography.bodyLarge)
+        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -1057,12 +1057,12 @@ fun AddNewType(
     var searchQuery by remember { mutableStateOf("") }
 
     val persons = listOf(
-        Following("Penny", R.drawable.friend1),
-        Following("Sheldon", R.drawable.friend2),
-        Following("Amy", R.drawable.friend3),
-        Following("Leonard", R.drawable.friend1),
-        Following("Howard", R.drawable.friend2),
-        Following("Bernadette", R.drawable.friend3)
+        Person("Penny", R.drawable.friend1, PersonStatus.NONE),
+        Person("Sheldon", R.drawable.friend2, PersonStatus.NONE),
+        Person("Amy", R.drawable.friend3, PersonStatus.PENDING),
+        Person("Leonard", R.drawable.friend1, PersonStatus.NONE),
+        Person("Howard", R.drawable.friend2, PersonStatus.NONE),
+        Person("Bernadette", R.drawable.friend3, PersonStatus.PENDING)
     )
 
     val filteredPersons = persons.filter {
