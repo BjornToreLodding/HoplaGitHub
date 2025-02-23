@@ -95,5 +95,7 @@
     <string name="breed">Rase</string>
     <string name="age">Alder</string>
     <string name="trips_added">Løyper lagt til</string>
+    <string name="remove_friend">Fjerne venn?</string>
+    <string name="delete_friend_dialogue">Er du sikker på at du vil fjerne denne vennen?</string>
 
 </resources>

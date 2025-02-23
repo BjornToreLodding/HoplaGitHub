@@ -52,6 +52,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 
@@ -742,6 +743,7 @@ fun FriendItem(friend: Friend, navController: NavController) {
 
 @Composable
 fun FriendDetailScreen(navController: NavController, friendName: String, friendImageResource: Int) {
+    var showConfirmationDialog by remember { mutableStateOf(false) }
     val trips = listOf(
         Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
         Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
@@ -784,6 +786,35 @@ fun FriendDetailScreen(navController: NavController, friendName: String, friendI
                     Text(text = friendName, style = MaterialTheme.typography.headlineLarge)
                     Text(text = stringResource(R.string.friends) + " : 5", style = MaterialTheme.typography.bodySmall)
                     Text(text = stringResource(R.string.trips_added) + " : 3", style = MaterialTheme.typography.bodySmall)
+                    Text( text = stringResource(R.string.remove_friend),
+                        modifier = Modifier.clickable {
+                            showConfirmationDialog = true
+                        },
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = Color.Red,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                    if (showConfirmationDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmationDialog = false },
+                            title = { Text(text = stringResource(R.string.remove_friend)) },
+                            text = { Text(text = stringResource(R.string.delete_friend_dialogue)) },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Handle confirmation action here
+                                    showConfirmationDialog = false
+                                }) {
+                                    Text(text = stringResource(R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showConfirmationDialog = false }) {
+                                    Text(text = stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

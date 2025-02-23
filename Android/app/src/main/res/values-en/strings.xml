@@ -96,5 +96,7 @@
     <string name="breed">Breed</string>
     <string name="age">Age</string>
     <string name="trips_added">Trips added</string>
+    <string name="remove_friend">Remove friend?</string>
+    <string name="delete_friend_dialogue">Are you sure you want to remove this firend?</string>
 
 </resources>
