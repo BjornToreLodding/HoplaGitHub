@@ -735,7 +735,7 @@ fun FriendsScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filteredFriends) { friend ->
-                    FriendItem(friend, navController)
+                    PersonItem(friend, navController)
                 }
             }
         }
@@ -744,30 +744,7 @@ fun FriendsScreen(navController: NavController) {
 }
 
 @Composable
-fun FriendItem(person: Person, navController: NavController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
-            .padding(16.dp)
-            .clickable { navController.navigate("friend_detail/${person.name}/${person.imageResource}") }
-    ) {
-        Image(
-            painter = painterResource(id = person.imageResource),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
-    }
-}
-
-@Composable
-fun FriendDetailScreen(navController: NavController, friendName: String, friendImageResource: Int) {
+fun PersonDetailScreen(navController: NavController, friendName: String, friendImageResource: Int) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val trips = listOf(
         Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
@@ -888,7 +865,7 @@ fun FollowingScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filteredFollowing) { following ->
-                    FollowingItem(following, navController)
+                    PersonItem(following, navController)
                 }
             }
         }
@@ -928,29 +905,6 @@ fun FollowingDetailScreen(navController: NavController, followingName: String, f
                     .clip(CircleShape)
             )
         }
-    }
-}
-
-@Composable
-fun FollowingItem(person: Person, navController: NavController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
-            .padding(16.dp)
-            .clickable { navController.navigate("friend_detail/${person.name}/${person.imageResource}") }
-    ) {
-        Image(
-            painter = painterResource(id = person.imageResource),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -1056,7 +1010,7 @@ fun AddNewType(
     var ageOrFriendAge by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val persons = listOf(
+    val testNonFriends = listOf(
         Person("Penny", R.drawable.friend1, PersonStatus.NONE),
         Person("Sheldon", R.drawable.friend2, PersonStatus.NONE),
         Person("Amy", R.drawable.friend3, PersonStatus.PENDING),
@@ -1064,8 +1018,8 @@ fun AddNewType(
         Person("Howard", R.drawable.friend2, PersonStatus.NONE),
         Person("Bernadette", R.drawable.friend3, PersonStatus.PENDING)
     )
-
-    val filteredPersons = persons.filter {
+    // Search for adding new friends/followers
+    val filteredPersons = testNonFriends.filter {
         it.name.contains(searchQuery, ignoreCase = true)
     }
 
@@ -1076,6 +1030,7 @@ fun AddNewType(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // WHen it is a horse that is supposed to be added
         when (type) {
             "Horse" -> {
                 Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
@@ -1108,6 +1063,7 @@ fun AddNewType(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
+                // Add option to remove image if it is added
                 if (imageBitmap != null) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -1141,6 +1097,7 @@ fun AddNewType(
                     Text(text = "Add $type")
                 }
             }
+            // If it is a friend/follow that is supposed to be added
             else -> {
                 Column(
                     modifier = Modifier
@@ -1155,11 +1112,34 @@ fun AddNewType(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(filteredPersons) { persons ->
-                            FollowingItem(persons, navController)
+                            PersonItem(persons, navController)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PersonItem(person: Person, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable { navController.navigate("person_detail/${person.name}/${person.imageResource}") }
+    ) {
+        Image(
+            painter = painterResource(id = person.imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
     }
 }

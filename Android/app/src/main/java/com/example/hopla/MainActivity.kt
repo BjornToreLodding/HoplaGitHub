@@ -117,26 +117,15 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("update_screen") { UpdateScreen(navController) }
                             composable(
-                                "friend_detail/{friendName}/{friendImageResource}",
+                                "person_detail/{personName}/{personImageResource}",
                                 arguments = listOf(
-                                    navArgument("friendName") { type = NavType.StringType },
-                                    navArgument("friendImageResource") { type = NavType.IntType }
+                                    navArgument("personName") { type = NavType.StringType },
+                                    navArgument("personImageResource") { type = NavType.IntType }
                                 )
                             ) { backStackEntry ->
-                                val friendName = backStackEntry.arguments?.getString("friendName") ?: ""
-                                val friendImageResource = backStackEntry.arguments?.getInt("friendImageResource") ?: 0
-                                FriendDetailScreen(navController, friendName, friendImageResource)
-                            }
-                            composable(
-                                "following_detail/{followingName}/{followingImageResource}",
-                                arguments = listOf(
-                                    navArgument("followingName") { type = NavType.StringType },
-                                    navArgument("followingImageResource") { type = NavType.IntType }
-                                )
-                            ) { backStackEntry ->
-                                val followingName = backStackEntry.arguments?.getString("followingName") ?: ""
-                                val followingImageResource = backStackEntry.arguments?.getInt("followingImageResource") ?: 0
-                                FollowingDetailScreen(navController, followingName, followingImageResource)
+                                val personName = backStackEntry.arguments?.getString("personName") ?: ""
+                                val personImageResource = backStackEntry.arguments?.getInt("personImageResource") ?: 0
+                                PersonDetailScreen(navController, personName, personImageResource)
                             }
                             composable(
                                 "horse_detail/{horseName}/{horseImageResource}/{horseBreed}/{horseAge}",

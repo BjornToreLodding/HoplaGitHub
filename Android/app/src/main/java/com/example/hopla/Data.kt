@@ -14,6 +14,7 @@ data class Trip(
     val imageResource: Int
 )
 
+// Different status relationship between users can be
 enum class PersonStatus {
     FRIEND,
     FOLLOWING,
