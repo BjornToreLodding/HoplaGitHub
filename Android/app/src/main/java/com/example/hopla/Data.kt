@@ -1,5 +1,10 @@
 package com.example.hopla
 
+val baseURLID = "/12345678-0000-0000-"
+val horseURLID = "0002-"
+val userURLID = "0123456780003"
+val baseID = "3"
+
 // Class for the data of a trip
 data class Trip(
     val name: String,
@@ -27,4 +32,12 @@ data class Horse(
     val imageResource: Int,
     val breed: String,
     val age: Int
+)
+
+data class User(
+    val id: String,
+    val name: String,
+    val email: String,
+    val password_hash: String,
+    val created_at: String
 )

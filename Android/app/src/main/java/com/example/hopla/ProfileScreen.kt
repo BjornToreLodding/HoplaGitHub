@@ -51,10 +51,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.sharp.AccountBox
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
+import android.util.Log
 
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -466,90 +468,113 @@ fun ProfileButtons(navController: NavController) {
     }
 }
 
+
+
 @Composable
 fun UserChanges(modifier: Modifier = Modifier) {
-    var email by remember { mutableStateOf("test@gmail.com") }
-    var username by remember { mutableStateOf("test") }
+    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(true) }
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.tertiary)
-    ) {
-        Column {
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
-            Text(text = stringResource(R.string.username))
-            TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = {  },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
-            Text(text = stringResource(R.string.email))
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
-            Text(
-                text = stringResource(R.string.change_password),
-                modifier = Modifier.clickable { showDialog = true },
-                style = TextStyle(textDecoration = TextDecoration.Underline)
-            )
+    // Get username and email from the API
+    LaunchedEffect(Unit) {
+        try {
+            val user = RetrofitInstance.api.getUser()
+            email = user.email
+            username = user.name
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("UserChanges", "Error loading user data", e)
+        } finally {
+            isLoading = false
         }
     }
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = stringResource(R.string.change_password)) },
-            text = {
-                Column {
-                    TextField(
-                        value = currentPassword,
-                        onValueChange = { currentPassword = it },
-                        label = { Text(text = stringResource(R.string.current_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextField(
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        label = { Text(text = stringResource(R.string.new_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        label = { Text(text = stringResource(R.string.confirm_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    // Handle password change logic here
-                    showDialog = false
-                }) {
-                    Text(text = stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
+    if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+        ) {
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+                Text(text = stringResource(R.string.username))
+                TextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = {  },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+                Text(text = stringResource(R.string.email))
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+                Text(
+                    text = stringResource(R.string.change_password),
+                    modifier = Modifier.clickable { showDialog = true },
+                    style = TextStyle(textDecoration = TextDecoration.Underline)
+                )
             }
-        )
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = stringResource(R.string.change_password)) },
+                text = {
+                    Column {
+                        TextField(
+                            value = currentPassword,
+                            onValueChange = { currentPassword = it },
+                            label = { Text(text = stringResource(R.string.current_password)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        TextField(
+                            value = newPassword,
+                            onValueChange = { newPassword = it },
+                            label = { Text(text = stringResource(R.string.new_password)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        TextField(
+                            value = confirmPassword,
+                            onValueChange = { confirmPassword = it },
+                            label = { Text(text = stringResource(R.string.confirm_password)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        // Handle password change logic here
+                        showDialog = false
+                    }) {
+                        Text(text = stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
     }
 }
 

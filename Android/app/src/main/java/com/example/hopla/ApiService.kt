@@ -5,15 +5,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+// For user data (profile)
 interface ApiService {
-    @GET("users")
-    suspend fun getUser(@Query("id") id: Int): User
+    @GET("users/int/3")
+    suspend fun getUser(): User
 }
 
 object RetrofitInstance {
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://hoplatest.onrender.com/api/")
+            .baseUrl("https://hopla.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
