@@ -23,3 +23,18 @@ object RetrofitInstance {
     }
 }
 
+fun fetchMessages(messageName: String): List<Message> {
+    // Replace with actual database fetching logic
+    return listOf(
+        Message(
+            id = "1",
+            content = "Welcome to the community!",
+            timestamp = System.currentTimeMillis()
+        ),
+        Message(
+            id = "2",
+            content = "Hello everyone!",
+            timestamp = System.currentTimeMillis()
+        )
+    )
+}

@@ -282,7 +282,6 @@ fun MessageBox(
                         if (newMessage.isNotBlank()) {
                             val newMsg = Message(
                                 id = UUID.randomUUID().toString(),
-                                communityName = community.name,
                                 content = newMessage,
                                 timestamp = System.currentTimeMillis()
                             )

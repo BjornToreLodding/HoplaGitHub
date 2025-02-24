@@ -28,19 +28,28 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
+import androidx.compose.ui.window.Dialog
+import com.google.ai.client.generativeai.type.content
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -318,6 +327,7 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
     var currentImageIndex by remember { mutableIntStateOf(0) }
     var userRating by remember { mutableIntStateOf(0) }
     val images = listOf(R.drawable.stockimg1, R.drawable.stockimg2)
+    var showMessageBox by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Header
@@ -336,7 +346,7 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.primary)
             ) {
-                // Row in header to display items next to eachother
+                // Row in header to display items next to each other
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -468,6 +478,7 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
                     ) {
                         Text(text = stringResource(R.string.new_updates))
                     }
+
                 }
             }
 
@@ -550,10 +561,61 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
                                 .fillMaxWidth()
                                 .padding(4.dp)
                                 .background(MaterialTheme.colorScheme.secondary)
-                                .clickable { /* Handle click */ },
+                                .clickable { showMessageBox = true },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(text = stringResource(R.string.latest_update_about_the_route))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (showMessageBox) {
+        Dialog(onDismissRequest = { showMessageBox = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .border(2.dp, Color.Black)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.latest_update_about_the_route),
+                        modifier = Modifier.padding(8.dp),
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    // Sample messages list
+                    val messages = listOf(
+                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis()),
+                        Message(id = "2", content = "Watch out for fallen branches.", timestamp = System.currentTimeMillis() - 3600000)
+                    )
+
+                    LazyColumn {
+                        items(messages) { message ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(8.dp)
+                            ) {
+                                Text(text = message.content)
+                                Text(
+                                    text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
+                                        Date(message.timestamp)
+                                    ),
+                                    fontSize = 10.sp,
+                                    modifier = Modifier.align(Alignment.End)
+                                )
+                            }
                         }
                     }
                 }

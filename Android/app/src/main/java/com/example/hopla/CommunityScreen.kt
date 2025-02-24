@@ -195,7 +195,7 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
 
     // Load messages from the database
     LaunchedEffect(community.name) {
-        val fetchedMessages = fetchMessagesForCommunity(community.name)
+        val fetchedMessages = fetchMessages(community.name)
         messages.addAll(fetchedMessages)
     }
 
@@ -262,14 +262,6 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
             }
         )
     }
-}
-
-fun fetchMessagesForCommunity(communityName: String): List<Message> {
-    // Replace with actual database fetching logic
-    return listOf(
-        Message(id = "1", communityName = communityName, content = "Welcome to the community!", timestamp = System.currentTimeMillis()),
-        Message(id = "2", communityName = communityName, content = "Hello everyone!", timestamp = System.currentTimeMillis())
-    )
 }
 
 // Function to retrieve the CommunityGroup object based on the communityName
