@@ -100,9 +100,13 @@ class MainActivity : ComponentActivity() {
                                 "communityDetail/{communityName}",
                                 arguments = listOf(navArgument("communityName") { type = NavType.StringType })
                             ) { backStackEntry ->
-                                val communityName = backStackEntry.arguments?.getString("communityName")
-                                val communityGroup = communityName?.let { getCommunityGroupByName(it) }
-                                communityGroup?.let { CommunityDetailScreen(navController, it) }
+                                val communityName = backStackEntry.arguments?.getString("communityName") ?: ""
+                                val community = getCommunityByName(communityName)
+                                if (community != null) {
+                                    CommunityDetailScreen(navController, community)
+                                } else {
+                                    Text(text = "Community not found")
+                                }
                             }
                             composable("addCommunityScreen") {
                                 AddCommunityScreen(navController) { newCommunity ->

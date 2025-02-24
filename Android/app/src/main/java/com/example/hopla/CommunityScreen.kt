@@ -30,42 +30,36 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-
-// Data class to represent a community group
-data class CommunityGroup(
-    val image: Painter,
-    val name: String,
-    val description: String
-)
 
 // Composable function to display the community screen
 @Composable
 fun CommunityScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var showLikedOnly by remember { mutableStateOf(false) }
-    val likedGroups = remember { mutableStateListOf<CommunityGroup>() }
-    val groups = listOf(
-        CommunityGroup(
-            painterResource(R.drawable.stockimg1),
-            "Horse community",
-            "A modern stable with excellent facilities."
+    val likedCommunities = remember { mutableStateListOf<Community>() }
+    val communities = listOf(
+        Community(
+            name = "Horse community",
+            imageResource = R.drawable.stockimg1,
+            description = "A modern stable with excellent facilities."
         ),
-        CommunityGroup(
-            painterResource(R.drawable.stockimg2),
-            "Ponny community",
-            "SANDNES OG JÆREN RIDEKLUBB"
+        Community(
+            name = "Ponny community",
+            imageResource = R.drawable.stockimg2,
+            description = "SANDNES OG JÆREN RIDEKLUBB"
         ),
-        CommunityGroup(
-            painterResource(R.drawable.stockimg1),
-            "Donkey community",
-            "BÆRUM RIDEKLUBB"
+        Community(
+            name = "Donkey community",
+            imageResource = R.drawable.stockimg1,
+            description = "BÆRUM RIDEKLUBB"
         )
     )
-    val filteredGroups = groups.filter {
+    val filteredCommunities = communities.filter {
         it.name.contains(searchQuery, ignoreCase = true) &&
-                (!showLikedOnly || likedGroups.contains(it))
+                (!showLikedOnly || likedCommunities.contains(it))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -83,8 +77,8 @@ fun CommunityScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(top = 8.dp)
             ) {
-                items(filteredGroups) { group ->
-                    CommunityCard(group, navController, likedGroups)
+                items(filteredCommunities) { community ->
+                    CommunityCard(community, navController, likedCommunities)
                 }
             }
         }
@@ -94,55 +88,48 @@ fun CommunityScreen(navController: NavController) {
 
 // Composable function to display a community group card
 @Composable
-fun CommunityCard(group: CommunityGroup, navController: NavController, likedGroups: MutableList<CommunityGroup>) {
-    var isLiked by remember { mutableStateOf(likedGroups.contains(group)) }
+fun CommunityCard(community: Community, navController: NavController, likedCommunities: MutableList<Community>) {
+    var isLiked by remember { mutableStateOf(likedCommunities.contains(community)) }
 
-    // Display the community group card
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { navController.navigate("communityDetail/${group.name}") }
+            .clickable { navController.navigate("communityDetail/${community.name}") }
     ) {
-        // Inner box for the group card
         Box {
             Column {
-                // The image of the group
                 Image(
-                    painter = group.image,
-                    contentDescription = group.name,
+                    painter = painterResource(id = community.imageResource),
+                    contentDescription = community.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
                 )
-                // The name of the group
                 Text(
-                    text = group.name,
+                    text = community.name,
                     fontSize = 16.sp,
                     modifier = Modifier.padding(8.dp)
                 )
             }
-            // Box for the like button
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)
                     .background(MaterialTheme.colorScheme.background, shape = CircleShape)
             ) {
-                // Like button icon
                 IconButton(
                     onClick = {
                         isLiked = !isLiked
                         if (isLiked) {
-                            likedGroups.add(group)
+                            likedCommunities.add(community)
                         } else {
-                            likedGroups.remove(group)
+                            likedCommunities.remove(community)
                         }
                     }
                 ) {
-                    // Icon changing from outlined to filled based on the like status
                     Icon(
                         imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) stringResource(R.string.liked) else stringResource(R.string.not_liked),
@@ -198,7 +185,7 @@ fun TopTextCommunity(onShowLikedOnlyChange: (Boolean) -> Unit) {
 }
 
 @Composable
-fun CommunityDetailScreen(navController: NavController, communityGroup: CommunityGroup) {
+fun CommunityDetailScreen(navController: NavController, community: Community) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -220,7 +207,7 @@ fun CommunityDetailScreen(navController: NavController, communityGroup: Communit
                     )
                 }
                 Text(
-                    text = communityGroup.name,
+                    text = community.name,
                     fontSize = 24.sp,
                     modifier = Modifier.padding(start = 16.dp)
                 )
@@ -228,40 +215,40 @@ fun CommunityDetailScreen(navController: NavController, communityGroup: Communit
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = communityGroup.description,
+            text = community.description,
             fontSize = 16.sp
         )
     }
 }
 
-@Composable
 // Function to retrieve the CommunityGroup object based on the communityName
-fun getCommunityGroupByName(name: String): CommunityGroup? {
-    val groups = listOf(
-        CommunityGroup(
-            painterResource(R.drawable.stockimg1),
-            "This is the first group.",
-            "A modern stable with excellent facilities."
+@Composable
+fun getCommunityByName(name: String): Community? {
+    val communities = listOf(
+        Community(
+            name = "Horse community",
+            imageResource = R.drawable.stockimg1,
+            description = "A modern stable with excellent facilities."
         ),
-        CommunityGroup(
-            painterResource(R.drawable.stockimg2),
-            "This is the second group.",
-            "SANDNES OG JÆREN RIDEKLUBB"
+        Community(
+            name = "Ponny community",
+            imageResource = R.drawable.stockimg2,
+            description = "SANDNES OG JÆREN RIDEKLUBB"
         ),
-        CommunityGroup(
-            painterResource(R.drawable.stockimg1),
-            "This is the third group.",
-            "BÆRUM RIDEKLUBB"
+        Community(
+            name = "Donkey community",
+            imageResource = R.drawable.stockimg1,
+            description = "BÆRUM RIDEKLUBB"
         )
     )
-    return groups.find { it.name == name }
+    return communities.find { it.name == name }
 }
 
 // Add a new community group screen
 @Composable
 fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit) {
     var name by remember { mutableStateOf("") }
-    var imageResource by remember { mutableStateOf(0) }
+    var imageResource by remember { mutableIntStateOf(0) }
     var description by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
