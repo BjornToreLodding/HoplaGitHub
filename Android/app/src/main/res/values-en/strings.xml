@@ -108,5 +108,6 @@
     <string name="add_new_community">Add new community</string>
     <string name="info">Info</string>
     <string name="close">Close</string>
+    <string name="enter_you_message">Enter your message</string>
 
 </resources>

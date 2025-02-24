@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -35,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 // A search bar with a icon and a text field
 @Composable
@@ -216,5 +223,79 @@ fun ImagePicker(
                 }
             }
         )
+    }
+}
+
+// Standard for how a messaging board should look like
+@Composable
+fun MessageBox(
+    messages: SnapshotStateList<Message>,
+    newMessage: String,
+    onMessageChange: (String) -> Unit,
+    community: Community
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .border(3.dp, MaterialTheme.colorScheme.primary)
+            .padding(16.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = 8.dp)
+            ) {
+                items(messages) { message ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(8.dp)
+                    ) {
+                        Text(text = message.content)
+                        Text(
+                            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
+                                Date(
+                                    message.timestamp
+                                )
+                            ),
+                            fontSize = 10.sp,
+                            modifier = Modifier.align(Alignment.End)
+                        )
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material.TextField(
+                    value = newMessage,
+                    onValueChange = onMessageChange,
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text(text = stringResource(R.string.enter_you_message)) }
+                )
+                Button(
+                    onClick = {
+                        if (newMessage.isNotBlank()) {
+                            val newMsg = Message(
+                                id = UUID.randomUUID().toString(),
+                                communityName = community.name,
+                                content = newMessage,
+                                timestamp = System.currentTimeMillis()
+                            )
+                            messages.add(newMsg)
+                            onMessageChange("")
+                            // Save the new message to the database
+                        }
+                    },
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Text(text = stringResource(R.string.publish))
+                }
+            }
+        }
     }
 }

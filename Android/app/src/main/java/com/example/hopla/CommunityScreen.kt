@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.border
 import androidx.compose.runtime.LaunchedEffect
-import java.util.UUID
 
 // Composable function to display the community screen
 @Composable
@@ -47,17 +46,17 @@ fun CommunityScreen(navController: NavController) {
         Community(
             name = "Horse community",
             imageResource = R.drawable.stockimg1,
-            description = "A modern stable with excellent facilities."
+            description = "A stable for horses ONLY"
         ),
         Community(
             name = "Ponny community",
             imageResource = R.drawable.stockimg2,
-            description = "SANDNES OG JÆREN RIDEKLUBB"
+            description = "A stable for ponies ONLY"
         ),
         Community(
             name = "Donkey community",
             imageResource = R.drawable.stockimg1,
-            description = "BÆRUM RIDEKLUBB"
+            description = "A stable for donkeys ONLY"
         )
     )
     val filteredCommunities = communities.filter {
@@ -249,66 +248,7 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .border(3.dp, MaterialTheme.colorScheme.primary)
-                .padding(16.dp)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = 8.dp)
-                ) {
-                    items(messages) { message ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                                .background(MaterialTheme.colorScheme.surface)
-                                .padding(8.dp)
-                        ) {
-                            Text(text = message.content)
-                            Text(
-                                text = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(message.timestamp)),
-                                fontSize = 10.sp,
-                                modifier = Modifier.align(Alignment.End)
-                            )
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextField(
-                        value = newMessage,
-                        onValueChange = { newMessage = it },
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text(text = "Enter your message") }
-                    )
-                    Button(
-                        onClick = {
-                            if (newMessage.isNotBlank()) {
-                                val newMsg = Message(
-                                    id = UUID.randomUUID().toString(),
-                                    communityName = community.name,
-                                    content = newMessage,
-                                    timestamp = System.currentTimeMillis()
-                                )
-                                messages.add(newMsg)
-                                newMessage = ""
-                                // Save the new message to the database
-                            }
-                        },
-                        modifier = Modifier.padding(start = 8.dp)
-                    ) {
-                        Text(text = "Send")
-                    }
-                }
-            }
-        }
+        MessageBox(messages, newMessage, onMessageChange = { newMessage = it }, community)
     }
 
     if (showDialog) {

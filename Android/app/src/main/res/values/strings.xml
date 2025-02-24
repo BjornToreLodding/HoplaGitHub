@@ -107,5 +107,6 @@
     <string name="add_new_community">Legg til nytt fellesskap</string>
     <string name="info">Info</string>
     <string name="close">Lukk</string>
+    <string name="enter_you_message">Skriv meldingen her</string>
 
 </resources>
