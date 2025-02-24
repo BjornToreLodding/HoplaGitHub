@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +28,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.material.TextField
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 
 // Data class to represent a community group
 data class CommunityGroup(
@@ -68,7 +73,7 @@ fun CommunityScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            TopTextCommunity(showLikedOnly) { showLikedOnly = it }
+            TopTextCommunity { showLikedOnly = it }
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
@@ -151,7 +156,7 @@ fun CommunityCard(group: CommunityGroup, navController: NavController, likedGrou
 
 // Top text for filtering the groups based on position and liked status
 @Composable
-fun TopTextCommunity(showLikedOnly: Boolean, onShowLikedOnlyChange: (Boolean) -> Unit) {
+fun TopTextCommunity(onShowLikedOnlyChange: (Boolean) -> Unit) {
     // Column for the top text
     Column(
         modifier = Modifier
@@ -254,33 +259,67 @@ fun getCommunityGroupByName(name: String): CommunityGroup? {
 
 // Add a new community group screen
 @Composable
-fun AddCommunityScreen(navController: NavController) {
+fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var imageResource by remember { mutableStateOf(0) }
+    var description by remember { mutableStateOf("") }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(8.dp)
-        ) {
+        ScreenHeader(navController = navController, headerText = stringResource(R.string.add_new_community))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text(text = stringResource(R.string.name)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        TextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text(text = stringResource(R.string.description)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        // Add option to remove image if it is added
+        if (imageBitmap != null) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+                Image(
+                    bitmap = imageBitmap!!.asImageBitmap(),
+                    contentDescription = "Selected Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(64.dp)
+                )
+                IconButton(onClick = { imageBitmap = null }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Remove Image"
                     )
                 }
-                Text(
-                    text = "Add",
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
             }
+        }
+        ImagePicker(
+            onImageSelected = { bitmap -> imageBitmap = bitmap },
+            text = if (imageBitmap == null) stringResource(R.string.add_image) else stringResource(R.string.change_image)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            val newCommunity = Community(name, imageResource, description)
+            onAdd(newCommunity)
+            navController.popBackStack()
+        }) {
+            Text(text = stringResource(R.string.add_new_community))
         }
     }
 }

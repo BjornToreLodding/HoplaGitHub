@@ -103,5 +103,7 @@
     <string name="remove_request_dialogue">Vil du fjerne forespørselen?</string>
     <string name="follow">Følg</string>
     <string name="add_friend">Legg til</string>
+    <string name="change_image">Bytt bilde</string>
+    <string name="add_new_community">Legg til nytt fellesskap</string>
 
 </resources>

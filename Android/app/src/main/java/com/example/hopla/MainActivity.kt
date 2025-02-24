@@ -104,7 +104,11 @@ class MainActivity : ComponentActivity() {
                                 val communityGroup = communityName?.let { getCommunityGroupByName(it) }
                                 communityGroup?.let { CommunityDetailScreen(navController, it) }
                             }
-                            composable("addCommunityScreen") { AddCommunityScreen(navController) }
+                            composable("addCommunityScreen") {
+                                AddCommunityScreen(navController) { newCommunity ->
+                                    // Handle the addition of the new community here
+                                }
+                            }
                             composable("addFriendScreen") {
                                 AddNewType(navController, "Friend") { name, imageBitmap, friendType, friendAge ->
                                     // Handle adding a new friend

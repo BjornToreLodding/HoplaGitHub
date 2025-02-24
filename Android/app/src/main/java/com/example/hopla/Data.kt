@@ -45,3 +45,10 @@ data class User(
     val passwordHash: String,
     val createdTime: String
 )
+
+// Class for the data of a community
+data class Community(
+    val name: String,
+    val imageResource: Int,
+    val description: String
+)
