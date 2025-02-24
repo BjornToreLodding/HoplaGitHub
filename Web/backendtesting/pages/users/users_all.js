@@ -26,7 +26,7 @@ export async function render(container) {
 
             // Opprett bilde-element
             const profileImage = document.createElement("img");
-            profileImage.src = user.profilePictureUrl ? user.profilePictureUrl : "default-profile.png"; 
+            profileImage.src = user.profilePictureUrl ? user.profilePictureUrl : "default-profile.png";
             profileImage.alt = `${user.name}'s profilbilde`;
             profileImage.className = "profile-picture";
 
@@ -63,51 +63,51 @@ export async function render(container) {
 
             // Logg inn-knappens funksjonalitet (tilbake til original versjon)
             // Logg inn-knappens funksjonalitet
-loginButton.addEventListener("click", async () => {
-    try {
-        console.log(`➡️  Prøver å logge inn som: ${user.name} (ID: ${user.id})`);
+            loginButton.addEventListener("click", async () => {
+                try {
+                    console.log(`➡️  Prøver å logge inn som: ${user.name} (ID: ${user.id})`);
 
-        const loginResponse = await fetch("https://localhost:7128/users/login/test", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: user.id })  
-        });
+                    const loginResponse = await fetch("https://localhost:7128/users/login/test", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: user.id })
+                    });
 
-        if (!loginResponse.ok) {
-            throw new Error(`🚨 Login feilet! Status: ${loginResponse.status}`);
-        }
+                    if (!loginResponse.ok) {
+                        throw new Error(`🚨 Login feilet! Status: ${loginResponse.status}`);
+                    }
 
-        const loginData = await loginResponse.json();
-        console.log("✅ Login-data mottatt:", loginData);
+                    const loginData = await loginResponse.json();
+                    console.log("✅ Login-data mottatt:", loginData);
 
-        if (!loginData.token || !loginData.name || !loginData.alias) {
-            throw new Error("🚨 Feil: Manglende data i responsen!");
-        }
+                    if (!loginData.token || !loginData.name || !loginData.alias) {
+                        throw new Error("🚨 Feil: Manglende data i responsen!");
+                    }
 
-        // Lagrer brukerinfo og token i localStorage
-        localStorage.setItem("authToken", loginData.token);
-        localStorage.setItem("userInfo", JSON.stringify({
-            id: loginData.userId,
-            name: loginData.name,
-            alias: loginData.alias,
-            profilePictureURL: loginData.profilePictureURL
-        }));
+                    // Lagrer brukerinfo og token i localStorage
+                    localStorage.setItem("authToken", loginData.token);
+                    localStorage.setItem("userInfo", JSON.stringify({
+                        id: loginData.userId,
+                        name: loginData.name,
+                        alias: loginData.alias,
+                        profilePictureURL: loginData.profilePictureURL
+                    }));
 
-        console.log("🛠️  Oppdatert localStorage:", localStorage.getItem("userInfo"));
+                    console.log("🛠️  Oppdatert localStorage:", localStorage.getItem("userInfo"));
 
-        // Oppdater UI etter innlogging
-        updateUserUI();
+                    // Oppdater UI etter innlogging
+                    updateUserUI();
 
-        // Naviger til dashboardet etter kort forsinkelse
-        setTimeout(() => {
-            loadContent('users', 'dashboard');
-        }, 500);
+                    // Naviger til dashboardet etter kort forsinkelse
+                    setTimeout(() => {
+                        loadContent('users', 'dashboard');
+                    }, 500);
 
-    } catch (error) {
-        console.error("❌ Feil ved innlogging:", error.message || error);
-        alert("Kunne ikke logge inn. Sjekk konsollen for detaljer.");
-    }
-});
+                } catch (error) {
+                    console.error("❌ Feil ved innlogging:", error.message || error);
+                    alert("Kunne ikke logge inn. Sjekk konsollen for detaljer.");
+                }
+            });
 
             // Vis profilside-knappens funksjonalitet (dette er det eneste nye!)
             profileButton.addEventListener("click", () => {
@@ -115,7 +115,7 @@ loginButton.addEventListener("click", async () => {
                 console.log(`➡️ Åpner profilside for bruker: ${user.name} (ID: ${userId})`);
                 loadContent('users', 'profile', { userId });
             });
-            
+
 
             // Legg til elementer i brukerlisten
             userItem.appendChild(profileImage);
