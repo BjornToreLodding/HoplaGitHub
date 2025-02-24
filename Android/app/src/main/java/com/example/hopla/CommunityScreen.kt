@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,9 +29,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.border
+import androidx.compose.runtime.LaunchedEffect
+import java.util.UUID
 
 // Composable function to display the community screen
 @Composable
@@ -184,8 +187,19 @@ fun TopTextCommunity(onShowLikedOnlyChange: (Boolean) -> Unit) {
     }
 }
 
+// Details about a specific community
 @Composable
 fun CommunityDetailScreen(navController: NavController, community: Community) {
+    var showDialog by remember { mutableStateOf(false) }
+    var newMessage by remember { mutableStateOf("") }
+    val messages = remember { mutableStateListOf<Message>() }
+
+    // Load messages from the database
+    LaunchedEffect(community.name) {
+        val fetchedMessages = fetchMessagesForCommunity(community.name)
+        messages.addAll(fetchedMessages)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -194,11 +208,26 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(8.dp)
+                .fillMaxHeight(0.2f)
+                .border(1.dp, MaterialTheme.colorScheme.primary)
         ) {
+            Image(
+                painter = painterResource(id = community.imageResource),
+                contentDescription = community.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+            )
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -208,17 +237,99 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
                 }
                 Text(
                     text = community.name,
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
+                IconButton(onClick = { showDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = stringResource(R.string.info)
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = community.description,
-            fontSize = 16.sp
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .border(3.dp, MaterialTheme.colorScheme.primary)
+                .padding(16.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = 8.dp)
+                ) {
+                    items(messages) { message ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(8.dp)
+                        ) {
+                            Text(text = message.content)
+                            Text(
+                                text = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(message.timestamp)),
+                                fontSize = 10.sp,
+                                modifier = Modifier.align(Alignment.End)
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        value = newMessage,
+                        onValueChange = { newMessage = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text(text = "Enter your message") }
+                    )
+                    Button(
+                        onClick = {
+                            if (newMessage.isNotBlank()) {
+                                val newMsg = Message(
+                                    id = UUID.randomUUID().toString(),
+                                    communityName = community.name,
+                                    content = newMessage,
+                                    timestamp = System.currentTimeMillis()
+                                )
+                                messages.add(newMsg)
+                                newMessage = ""
+                                // Save the new message to the database
+                            }
+                        },
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        Text(text = "Send")
+                    }
+                }
+            }
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            text = { Text(text = community.description) },
+            confirmButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text(text = stringResource(R.string.close))
+                }
+            }
         )
     }
+}
+
+fun fetchMessagesForCommunity(communityName: String): List<Message> {
+    // Replace with actual database fetching logic
+    return listOf(
+        Message(id = "1", communityName = communityName, content = "Welcome to the community!", timestamp = System.currentTimeMillis()),
+        Message(id = "2", communityName = communityName, content = "Hello everyone!", timestamp = System.currentTimeMillis())
+    )
 }
 
 // Function to retrieve the CommunityGroup object based on the communityName

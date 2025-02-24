@@ -52,3 +52,10 @@ data class Community(
     val imageResource: Int,
     val description: String
 )
+
+data class Message(
+    val id: String,
+    val communityName: String,
+    val content: String,
+    val timestamp: Long
+)
