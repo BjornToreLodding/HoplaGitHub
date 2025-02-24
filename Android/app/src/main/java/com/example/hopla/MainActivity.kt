@@ -117,15 +117,18 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("update_screen") { UpdateScreen(navController) }
                             composable(
-                                "person_detail/{personName}/{personImageResource}",
+                                "person_detail/{personName}/{personImageResource}/{personStatus}",
                                 arguments = listOf(
                                     navArgument("personName") { type = NavType.StringType },
-                                    navArgument("personImageResource") { type = NavType.IntType }
+                                    navArgument("personImageResource") { type = NavType.IntType },
+                                    navArgument("personStatus") { type = NavType.StringType }
                                 )
                             ) { backStackEntry ->
                                 val personName = backStackEntry.arguments?.getString("personName") ?: ""
                                 val personImageResource = backStackEntry.arguments?.getInt("personImageResource") ?: 0
-                                PersonDetailScreen(navController, personName, personImageResource)
+                                val personStatus = backStackEntry.arguments?.getString("personStatus") ?: "NONE"
+                                val person = Person(name = personName, imageResource = personImageResource, status = PersonStatus.valueOf(personStatus))
+                                PersonDetailScreen(navController, person)
                             }
                             composable(
                                 "horse_detail/{horseName}/{horseImageResource}/{horseBreed}/{horseAge}",

@@ -744,7 +744,7 @@ fun FriendsScreen(navController: NavController) {
 }
 
 @Composable
-fun PersonDetailScreen(navController: NavController, friendName: String, friendImageResource: Int) {
+fun PersonDetailScreen(navController: NavController, person: Person) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val trips = listOf(
         Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
@@ -775,7 +775,7 @@ fun PersonDetailScreen(navController: NavController, friendName: String, friendI
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = painterResource(id = friendImageResource),
+                    painter = painterResource(id = person.imageResource),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -785,18 +785,22 @@ fun PersonDetailScreen(navController: NavController, friendName: String, friendI
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(text = friendName, style = MaterialTheme.typography.headlineLarge)
+                    Text(text = person.name, style = MaterialTheme.typography.headlineLarge)
                     Text(text = stringResource(R.string.friends) + " : 5", style = MaterialTheme.typography.bodySmall)
                     Text(text = stringResource(R.string.trips_added) + " : 3", style = MaterialTheme.typography.bodySmall)
-                    Text( text = stringResource(R.string.remove_friend),
-                        modifier = Modifier.clickable {
-                            showConfirmationDialog = true
-                        },
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = Color.Red,
-                            textDecoration = TextDecoration.Underline
+                    Text(text = person.status.toString(), style = MaterialTheme.typography.bodySmall)
+                    if (person.status == PersonStatus.FRIEND) {
+                        Text(
+                            text = stringResource(R.string.remove_friend),
+                            modifier = Modifier.clickable {
+                                showConfirmationDialog = true
+                            },
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.Red,
+                                textDecoration = TextDecoration.Underline
+                            )
                         )
-                    )
+                    }
                     if (showConfirmationDialog) {
                         AlertDialog(
                             onDismissRequest = { showConfirmationDialog = false },
@@ -870,41 +874,6 @@ fun FollowingScreen(navController: NavController) {
             }
         }
         AddButton(onClick = { navController.navigate("addFriendScreen") })
-    }
-}
-
-@Composable
-fun FollowingDetailScreen(navController: NavController, followingName: String, followingImageResource: Int) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        IconButton(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.back)
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = followingName, style = MaterialTheme.typography.bodySmall)
-            Spacer(modifier = Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = followingImageResource),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-            )
-        }
     }
 }
 
@@ -1030,7 +999,7 @@ fun AddNewType(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // WHen it is a horse that is supposed to be added
+        // When it is a horse that is supposed to be added
         when (type) {
             "Horse" -> {
                 Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
@@ -1129,7 +1098,7 @@ fun PersonItem(person: Person, navController: NavController) {
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.secondary)
             .padding(16.dp)
-            .clickable { navController.navigate("person_detail/${person.name}/${person.imageResource}") }
+            .clickable { navController.navigate("person_detail/${person.name}/${person.imageResource}/${person.status}") }
     ) {
         Image(
             painter = painterResource(id = person.imageResource),
