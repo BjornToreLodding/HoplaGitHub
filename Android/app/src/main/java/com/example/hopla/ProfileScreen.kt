@@ -745,7 +745,9 @@ fun FriendsScreen(navController: NavController) {
 
 @Composable
 fun PersonDetailScreen(navController: NavController, person: Person) {
-    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var showConfirmationDialogFriend by remember { mutableStateOf(false) }
+    var showConfirmationDialogFollowing by remember { mutableStateOf(false) }
+    var showConfirmationDialogPending by remember { mutableStateOf(false) }
     val trips = listOf(
         Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
         Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
@@ -789,11 +791,12 @@ fun PersonDetailScreen(navController: NavController, person: Person) {
                     Text(text = stringResource(R.string.friends) + " : 5", style = MaterialTheme.typography.bodySmall)
                     Text(text = stringResource(R.string.trips_added) + " : 3", style = MaterialTheme.typography.bodySmall)
                     Text(text = person.status.toString(), style = MaterialTheme.typography.bodySmall)
+                    // If the user is a friend
                     if (person.status == PersonStatus.FRIEND) {
                         Text(
                             text = stringResource(R.string.remove_friend),
                             modifier = Modifier.clickable {
-                                showConfirmationDialog = true
+                                showConfirmationDialogFriend = true
                             },
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Color.Red,
@@ -801,21 +804,96 @@ fun PersonDetailScreen(navController: NavController, person: Person) {
                             )
                         )
                     }
-                    if (showConfirmationDialog) {
+                    // If the user is following that person
+                    if (person.status == PersonStatus.FOLLOWING) {
+                        Text(
+                            text = stringResource(R.string.unfollow),
+                            modifier = Modifier.clickable{
+                                showConfirmationDialogFollowing = true
+                            },
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.Red,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                    // If the user has a pending friend request
+                    if (person.status == PersonStatus.PENDING) {
+                        Text(
+                            text = stringResource(R.string.friendrequest_pending),
+                            modifier = Modifier.clickable {
+                                showConfirmationDialogPending = true
+                            },
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.Red,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                    // If the user has no relation to that user
+                    if (person.status == PersonStatus.NONE) {
+                        Button(onClick = { /* Handle follow logic here */ }) {
+                            Text(text = stringResource(R.string.follow))
+                        }
+                        Button(onClick = { /* Handle follow logic here */ }) {
+                            Text(text = stringResource(R.string.add_friend))
+                        }
+                    }
+                    if (showConfirmationDialogFriend) {
                         AlertDialog(
-                            onDismissRequest = { showConfirmationDialog = false },
+                            onDismissRequest = { showConfirmationDialogFriend = false },
                             title = { Text(text = stringResource(R.string.remove_friend)) },
                             text = { Text(text = stringResource(R.string.delete_friend_dialogue)) },
                             confirmButton = {
                                 Button(onClick = {
                                     // Handle confirmation action here
-                                    showConfirmationDialog = false
+                                    showConfirmationDialogFriend = false
                                 }) {
                                     Text(text = stringResource(R.string.confirm))
                                 }
                             },
                             dismissButton = {
-                                Button(onClick = { showConfirmationDialog = false }) {
+                                Button(onClick = { showConfirmationDialogFriend = false }) {
+                                    Text(text = stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
+                    if (showConfirmationDialogFollowing) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmationDialogFollowing = false },
+                            title = { Text(text = stringResource(R.string.unfollow)) },
+                            text = { Text(text = stringResource(R.string.unfollow_dialogue)) },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Handle confirmation action here
+                                    showConfirmationDialogFollowing = false
+                                }) {
+                                    Text(text = stringResource(R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showConfirmationDialogFollowing = false }) {
+                                    Text(text = stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
+                    if (showConfirmationDialogPending) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmationDialogPending = false },
+                            title = { Text(text = stringResource(R.string.friendrequest_pending)) },
+                            text = { Text(text = stringResource(R.string.remove_request_dialogue)) },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Handle confirmation action here
+                                    showConfirmationDialogPending = false
+                                }) {
+                                    Text(text = stringResource(R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showConfirmationDialogPending = false }) {
                                     Text(text = stringResource(R.string.cancel))
                                 }
                             }

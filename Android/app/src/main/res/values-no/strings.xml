@@ -98,5 +98,11 @@
     <string name="trips_added">Løyper lagt til</string>
     <string name="remove_friend">Fjerne venn?</string>
     <string name="delete_friend_dialogue">Er du sikker på at du vil fjerne denne vennen?</string>
+    <string name="unfollow">Avfølge</string>
+    <string name="unfollow_dialogue">Er du sikker på ar du vil avfølge denne personen?</string>
+    <string name="friendrequest_pending">Venneforespørsel venter</string>
+    <string name="remove_request_dialogue">Vil du fjerne forespørselen?</string>
+    <string name="follow">Følg</string>
+    <string name="add_friend">Legg til</string>
 
 </resources>

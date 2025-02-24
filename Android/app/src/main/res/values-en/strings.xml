@@ -98,5 +98,11 @@
     <string name="trips_added">Trips added</string>
     <string name="remove_friend">Remove friend?</string>
     <string name="delete_friend_dialogue">Are you sure you want to remove this firend?</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="unfollow_dialogue">"Are you sure you want to unfollow this person? "</string>
+    <string name="friendrequest_pending">Friendrequest pending</string>
+    <string name="remove_request_dialogue">Do you want to remove the request?</string>
+    <string name="follow">Follow</string>
+    <string name="add_friend">Add friend</string>
 
 </resources>
