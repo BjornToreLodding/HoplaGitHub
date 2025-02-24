@@ -188,6 +188,31 @@ public class UserController : ControllerBase
             created_at = user.CreatedAt
         });
     }
+    [HttpGet("profile/{userId}")]
+    public async Task<IActionResult> GetUserProfile(
+        Guid userId,
+        [FromQuery] bool changepassword)
+    {
+        
+        var user = await _context.Users.FindAsync(userId);
+
+        if (user == null)
+        {
+            return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
+        }
+
+        return Ok(new
+        {
+            id = user.Id,
+            name = user.Name,
+            profilePictureURL = user.ProfilePictureUrl + "?w=400&h=500&fit=crop",
+            alias = user.Alias,
+            email = user.Email,
+            description = user.Description,
+            dob = user.Dob,
+            created_at = user.CreatedAt
+        });
+    }
     //[Authorize]
     [HttpPost("new")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)

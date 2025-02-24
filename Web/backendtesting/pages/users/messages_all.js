@@ -28,6 +28,7 @@ export async function render(container) {
             const partnerId = isSender ? message.receiverId : message.senderId;
             const partnerName = isSender ? message.receiverName : message.senderName;
             const partnerPicture = isSender ? message.receiverPicture : message.senderPicture;
+            const senderPicture = message.senderPicture; // Nytt: Avsenderens bilde
             const messageContent = message.content;
             const timestamp = new Date(message.timestamp).toLocaleString();
 
@@ -35,7 +36,7 @@ export async function render(container) {
             const listItem = document.createElement("li");
             listItem.classList.add("message-item");
             listItem.innerHTML = `
-                <img src="${partnerPicture || 'default-profile.png'}" class="profile-pic" alt="${partnerName}">
+                <img src="${senderPicture || 'default-profile.png'}" class="profile-pic sender" alt="Avsender">
                 <div class="message-info">
                     <strong>${partnerName}</strong> <small>${timestamp}</small>
                     <p>${messageContent}</p>

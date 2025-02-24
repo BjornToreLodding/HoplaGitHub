@@ -220,8 +220,33 @@ function loadSideMenu(section) {
     });
 }
 
+// Laster innhold i hovedområdet med støtte for params
+async function loadContent(section, page, params = {}) {  // Legg til params her
+    const mainContent = document.getElementById("main-content");
 
+    try {
+        // Last HTML først (hvis den finnes)
+        const htmlResponse = await fetch(`./pages/${section}/${page}.html`);
+        if (htmlResponse.ok) {
+            mainContent.innerHTML = await htmlResponse.text();
+        } else {
+            mainContent.innerHTML = `<h2>Kunne ikke finne ${page}.html</h2>`;
+        }
 
+        // Deretter, last JavaScript-modulen og send params
+        console.log(`📂 Laster inn: /pages/${section}/${page}.js med params:`, params);
+        const module = await import(`./pages/${section}/${page}.js`);
+
+        if (module.render) {
+            module.render(mainContent, params);  // Send params videre til render-funksjonen
+        }
+    } catch (error) {
+        console.error("Feil ved lasting av siden:", error);
+        mainContent.innerHTML = `<h2>Kunne ikke laste inn ${page}.</h2>`;
+    }
+}
+
+/*
 // Laster innhold i hovedområdet
 async function loadContent(section, page) {
     const mainContent = document.getElementById("main-content");
@@ -236,7 +261,11 @@ async function loadContent(section, page) {
         }
 
         // Deretter, last JavaScript-modulen (dersom den finnes)
+        console.log(`📂 Laster inn: /pages/${section}/${page}.js med params:`, params);
         const module = await import(`./pages/${section}/${page}.js`);
+        module.render(document.getElementById("app"), params);
+        
+        //const module = await import(`./pages/${section}/${page}.js`);
         if (module.render) {
             module.render(mainContent); // Kall render-funksjonen i modulen
         }
@@ -246,7 +275,7 @@ async function loadContent(section, page) {
     }
 }
 
-/*
+
 
 function loadContent(section, page) {
     const mainContent = document.getElementById("main-content");
