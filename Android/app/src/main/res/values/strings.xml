@@ -79,5 +79,34 @@
     <string name="verification_explanation">Sjekk mailen din for å verifisere kontoen din</string>
     <string name="confirm_logout">Trykk bekreft for å logge ut</string>
     <string name="search">Søk</string>
+    
+    <string name="gravel">Grus</string>
+    <string name="parking">Parkering</string>
+    <string name="asphalt">Asfalt</string>
+
+    <string name="comment">Kommentar: </string>
+    <string name="publish">Publiser</string>
+    <string name="dateString">Dato</string>
+    <string name="length">Lengde</string>
+    <string name="hourString">Timer</string>
+    <string name="my_horses">Mine hester</string>
+    <string name="add_image">Legg til bilde</string>
+    <string name="name">Navn</string>
+    <string name="breed">Rase</string>
+    <string name="age">Alder</string>
+    <string name="trips_added">Løyper lagt til</string>
+    <string name="remove_friend">Fjerne venn?</string>
+    <string name="delete_friend_dialogue">Er du sikker på at du vil fjerne denne vennen?</string>
+    <string name="unfollow">Avfølge</string>
+    <string name="unfollow_dialogue">Er du sikker på ar du vil avfølge denne personen?</string>
+    <string name="friendrequest_pending">Venneforespørsel venter</string>
+    <string name="remove_request_dialogue">Vil du fjerne forespørselen?</string>
+    <string name="follow">Følg</string>
+    <string name="add_friend">Legg til</string>
+    <string name="change_image">Bytt bilde</string>
+    <string name="add_new_community">Legg til nytt fellesskap</string>
+    <string name="info">Info</string>
+    <string name="close">Lukk</string>
+    <string name="enter_you_message">Skriv meldingen her</string>
 
 </resources>

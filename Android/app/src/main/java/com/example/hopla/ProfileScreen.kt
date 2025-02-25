@@ -36,19 +36,10 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -58,49 +49,50 @@ import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.sharp.AccountBox
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
-
-data class Trip(
-    val name: String,
-    val date: String,
-    val length: String,
-    val time: String
-)
+import android.util.Log
 
 @Composable
-fun ProfileScreen(
-    navController: NavController
-) {
+fun ProfileScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(3.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            IconButton(
-                onClick = { navController.navigate("settings") },
-                modifier = Modifier
-                    .padding(6.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings)
-                )
-            }
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(3.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = { navController.navigate("settings") },
+                    modifier = Modifier.padding(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
+                }
+            }
             ProfilePicture()
             ProfileButtons(navController)
-            UserChanges(modifier = Modifier.weight(1f))
+            UserChanges(modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth())
         }
     }
 }
+
 
 @Composable
 fun SettingsScreen(
@@ -372,252 +364,226 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
     }
 }
 
+// Function to update the profile picture of the user
 @Composable
 fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var permissionGranted by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    // Camera launcher
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        imageBitmap = bitmap
-    }
-
-    // Content picker launcher
-    val contentPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            val inputStream = context.contentResolver.openInputStream(it)
-            imageBitmap = BitmapFactory.decodeStream(inputStream)
-        }
-    }
-
-    // Permission launcher
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        permissionGranted = isGranted
-        if (isGranted) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(null)
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // Check and request for camera permission
-    LaunchedEffect(Unit) {
-        when {
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                permissionGranted = true
-            }
-            else -> {
-                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }
-    }
-
-    // Display the current profile picture (either the captured or default image)
-    if (imageBitmap != null) {
-        Image(
-            bitmap = imageBitmap!!.asImageBitmap(),
-            contentDescription = "Captured Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-        )
-    } else {
-        Image(
-            painter = painterResource(id = imageResource),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-        )
-    }
-
-    // Text to trigger camera action
-    Text(
-        text = stringResource(R.string.change_profile_picture),
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .clickable { showDialog = true },
-        style = TextStyle(textDecoration = TextDecoration.Underline)
+    ImagePicker(
+        onImageSelected = { bitmap -> imageBitmap = bitmap },
+        text = stringResource(R.string.change_profile_picture)
     )
 
-    // Dialog to confirm taking a picture
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = stringResource(R.string.change_profile_picture)) },
-            text = { Text(text = stringResource(R.string.profile_pic_description)) },
-            confirmButton = {
-                Column {
-                    Button(onClick = {
-                        if (permissionGranted) {
-                            cameraLauncher.launch(null)
-                        }
-                        showDialog = false
-                    }) {
-                        Text(text = stringResource(R.string.take_a_picture))
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        contentPickerLauncher.launch("image/*")
-                        showDialog = false
-                    }) {
-                        Text(text = stringResource(R.string.choose_from_library))
-                    }
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
+    // Display the current profile picture (either the selected or default image)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .size(200.dp)
+            .clip(CircleShape)
+            .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .clip(CircleShape)
+                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+        ) {
+            if (imageBitmap != null) {
+                Image(
+                    bitmap = imageBitmap!!.asImageBitmap(),
+                    contentDescription = "Profile Picture",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
-        )
+        }
     }
 }
 
 @Composable
 fun ProfileButtons(navController: NavController) {
-    Row(
+    Column(
         modifier = Modifier
             .padding(top = 8.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Button(
-            onClick = { navController.navigate("my_trips") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(2.dp)
-                .height(50.dp),
-            shape = RectangleShape
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = stringResource(R.string.my_trips), color = PrimaryWhite)
+            Button(
+                onClick = { navController.navigate("my_trips") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.my_trips), color = PrimaryWhite)
+            }
+            Button(
+                onClick = { navController.navigate("my_horses") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.my_horses), color = PrimaryWhite)
+            }
         }
-        Button(
-            onClick = { navController.navigate("friends") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(2.dp)
-                .height(50.dp),
-            shape = RectangleShape
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = stringResource(R.string.friends), color = PrimaryWhite)
-        }
-        Button(
-            onClick = { navController.navigate("following") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(2.dp)
-                .height(50.dp),
-            shape = RectangleShape
-        ) {
-            Text(text = stringResource(R.string.following),color = PrimaryWhite)
+            Button(
+                onClick = { navController.navigate("friends") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.friends), color = PrimaryWhite)
+            }
+            Button(
+                onClick = { navController.navigate("following") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = stringResource(R.string.following), color = PrimaryWhite)
+            }
         }
     }
 }
 
+
+
 @Composable
 fun UserChanges(modifier: Modifier = Modifier) {
-    var email by remember { mutableStateOf("test@gmail.com") }
-    var username by remember { mutableStateOf("test") }
+    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(true) }
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.tertiary)
-    ) {
-        Column {
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
-            Text(text = stringResource(R.string.username))
-            TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = {  },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
-            Text(text = stringResource(R.string.email))
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
-            Text(
-                text = stringResource(R.string.change_password),
-                modifier = Modifier.clickable { showDialog = true },
-                style = TextStyle(textDecoration = TextDecoration.Underline)
-            )
+    // Get username and email from the API
+    LaunchedEffect(Unit) {
+        try {
+            val user = RetrofitInstance.api.getUser()
+            email = user.email
+            username = user.name
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("UserChanges", "Error loading user data", e)
+        } finally {
+            isLoading = false
         }
     }
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = stringResource(R.string.change_password)) },
-            text = {
-                Column {
-                    TextField(
-                        value = currentPassword,
-                        onValueChange = { currentPassword = it },
-                        label = { Text(text = stringResource(R.string.current_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextField(
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        label = { Text(text = stringResource(R.string.new_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        label = { Text(text = stringResource(R.string.confirm_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    // Handle password change logic here
-                    showDialog = false
-                }) {
-                    Text(text = stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
+    if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+        ) {
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+                Text(text = stringResource(R.string.username))
+                TextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = {  },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+                Text(text = stringResource(R.string.email))
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+                Text(
+                    text = stringResource(R.string.change_password),
+                    modifier = Modifier.clickable { showDialog = true },
+                    style = TextStyle(textDecoration = TextDecoration.Underline)
+                )
             }
-        )
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = stringResource(R.string.change_password)) },
+                text = {
+                    Column {
+                        TextField(
+                            value = currentPassword,
+                            onValueChange = { currentPassword = it },
+                            label = { Text(text = stringResource(R.string.current_password)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        TextField(
+                            value = newPassword,
+                            onValueChange = { newPassword = it },
+                            label = { Text(text = stringResource(R.string.new_password)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        TextField(
+                            value = confirmPassword,
+                            onValueChange = { confirmPassword = it },
+                            label = { Text(text = stringResource(R.string.confirm_password)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        // Handle password change logic here
+                        showDialog = false
+                    }) {
+                        Text(text = stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
     }
 }
 
 @Composable
 fun MyTripsScreen(navController: NavController) {
     val trips = listOf(
-        Trip("Trip to the mountains", "2023-10-01", "10 km", "2 hours"),
-        Trip("City walk", "2023-09-15", "5 km", "1 hour"),
-        Trip("Beach run", "2023-08-20", "8 km", "1.5 hours")
+        Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
+        Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
+        Trip("Beach run", "2023-08-20", "8", "1.5", R.drawable.stockimg2),
     )
 
     Column(
@@ -666,6 +632,9 @@ fun MyTripsScreen(navController: NavController) {
 
 @Composable
 fun TripItem(trip: Trip) {
+    var showDialog by remember { mutableStateOf(false) }
+    var showImage by remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -676,46 +645,269 @@ fun TripItem(trip: Trip) {
     ) {
         Column {
             Text(text = trip.name, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Date: ${trip.date}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Length: ${trip.length}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Time: ${trip.time}", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.dateString) + ": ${trip.date}", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.length) + ": ${trip.length} km", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.hourString) + ": ${trip.time} " + stringResource(R.string.hourString), style = MaterialTheme.typography.bodySmall)
+        }
+        IconButton(
+            onClick = {
+                showDialog = true
+                showImage = true // Reset showImage to true when the icon is clicked
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Sharp.AccountBox,
+                contentDescription = stringResource(R.string.liked)
+            )
+        }
+    }
+
+    if (showDialog && showImage) {
+        Dialog(onDismissRequest = {
+            showDialog = false
+            showImage = true // Reset showImage to true when the dialog is dismissed so image can be clicked several times
+        }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box {
+                    Image(
+                        painter = painterResource(id = trip.imageResource),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                    )
+                    IconButton(
+                        onClick = { showImage = false },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.cancel)
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun FriendsScreen(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        Box(
+    var searchQuery by remember { mutableStateOf("") }
+    val people = listOf(
+        Person("Ole", R.drawable.friend1, PersonStatus.FRIEND),
+        Person("Dole", R.drawable.friend2, PersonStatus.FRIEND),
+        Person("Doffen", R.drawable.friend3, PersonStatus.FRIEND),
+        Person("Dolly", R.drawable.friend1, PersonStatus.FRIEND),
+        Person("Langbein", R.drawable.friend2, PersonStatus.FRIEND),
+        Person("Donald", R.drawable.friend3, PersonStatus.FRIEND)
+    )
+    val filteredFriends = people.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .background(MaterialTheme.colorScheme.tertiary)
-                .border(10.dp, MaterialTheme.colorScheme.primary)
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            ScreenHeader(navController, stringResource(R.string.friends))
+
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(filteredFriends) { friend ->
+                    PersonItem(friend, navController)
+                }
+            }
+        }
+        AddButton(onClick = { navController.navigate("addFriendScreen") })
+    }
+}
+
+@Composable
+fun PersonDetailScreen(navController: NavController, person: Person) {
+    var showConfirmationDialogFriend by remember { mutableStateOf(false) }
+    var showConfirmationDialogFollowing by remember { mutableStateOf(false) }
+    var showConfirmationDialogPending by remember { mutableStateOf(false) }
+    val trips = listOf(
+        Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
+        Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
+        Trip("Beach run", "2023-08-20", "8", "1.5", R.drawable.stockimg2)
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.back)
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
+                Image(
+                    painter = painterResource(id = person.imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .border(5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(text = person.name, style = MaterialTheme.typography.headlineLarge)
+                    Text(text = stringResource(R.string.friends) + " : 5", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(R.string.trips_added) + " : 3", style = MaterialTheme.typography.bodySmall)
+                    Text(text = person.status.toString(), style = MaterialTheme.typography.bodySmall)
+                    // If the user is a friend
+                    if (person.status == PersonStatus.FRIEND) {
+                        Text(
+                            text = stringResource(R.string.remove_friend),
+                            modifier = Modifier.clickable {
+                                showConfirmationDialogFriend = true
+                            },
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.Red,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                    // If the user is following that person
+                    if (person.status == PersonStatus.FOLLOWING) {
+                        Text(
+                            text = stringResource(R.string.unfollow),
+                            modifier = Modifier.clickable{
+                                showConfirmationDialogFollowing = true
+                            },
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.Red,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                    // If the user has a pending friend request
+                    if (person.status == PersonStatus.PENDING) {
+                        Text(
+                            text = stringResource(R.string.friendrequest_pending),
+                            modifier = Modifier.clickable {
+                                showConfirmationDialogPending = true
+                            },
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.Red,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                    // If the user has no relation to that user
+                    if (person.status == PersonStatus.NONE) {
+                        Button(onClick = { /* Handle follow logic here */ }) {
+                            Text(text = stringResource(R.string.follow))
+                        }
+                        Button(onClick = { /* Handle follow logic here */ }) {
+                            Text(text = stringResource(R.string.add_friend))
+                        }
+                    }
+                    if (showConfirmationDialogFriend) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmationDialogFriend = false },
+                            title = { Text(text = stringResource(R.string.remove_friend)) },
+                            text = { Text(text = stringResource(R.string.delete_friend_dialogue)) },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Handle confirmation action here
+                                    showConfirmationDialogFriend = false
+                                }) {
+                                    Text(text = stringResource(R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showConfirmationDialogFriend = false }) {
+                                    Text(text = stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
+                    if (showConfirmationDialogFollowing) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmationDialogFollowing = false },
+                            title = { Text(text = stringResource(R.string.unfollow)) },
+                            text = { Text(text = stringResource(R.string.unfollow_dialogue)) },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Handle confirmation action here
+                                    showConfirmationDialogFollowing = false
+                                }) {
+                                    Text(text = stringResource(R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showConfirmationDialogFollowing = false }) {
+                                    Text(text = stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
+                    if (showConfirmationDialogPending) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmationDialogPending = false },
+                            title = { Text(text = stringResource(R.string.friendrequest_pending)) },
+                            text = { Text(text = stringResource(R.string.remove_request_dialogue)) },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Handle confirmation action here
+                                    showConfirmationDialogPending = false
+                                }) {
+                                    Text(text = stringResource(R.string.confirm))
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showConfirmationDialogPending = false }) {
+                                    Text(text = stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
                 }
             }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Text(
-                    text = stringResource(R.string.friends),
-                    fontSize = 24.sp
-                )
+                items(trips) { trip ->
+                    TripItem(trip)
+                }
             }
         }
     }
@@ -723,38 +915,278 @@ fun FriendsScreen(navController: NavController) {
 
 @Composable
 fun FollowingScreen(navController: NavController) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val people = listOf(
+        Person("Rachel", R.drawable.friend1, PersonStatus.FOLLOWING),
+        Person("Monica", R.drawable.friend2, PersonStatus.FOLLOWING),
+        Person("Phoebe", R.drawable.friend3, PersonStatus.FOLLOWING),
+        Person("Chandler", R.drawable.friend1, PersonStatus.FOLLOWING),
+        Person("Joey", R.drawable.friend2, PersonStatus.FOLLOWING),
+        Person("Ross", R.drawable.friend3, PersonStatus.FOLLOWING)
+    )
+
+    val filteredFollowing = people.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            ScreenHeader(navController, stringResource(R.string.following))
+
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(filteredFollowing) { following ->
+                    PersonItem(following, navController)
+                }
+            }
+        }
+        AddButton(onClick = { navController.navigate("addFriendScreen") })
+    }
+}
+
+@Composable
+fun MyHorsesScreen(navController: NavController) {
+    val horses = listOf(
+        Horse("Hest1", R.drawable.horse1, "Dølahest", 5),
+        Horse("Hest2", R.drawable.horse2, "Fjording", 7),
+        Horse("Hest3", R.drawable.horse3, "Araber", 3),
+        Horse("Hest4", R.drawable.horse1, "Frieser", 6),
+        Horse("Hest5", R.drawable.horse2, "Shetlandsponni", 10),
+        Horse("Hest6", R.drawable.horse3, "Islandshest", 8)
+    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column {
+            Box(modifier = Modifier.padding(8.dp)) {
+                ScreenHeader(navController, stringResource(R.string.my_horses))
+            }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(horses) { horse ->
+                    HorseItem(horse, navController)
+                }
+            }
+        }
+        AddButton(onClick = { navController.navigate("addHorseScreen") })
+    }
+}
+
+@Composable
+fun HorseDetailScreen(navController: NavController, horseName: String, horseImageResource: Int, horseBreed: String, horseAge: Int) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = horseName, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Image(
+                painter = painterResource(id = horseImageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Breed: $horseBreed", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Age: $horseAge", style = MaterialTheme.typography.bodySmall)
+        }
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.back)
+            )
+        }
+    }
+}
+
+@Composable
+fun HorseItem(horse: Horse, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable {
+                navController.navigate("horse_detail/${horse.name}/${horse.imageResource}/${horse.breed}/${horse.age}")
+            }
+    ) {
+        Image(
+            painter = painterResource(id = horse.imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = horse.name, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun AddNewType(
+    navController: NavController,
+    type: String,
+    onAdd: (String, Bitmap?, String, Int) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var breedOrFriendType by remember { mutableStateOf("") }
+    var ageOrFriendAge by remember { mutableIntStateOf(0) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val testNonFriends = listOf(
+        Person("Penny", R.drawable.friend1, PersonStatus.NONE),
+        Person("Sheldon", R.drawable.friend2, PersonStatus.NONE),
+        Person("Amy", R.drawable.friend3, PersonStatus.PENDING),
+        Person("Leonard", R.drawable.friend1, PersonStatus.NONE),
+        Person("Howard", R.drawable.friend2, PersonStatus.NONE),
+        Person("Bernadette", R.drawable.friend3, PersonStatus.PENDING)
+    )
+    // Search for adding new friends/followers
+    val filteredPersons = testNonFriends.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .background(MaterialTheme.colorScheme.tertiary)
-                .border(10.dp, MaterialTheme.colorScheme.primary)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
+        // When it is a horse that is supposed to be added
+        when (type) {
+            "Horse" -> {
+                Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(text = stringResource(R.string.name)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextField(
+                            value = breedOrFriendType,
+                            onValueChange = { breedOrFriendType = it },
+                            label = { Text(text = stringResource(R.string.breed)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TextField(
+                            value = ageOrFriendAge.toString(),
+                            onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
+                            label = { Text(text = stringResource(R.string.age)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+                // Add option to remove image if it is added
+                if (imageBitmap != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            bitmap = imageBitmap!!.asImageBitmap(),
+                            contentDescription = "Selected Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(64.dp)
+                        )
+                        IconButton(onClick = { imageBitmap = null }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Remove Image"
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                ImagePicker(
+                    onImageSelected = { bitmap -> imageBitmap = bitmap },
+                    text = stringResource(R.string.add_image)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    onAdd(name, imageBitmap, breedOrFriendType, ageOrFriendAge)
+                    navController.popBackStack()
+                }) {
+                    Text(text = "Add $type")
                 }
             }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.following),
-                    fontSize = 24.sp
-                )
+            // If it is a friend/follow that is supposed to be added
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    SearchBar(
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = { searchQuery = it }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(filteredPersons) { persons ->
+                            PersonItem(persons, navController)
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+fun PersonItem(person: Person, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable { navController.navigate("person_detail/${person.name}/${person.imageResource}/${person.status}") }
+    ) {
+        Image(
+            painter = painterResource(id = person.imageResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
     }
 }

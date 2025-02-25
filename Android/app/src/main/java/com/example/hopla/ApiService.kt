@@ -3,17 +3,17 @@ package com.example.hopla
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Query
 
+// For user data (profile)
 interface ApiService {
-    @GET("users")
-    suspend fun getUser(@Query("id") id: Int): User
+    @GET("users/int/$baseID")
+    suspend fun getUser(): User
 }
 
 object RetrofitInstance {
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://hoplatest.onrender.com/api/")
+            .baseUrl("https://hopla.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -23,3 +23,18 @@ object RetrofitInstance {
     }
 }
 
+fun fetchMessages(messageName: String): List<Message> {
+    // Replace with actual database fetching logic
+    return listOf(
+        Message(
+            id = "1",
+            content = "Welcome to the community!",
+            timestamp = System.currentTimeMillis()
+        ),
+        Message(
+            id = "2",
+            content = "Hello everyone!",
+            timestamp = System.currentTimeMillis()
+        )
+    )
+}

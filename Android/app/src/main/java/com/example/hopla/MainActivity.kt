@@ -39,6 +39,9 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
@@ -84,23 +87,72 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         ) {
                             composable(Screen.Home.route) { HomeScreen() }
-                            composable(Screen.Trails.route) { TrailsScreen() }
+                            composable(Screen.Trails.route) { TrailsScreen(navController) }
                             composable(Screen.NewTrip.route) { NewTripScreen() }
                             composable(Screen.Community.route) { CommunityScreen(navController) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
+                            composable("my_horses") { MyHorsesScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("following") { FollowingScreen(navController) }
                             composable(
                                 "communityDetail/{communityName}",
                                 arguments = listOf(navArgument("communityName") { type = NavType.StringType })
                             ) { backStackEntry ->
-                                val communityName = backStackEntry.arguments?.getString("communityName")
-                                val communityGroup = communityName?.let { getCommunityGroupByName(it) }
-                                communityGroup?.let { CommunityDetailScreen(navController, it) }
+                                val communityName = backStackEntry.arguments?.getString("communityName") ?: ""
+                                val community = getCommunityByName(communityName)
+                                if (community != null) {
+                                    CommunityDetailScreen(navController, community)
+                                } else {
+                                    Text(text = "Community not found")
+                                }
                             }
-                            composable("addCommunityScreen") { AddCommunityScreen(navController) }
+                            composable("addCommunityScreen") {
+                                AddCommunityScreen(navController) { newCommunity ->
+                                    // Handle the addition of the new community here
+                                }
+                            }
+                            composable("addFriendScreen") {
+                                AddNewType(navController, "Friend") { name, imageBitmap, friendType, friendAge ->
+                                    // Handle adding a new friend
+                                }
+                            }
+                            composable("addHorseScreen") {
+                                AddNewType(navController, "Horse") { name, imageResource, breed, age ->
+                                    // Handle adding a new horse
+                                }
+                            }
+                            composable("update_screen") { UpdateScreen(navController) }
+                            composable(
+                                "person_detail/{personName}/{personImageResource}/{personStatus}",
+                                arguments = listOf(
+                                    navArgument("personName") { type = NavType.StringType },
+                                    navArgument("personImageResource") { type = NavType.IntType },
+                                    navArgument("personStatus") { type = NavType.StringType }
+                                )
+                            ) { backStackEntry ->
+                                val personName = backStackEntry.arguments?.getString("personName") ?: ""
+                                val personImageResource = backStackEntry.arguments?.getInt("personImageResource") ?: 0
+                                val personStatus = backStackEntry.arguments?.getString("personStatus") ?: "NONE"
+                                val person = Person(name = personName, imageResource = personImageResource, status = PersonStatus.valueOf(personStatus))
+                                PersonDetailScreen(navController, person)
+                            }
+                            composable(
+                                "horse_detail/{horseName}/{horseImageResource}/{horseBreed}/{horseAge}",
+                                arguments = listOf(
+                                    navArgument("horseName") { type = NavType.StringType },
+                                    navArgument("horseImageResource") { type = NavType.IntType },
+                                    navArgument("horseBreed") { type = NavType.StringType },
+                                    navArgument("horseAge") { type = NavType.IntType }
+                                )
+                            ) { backStackEntry ->
+                                val horseName = backStackEntry.arguments?.getString("horseName") ?: ""
+                                val horseImageResource = backStackEntry.arguments?.getInt("horseImageResource") ?: 0
+                                val horseBreed = backStackEntry.arguments?.getString("horseBreed") ?: ""
+                                val horseAge = backStackEntry.arguments?.getInt("horseAge") ?: 0
+                                HorseDetailScreen(navController, horseName, horseImageResource, horseBreed, horseAge)
+                            }
                         }
                     }
                 } else {
@@ -147,8 +199,6 @@ fun TopBar() {
     )
 }
 
-
-
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
@@ -159,6 +209,10 @@ fun BottomNavigationBar(navController: NavHostController) {
         Screen.Profile
     )
     val context = LocalContext.current
+    // Variables for double pressing to return to start destination og navigation item
+    var lastSelectedItem by remember { mutableStateOf<Screen?>(null) }
+    var lastPressTime by remember { mutableLongStateOf(0L) }
+
     BottomNavigation(
         modifier = Modifier.height(100.dp),
         backgroundColor = MaterialTheme.colorScheme.primary
@@ -178,13 +232,26 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1) },
                 selected = currentRoute == screen.route,
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                    val currentTime = System.currentTimeMillis()
+                    if (lastSelectedItem == screen && currentTime - lastPressTime < 300) {
+                        navController.navigate(screen.route) {
+                            popUpTo(screen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    } else {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
+                    lastSelectedItem = screen
+                    lastPressTime = currentTime
                 }
             )
         }
