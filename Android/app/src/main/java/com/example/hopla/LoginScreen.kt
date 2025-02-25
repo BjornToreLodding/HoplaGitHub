@@ -3,11 +3,27 @@ package com.example.hopla
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -20,6 +36,26 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import android.util.Log
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class LoginRequest(val email: String, val password: String)
+
+@Serializable
+data class ErrorResponse(val message: String)
 
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
@@ -28,6 +64,9 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
     var showForgottenPasswordDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -83,9 +122,45 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
         Button(
             onClick = {
                 if (username.isEmpty() || password.isEmpty()) {
+                    errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
                     showErrorDialog = true
                 } else {
-                    onLogin()
+                    coroutineScope.launch {
+                        val client = HttpClient {
+                            install(ContentNegotiation) {
+                                json(Json {
+                                    ignoreUnknownKeys = true
+                                    isLenient = true
+                                    encodeDefaults = true
+                                })
+                            }
+                        }
+                        try {
+                            val response: HttpResponse = client.post("https://hopla.onrender.com/users/login/") {
+                                contentType(ContentType.Application.Json)
+                                setBody(LoginRequest(email = username, password = password))
+                            }
+                            Log.d("LoginScreen", "Response status: ${response.status}")
+                            if (response.status == HttpStatusCode.OK) {
+                                onLogin()
+                            } else if (response.status == HttpStatusCode.Unauthorized) {
+                                val errorResponse = response.body<ErrorResponse>()
+                                errorMessage = errorResponse.message
+                                showErrorDialog = true
+                                Log.d("LoginScreen", "Unauthorized: ${errorResponse.message}")
+                            } else {
+                                errorMessage = context.getString(R.string.not_available_right_now)
+                                showErrorDialog = true
+                                Log.d("LoginScreen", "Unexpected status: ${response.status}")
+                            }
+                        } catch (e: Exception) {
+                            errorMessage = context.getString(R.string.not_available_right_now)
+                            showErrorDialog = true
+                            Log.e("LoginScreen", "Exception: ${e.message}", e)
+                        } finally {
+                            client.close()
+                        }
+                    }
                 }
             },
             modifier = Modifier
@@ -94,6 +169,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
         ) {
             Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
         }
+
         Text(
             text = stringResource(R.string.create_user),
             color = MaterialTheme.colorScheme.primary,
@@ -115,12 +191,12 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     }
 
     if (showErrorDialog) {
-        ErrorDialog(onDismiss = { showErrorDialog = false })
+        ErrorDialog(errorMessage = errorMessage, onDismiss = { showErrorDialog = false })
     }
 }
 
 @Composable
-fun ErrorDialog(onDismiss: () -> Unit) {
+fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -139,7 +215,7 @@ fun ErrorDialog(onDismiss: () -> Unit) {
                     ),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Text(text = stringResource(R.string.input_fields_cannot_be_empty))
+                Text(text = errorMessage)
                 Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
                     Text(text = stringResource(R.string.ok))
                 }
@@ -147,7 +223,6 @@ fun ErrorDialog(onDismiss: () -> Unit) {
         }
     }
 }
-
 
 @Composable
 fun ForgottenPasswordDialog(onDismiss: () -> Unit) {

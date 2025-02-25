@@ -112,5 +112,6 @@
     <string name="error">Feil</string>
     <string name="input_fields_cannot_be_empty">Ingen av feltene kan være tomme</string>
     <string name="ok">Ok</string>
+    <string name="not_available_right_now">Ikke tilgjengelig for øyeblikket</string>
 
 </resources>

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("plugin.serialization") version "1.8.0"
 }
 
 android {
@@ -83,4 +84,11 @@ dependencies {
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-maps:18.0.2")
     implementation("com.google.maps.android:maps-compose:2.0.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation ("io.ktor:ktor-client-core:2.1.0")
+    implementation ("io.ktor:ktor-client-cio:2.1.0")
+    implementation ("io.ktor:ktor-client-serialization:2.1.0")
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 }
