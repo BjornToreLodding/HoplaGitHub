@@ -78,7 +78,6 @@ struct Home: View {
         .frame(height: 60)
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
     }
-
 }
 
 

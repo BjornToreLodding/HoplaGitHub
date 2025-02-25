@@ -9,8 +9,17 @@ import SwiftUI
 
 struct Login: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    @State private var username: String = "" // Username
-    @State private var password: String = "" // Password
+    
+    @State private var isShowingForgottenPassword = false // True when clicking on text
+    @State private var isShowingSignUp = false // Sheet for creating a new user
+    @State private var password: String = "" // Already a user: Password
+    @State private var email: String = "" // Already a user: Email
+    @State private var username: String = "" // Creating a username
+    @State private var newPassword: String = "" // When creating a new user
+    @State private var confirmNewPassword: String = "" // When creating a new user
+    @State private var newEmail: String = "" // // When creating a new user
+    @State private var passwordMismatchWarning: String? = nil // Check if password is the same
+    
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
     
     var body: some View {
@@ -31,12 +40,14 @@ struct Login: View {
                     
                     Spacer()
                     
+                    // MARK: - Text fields
+                    
                     // Username Label & TextField
-                    Text("Username")
+                    Text("Email")
                         .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                         .padding(.top, 50)
                     
-                    TextField("Enter your username", text: $username)
+                    TextField("Enter your email", text: $email)
                         .padding()
                         .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                         .cornerRadius(8)
@@ -55,6 +66,50 @@ struct Login: View {
                         .frame(width: 300)
                         .multilineTextAlignment(.center)
                     
+                    
+                    // MARK: - Forgotten password
+                    VStack {
+                        Text("Forgotten password?")
+                            .frame(width: 360, height: 30)
+                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .underline(true)
+                            .padding(.top, 10)
+                            .onTapGesture { // When clicking on change password
+                                resetEmail() // Reset email when opening
+                                isShowingForgottenPassword = true // Show sheet
+                            }
+                    }
+                    .sheet(isPresented: $isShowingForgottenPassword, onDismiss: {
+                        resetEmail() // Reset fields when closing
+                    }) {
+                        VStack(spacing: 20) {
+                            Text("Enter your email address to reset your password:")
+                                .font(.headline)
+                            
+                            TextField("Enter email:", text: $email)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+                            
+                            Button("Send") {
+                                resetEmail()
+                                isShowingForgottenPassword = false
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                            
+                            Button("Cancel") {
+                                isShowingForgottenPassword = false
+                            }
+                            .padding()
+                        }
+                        .padding()
+                    }
+                    
+                    
+                    // MARK: - Login
+                    
                     Button(action: {
                         // Simulating login, replace with actual authentication logic
                         isLoggedIn = true
@@ -72,17 +127,101 @@ struct Login: View {
                     
                     Spacer()
                     
-                    // Sign Up Link
+                    // MARK: - Sign up
+                    
                     VStack {
                         Text("Not a member? Sign up")
-                            .underline()
+                            .frame(width: 360, height: 30)
                             .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
-                            .padding(.top, 20)
+                            .underline(true)
+                            .padding(.top, 10)
+                            .onTapGesture {
+                                resetEmail()
+                                isShowingSignUp = true
+                            }
+                    }
+                    .sheet(isPresented: $isShowingSignUp, onDismiss: {
+                        resetTextFields()
+                    }) {
+                        VStack(spacing: 20) {
+                            Text("Enter your email address")
+                                .font(.headline)
+
+                            TextField("Enter email address", text: $newEmail)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+
+                            Text("Enter a password")
+                                .font(.headline)
+
+                            SecureField("Password", text: $newPassword)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+
+                            Text("Confirm password")
+                                .font(.headline)
+
+                            SecureField("Confirm password", text: $confirmNewPassword)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+
+                            // Show warning if passwords do not match
+                            if let warning = passwordMismatchWarning {
+                                Text(warning)
+                                    .foregroundColor(.red)
+                                    .font(.caption)
+                            }
+
+                            Text("Enter username")
+                                .font(.headline)
+
+                            TextField("Username", text: $username)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+
+                            Button(action: {
+                                if newPassword == confirmNewPassword {
+                                    password = newPassword
+                                    isLoggedIn = true
+                                    passwordMismatchWarning = nil // Clear warning if passwords match
+                                } else {
+                                    passwordMismatchWarning = "Passwords do not match!"
+                                }
+                            }) {
+                                Text("Join now")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200, height: 50)
+                                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                                    .cornerRadius(8)
+                            }
+
+                            Button("Cancel") {
+                                isShowingSignUp = false
+                            }
+                            .padding()
+                        }
+                        .padding()
                     }
                 }
             }
             .navigationBarHidden(true) // Hide navigation bar on the login screen
         }
+    }
+    
+    
+    // MARK: - Functions Sheets
+    
+    // Resets email
+    private func resetEmail() {
+        email = ""
+    }
+    
+    // Resets all fields sign up
+    private func resetTextFields() {
+        username = ""
+        newEmail = ""
+        newPassword = ""
     }
 }
 

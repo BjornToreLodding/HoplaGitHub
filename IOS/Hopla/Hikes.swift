@@ -7,80 +7,162 @@
 
 import SwiftUI
 
-struct Hikes: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    // Track selected filter
-    @State private var selectedFilter: String = "location"
+// MARK: - Hike Model
+struct Hike: Identifiable {
+    let id = UUID()
+    let name: String
+    let filter: String
+    let rating: Int
+    var isFavorite: Bool
+    let imageName: String
+}
 
-    let hikes = [
-        Hike(name: "Gjøvikrunden", imageName: "Gjøvik.jpg"),
-        Hike(name: "Preikestolen", imageName: "Preikestolen.jpg"),
-        Hike(name: "Vågan", imageName: "Gjøvik.jpg"),
-        Hike(name: "Bobby", imageName: "Preikestolen.jpg"),
-        Hike(name: "Våganes", imageName: "Gjøvik.jpg"),
-        Hike(name: "Bob", imageName: "Preikestolen.jpg")
+// MARK: - Filter Options
+enum FilterOption: String, CaseIterable, Identifiable {
+    case map
+    case location
+    case heart
+    case star
+    case arrow
+    
+    var id: String { self.rawValue }
+    
+    var systemImage: String {
+        switch self {
+        case .map: return "map"
+        case .location: return "location"
+        case .heart: return "heart"
+        case .star: return "star"
+        case .arrow: return "chevron.down"
+        }
+    }
+}
+
+// MARK: - Main View
+struct Hikes: View {
+    @Environment(\.colorScheme) var colorScheme
+    @State private var selectedFilter: String = "location"
+    
+    @State private var hikes: [Hike] = [
+        Hike(name: "Boredalstien", filter: "Asfalt, Grus, Parkering", rating: 2, isFavorite: false, imageName: "HorseImage"),
+        Hike(name: "Boredalstien", filter: "Asfalt, Grus, Parkering", rating: 4, isFavorite: false, imageName: "HorseImage2"),
+        Hike(name: "Boredalstien", filter: "Asfalt, Grus, Parkering", rating: 5, isFavorite: true, imageName: "HorseImage3"),
+        Hike(name: "Boredalstien", filter: "Asfalt, Grus, Parkering", rating: 3, isFavorite: false, imageName: "HorseImage")
     ]
     
-    // To select a filter
-    enum FilterOption: String, CaseIterable, Identifiable {
-            case map
-            case location
-            case heart
-            case star
-            case arrow
-
-            var id: String { self.rawValue }
-
-            var systemImage: String {
-                switch self {
-                case .map: return "map"
-                case .location: return "location"
-                case .heart: return "heart"
-                case .star: return "star"
-                case .arrow: return "chevron.down"
-                }
-            }
-        }
-    
-
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) { // Ensure no extra spacing
-                filterBar
-                ScrollView {
-                    Rectangle()
-                        .fill(AdaptiveColor(light: .white, dark: .mainDarkBackground).color(for: colorScheme))
-                        .frame(width: 300, height: 80)
+        VStack {
+            // Top Filter Bar
+            filterBar
+            
+            // Scrollable Hike List
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach($hikes) { $hike in
+                        HikeCard(hike: $hike)
+                    }
+                    .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                 }
+                .padding(.horizontal)
             }
-            .navigationTitle("Hikes")
         }
-
+        .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
     }
-    // MARK: - Filter Bar Below Logo
+    
+    // MARK: - Filter Bar
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
-                Image(systemName: "map").tag("map")
-                Image(systemName: "location").tag("location")
-                Image(systemName: "heart").tag("heart")
-                Image(systemName: "star").tag("star")
-                Image(systemName: "chevron.down").tag("chevron.down")
+                ForEach(FilterOption.allCases) { option in
+                    Image(systemName: option.systemImage).tag(option.rawValue)
+                }
             }
+            .pickerStyle(SegmentedPickerStyle())
             .padding(.top, 30)
-            .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
         }
         .frame(height: 60)
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
 }
 
-#Preview("English") {
-    ContentView()
+// MARK: - Hike Card
+struct HikeCard: View {
+    @Binding var hike: Hike
+    
+    var body: some View {
+        VStack {
+            ZStack(alignment: .topLeading) {
+                // Image
+                Image(hike.imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 150)
+                    .clipped()
+                
+                // Black overlay
+                    Color.black.opacity(0.4)
+                        .frame(height: 150)
+                        .frame(maxWidth: .infinity)
+                
+                // Heart Button (top right)
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        hike.isFavorite.toggle()
+                    }) {
+                        Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
+                            .foregroundColor(hike.isFavorite ? .red : .white)
+                            .padding()
+                    }
+                }
+                
+                // Hike Name (bottom left)
+                VStack {
+                    Spacer()
+                    HStack {
+                        Text(hike.name)
+                            .foregroundStyle(.white)
+                        Spacer()
+
+                    }
+                }
+                
+                // Star Rating (bottom right)
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        StarRating(rating: hike.rating)
+                            .padding(.top, 40) // Padding applied outside the background
+                            .foregroundStyle(.yellow)
+                    }
+                }
+            }
+            
+            // Filters
+            Text(hike.filter)
+                .font(.subheadline)
+                .frame(height: 20)
+                .foregroundStyle(.black)
+                .frame(maxWidth: .infinity, alignment: .leading) // Aligns text to the left
+                .padding(.bottom, 10)
+        }
+        .clipShape(Rectangle())
+        .shadow(radius: 3)
+    }
+
 }
 
-#Preview("Norsk") {
-    ContentView()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
+// MARK: - Star Rating View
+struct StarRating: View {
+    let rating: Int
+    
+    var body: some View {
+        HStack {
+            ForEach(1...5, id: \.self) { index in
+                Image(systemName: index <= rating ? "star.fill" : "star")
+                    .foregroundColor(.yellow)
+            }
+        }
+    }
 }
-

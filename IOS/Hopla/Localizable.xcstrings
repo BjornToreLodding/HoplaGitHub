@@ -108,6 +108,9 @@
         }
       }
     },
+    "Confirm password" : {
+
+    },
     "Continue" : {
       "localizations" : {
         "nb" : {
@@ -158,6 +161,9 @@
         }
       }
     },
+    "Email" : {
+
+    },
     "English" : {
       "localizations" : {
         "nb" : {
@@ -167,6 +173,15 @@
           }
         }
       }
+    },
+    "Enter a password" : {
+
+    },
+    "Enter email address" : {
+
+    },
+    "Enter email:" : {
+
     },
     "Enter new password" : {
       "localizations" : {
@@ -198,6 +213,18 @@
         }
       }
     },
+    "Enter username" : {
+
+    },
+    "Enter your email" : {
+
+    },
+    "Enter your email address" : {
+
+    },
+    "Enter your email address to reset your password:" : {
+
+    },
     "Enter your password" : {
       "localizations" : {
         "nb" : {
@@ -209,6 +236,7 @@
       }
     },
     "Enter your username" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -237,6 +265,9 @@
           }
         }
       }
+    },
+    "Forgotten password?" : {
+
     },
     "Friends" : {
       "localizations" : {
@@ -271,6 +302,9 @@
           }
         }
       }
+    },
+    "Join now" : {
+
     },
     "Log In" : {
       "localizations" : {
@@ -387,6 +421,9 @@
       }
     },
     "Search bar" : {
+
+    },
+    "Send" : {
 
     },
     "Send a Report" : {

@@ -1,11 +1,5 @@
 import SwiftUI
 
-// Struct with hikes
-struct Hike: Identifiable {
-    let id = UUID() // ID
-    let name: String // Name of hike
-    let imageName: String // Image name
-}
 
 struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
