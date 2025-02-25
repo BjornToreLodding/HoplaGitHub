@@ -58,6 +58,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 import android.util.Log
 
+// Main profile function
 @Composable
 fun ProfileScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
