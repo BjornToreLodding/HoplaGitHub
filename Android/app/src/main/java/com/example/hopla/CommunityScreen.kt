@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.border
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 
 // Composable function to display the community screen
 @Composable
@@ -69,7 +71,7 @@ fun CommunityScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            TopTextCommunity { showLikedOnly = it }
+            TopTextCommunity(currentPage = if (showLikedOnly) "liked" else "position") { showLikedOnly = it }
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
@@ -145,7 +147,7 @@ fun CommunityCard(community: Community, navController: NavController, likedCommu
 
 // Top text for filtering the groups based on position and liked status
 @Composable
-fun TopTextCommunity(onShowLikedOnlyChange: (Boolean) -> Unit) {
+fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Unit) {
     // Column for the top text
     Column(
         modifier = Modifier
@@ -162,24 +164,28 @@ fun TopTextCommunity(onShowLikedOnlyChange: (Boolean) -> Unit) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .clickable { onShowLikedOnlyChange(false) },
+                    .clickable { onShowLikedOnlyChange(false) }
+                    .background(if (currentPage == "position") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = stringResource(R.string.position),
-                    fontSize = 10.sp
+                    fontSize = 10.sp,
+                    color = if (currentPage == "position") MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
                 )
             }
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .clickable { onShowLikedOnlyChange(true) },
+                    .clickable { onShowLikedOnlyChange(true) }
+                    .background(if (currentPage == "liked") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = stringResource(R.string.liked),
-                    fontSize = 10.sp
+                    fontSize = 10.sp,
+                    color = if (currentPage == "liked") MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -271,17 +277,17 @@ fun getCommunityByName(name: String): Community? {
         Community(
             name = "Horse community",
             imageResource = R.drawable.stockimg1,
-            description = "A modern stable with excellent facilities."
+            description = "A community for horse lovers ONLY"
         ),
         Community(
             name = "Ponny community",
             imageResource = R.drawable.stockimg2,
-            description = "SANDNES OG JÆREN RIDEKLUBB"
+            description = "A community for ponny lovers ONLY"
         ),
         Community(
             name = "Donkey community",
             imageResource = R.drawable.stockimg1,
-            description = "BÆRUM RIDEKLUBB"
+            description = "A community for donkey lovers ONLY"
         )
     )
     return communities.find { it.name == name }

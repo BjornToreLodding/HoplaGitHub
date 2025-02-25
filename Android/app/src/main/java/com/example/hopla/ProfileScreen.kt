@@ -370,11 +370,6 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
 fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    ImagePicker(
-        onImageSelected = { bitmap -> imageBitmap = bitmap },
-        text = stringResource(R.string.change_profile_picture)
-    )
-
     // Display the current profile picture (either the selected or default image)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -406,6 +401,10 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
             }
         }
     }
+    ImagePicker(
+        onImageSelected = { bitmap -> imageBitmap = bitmap },
+        text = stringResource(R.string.change_profile_picture)
+    )
 }
 
 @Composable
