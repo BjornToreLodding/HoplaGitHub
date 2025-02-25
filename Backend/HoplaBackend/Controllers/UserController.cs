@@ -55,7 +55,7 @@ public class UserController : ControllerBase
         //skulle vært name ikke navn, men må rette opp i js for loging osv..
         name = user.Name,
         alias = user.Alias,
-        profilePictureURL = user.ProfilePictureUrl + "?w=50&h=50&fit=crop"
+        profilePictureURL = user.ProfilePictureUrl + "?w=200&h=200&fit=crop"
     });
     }
     [HttpPost("login/test")]
@@ -167,6 +167,7 @@ public class UserController : ControllerBase
     
         return await GetUser(newGuid, false);
     }
+    [HttpGet("home")]
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetUser(
         Guid userId,
