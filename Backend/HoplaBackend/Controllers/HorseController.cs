@@ -47,7 +47,7 @@ namespace HoplaBackend.Controllers
             {
                 h.Id,
                 h.Name,
-                ProfilePictureUrl = !string.IsNullOrEmpty(h.HorsePictureUrl) 
+                horsePictureUrl = !string.IsNullOrEmpty(h.HorsePictureUrl) 
                     ? $"{h.HorsePictureUrl}?h=64&w=64&fit=crop"
                     : ""
             })
@@ -87,7 +87,7 @@ namespace HoplaBackend.Controllers
             {
                 //id = horse.Id,
                 name = horse.Name,
-                ProfilePictureUrl = !string.IsNullOrEmpty(horse.HorsePictureUrl) 
+                horsePictureUrl = !string.IsNullOrEmpty(horse.HorsePictureUrl) 
                     ? $"{horse.HorsePictureUrl}?h=200&w=200&fit=crop"
                     : "",
                 breed = horse.Breed,
