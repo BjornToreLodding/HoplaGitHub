@@ -109,7 +109,7 @@ public class UserController : ControllerBase
         return Ok(new { message = "Bruker registrert!" });
     }
 
-    //Admin funksjon eller bygges om til søkefunksjon
+    //Admin funksjon eller bygges om evt utvides til søkefunksjon
     //[Authorize]
     [HttpGet("all")]
     public async Task<IActionResult> GetUsers()
@@ -135,6 +135,7 @@ public class UserController : ControllerBase
                     : "",
                 u.Alias
             })
+            .OrderBy(u => u.Id) // Sorterer etter Guid
             .ToListAsync();
 
         if (!users.Any())
