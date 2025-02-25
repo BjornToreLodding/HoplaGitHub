@@ -27,6 +27,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var password by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var showForgottenPasswordDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -80,7 +81,13 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
         )
 
         Button(
-            onClick = onLogin,
+            onClick = {
+                if (username.isEmpty() || password.isEmpty()) {
+                    showErrorDialog = true
+                } else {
+                    onLogin()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -105,6 +112,39 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
 
     if (showForgottenPasswordDialog) {
         ForgottenPasswordDialog(onDismiss = { showForgottenPasswordDialog = false })
+    }
+
+    if (showErrorDialog) {
+        ErrorDialog(onDismiss = { showErrorDialog = false })
+    }
+}
+
+@Composable
+fun ErrorDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.error),
+                    style = TextStyle(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(text = stringResource(R.string.input_fields_cannot_be_empty))
+                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
+                    Text(text = stringResource(R.string.ok))
+                }
+            }
+        }
     }
 }
 
