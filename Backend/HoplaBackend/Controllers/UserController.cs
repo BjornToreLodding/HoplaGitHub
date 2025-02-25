@@ -52,6 +52,7 @@ public class UserController : ControllerBase
     { 
         token,
         userId = user.Id,
+        email = user.Email,
         //skulle vært name ikke navn, men må rette opp i js for loging osv..
         name = user.Name,
         alias = user.Alias,
@@ -167,7 +168,48 @@ public class UserController : ControllerBase
     
         return await GetUser(newGuid, false);
     }
-    [HttpGet("home")]
+    [Authorize]
+    [HttpGet("myprofile")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var user = await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => new 
+            {
+                u.Alias,
+                u.Name,
+                u.Email,
+                //u.ProfilePictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
+                ProfilePictureUrl = !string.IsNullOrEmpty(u.ProfilePictureUrl) 
+                    ? $"{u.ProfilePictureUrl}?h=200&w=200&fit=crop"
+                    : ""
+            })
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+        }
+
+        return Ok(user);
+    }
+
+
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetUser(
         Guid userId,
