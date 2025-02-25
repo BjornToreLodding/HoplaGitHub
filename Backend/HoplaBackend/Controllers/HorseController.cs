@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
 using HoplaBackend.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace HoplaBackend.Controllers
 {
@@ -18,6 +20,46 @@ namespace HoplaBackend.Controllers
         {
             _context = context;
         }
+    
+    [Authorize]
+    [HttpGet("userhorses")]
+    public async Task<IActionResult> GetUserHorses()
+    {
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        // Hent brukerens hester
+        var horses = await _context.Horses
+            .Where(h => h.User.Id == userId) // Sammenligner riktig Guid
+            .Select(h => new 
+            {
+                h.Id,
+                h.Name,
+                ProfilePictureUrl = !string.IsNullOrEmpty(h.HorsePictureUrl) 
+                    ? $"{h.HorsePictureUrl}?h=64&w=64&fit=crop"
+                    : ""
+            })
+            .ToListAsync(); // Krever Microsoft.EntityFrameworkCore
+
+        if (horses == null || !horses.Any())
+        {
+            return NotFound(new { message = "Ingen hester funnet" });
+        }
+
+        return Ok(horses);
+    }
 
         [HttpGet("int/{horseId}")] 
         public async Task<IActionResult> GetIntHorse(int horseId)
@@ -43,10 +85,18 @@ namespace HoplaBackend.Controllers
 
             return Ok(new
             {
-                id = horse.Id,
+                //id = horse.Id,
                 name = horse.Name,
-                userId = horse.UserId,
-                userName = horse.User.Name // Henter brukerens navn
+                ProfilePictureUrl = !string.IsNullOrEmpty(horse.HorsePictureUrl) 
+                    ? $"{horse.HorsePictureUrl}?h=200&w=200&fit=crop"
+                    : "",
+                breed = horse.Breed,
+                dob = horse.Dob,
+                age = horse.Dob.HasValue 
+                    ? DateTime.UtcNow.Year - horse.Dob.Value.Year - 
+                        (DateTime.UtcNow.DayOfYear < horse.Dob.Value.DayOfYear ? 1 : 0) 
+                    : (int?)null, // Setter alder til null hvis fødselsdato mangler
+                
             });
         }
     }

@@ -19,6 +19,7 @@ public partial class Horse
     public required User User { get; set; }  // Navigasjonsegenskap
 
     public string? Breed { get; set; }
+    public string? HorsePictureUrl { get; set; }
 
     public DateTime? Dob { get; set; }
 
