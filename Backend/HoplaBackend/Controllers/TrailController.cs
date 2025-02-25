@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
 using System.IO;
-using HoplaBackend;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using HoplaBackend.Helpers;
 
 namespace HoplaBackend.Controllers;
 
@@ -22,7 +22,7 @@ public class TrailController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("closest")]
+    [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 
         [FromQuery] double longitude,
@@ -117,7 +117,7 @@ public class TrailController : ControllerBase
         return Ok(sortedTrails);
     }
 
-    [HttpGet("list")]
+    [HttpGet("map")]
     public async Task<IActionResult> CreateTrailsList(
         [FromQuery] double latitude, 
         [FromQuery] double longitude,

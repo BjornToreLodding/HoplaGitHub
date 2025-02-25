@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
+using HoplaBackend.Helpers;
 
 namespace HoplaBackend.Controllers
 {
@@ -18,6 +19,15 @@ namespace HoplaBackend.Controllers
             _context = context;
         }
 
+        [HttpGet("int/{horseId}")] 
+        public async Task<IActionResult> GetIntHorse(int horseId)
+        {
+            //var endpointName = ControllerContext.ActionDescriptor.ActionName;
+            var controllerName = ControllerContext.ActionDescriptor.ControllerName;
+            Guid newGuid = CustomConvert.IntToGuid(controllerName, horseId);
+        
+            return await GetHorse(newGuid);
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetHorse(Guid id)
         {

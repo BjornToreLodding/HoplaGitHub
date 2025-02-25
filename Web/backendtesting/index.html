@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hopla Endpointtestside</title>
+
+    <link rel="stylesheet" href="/styles/messages.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Toppmeny -->
+    <nav id="top-menu">
+        <ul>
+            <li><a href="#" onclick="loadSideMenu('admin')">Admin</a></li>
+            <li><a href="#" onclick="loadSideMenu('testing')">Testing</a></li> 
+            <li><a href="#" onclick="loadSideMenu('users')">Users</a></li>
+            <li><a href="#" onclick="loadSideMenu('stables')">Stables</a></li>
+            <li><a href="#" onclick="loadSideMenu('turer')">Turer</a></li>
+            
+            <!-- Login-knapp (vises kun hvis bruker ikke er logget inn) -->
+            <!-- <li><button id="login-button" onclick="goToLogin()">Logg inn</button></li> -->
+    
+            <!-- Brukerinfo (vises når brukeren er logget inn) -->
+            <li id="user-info" class="hidden">
+                <img id="user-avatar" src="" alt="Profilbilde" class="profile-pic hidden">
+                <span id="user-text"></span>
+                <button id="logout-button" onclick="logout()" class="hidden">Logg ut</button>
+            </li>
+        </ul>
+    </nav>
+    
+
+    <div class="container">
+        <!-- Sidemeny -->
+        <aside id="side-menu">
+            <ul id="side-menu-list"></ul>
+        </aside>
+
+        <!-- Hovedinnhold -->
+        <main id="main-content">
+            <h2>Velkommen!</h2>
+            <p>Velg et menyvalg for å begynne.</p>
+        </main>
+    </div>
+
+    <script src="index.js"></script> <!-- Sørg for at index.js lastes ETTER Leaflet -->
+</body>
+</html>

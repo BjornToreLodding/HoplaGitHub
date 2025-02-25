@@ -20,6 +20,16 @@ public class RideController : ControllerBase
     {
         _context = context;
     }
+    [HttpGet("int/{userId}")] 
+    public async Task<IActionResult> GetIntHorse(int userId)
+    {
+        //var endpointName = ControllerContext.ActionDescriptor.ActionName;
+        var controllerName = ControllerContext.ActionDescriptor.ControllerName;
+        Guid newGuid = CustomConvert.IntToGuid(controllerName, userId);
+    
+        return await GetUserRides(newGuid);
+    }
+
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetUserRides(Guid userId)
     {

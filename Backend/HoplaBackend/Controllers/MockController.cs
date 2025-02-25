@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using HoplaBackend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
+using HoplaBackend.Helpers;
 
 namespace HoplaBackend.Models;
 
@@ -21,7 +21,7 @@ public class MockController : ControllerBase
         _context = context;
     }
 
-    [HttpPost("cleardatabase")]
+    [HttpPost("databasecontentclear")]
     public async Task<IActionResult> ClearDatabase()
     {
         _context.Users.RemoveRange(_context.Users);
@@ -37,6 +37,7 @@ public class MockController : ControllerBase
         _context.Trails.RemoveRange(_context.Trails);
         //_context.TrailReviews.RemoveRange(_context.TrailReviews);
         //_context.TrailFilters(_context.TrailFilters);
+        _context.SystemSettings.RemoveRange(_context.SystemSettings); 
 
 
 
@@ -54,21 +55,34 @@ public class MockController : ControllerBase
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
 
         // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Trenger ikke denne lenger da den er bygget om fra int til Guid
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"UserRelations_Id_seq\" RESTART WITH 1");
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Messages_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableMessages_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableUsers_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableMessages_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableUsers_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Denne skulle sikkert hete noe annet?
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
 
         return Ok("Database cleared and IDs reset.");    
         }
+
+    // Fyller opp tabellen systemSettings med systemSettingsMock.cs
+    [HttpPost("createsystemsettings")]
+    public async Task<IActionResult> CreateSystemSettings()
+    {
+        if (_context.SystemSettings.Any()) { return NoContent(); }
+        var systemSettings = SystemSettingMock.SetDefaultSettingsMock();
+        _context.SystemSettings.AddRange(systemSettings);
+        await _context.SaveChangesAsync();
+        return Created("", new { message = "SystemSettings created "});
+    }
 
     [HttpPost("createusers")]
     public async Task<IActionResult> CreateUsers() //rød strek under Task<IActionResult>
@@ -229,7 +243,7 @@ public class MockController : ControllerBase
     }
 
 
-    [HttpPost("createcontent")]
+    [HttpPost("databasecontentcreate")]
     public async Task<IActionResult> CreateDbContent()
     {
         //await ClearDatabase();
@@ -248,6 +262,7 @@ public class MockController : ControllerBase
         //await CreateTrailDetails();
         //await CreateTrailReviews();
         //await CreateTrailFilters;
+        await CreateSystemSettings();
 
         //return Created();
         return Created("", new { message = "opprettet!"});

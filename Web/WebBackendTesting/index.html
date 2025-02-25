@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div id="topbar"></div>
+        <script>
+            async function loadTopbar() {
+            const response = await fetch('top.html');
+            const html = await response.text();
+            document.getElementById('topbar').innerHTML = html;
+            }
+        loadTopbar();
+    </script>
+
+    <div class="container">
+        <div class="sidebar" id="sidebar"></div>
+        <div class="content" id="content"></div>
+    </div>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>

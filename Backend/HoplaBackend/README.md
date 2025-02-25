@@ -2,25 +2,43 @@
 
 
 
+
 # API Endpoints
 
 ## Oversikt over APIets Endpoints og hvordan man bruker det.
 
-- Hva man kan sende med av path, parametere, body
-- Hva det returnerer
+- Tilgjengelige paths, query, parametere og body ??
+- Syntaks
+- JSON-response
 - Eksempel med curl
-- Hvilke feilkoder de kan returnere
+- Hvilke statuskoder som kan returnere
 
 ---
 
-## Endpoints Oversikt
+## Endpoints Oversikt ()
 
 | 🔄 | Metode | Endpoint | Beskrivelse/Parameters |
 |------|--------|-------------------------------|-------------|
-| ✅ | GET | [`/div/helloworld`](#get-divhelloworld) | Sjekke om APIet svarer |
-| ✅ | GET | [`/div/status`](#get-divstatus) | - oppetid, requestcount + errorcount. |
-| ❌ | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
-| ✅ | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker |
+| ✅ | GET | [`/div/helloworld`](#get-divhelloworld) | Sjekker om APIet svarer |
+| ✅ | GET | [`/div/status`](#get-divstatus) | sjekker oppetid, requestcount + errorcount. |
+| ✅ | GET | [`/div/database`](#get-divdatabase) | Sjekker om det forbindelse mellom database og backend |
+| ⚠️ | GET | [`/div/logging`](#get-divlogging) | Her kan man aktivere og deaktivere logging til logtail enklet så man slipper omstart (Burde muligens være POST/PUT for mest mulig RESTful?) |
+| ✅ | GET | [`/admin/settings/all`](#get-adminsettingsall) | Alle Innstillinger og deres verdier |
+| ✅ | GET | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | Vise verdien på en innstilling |
+| ✅ | PUT | [`/admin/settings/{keyName}`](#put-adminsettingskeyname) | Endre en innstilling |
+| ✅ | POST | [`/users/register`](#post-usersregister) | Registrer ny bruker brukere |
+| ✅ | POST | [`/users/login`](#post-userslogin) | returnerer aut-token |
+| ✅ | POST | [`/users/login/test`](#post-userslogintest) | logger inn uten passord (kun for enklere testing) returnerer aut-token  |
+| ✅ | POST | [`/users/aut/changepassword`](#post-usersautchangepassword) |  |
+| ✅ | POST | [`/users/aut/int/{userId}`](#post-usersautintuserid) | for enkel testing om det fungerer med  |
+| ✅ | POST | [`/users/changepassword`](#post-userschangepassword) | authorize etablert, må sende med token. |
+| ❌ | POST | [`/users/forgotpassword`](#post-forgotpassword) | Regner med denne skal sende epost med mulighet for nullstilling av passord |
+| ❌ | POST | [`/users/resetpassword`](#post-resetpassword) | Da kommer man til denne for å sette nytt passord |
+| ❌ | GET | [`/users/settings`](#get-userssettings) |  |
+| ❌ | PUT | [`/users/settings`](#put-userssettings) |  |
+| ✅ | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
+| ✅ | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker (blir nok erstatet av users/profile/{usersID} )|
+| ✅ | GET | [`/users/profile/{userid}`](#get-usersprofileuserid) | Returnerer info for å vise profil |
 | ✅ | POST | [`/users`](#post-users) | Oppretter ny bruker |
 | ⚠️ | PUT | [`/users/{userid}`](#put-usersuserid) | Litt mangelfull |
 | ✅ | DELETE | [`/users/{userid}`](#delete-usersuserid) | - slette en bruker |
@@ -28,15 +46,17 @@
 | ❌ | POST | [`/horses`](#post-horses) | Registrere ny hest på bruker |
 | ❌ | PUT | [`/horses`](#put-horses) | |
 | ❌ | DELETE | [`/horses`](#delete-horses) | |
-| ✅ | GET | [`/userrelations/friends/{userid}`](#get-userrelationsfriendsuserid) | |
-| ✅ | GET | [`/userrelations/requests/{userid}`](#get-userrelationsrequestsuserid) | |
-| ✅ | GET | [`/userrelations/blocked/{userid}`](#get-userrelationsblocksuserid) | |
-| ✅ | POST | [`/userrelations/friendrequests`](#post-userrelationsfriendrequestsuserid) | |
-| ✅ | POST | [`/userrelations/block`](#post-userrelationsblock) | |
-| ✅ | PUT | [`/userrelations/{userrelationid}`](#put-userrelationsuserrelationid) | |
-| ✅ | DELETE | [`/userrelations/{fromUserId}/{toUserId}`](#delete-userrelationsfromuseridtouserid) | |
-| ⚠️ | GET | [`/trail/closest`](#get-trailclosest) | Query=?latitude=x&longitude=y&limit=n&offset=m |
-| ⚠️ | GET | [`/trail/list`](#get-traillist) | - Query= ?zoomlevel&filters |
+| ✅ | GET | [`/userrelations/friends/{userid}`](#get-userrelationsfriendsuserid) | viser venner |
+| ✅ | GET | [`/userrelations/requests/{userid}`](#get-userrelationsrequestsuserid) | viser venneforspørsler |
+| ❌ | GET | [`/userrelations/follow/{userid}`](#get-userrelationsfollowuserid) | viser hvem userId følger |
+| ✅ | GET | [`/userrelations/blocked/{userid}`](#get-userrelationsblocksuserid) | viser hvem userId blokkerer |
+| ✅ | POST | [`/userrelations/friendrequests`](#post-userrelationsfriendrequestsuserid) | sende venneforspørsel |
+| ❌ | POST | [`/userrelations/follow/`](#post-userrelationsfollow) | følger en bruker |
+| ✅ | POST | [`/userrelations/block`](#post-userrelationsblock) | blokkerer en bruker |
+| ✅ | PUT | [`/userrelations/{userrelationid}`](#put-userrelationsuserrelationid) | bytter status på en userrelation, f.eks fra request til friend eller fra friend til delete eller block |
+| ✅ | DELETE | [`/userrelations/{fromUserId}/{toUserId}`](#delete-userrelationsfromuseridtouserid) | sletter en userrelation, f.eks blokkering |
+| ✅ | GET | [`/trail/list`](#get-traillist) | Liste over løyper sortert etter næreste først |
+| ⚠️ | GET | [`/trail/map`](#get-trailmap) | Løyper som passer inni kartutsnittet |
 | ❌ | POST | [`/trail`](#post-trail) | Bruker data fra en Ride og lager en løype av det. |
 | ❌ | PUT | [`/trail/{trailId}`](#put-trailtrailid) | evt endre en trail |
 | ❌ | DELETE | [`/trail/{trailId}`](#delete-trailtrailid) | |
@@ -46,11 +66,11 @@
 | ✅ | GET | [`/rides`](#get-rides) | |
 | ✅ | POST | [`/rides`](#post-rides) | |
 | ❌ | PUT | [`/rides/{rideId}`](#put-ridesrideid) | - Nesten utviklet. Trenger testing bildeopplegg |
-| ✅ | GET | [`/messages/{userId}`](#get-messagesuserid) | - Viser siste melding mottatt fra alle brukere |
-| ✅ | GET | [`/messages/{sUserId}/{rUserId}`](#get-messagessuseridruserid) | - Viser meldinger mellom 2 brukere, DESC Time |
-| ✅ | POST | [`/messages`](#post-messages) | - Sende melding til en annen bruker. |
-| ❌ | PUT | [`/messages/{messageId}`](#put-messagesmessageid) | - Endre en melding? |
-| ❌ | DELETE | [`/messages/{messageId}`](#delete-messagesmessageid) | - Slette en melding |
+| ✅ | GET | [`/messages/{userId}`](#get-messagesuserid) | Viser siste melding som userId har mottatt fra alle brukere |
+| ✅ | GET | [`/messages/{sUserId}/{rUserId}`](#get-messagessuseridruserid) | Viser meldinger mellom 2 brukere, DESC Time |
+| ✅ | POST | [`/messages`](#post-messages) | Sende melding til en annen bruker. |
+| ❌ | PUT | [`/messages/{messageId}`](#put-messagesmessageid) | Rediger en melding? |
+| ❌ | DELETE | [`/messages/{messageId}`](#delete-messagesmessageid) | Slette en melding |
 | ❌ | GET | [`/stables/list`](#get-stableslist) | -Viser alle staller, evt nærmeste staller |
 | ❌ | POST | [`/stables`](#post-stables) | - Registrere ny stall |
 | ❌ | ??? | [`/stableusers`](#stableusers) | Kommer senere, men dette er medlemmer av en stall. |
@@ -83,6 +103,7 @@ Ved å kjøre APIene under, så opprettes mockdata som er hardkodet i egne mock-
 | ❌ | POST | `/mock/createtraildetails` | Oppretter detaljer om løyper |
 | ❌ | POST | `/mock/createtrailreviews` | Oppretter anmeldelser av løyper |
 | ❌ | POST | `/mock/createtrailfilters` | Oppretter filtre for løyper |
+| ✅ | POST | `/mock/createsettings` | Oppretter test-løyper |
 
 ✅ = Fullført
 <br>⚠️ = Utviklet, men har feil eller at ikke alle queries er utviklet. 
@@ -522,7 +543,7 @@ curl -X DELETE "https://hopla.onrender.com/userrelations/123/456"
 
 ---
 
-### GET /trail/closest
+### GET /trail/list
 🚧🚧🚧 *Under utvikling. Filtere er ikke utviklet. kommer senere*
 
 **Beskrivelse:** Henter nærmeste tilgjengelige løyper basert på posisjon.
@@ -557,7 +578,7 @@ curl -X GET "https://hopla.onrender.com/trail/closest?latitude=59.9139&longitude
 ---
 
 
-### GET /trail/list
+### GET /trail/map
 🚧🚧🚧 *Under utvikling, Filtere er ikke utviklet. kommer senere*
 
 **Beskrivelse:** Henter nærmeste tilgjengelige løyper basert på posisjon.

@@ -39,8 +39,12 @@ public class MessageController : ControllerBase
                     Timestamp = m.SentAt,
                     SenderId = m.SUserId,
                     SenderName = m.Sender.Name,
+                    SenderAlias = m.Sender.Alias,
+                    SenderPicture = m.Sender.ProfilePictureUrl + "?w=75&h=75&fit=crop",
                     ReceiverId = m.RUserId,
-                    ReceiverName = m.Receiver.Name
+                    ReceiverName = m.Receiver.Name,
+                    ReceiverAlias = m.Receiver.Alias,
+                    ReceiverPicture = m.Receiver.ProfilePictureUrl + "?w=75&h=75&fit=crop"
                 })
                 .ToListAsync();
 
@@ -67,8 +71,12 @@ public class MessageController : ControllerBase
                 Timestamp = m.SentAt,
                 SenderId = m.SUserId,
                 SenderName = m.Sender.Name,
+                SenderAlias = m.Sender.Alias,
+                SenderPicture = m.Sender.ProfilePictureUrl + "?w=75&h=75&fit=crop",
                 ReceiverId = m.RUserId,
-                ReceiverName = m.Receiver.Name
+                ReceiverName = m.Receiver.Name,
+                ReceiverAlias = m.Receiver.Alias,
+                ReceiverPicture = m.Receiver.ProfilePictureUrl + "?w=75&h=75&fit=crop"
             })
             .ToListAsync();
 

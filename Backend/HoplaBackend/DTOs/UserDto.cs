@@ -2,6 +2,36 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HoplaBackend.DTOs;
 
+
+// Vurdere å legge denne i ny DTO, f.eks AuthenticationDto.cs
+public class LoginRequest
+{
+    public string? Email { get; set; }
+    public string? Password { get; set; }
+}
+public class LoginTest
+{
+    public Guid? Id { get; set; }
+}
+// Vurdere å legge denne i ny DTO, f.eks AuthenticationDto.cs
+public class RegisterRequest
+{
+    public string Email { get; set; }
+    public string Password { get; set; }
+}
+public class ChangePasswordRequest
+{
+    public string OldPassword { get; set; }
+    public string NewPassword { get; set; }
+}
+
+
+public class UserDto
+{
+    public string Email { get; set; }
+    public string FullName { get; set; }
+}
+
 public class CreateUserDto
 {
     public string? Name { get; set; }
