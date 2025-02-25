@@ -28,19 +28,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
+import androidx.compose.ui.window.Dialog
+import com.google.ai.client.generativeai.type.content
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
-fun TrailsScreen() {
+fun TrailsScreen(navController: NavController) {
     var isMapClicked by remember { mutableStateOf(false) }
     var isCloseByClicked by remember { mutableStateOf(false) }
     var isFavoriteClicked by remember { mutableStateOf(false) }
@@ -194,7 +206,7 @@ fun TrailsScreen() {
         }
         // If the user has clicked a specific trail, display the function RouteClicked
         if (isRouteClicked) {
-            RouteClicked(onBackClick = { isRouteClicked = false })
+            RouteClicked(navController = navController, onBackClick = { isRouteClicked = false })
         // If the user has clicked the map icon, display the map
         } else if (isMapClicked) {
             Box(
@@ -311,10 +323,11 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
 
 // Function to display the trail that have been clicked
 @Composable
-fun RouteClicked(onBackClick: () -> Unit) {
+fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
     var currentImageIndex by remember { mutableIntStateOf(0) }
     var userRating by remember { mutableIntStateOf(0) }
     val images = listOf(R.drawable.stockimg1, R.drawable.stockimg2)
+    var showMessageBox by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Header
@@ -333,7 +346,7 @@ fun RouteClicked(onBackClick: () -> Unit) {
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.primary)
             ) {
-                // Row in header to display items next to eachother
+                // Row in header to display items next to each other
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -460,11 +473,12 @@ fun RouteClicked(onBackClick: () -> Unit) {
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
                             .background(MaterialTheme.colorScheme.secondary)
-                            .clickable { /* Handle click */ },
+                            .clickable {  navController.navigate("update_screen")  },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = stringResource(R.string.new_updates))
                     }
+
                 }
             }
 
@@ -547,10 +561,61 @@ fun RouteClicked(onBackClick: () -> Unit) {
                                 .fillMaxWidth()
                                 .padding(4.dp)
                                 .background(MaterialTheme.colorScheme.secondary)
-                                .clickable { /* Handle click */ },
+                                .clickable { showMessageBox = true },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(text = stringResource(R.string.latest_update_about_the_route))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (showMessageBox) {
+        Dialog(onDismissRequest = { showMessageBox = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .border(2.dp, Color.Black)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.latest_update_about_the_route),
+                        modifier = Modifier.padding(8.dp),
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    // Sample messages list
+                    val messages = listOf(
+                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis()),
+                        Message(id = "2", content = "Watch out for fallen branches.", timestamp = System.currentTimeMillis() - 3600000)
+                    )
+
+                    LazyColumn {
+                        items(messages) { message ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(8.dp)
+                            ) {
+                                Text(text = message.content)
+                                Text(
+                                    text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
+                                        Date(message.timestamp)
+                                    ),
+                                    fontSize = 10.sp,
+                                    modifier = Modifier.align(Alignment.End)
+                                )
+                            }
                         }
                     }
                 }
@@ -572,6 +637,111 @@ fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
                     .size(20.dp)
                     .clickable { onRatingChanged(index + 1) }
             )
+        }
+    }
+}
+
+// Function to display the update screen where user can add their own update about the route
+@Composable
+fun UpdateScreen(navController: NavController) {
+    var location by remember { mutableStateOf("Boredalstien") }
+    var comment by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFEDE6DD)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Header Box (Title + Back Button)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFB8A999))
+                .padding(vertical = 12.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Back",
+                        tint = Color.Black
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.new_updates),
+                    color = Color.White,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Location Field (Read-only)
+        TextField(
+            value = location,
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .background(Color.White),
+            readOnly = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Comment Box with Floating Add Button
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .height(150.dp)
+                .background(Color.White),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
+                Text(text = stringResource(R.string.comment), color = Color.Gray)
+                TextField(
+                    value = comment,
+                    onValueChange = { comment = it },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            FloatingActionButton(
+                onClick = { /* Handle Add Action */ },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .size(40.dp),
+                containerColor = Color(0xFFD9CFC4)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Comment")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Publish Button
+        Button(
+            onClick = {
+                comment = "" // Clear the comment box
+                navController.popBackStack() // Navigate back to the previous screen
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .height(40.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9CFC4))
+        ) {
+            Text(text = stringResource(R.string.publish), color = Color.Gray)
         }
     }
 }

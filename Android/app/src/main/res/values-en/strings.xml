@@ -81,4 +81,33 @@
     <string name="confirm_logout">Press confirm to logg out</string>
     <string name="search">Search</string>
 
+    <string name="gravel">Gravel</string>
+    <string name="parking">Parking</string>
+    <string name="asphalt">Asphalt</string>
+
+    <string name="comment">Comment:</string>
+    <string name="publish">Publish</string>
+    <string name="dateString">Date</string>
+    <string name="length">"Length "</string>
+    <string name="hourString">Hours</string>
+    <string name="my_horses">My horses</string>
+    <string name="add_image">Add image</string>
+    <string name="name">Name</string>
+    <string name="breed">Breed</string>
+    <string name="age">Age</string>
+    <string name="trips_added">Trips added</string>
+    <string name="remove_friend">Remove friend?</string>
+    <string name="delete_friend_dialogue">Are you sure you want to remove this firend?</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="unfollow_dialogue">"Are you sure you want to unfollow this person? "</string>
+    <string name="friendrequest_pending">Friendrequest pending</string>
+    <string name="remove_request_dialogue">Do you want to remove the request?</string>
+    <string name="follow">Follow</string>
+    <string name="add_friend">Add friend</string>
+    <string name="change_image">Change image</string>
+    <string name="add_new_community">Add new community</string>
+    <string name="info">Info</string>
+    <string name="close">Close</string>
+    <string name="enter_you_message">Enter your message</string>
+
 </resources>
