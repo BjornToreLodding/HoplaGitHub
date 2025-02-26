@@ -30,11 +30,18 @@ data class Person(
 )
 
 // Class for the data of a horse
-data class Horse(
+data class HorseDetail(
     val name: String,
     val imageResource: Int,
     val breed: String,
     val age: Int
+)
+
+@Serializable
+data class Horse(
+    val id: String,
+    val name: String,
+    val horsePictureUrl: String
 )
 
 // Class for the data of a user (yourself)

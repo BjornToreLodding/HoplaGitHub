@@ -51,11 +51,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.sharp.AccountBox
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 import coil.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.launch
 
 // Main profile function
 @Composable
@@ -932,29 +935,28 @@ fun FollowingScreen(navController: NavController) {
 
 @Composable
 fun MyHorsesScreen(navController: NavController) {
-    val horses = listOf(
-        Horse("Hest1", R.drawable.horse1, "Dølahest", 5),
-        Horse("Hest2", R.drawable.horse2, "Fjording", 7),
-        Horse("Hest3", R.drawable.horse3, "Araber", 3),
-        Horse("Hest4", R.drawable.horse1, "Frieser", 6),
-        Horse("Hest5", R.drawable.horse2, "Shetlandsponni", 10),
-        Horse("Hest6", R.drawable.horse3, "Islandshest", 8)
-    )
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column {
-            Box(modifier = Modifier.padding(8.dp)) {
-                ScreenHeader(navController, stringResource(R.string.my_horses))
-            }
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(horses) { horse ->
-                    HorseItem(horse, navController)
-                }
+    var horses by remember { mutableStateOf<List<Horse>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            horses = fetchHorses(UserSession.token)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.padding(8.dp)) {
+            ScreenHeader(navController, stringResource(R.string.my_horses))
+        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(horses) { horse ->
+                HorseItem(horse, navController)
             }
         }
-        AddButton(onClick = { navController.navigate("addHorseScreen") })
     }
+    AddButton(onClick = { navController.navigate("addHorseScreen") })
 }
 
 @Composable
@@ -995,6 +997,7 @@ fun HorseDetailScreen(navController: NavController, horseName: String, horseImag
     }
 }
 
+// Horsedetail commented out until method for connecting to database is implemented
 @Composable
 fun HorseItem(horse: Horse, navController: NavController) {
     Row(
@@ -1004,11 +1007,11 @@ fun HorseItem(horse: Horse, navController: NavController) {
             .background(MaterialTheme.colorScheme.secondary)
             .padding(16.dp)
             .clickable {
-                navController.navigate("horse_detail/${horse.name}/${horse.imageResource}/${horse.breed}/${horse.age}")
+                /*navController.navigate("horse_detail/${horse.name}/${horse.horsePictureUrl}")*/
             }
     ) {
         Image(
-            painter = painterResource(id = horse.imageResource),
+            painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
