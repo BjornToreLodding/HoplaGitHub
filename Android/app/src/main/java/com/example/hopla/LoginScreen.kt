@@ -121,7 +121,10 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
 
         Button(
             onClick = {
-                if (username.isEmpty() || password.isEmpty()) {
+                val trimmedUsername = username.trim()
+                val trimmedPassword = password.trim()
+
+                if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
                     errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
                     showErrorDialog = true
                 } else {
@@ -136,22 +139,26 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                             }
                         }
                         try {
-                            val response: HttpResponse = client.post("https://hopla.onrender.com/users/login/") {
+                            val response: HttpResponse = client.post(apiUrl+"users/login/") {
                                 contentType(ContentType.Application.Json)
-                                setBody(LoginRequest(email = username, password = password))
+                                setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
                             }
                             Log.d("LoginScreen", "Response status: ${response.status}")
-                            if (response.status == HttpStatusCode.OK) {
-                                onLogin()
-                            } else if (response.status == HttpStatusCode.Unauthorized) {
-                                val errorResponse = response.body<ErrorResponse>()
-                                errorMessage = errorResponse.message
-                                showErrorDialog = true
-                                Log.d("LoginScreen", "Unauthorized: ${errorResponse.message}")
-                            } else {
-                                errorMessage = context.getString(R.string.not_available_right_now)
-                                showErrorDialog = true
-                                Log.d("LoginScreen", "Unexpected status: ${response.status}")
+                            when (response.status) {
+                                HttpStatusCode.OK -> {
+                                    onLogin()
+                                }
+                                HttpStatusCode.Unauthorized -> {
+                                    val errorResponse = response.body<ErrorResponse>()
+                                    errorMessage = errorResponse.message
+                                    showErrorDialog = true
+                                    Log.d("LoginScreen", "Unauthorized: ${errorResponse.message}")
+                                }
+                                else -> {
+                                    errorMessage = context.getString(R.string.not_available_right_now)
+                                    showErrorDialog = true
+                                    Log.d("LoginScreen", "Unexpected status: ${response.status}")
+                                }
                             }
                         } catch (e: Exception) {
                             errorMessage = context.getString(R.string.not_available_right_now)

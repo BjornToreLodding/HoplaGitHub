@@ -1,9 +1,7 @@
 package com.example.hopla
 
-const val baseURLID = "/12345678-0000-0000-"
-const val horseURLID = "0002-"
-const val userURLID = "0123456780003"
 const val baseID = "3"
+const val apiUrl = "https://hopla.onrender.com/"
 
 // Class for the data of a trip
 data class Trip(
