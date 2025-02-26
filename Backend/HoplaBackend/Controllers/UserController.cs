@@ -19,8 +19,8 @@ namespace HoplaBackend.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly Authentication _authentication;
     private readonly AppDbContext _context;
+    private readonly Authentication _authentication;
 
     public UserController(Authentication authentication, AppDbContext context)
     {

@@ -4,32 +4,55 @@ using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
 using HoplaBackend.DTOs;
+using HoplaBackend.Helpers;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HoplaBackend.Controllers
 {
  
     [Route("userrelations")]
     [ApiController]
-        public class UserRelationsController : ControllerBase
+    public class UserRelationsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly Authentication _authentication;
 
-        public UserRelationsController(AppDbContext context)
+        public UserRelationsController(Authentication authentication, AppDbContext context)
         {
+            _authentication = authentication;
             _context = context;
         }
-
-
-        [HttpGet("friends/{userId}")]
-        public async Task<IActionResult> GetFriends(Guid userId)
+        [Authorize]
+        [HttpGet("friends")]
+        public async Task<IActionResult> GetFriends()
         {
+            //Debugging
+            Console.WriteLine("Token claims:");
+            foreach (var claim in User.Claims)
+            {
+                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+            }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
             var friends = await _context.UserRelations
-                .Where(ur => (ur.Status == "Accepted" || ur.Status == "accepted") && (ur.FromUserId == userId || ur.ToUserId == userId))
+                .Where(ur => (ur.Status == "friend" || ur.Status == "FRIEND" || ur.Status == "Friend") && (ur.FromUserId == userId || ur.ToUserId == userId))
                 .Select(ur => new
                 {
                     FriendId = ur.FromUserId == userId ? ur.ToUserId : ur.FromUserId,
                     FriendName = ur.FromUserId == userId ? ur.ToUser.Name : ur.FromUser.Name,
-                    FriendAlias = ur.FromUserId == userId ? ur.ToUser.Alias : ur.FromUser.Alias 
+                    FriendAlias = ur.FromUserId == userId ? ur.ToUser.Alias : ur.FromUser.Alias,
+                    FriendPictureURL = ur.FromUserId == userId 
+                    ? ur.ToUser.ProfilePictureUrl + "?w=64&h=64&fit=crop" 
+                    : ur.FromUser.ProfilePictureUrl + "?w=64&h=64&fit=crop"
                 })
                 .ToListAsync();
 
