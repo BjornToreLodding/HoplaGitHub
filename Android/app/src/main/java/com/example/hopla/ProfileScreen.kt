@@ -688,17 +688,17 @@ fun TripItem(trip: Trip) {
 
 @Composable
 fun FriendsScreen(navController: NavController) {
-    var searchQuery by remember { mutableStateOf("") }
-    val people = listOf(
-        Person("Ole", R.drawable.friend1, PersonStatus.FRIEND),
-        Person("Dole", R.drawable.friend2, PersonStatus.FRIEND),
-        Person("Doffen", R.drawable.friend3, PersonStatus.FRIEND),
-        Person("Dolly", R.drawable.friend1, PersonStatus.FRIEND),
-        Person("Langbein", R.drawable.friend2, PersonStatus.FRIEND),
-        Person("Donald", R.drawable.friend3, PersonStatus.FRIEND)
-    )
-    val filteredFriends = people.filter {
-        it.name.contains(searchQuery, ignoreCase = true)
+    var friends by remember { mutableStateOf<List<Friend>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                friends = fetchFriends(UserSession.token)
+            } catch (e: Exception) {
+                Log.e("FriendsScreen", "Error fetching friends", e)
+            }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -709,20 +709,49 @@ fun FriendsScreen(navController: NavController) {
         ) {
             ScreenHeader(navController, stringResource(R.string.friends))
 
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it }
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(filteredFriends) { friend ->
-                    PersonItem(friend, navController)
+            if (friends.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.if_no_friends),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(friends) { friend ->
+                        FriendItem(friend, navController)
+                    }
                 }
             }
         }
         AddButton(onClick = { navController.navigate("addFriendScreen") })
+    }
+}
+
+@Composable
+fun FriendItem(friend: Friend, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable { /*navController.navigate("person_detail/${friend.friendId}")*/ }
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model = friend.friendPictureURL),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(text = friend.friendName, style = MaterialTheme.typography.bodyLarge)
+            Text(text = friend.friendAlias, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 

@@ -68,3 +68,11 @@ data class Message(
     val content: String,
     val timestamp: Long
 )
+
+@Serializable
+data class Friend(
+    val friendId: String,
+    val friendName: String,
+    val friendAlias: String,
+    val friendPictureURL: String
+)

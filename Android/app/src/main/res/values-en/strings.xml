@@ -114,5 +114,6 @@
     <string name="ok">Ok</string>
     <string name="not_available_right_now">Not available at the moment</string>
     <string name="date_of_birth">Date of birth</string>
+    <string name="if_no_friends">Add friends by pressing the + sign</string>
 
 </resources>

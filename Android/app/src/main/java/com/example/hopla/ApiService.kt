@@ -54,3 +54,19 @@ suspend fun fetchHorseDetails(horseId: String, token: String): HorseDetail {
         response.body()
     }
 }
+
+suspend fun fetchFriends(token: String): List<Friend> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl+"userrelations/friends") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}
