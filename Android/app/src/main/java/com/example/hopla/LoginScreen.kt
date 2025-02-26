@@ -68,6 +68,15 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // Variables for response feedback for the post request when logging in
+    var token by remember { mutableStateOf("") }
+    var userId by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var alias by remember { mutableStateOf("") }
+    var profilePictureURL by remember { mutableStateOf("") }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,13 +148,20 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                             }
                         }
                         try {
-                            val response: HttpResponse = client.post(apiUrl+"users/login/") {
+                            val response: HttpResponse = client.post(apiUrl + "users/login/") {
                                 contentType(ContentType.Application.Json)
                                 setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
                             }
                             Log.d("LoginScreen", "Response status: ${response.status}")
                             when (response.status) {
                                 HttpStatusCode.OK -> {
+                                    val loginResponse = response.body<User>()
+                                    UserSession.token = loginResponse.token
+                                    UserSession.userId = loginResponse.userId
+                                    UserSession.email = loginResponse.email
+                                    UserSession.name = loginResponse.name
+                                    UserSession.alias = loginResponse.alias
+                                    UserSession.profilePictureURL = loginResponse.profilePictureURL
                                     onLogin()
                                 }
                                 HttpStatusCode.Unauthorized -> {

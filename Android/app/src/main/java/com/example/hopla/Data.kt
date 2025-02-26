@@ -1,5 +1,7 @@
 package com.example.hopla
 
+import kotlinx.serialization.Serializable
+
 const val baseID = "3"
 const val apiUrl = "https://hopla.onrender.com/"
 
@@ -36,12 +38,14 @@ data class Horse(
 )
 
 // Class for the data of a user (yourself)
+@Serializable
 data class User(
-    val id: String,
+    val token: String,
+    val userId: String,
     val name: String,
     val email: String,
-    val passwordHash: String,
-    val createdTime: String
+    val alias: String,
+    val profilePictureURL: String
 )
 
 // Class for the data of a community
