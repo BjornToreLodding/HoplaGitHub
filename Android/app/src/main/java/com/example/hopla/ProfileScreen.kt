@@ -47,18 +47,28 @@ import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
+import android.icu.util.LocaleData
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
+import java.time.LocalDate
 
 // Main profile function
 @Composable
@@ -960,42 +970,115 @@ fun MyHorsesScreen(navController: NavController) {
 }
 
 @Composable
-fun HorseDetailScreen(navController: NavController, horseName: String, horseImageResource: Int, horseBreed: String, horseAge: Int) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = horseName, style = MaterialTheme.typography.bodySmall)
-            Spacer(modifier = Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = horseImageResource),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Breed: $horseBreed", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Age: $horseAge", style = MaterialTheme.typography.bodySmall)
+fun HorseDetailScreen(navController: NavController, horseId: String) {
+    var horseDetail by remember { mutableStateOf<HorseDetail?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(horseId) {
+        coroutineScope.launch {
+            try {
+                horseDetail = fetchHorseDetails(horseId, UserSession.token)
+            } catch (e: Exception) {
+                Log.e("HorseDetailScreen", "Error fetching horse details", e)
+            }
         }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
+    ) {
+        horseDetail?.let { horse ->
+            val formattedDob = try {
+                val dateTime = horse.dob.split("T")[0]
+                val (year, month, day) = dateTime.split("-")
+                "$day.$month.$year"
+            } catch (e: Exception) {
+                Log.e("HorseDetailScreen", "Error parsing date of birth", e)
+                "Unknown"
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+            ) {
+                // Name
+                Text(
+                    text = horse.name,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                // Image with Border & Shadow
+                Box(
+                    modifier = Modifier
+                        .size(220.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surface, CircleShape)
+                        .border(4.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        .shadow(8.dp, CircleShape)
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // Card with Details
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        DetailRow(label = stringResource(R.string.breed) + ":", value = horse.breed)
+                        DetailRow(label = stringResource(R.string.age) + ":", value = horse.age.toString())
+                        DetailRow(label = stringResource(R.string.date_of_birth) + ":", value = formattedDob)
+                    }
+                }
+            }
+        }
+
+        // Close Button (Top-Right)
         IconButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp)
+                .size(48.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.back)
+                contentDescription = stringResource(R.string.back),
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
     }
 }
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
 
 // Horsedetail commented out until method for connecting to database is implemented
 @Composable
@@ -1007,7 +1090,7 @@ fun HorseItem(horse: Horse, navController: NavController) {
             .background(MaterialTheme.colorScheme.secondary)
             .padding(16.dp)
             .clickable {
-                /*navController.navigate("horse_detail/${horse.name}/${horse.horsePictureUrl}")*/
+                navController.navigate("horse_detail/${horse.id}")
             }
     ) {
         Image(

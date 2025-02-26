@@ -29,12 +29,13 @@ data class Person(
     val status: PersonStatus
 )
 
-// Class for the data of a horse
+@Serializable
 data class HorseDetail(
     val name: String,
-    val imageResource: Int,
-    val breed: String,
-    val age: Int
+    val horsePictureUrl: String,
+    val dob: String,
+    val age: Int,
+    val breed: String
 )
 
 @Serializable

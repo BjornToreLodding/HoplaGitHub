@@ -139,19 +139,13 @@ class MainActivity : ComponentActivity() {
                                 PersonDetailScreen(navController, person)
                             }
                             composable(
-                                "horse_detail/{horseName}/{horseImageResource}/{horseBreed}/{horseAge}",
+                                "horse_detail/{horseId}",
                                 arguments = listOf(
-                                    navArgument("horseName") { type = NavType.StringType },
-                                    navArgument("horseImageResource") { type = NavType.IntType },
-                                    navArgument("horseBreed") { type = NavType.StringType },
-                                    navArgument("horseAge") { type = NavType.IntType }
+                                    navArgument("horseId") { type = NavType.StringType }
                                 )
                             ) { backStackEntry ->
-                                val horseName = backStackEntry.arguments?.getString("horseName") ?: ""
-                                val horseImageResource = backStackEntry.arguments?.getInt("horseImageResource") ?: 0
-                                val horseBreed = backStackEntry.arguments?.getString("horseBreed") ?: ""
-                                val horseAge = backStackEntry.arguments?.getInt("horseAge") ?: 0
-                                HorseDetailScreen(navController, horseName, horseImageResource, horseBreed, horseAge)
+                                val horseId = backStackEntry.arguments?.getString("horseId") ?: ""
+                                HorseDetailScreen(navController, horseId)
                             }
                         }
                     }
