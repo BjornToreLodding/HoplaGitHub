@@ -70,3 +70,19 @@ suspend fun fetchFriends(token: String): List<Friend> {
         response.body()
     }
 }
+
+suspend fun fetchFollowing(token: String): List<Following> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "userrelations/following") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}

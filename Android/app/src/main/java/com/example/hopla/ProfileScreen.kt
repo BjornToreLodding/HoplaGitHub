@@ -938,19 +938,23 @@ fun PersonDetailScreen(navController: NavController, person: Person) {
 
 @Composable
 fun FollowingScreen(navController: NavController) {
+    var following by remember { mutableStateOf<List<Following>>(emptyList()) }
     var searchQuery by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
-    val people = listOf(
-        Person("Rachel", R.drawable.friend1, PersonStatus.FOLLOWING),
-        Person("Monica", R.drawable.friend2, PersonStatus.FOLLOWING),
-        Person("Phoebe", R.drawable.friend3, PersonStatus.FOLLOWING),
-        Person("Chandler", R.drawable.friend1, PersonStatus.FOLLOWING),
-        Person("Joey", R.drawable.friend2, PersonStatus.FOLLOWING),
-        Person("Ross", R.drawable.friend3, PersonStatus.FOLLOWING)
-    )
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                following = fetchFollowing(UserSession.token)
+            } catch (e: Exception) {
+                Log.e("FollowingScreen", "Error fetching following", e)
+            }
+        }
+    }
 
-    val filteredFollowing = people.filter {
-        it.name.contains(searchQuery, ignoreCase = true)
+    val filteredFollowing = following.filter {
+        it.followingUserName.contains(searchQuery, ignoreCase = true) ||
+                it.followingUserAlias.contains(searchQuery, ignoreCase = true)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -966,15 +970,49 @@ fun FollowingScreen(navController: NavController) {
                 onSearchQueryChange = { searchQuery = it }
             )
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(filteredFollowing) { following ->
-                    PersonItem(following, navController)
+            if (filteredFollowing.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.no_following_matches),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(filteredFollowing) { person ->
+                        FollowingItem(person, navController)
+                    }
                 }
             }
         }
         AddButton(onClick = { navController.navigate("addFriendScreen") })
+    }
+}
+
+@Composable
+fun FollowingItem(following: Following, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .clickable { /*navController.navigate("person_detail/${friend.friendId}")*/ }
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model = following.followingUserPicture),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(text = following.followingUserName, style = MaterialTheme.typography.bodyLarge)
+            Text(text = following.followingUserAlias, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 

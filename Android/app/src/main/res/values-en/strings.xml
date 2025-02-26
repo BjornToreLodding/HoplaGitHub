@@ -116,5 +116,6 @@
     <string name="date_of_birth">Date of birth</string>
     <string name="if_no_friends">Add friends by pressing the + sign</string>
     <string name="no_friends_match_search">No friends match what is searched</string>
+    <string name="no_following_matches">No one matches the search</string>
 
 </resources>

@@ -115,5 +115,6 @@
     <string name="date_of_birth">Fødselsdag</string>
     <string name="if_no_friends">Legg til venner ved å trykke på + tegnet</string>
     <string name="no_friends_match_search">Ingen venner matcher søket</string>
+    <string name="no_following_matches">Ingen du følger matcher søket</string>
 
 </resources>

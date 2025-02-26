@@ -76,3 +76,11 @@ data class Friend(
     val friendAlias: String,
     val friendPictureURL: String
 )
+
+@Serializable
+data class Following(
+    val followingUserId: String,
+    val followingUserName: String,
+    val followingUserAlias: String,
+    val followingUserPicture: String
+)
