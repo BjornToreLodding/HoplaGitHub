@@ -136,7 +136,7 @@ struct Profile: View {
                             .frame(width: 360, height: 3)
                             .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
                         
-                        Text("E-mail")
+                        Text("Email")
                             .frame(width: 360, height: 30)
                             .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                         

@@ -31,6 +31,9 @@
         }
       }
     },
+    "Average rating: " : {
+
+    },
     "Bob" : {
 
     },
@@ -109,7 +112,14 @@
       }
     },
     "Confirm password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekreft passord"
+          }
+        }
+      }
     },
     "Continue" : {
       "localizations" : {
@@ -152,6 +162,7 @@
       }
     },
     "E-mail" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -162,7 +173,14 @@
       }
     },
     "Email" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-post"
+          }
+        }
+      }
     },
     "English" : {
       "localizations" : {
@@ -175,13 +193,34 @@
       }
     },
     "Enter a password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv et passord"
+          }
+        }
+      }
     },
     "Enter email address" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv en e-postadresse"
+          }
+        }
+      }
     },
     "Enter email:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn e-post:"
+          }
+        }
+      }
     },
     "Enter new password" : {
       "localizations" : {
@@ -214,16 +253,44 @@
       }
     },
     "Enter username" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv brukernavn"
+          }
+        }
+      }
     },
     "Enter your email" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv e-posten din"
+          }
+        }
+      }
     },
     "Enter your email address" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv e-posten din"
+          }
+        }
+      }
     },
     "Enter your email address to reset your password:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn e-posten din for å endre passord:"
+          }
+        }
+      }
     },
     "Enter your password" : {
       "localizations" : {
@@ -231,17 +298,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skriv inn passord"
-          }
-        }
-      }
-    },
-    "Enter your username" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv inn brukernavn"
           }
         }
       }
@@ -267,7 +323,14 @@
       }
     },
     "Forgotten password?" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glemt passord?"
+          }
+        }
+      }
     },
     "Friends" : {
       "localizations" : {
@@ -280,6 +343,9 @@
       }
     },
     "Halla" : {
+
+    },
+    "Hi" : {
 
     },
     "Hikes" : {
@@ -304,7 +370,14 @@
       }
     },
     "Join now" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bli med nå"
+          }
+        }
+      }
     },
     "Log In" : {
       "localizations" : {
@@ -346,12 +419,35 @@
         }
       }
     },
+    "My rating: " : {
+
+    },
     "New Hike" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ny Tur"
+          }
+        }
+      }
+    },
+    "New update" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny oppdatering"
+          }
+        }
+      }
+    },
+    "Newest updates on this hike" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nyeste oppdateringer om løypen"
           }
         }
       }
@@ -442,6 +538,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Innstillinger"
+          }
+        }
+      }
+    },
+    "Start hike" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Følg løype"
           }
         }
       }
