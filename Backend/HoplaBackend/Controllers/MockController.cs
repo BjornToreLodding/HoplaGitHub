@@ -21,59 +21,15 @@ public class MockController : ControllerBase
         _context = context;
     }
 
-    [HttpPost("databasecontentclear")]
-    public async Task<IActionResult> ClearDatabase()
+    [HttpPost("clearsystemsettings")]
+    public async Task<IActionResult> ClearSystemsettings()
     {
-        _context.Users.RemoveRange(_context.Users);
-        _context.Horses.RemoveRange(_context.Horses);
-        _context.UserRelations.RemoveRange(_context.UserRelations);
-        _context.Messages.RemoveRange(_context.Messages);
-        _context.Stables.RemoveRange(_context.Stables);
-        _context.StableMessages.RemoveRange(_context.StableMessages);
-        _context.StableUsers.RemoveRange(_context.StableUsers);
-        _context.Rides.RemoveRange(_context.Rides); 
-        //_context.RideDetails.RemoveRange(_context.RideDetails);
-        //_context.RideReviews.RemoveRange(_context.RideReviews);
-        _context.Trails.RemoveRange(_context.Trails);
-        //_context.TrailReviews.RemoveRange(_context.TrailReviews);
-        //_context.TrailFilters(_context.TrailFilters);
-        _context.SystemSettings.RemoveRange(_context.SystemSettings); 
-
-
-
+        _context.SystemSettings.RemoveRange(_context.SystemSettings); //rød strek under _context.SystemSettings
         await _context.SaveChangesAsync();
-
-        //En merkelig feil, gjør at sekvensene for Id på Stables og Rides ikke starter på 1 etter cleardatabase og createcontent. 
-        // Da blir det feil når Mock skal opprettes for StableMessages og Trails, da Id refererer til noe som ikke eksisterer
-        //Det er ikke nødvendig og kjøre dette på Users og Horses, men de er med da det virker mest logisk.
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserRelations\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Messages\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Stables\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableMessages\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
-
-        // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Trenger ikke denne lenger da den er bygget om fra int til Guid
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"UserRelations_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Messages_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableMessages_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableUsers_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Denne skulle sikkert hete noe annet?
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
-        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
-
         return Ok("Database cleared and IDs reset.");    
-        }
+    }
 
-    // Fyller opp tabellen systemSettings med systemSettingsMock.cs
     [HttpPost("createsystemsettings")]
     public async Task<IActionResult> CreateSystemSettings()
     {
@@ -82,6 +38,15 @@ public class MockController : ControllerBase
         _context.SystemSettings.AddRange(systemSettings);
         await _context.SaveChangesAsync();
         return Created("", new { message = "SystemSettings created "});
+    }
+
+    [HttpPost("clearusers")]
+    public async Task<IActionResult> ClearUsers()
+    {
+        _context.Users.RemoveRange(_context.Users); //Ingen rød strek her
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
+        return Ok("Database cleared and IDs reset.");    
     }
 
     [HttpPost("createusers")]
@@ -97,6 +62,14 @@ public class MockController : ControllerBase
     
     }
 
+    [HttpPost("clearhorses")]
+    public async Task<IActionResult> ClearHorses()
+    {
+        _context.Horses.RemoveRange(_context.Horses);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
+        return Ok("Horses table cleared and IDs reset.");    
+    }
     [HttpPost("createhorses")]
     public async Task<IActionResult> CreateHorses()
     {
@@ -112,6 +85,15 @@ public class MockController : ControllerBase
     
         //return Created(); // versjon 12+
     }
+
+    [HttpPost("clearuserrelations")]
+    public async Task<IActionResult> ClearUserRelations()
+    {
+        _context.UserRelations.RemoveRange(_context.UserRelations);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserRelations\" RESTART IDENTITY CASCADE");
+        return Ok("UserRelations table cleared and IDs reset.");    
+    }
     [HttpPost("createuserrelations")]
     public async Task<IActionResult> CreateUserRelations()
     {
@@ -126,6 +108,15 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", friendRequests });
 
     }
+
+    [HttpPost("clearmessages")]
+    public async Task<IActionResult> ClearMessages()
+    {
+        _context.Messages.RemoveRange(_context.Messages);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Messages\" RESTART IDENTITY CASCADE");
+        return Ok("Messages table cleared and IDs reset.");    
+    }
     [HttpPost("createmessages")]
     public async Task<IActionResult> CreateMessages()
     {
@@ -139,7 +130,14 @@ public class MockController : ControllerBase
 
     }
 
-
+    [HttpPost("clearstables")]
+    public async Task<IActionResult> ClearStables()
+    {
+        _context.Stables.RemoveRange(_context.Stables);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Stables\" RESTART IDENTITY CASCADE");
+        return Ok("Stables table content cleared and IDs reset.");    
+    }
     [HttpPost("createstables")]
     public async Task<IActionResult> CreateStables()
     {
@@ -153,6 +151,14 @@ public class MockController : ControllerBase
 
     }
 
+    [HttpPost("clearstablemessages")]
+    public async Task<IActionResult> ClearStableMessages()
+    {
+        _context.StableMessages.RemoveRange(_context.StableMessages);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableMessages\" RESTART IDENTITY CASCADE");
+        return Ok("StableMessages table content cleared and IDs reset.");    
+    }
     [HttpPost("createstablemessages")]
     public async Task<IActionResult> CreateStableMessages()
     {
@@ -243,8 +249,8 @@ public class MockController : ControllerBase
     }
 
 
-    [HttpPost("databasecontentcreate")]
-    public async Task<IActionResult> CreateDbContent()
+    [HttpPost("createdatabase")]
+    public async Task<IActionResult> CreateDataBase() //kanskje misvisende navn. Lager innholdet
     {
         //await ClearDatabase();
         await CreateUsers();
@@ -268,4 +274,59 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!"});
 
     }
+    [HttpPost("databaseclear")]
+    public async Task<IActionResult> ClearDatabase()
+    {
+        
+        _context.SystemSettings.RemoveRange(_context.SystemSettings); //ingen rød strek her
+        _context.Users.RemoveRange(_context.Users); //ingen rød strek her
+        _context.Horses.RemoveRange(_context.Horses);//ingen rød strek her
+        _context.UserRelations.RemoveRange(_context.UserRelations); //ingen rød strek her
+        _context.Messages.RemoveRange(_context.Messages);
+        _context.Stables.RemoveRange(_context.Stables);
+        _context.StableMessages.RemoveRange(_context.StableMessages);
+        _context.StableUsers.RemoveRange(_context.StableUsers);
+        _context.Rides.RemoveRange(_context.Rides); 
+        //_context.RideDetails.RemoveRange(_context.RideDetails);
+        //_context.RideReviews.RemoveRange(_context.RideReviews);
+        _context.Trails.RemoveRange(_context.Trails);
+        //_context.TrailReviews.RemoveRange(_context.TrailReviews);
+        //_context.TrailFilters(_context.TrailFilters);
+
+
+
+        await _context.SaveChangesAsync();
+
+        //En merkelig feil, gjør at sekvensene for Id på Stables og Rides ikke starter på 1 etter cleardatabase og createcontent. 
+        // Da blir det feil når Mock skal opprettes for StableMessages og Trails, da Id refererer til noe som ikke eksisterer
+        //Det er ikke nødvendig og kjøre dette på Users og Horses, men de er med da det virker mest logisk.
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserRelations\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Messages\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Stables\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableMessages\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
+
+        // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Trenger ikke denne lenger da den er bygget om fra int til Guid
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Horses_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"UserRelations_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Messages_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Stables_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableMessages_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"StableUsers_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Denne skulle sikkert hete noe annet?
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
+        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
+
+        return Ok("Database cleared and IDs reset.");    
+        }
+
+    // Fyller opp tabellen systemSettings med systemSettingsMock.cs
+
 }

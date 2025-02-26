@@ -60,16 +60,7 @@ namespace HoplaBackend.Controllers
 
         return Ok(horses);
     }
-
-        [HttpGet("int/{horseId}")] 
-        public async Task<IActionResult> GetIntHorse(int horseId)
-        {
-            //var endpointName = ControllerContext.ActionDescriptor.ActionName;
-            var controllerName = ControllerContext.ActionDescriptor.ControllerName;
-            Guid newGuid = CustomConvert.IntToGuid(controllerName, horseId);
-        
-            return await GetHorse(newGuid);
-        }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetHorse(Guid id)
         {
@@ -101,3 +92,15 @@ namespace HoplaBackend.Controllers
         }
     }
 }
+/*
+        //brukes ikke lenger
+        [HttpGet("int/{horseId}")] 
+        public async Task<IActionResult> GetIntHorse(int horseId)
+        {
+            //var endpointName = ControllerContext.ActionDescriptor.ActionName;
+            var controllerName = ControllerContext.ActionDescriptor.ControllerName;
+            Guid newGuid = CustomConvert.IntToGuid(controllerName, horseId);
+        
+            return await GetHorse(newGuid);
+        }
+*/

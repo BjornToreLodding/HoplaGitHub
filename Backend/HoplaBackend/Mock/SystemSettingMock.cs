@@ -21,17 +21,22 @@ public static class SystemSettingMock
             new SystemSetting { Key = "AutoLogoutMinsAdmin", Value = "60", Type = "int" }, // minutter
             new SystemSetting { Key = "AllowUserRegistration", Value = "true", Type = "bool" }, // Må være aktivert for at ny medlemmer skal kunne registreres.          
             new SystemSetting { Key = "MaxLoginAttemptBeforeDelay", Value = "2", Type = "int" }, // Etter Value forsøk på å logge inn, må man vente oppgitt verdi før man kan gjøre neste login
-            new SystemSetting { Key = "DelayLoginAttemp", Value = "5", Type = "int" }, // oppgitt i sekunder
-            new SystemSetting { Key = "DelayMaxLoginAttemps", Value = "10", Type = "int" }, // oppgitt i sekunder
+            new SystemSetting { Key = "DelayLoginAttemp", Value = "5", Type = "int" }, // oppgitt i sekunder - ikke skrevet kode for dette enda
+            new SystemSetting { Key = "DelayMaxLoginAttemps", Value = "10", Type = "int" }, // oppgitt i sekunder - ikke skrevet kode for dette enda
 
             // Hvis aktivert svarer kun Admin/-endpoints.
             new SystemSetting { Key = "EnableAPI", Value = "true", Type = "bool" },
 
-            new SystemSetting { Key = "UserProfilePictureList-height", Value = "100", Type = "int" }, // oppgitt i pixler
-            new SystemSetting { Key = "UserProfilePictureList-width", Value = "100", Type = "int" }, // oppgitt i pixler
-            new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "400", Type = "int" }, // oppgitt i pixler
-            new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "400", Type = "int" }, // oppgitt i pixler
-            new SystemSetting { Key = "HorsepictureList-height", Value = "100", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureList-height", Value = "64", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureList-width", Value = "64", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "200", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "200", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "HorsepictureList-height", Value = "64", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "HorsepictureList-width", Value = "64", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "HorsepictureSelect-height", Value = "200", Type = "int" }, // oppgitt i pixler
+            new SystemSetting { Key = "HorsepictureSelectList-width", Value = "200", Type = "int" }, // oppgitt i pixler
+
+
             new SystemSetting { Key = "Zettings1", Value = "10", Type = "int" }, // oppgitt i ?
             new SystemSetting { Key = "Zettings2", Value = "20", Type = "int" }, // oppgitt i ?
             new SystemSetting { Key = "Zettings3", Value = "30", Type = "int" }, // oppgitt i ?
