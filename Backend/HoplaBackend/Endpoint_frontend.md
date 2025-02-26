@@ -1,19 +1,13 @@
 
-
-
-
-
-
-
-
 # Profil
 
 <table>
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"} 
-<br><br>**Status:** <br>si ifra hvis det ønskes forrandringer
+![image.png](/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"} <br><br>**Status:** <br>si ifra hvis det ønskes forandringer
+
+`Android: Nå mulig å logge inn`
 </td>
 <td>
 
@@ -55,8 +49,9 @@ photo-1614203586837-1da2bef106a2?w=200&h=200&fit=crop"
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/b59f667b696efff50d4b81ce91ca3c72/image.png){width="248" height="456"}
-<br><br>**Status:** <br>si ifra hvis det ønskes forrandringer. <br><br>(NB Bruker ikke userID, men Token)
+![image.png](/vakvaer/hopla/-/wikis/uploads/b59f667b696efff50d4b81ce91ca3c72/image.png){width="248" height="456"} <br><br>**Status:** <br>si ifra hvis det ønskes forandringer. <br><br>(NB Bruker ikke userID, men Token)
+
+`Android: Bruker lagret informasjon fra login for øyeblikket for å displaye informasjon`
 </td>
 <td>
 
@@ -65,13 +60,13 @@ Main profil side
 * **`Get `request ~~som bruker userID med informasjon~~ :** (NB Bruker ikke userID, men Token)
   * **Brukernavn(alias), epost og bilde**
   * **(Bilde: bruker size 200.dp og clip circleshape)**
-
-* **GET med Authorization:
-  * **GET https://hopla.onrender.com/users/myprofile**
+* \*\*GET med Authorization:
+  * \*\*GET \*\***https://hopla.onrender.com/users/myprofile**
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
 **JSON Response (Eksempel)**
+
 ```Postman_JSON
 {
     "alias": "MangeBallerILufra",
@@ -80,15 +75,15 @@ Main profil side
     "profilePictureUrl": "https://images.unsplash.com/
 photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
-
 ```
 </td>
 </tr>
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/68cec6509720727d6fcc482677031ce9/image.png){width="324" height="565"}
-<br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
+![image.png](/vakvaer/hopla/-/wikis/uploads/68cec6509720727d6fcc482677031ce9/image.png){width="324" height="565"} <br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
+
+`Android: nå lagt inn`
 </td>
 <td>
 
@@ -96,31 +91,31 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 
 * `Get` request på å hente brukeren som er logget inn sine hester
 * Trenger å få: bilde og navn på hesten (hestens id for å kunne brukes til å gå til detalj siden om hver enkelt hest? )
-
-* **GET med Authorization:
-  * **GET GET https://hopla.onrender.com/horses/userhorses/**
+* \*\*GET med Authorization:
+  * \*\*GET GET \*\***https://hopla.onrender.com/horses/userhorses/**
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
- **Eksempel på response body JSON**
+**Eksempel på response body JSON**
+
 ```Postman_JSON
 [
     {
         "id": "12345678-0000-0000-0002-123456780001",
         "name": "Flodhest",
-        "profilePictureUrl": "https://images.unsplash.com/
+        "horsePictureUrl": "https://images.unsplash.com/
         photo-1599053581540-248ea75b59cb?h=64&w=64&fit=crop"
     },
     {
         "id": "12345678-0000-0000-0002-123456780018",
         "name": "Kronprins Durek",
-        "profilePictureUrl": "https://images.unsplash.com/
+        "horsePictureUrl": "https://images.unsplash.com/
         photo-1438283173091-5dbf5c5a3206?h=64&w=64&fit=crop"
     },
     {
         "id": "12345678-0000-0000-0002-123456780025",
         "name": "Fola Blakken",
-        "profilePictureUrl": "https://images.unsplash.com/
+        "horsePictureUrl": "https://images.unsplash.com/
         photo-1438283173091-5dbf5c5a3206?h=64&w=64&fit=crop"
     }
 ]
@@ -130,25 +125,26 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/6ea310ba1383bdd11b753b2f2803cf05/image.png){width="316" height="517"}
-<br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
+![image.png](/vakvaer/hopla/-/wikis/uploads/6ea310ba1383bdd11b753b2f2803cf05/image.png){width="316" height="517"} <br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
+
+`Android: lagt inn`
 </td>
 <td>
 
 **Profil -\> Mine hester -\> Velge en spesifikk hest**
 
 * Get request ut ifra hestens id for å hente: navn, bilde, rase og alder/fødselsdato
-
-* **GET med Authorization:
-  * **GET https://hopla.onrender.com/horses/{horseGuid}**
+* \*\*GET med Authorization:
+  * \*\*GET \*\***https://hopla.onrender.com/horses/{horseGuid}**
   * **auth Type Bearer Token** (kan enkelt deaktiveres)
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
   **Eksempel på response body**
+
 ```Postman_JSON
   {
     "name": "Flodhest",
-    "profilePictureUrl": "https://images.unsplash.com/
+    "horsePictureUrl": "https://images.unsplash.com/
     photo-1599053581540-248ea75b59cb?h=200&w=200&fit=crop",
     "dob": "2017-01-25T15:18:15.586439Z",
     "age": 8,
@@ -161,6 +157,9 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 <td>
 
 ![image.png](uploads/abb5dca0140be056c4f38b06913611e8/image.png){width="322" height="603"}
+
+<br><br>**Status:** <br>BT: Denne skal virke nå
+
 </td>
 <td>
 
@@ -170,12 +169,58 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 * Trenger bilde, navn og vennestatus enum verdi (id for å vise person detalj siden)
 
   (bilde: nå er det 64.dp)
+
+```
+// Enum verdier for vennestatuser jeg bruker nå: 
+enum class PersonStatus {
+    FRIEND,
+    FOLLOWING,
+    NONE,
+    PENDING
+}
+```
+**Eksempel på request**
+GET https://hopla.onrender.com/userrelations/friends
+<br>Denne henter vennene til innlogget bruker
+
+GET https://hopla.onrender.com/userrelations/friends?userid=12345678-0000-0000-0001-123456780003
+<br>Denne henter vennen til oppgitt userid
+
+**NB!! Begge må ha authorization Bearer Token**
+
+ **Eksempel på response body**
+ ```Postman_JSON
+ [
+    {
+        "friendId": "12345678-0000-0000-0001-123456780006",
+        "friendName": "Anna Louise Sedolfsen",
+        "friendAlias": "JockeyAnnaLouise",
+        "friendPictureURL": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=64&h=64&fit=crop"
+    },
+    {
+        "friendId": "12345678-0000-0000-0001-123456780005",
+        "friendName": "Ann Iren Haakenstad",
+        "friendAlias": "JockeyAnnIren",
+        "friendPictureURL": "https://images.unsplash.com/photo-1554151228-14d9def656e4?w=64&h=64&fit=crop"
+    },
+    {
+        "friendId": "12345678-0000-0000-0001-123456780004",
+        "friendName": "Thea Dyring",
+        "friendAlias": "JockeyThea",
+        "friendPictureURL": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop"
+    }
+ ]
+ ```
+
+
 </td>
 </tr>
 <tr>
 <td>
 
 ![image.png](uploads/c7a6e3a1b0bb4e20c192c65bd6bf5531/image.png){width="309" height="502"}
+
+<br><br>**Status:** <br>BT: Denne skal virke nå
 </td>
 <td>
 
@@ -185,6 +230,40 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 * Trenger bilde, navn og vennestatus enum verdi (id for å vise person detalj siden)
 
   (bilde: nå er det 64.dp)
+
+**Eksempel på request**
+GET https://hopla.onrender.com/userrelations/following
+<br>Denne henter vennene til innlogget bruker
+
+GET https://hopla.onrender.com/userrelations/follwing?userid=12345678-0000-0000-0001-123456780003
+<br>Denne henter vennen til oppgitt userid
+
+**NB!! Begge må ha authorization Bearer Token**
+
+ **Eksempel på response body**
+
+  ```Postman_JSON
+  [
+    {
+        "followingUserId": "12345678-0000-0000-0001-123456780037",
+        "followingUserName": "Høysnue Kåre",
+        "followingUserAlias": "AlltidISvime",
+        "followingUserPicture": "https://images.unsplash.com/photo-1535201344891-231e85e83c8a?w=64&h=64&fit=crop"
+    },
+    {
+        "followingUserId": "12345678-0000-0000-0001-123456780032",
+        "followingUserName": "Stalke Ulf",
+        "followingUserAlias": "CreepyStalker",
+        "followingUserPicture": "https://images.unsplash.com/photo-1535201344891-231e85e83c8a?w=64&h=64&fit=crop"
+    },
+    {
+        "followingUserId": "12345678-0000-0000-0001-123456780038",
+        "followingUserName": "Dag Gjesper Lang",
+        "followingUserAlias": "GjesperDagenLang",
+        "followingUserPicture": "https://images.unsplash.com/photo-1535201344891-231e85e83c8a?w=64&h=64&fit=crop"
+    }
+  ]
+  ```
 </td>
 </tr>
 <tr>
@@ -220,32 +299,32 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 <tr>
 <td>
 
-![image.png](uploads/6d56ffc28e83cf25bbf1f62fb664e3f6/image.png){width=307 height=576}
+![image.png](uploads/6d56ffc28e83cf25bbf1f62fb664e3f6/image.png){width="307" height="576"}
 </td>
 <td>
 
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
-**Hjem** 
+**Hjem**
 
-* Denne skal inneholde: Nye løyper lagt til, nye kommentarer på løyper fra alle brukere i appen. 
-* 5 og 5 innlegg etter hvert som man blar blir hentet (samme måte som over) 
+* Denne skal inneholde: Nye løyper lagt til, nye kommentarer på løyper fra alle brukere i appen.
+* 5 og 5 innlegg etter hvert som man blar blir hentet (samme måte som over)
   * Hvis løype: bilde, id, navn, løype beskrivelse, id og brukernavn på bruker som har registrert løypa
   * Hvis ny kommentar på løype: løype navn, løype id, kommentaren selv, evt bilde lagt til i kommentaren, brukernavn og brukerid til brukeren som la til kommentaren
 
-**Hjem -\> Venner** 
+**Hjem -\> Venner**
 
-* Samme som over, men alle løyper og kommentarer som hentes må være venn med brukeren som er logget in 
-* Også hente: 
-  * Stjerner gitt av venner på løyper (trenger da num stjerner, løype navn og løype id, brukerid og brukernavn) 
+* Samme som over, men alle løyper og kommentarer som hentes må være venn med brukeren som er logget in
+* Også hente:
+  * Stjerner gitt av venner på løyper (trenger da num stjerner, løype navn og løype id, brukerid og brukernavn)
 
-**Hjem -\> Område** 
+**Hjem -\> Område**
 
 * Samme som første bare at det er en viss avstand fra brukeren på alt som vises her
 
 **Hjem -\> Følger**
 
-* Vises ikke på bildet men skal legge til (kanskje bytte ut/ta vekk populært og/eller område) 
+* Vises ikke på bildet men skal legge til (kanskje bytte ut/ta vekk populært og/eller område)
 * Samme som første bare at det kun er brukere som den innloggede brukeren følger
 </td>
 </tr>

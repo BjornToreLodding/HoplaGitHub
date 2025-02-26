@@ -7,6 +7,7 @@ using HoplaBackend.DTOs;
 using HoplaBackend.Helpers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace HoplaBackend.Controllers
 {
@@ -25,24 +26,27 @@ namespace HoplaBackend.Controllers
         }
         [Authorize]
         [HttpGet("friends")]
-        public async Task<IActionResult> GetFriends()
-        {
-            //Debugging
-            Console.WriteLine("Token claims:");
-            foreach (var claim in User.Claims)
+        public async Task<IActionResult> GetFriends([FromQuery] Guid? userId)
+        { //userId hentes fra token, men for testing så ligger det også en query som lar oss sjekke andre userId enn token.
+            if (!userId.HasValue) // Henter userId fra token. 
             {
-                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+                //Debugging
+                Console.WriteLine("Token claims:");
+                foreach (var claim in User.Claims)
+                {
+                    Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+                }
+
+                // Hent brukerens ID fra tokenet
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+                {
+                    return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+                }         
+                userId = parsedUserId;
             }
-
-        // Hent brukerens ID fra tokenet
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-
             var friends = await _context.UserRelations
                 .Where(ur => (ur.Status == "friend" || ur.Status == "FRIEND" || ur.Status == "Friend") && (ur.FromUserId == userId || ur.ToUserId == userId))
                 .Select(ur => new
@@ -54,6 +58,7 @@ namespace HoplaBackend.Controllers
                     ? ur.ToUser.ProfilePictureUrl + "?w=64&h=64&fit=crop" 
                     : ur.FromUser.ProfilePictureUrl + "?w=64&h=64&fit=crop"
                 })
+                .OrderBy(f => f.FriendAlias) // Sorter etter FriendAlias
                 .ToListAsync();
 
             return Ok(friends);
@@ -61,25 +66,29 @@ namespace HoplaBackend.Controllers
 
         [Authorize]
         [HttpGet("following")]
-        public async Task<IActionResult> GetFollowingUsers()
-        {
-            //Debugging, fjernes når alt virker
-            Console.WriteLine("Token claims:");
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-            }
+        public async Task<IActionResult> GetFollowingUsers([FromQuery] Guid? userId)
+        {  //userId hentes fra token, men for testing så ligger det også en query som lar oss sjekke andre userId enn token.
+            if (!userId.HasValue) // Henter userId fra token. 
+                {
+                //Debugging, fjernes når alt virker
+                Console.WriteLine("Token claims:");
+                foreach (var claim in User.Claims)
+                {
+                    Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+                }
 
-            // Hent brukerens ID fra tokenet
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
-            {
-                return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+                // Hent brukerens ID fra tokenet
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+                {
+                    return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+                }
+                userId = parsedUserId;
             }
-
             var followingUsers = await _context.UserRelations
                 .Where(ur => ur.FromUserId == userId && ur.Status == "FOLLOWING")
+                .OrderBy(ur => ur.ToUser.Alias)
                 .Select(ur => new 
                 {
                     FollowingUserId = ur.ToUserId,
