@@ -59,6 +59,39 @@ namespace HoplaBackend.Controllers
             return Ok(friends);
         }
 
+        [Authorize]
+        [HttpGet("following")]
+        public async Task<IActionResult> GetFollowingUsers()
+        {
+            //Debugging, fjernes når alt virker
+            Console.WriteLine("Token claims:");
+            foreach (var claim in User.Claims)
+            {
+                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+            }
+
+            // Hent brukerens ID fra tokenet
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+            {
+                return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+            }
+
+            var followingUsers = await _context.UserRelations
+                .Where(ur => ur.FromUserId == userId && ur.Status == "FOLLOWING")
+                .Select(ur => new 
+                {
+                    FollowingUserId = ur.ToUserId,
+                    FollowingUserName = ur.ToUser.Name,
+                    FollowingUserAlias = ur.ToUser.Alias,
+                    FollowingUserPicture = ur.ToUser.ProfilePictureUrl + "?w=64&h=64&fit=crop"
+                })
+                .ToListAsync();
+
+            return Ok(followingUsers);
+        }
+
         [HttpGet("requests/{userId}")]
         public async Task<IActionResult> GetFriendRequestss(Guid userId)
         {
