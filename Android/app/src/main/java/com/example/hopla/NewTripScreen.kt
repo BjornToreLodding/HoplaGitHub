@@ -33,7 +33,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.ui.graphics.Color
 
@@ -43,7 +42,7 @@ import androidx.compose.ui.graphics.Color
 fun NewTripScreen() {
     var isRunning by remember { mutableStateOf(false) }
     var time by remember { mutableIntStateOf(0) }
-    var distance by remember { mutableStateOf(0.0) }
+    var distance by remember { mutableDoubleStateOf(0.0) }
     var lastLocation by remember { mutableStateOf<Location?>(null) }
     var showDialog by remember { mutableStateOf(false) }
     var tripName by remember { mutableStateOf("") }
@@ -76,6 +75,8 @@ fun NewTripScreen() {
         }
     }
 
+    val cameraPositionState = rememberCameraPositionState()
+
     LaunchedEffect(Unit) {
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -85,6 +86,9 @@ fun NewTripScreen() {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     lastLocation = location
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                        LatLng(location.latitude, location.longitude), 15f
+                    )
                 }
             }
         } else {
@@ -126,10 +130,6 @@ fun NewTripScreen() {
             delay(1000L)
             time++
         }
-    }
-
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(37.7749, -122.4194), 10f)
     }
 
     // filter words list
@@ -220,7 +220,7 @@ fun NewTripScreen() {
     }
 
     if (showDialog) {
-        var selectedRating by remember { mutableStateOf(0) } // Track selected stars
+        var selectedRating by remember { mutableIntStateOf(0) } // Track selected stars
 
         AlertDialog(
             onDismissRequest = { showDialog = false },

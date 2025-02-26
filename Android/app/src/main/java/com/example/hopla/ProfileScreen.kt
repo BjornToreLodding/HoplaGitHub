@@ -47,10 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
-import android.icu.util.LocaleData
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,8 +64,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
-import java.time.LocalDate
 
 // Main profile function
 @Composable
