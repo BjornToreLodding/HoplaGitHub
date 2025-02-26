@@ -115,5 +115,6 @@
     <string name="not_available_right_now">Not available at the moment</string>
     <string name="date_of_birth">Date of birth</string>
     <string name="if_no_friends">Add friends by pressing the + sign</string>
+    <string name="no_friends_match_search">No friends match what is searched</string>
 
 </resources>

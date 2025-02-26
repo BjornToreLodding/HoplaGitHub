@@ -689,6 +689,7 @@ fun TripItem(trip: Trip) {
 @Composable
 fun FriendsScreen(navController: NavController) {
     var friends by remember { mutableStateOf<List<Friend>>(emptyList()) }
+    var searchQuery by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -701,6 +702,11 @@ fun FriendsScreen(navController: NavController) {
         }
     }
 
+    val filteredFriends = friends.filter {
+        it.friendName.contains(searchQuery, ignoreCase = true) ||
+                it.friendAlias.contains(searchQuery, ignoreCase = true)
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -709,9 +715,14 @@ fun FriendsScreen(navController: NavController) {
         ) {
             ScreenHeader(navController, stringResource(R.string.friends))
 
-            if (friends.isEmpty()) {
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
+            )
+
+            if (filteredFriends.isEmpty()) {
                 Text(
-                    text = stringResource(R.string.if_no_friends),
+                    text = stringResource(R.string.no_friends_match_search),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -719,7 +730,7 @@ fun FriendsScreen(navController: NavController) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(friends) { friend ->
+                    items(filteredFriends) { friend ->
                         FriendItem(friend, navController)
                     }
                 }

@@ -115,5 +115,6 @@
     <string name="not_available_right_now">Ikke tilgjengelig for øyeblikket</string>
     <string name="date_of_birth">Fødselsdag</string>
     <string name="if_no_friends">Legg til venner ved å trykke på + tegnet</string>
+    <string name="no_friends_match_search">Ingen venner matcher søket</string>
 
 </resources>
