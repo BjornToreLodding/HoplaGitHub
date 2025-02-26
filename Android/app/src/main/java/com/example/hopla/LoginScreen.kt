@@ -68,15 +68,6 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Variables for response feedback for the post request when logging in
-    var token by remember { mutableStateOf("") }
-    var userId by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var alias by remember { mutableStateOf("") }
-    var profilePictureURL by remember { mutableStateOf("") }
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()

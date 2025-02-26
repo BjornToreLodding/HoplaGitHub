@@ -51,12 +51,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.sharp.AccountBox
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
-import android.util.Log
+import coil.compose.rememberAsyncImagePainter
 
 // Main profile function
 @Composable
@@ -367,10 +366,9 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
 
 // Function to update the profile picture of the user
 @Composable
-fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
+fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    // Display the current profile picture (either the selected or default image)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -393,7 +391,7 @@ fun ProfilePicture(imageResource: Int = R.drawable.logo2) {
                 )
             } else {
                 Image(
-                    painter = painterResource(id = imageResource),
+                    painter = rememberAsyncImagePainter(model = imageUrl),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
