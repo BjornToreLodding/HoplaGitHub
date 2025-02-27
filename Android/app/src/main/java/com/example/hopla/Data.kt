@@ -2,7 +2,7 @@ package com.example.hopla
 
 import kotlinx.serialization.Serializable
 
-const val baseID = "3"
+// Base URL for the API
 const val apiUrl = "https://hopla.onrender.com/"
 
 // Class for the data of a trip
@@ -29,6 +29,7 @@ data class Person(
     val status: PersonStatus
 )
 
+// Class for details about a specific horse
 @Serializable
 data class HorseDetail(
     val name: String,
@@ -38,6 +39,7 @@ data class HorseDetail(
     val breed: String
 )
 
+// Class for the data of a horse (for the list of horses)
 @Serializable
 data class Horse(
     val id: String,
@@ -63,6 +65,7 @@ data class Community(
     val description: String
 )
 
+// Class for the data of a post
 data class Message(
     val id: String,
     val content: String,
@@ -70,6 +73,7 @@ data class Message(
     val imageUrl: String? = null
 )
 
+// Class for the data for a friend (for the list of friends)
 @Serializable
 data class Friend(
     val friendId: String,
@@ -78,6 +82,7 @@ data class Friend(
     val friendPictureURL: String
 )
 
+// Class for the data for a person the user follows (for the list of following)
 @Serializable
 data class Following(
     val followingUserId: String,

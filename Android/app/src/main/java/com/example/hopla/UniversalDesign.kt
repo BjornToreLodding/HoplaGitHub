@@ -60,6 +60,7 @@ fun SearchBar(
     onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // A text field with a search icon
     TextField(
         value = searchQuery,
         onValueChange = onSearchQueryChange,
@@ -70,7 +71,7 @@ fun SearchBar(
                 contentDescription = stringResource(R.string.search)
             )
         },
-        singleLine = true,
+        singleLine = true,      // Only one line possibe
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -80,11 +81,13 @@ fun SearchBar(
 // An button (used for add) that takes navigation in as a parameter
 @Composable
 fun AddButton(onClick: () -> Unit) {
+    // Box for the button
     Box(
         modifier = Modifier
             .fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
+        // Floating action button with an add icon (+)
         FloatingActionButton(
             onClick = onClick,
             modifier = Modifier.padding(16.dp)
@@ -97,6 +100,7 @@ fun AddButton(onClick: () -> Unit) {
 // A header for the screen with a back button to navigate to previous page and a title
 @Composable
 fun ScreenHeader(navController: NavController, headerText: String) {
+    // Box for the header with a border
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,6 +108,7 @@ fun ScreenHeader(navController: NavController, headerText: String) {
             .background(MaterialTheme.colorScheme.tertiary)
             .border(10.dp, MaterialTheme.colorScheme.primary)
     ) {
+        // Row for the back button and the title
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxHeight()
@@ -234,6 +239,7 @@ fun MessageBox(
     onMessageChange: (String) -> Unit,
     community: Community
 ) {
+    // Main box for the message box
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -241,11 +247,13 @@ fun MessageBox(
             .padding(16.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            // Scrollview for the messages
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 8.dp)
             ) {
+                // The messages themselves
                 items(messages) { message ->
                     Column(
                         modifier = Modifier
@@ -271,12 +279,14 @@ fun MessageBox(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                androidx.compose.material.TextField(
+                // Text field for the new message
+                TextField(
                     value = newMessage,
                     onValueChange = onMessageChange,
                     modifier = Modifier.weight(1f),
                     placeholder = { Text(text = stringResource(R.string.enter_you_message)) }
                 )
+                // Button to publish the message
                 Button(
                     onClick = {
                         if (newMessage.isNotBlank()) {
