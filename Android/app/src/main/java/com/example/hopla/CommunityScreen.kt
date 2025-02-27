@@ -44,6 +44,7 @@ fun CommunityScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var showLikedOnly by remember { mutableStateOf(false) }
     val likedCommunities = remember { mutableStateListOf<Community>() }
+    // List of community groups (replace with database)
     val communities = listOf(
         Community(
             name = "Horse community",
@@ -61,31 +62,39 @@ fun CommunityScreen(navController: NavController) {
             description = "A stable for donkeys ONLY"
         )
     )
+
+    // Filter the communities based on the search query and liked status
     val filteredCommunities = communities.filter {
         it.name.contains(searchQuery, ignoreCase = true) &&
                 (!showLikedOnly || likedCommunities.contains(it))
     }
 
+    // Column for the community screen (whole screen)
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
+            // Top text for filtering the groups based on position and liked status
             TopTextCommunity(currentPage = if (showLikedOnly) "liked" else "position") { showLikedOnly = it }
+            // A search bar to search for community groups
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
             )
+            // Scrollview for displaying the community groups
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 8.dp)
             ) {
+                // Display the community groups
                 items(filteredCommunities) { community ->
                     CommunityCard(community, navController, likedCommunities)
                 }
             }
         }
+        // Add button to add a new community group
         AddButton(onClick = { navController.navigate("addCommunityScreen") })
     }
 }
@@ -95,6 +104,7 @@ fun CommunityScreen(navController: NavController) {
 fun CommunityCard(community: Community, navController: NavController, likedCommunities: MutableList<Community>) {
     var isLiked by remember { mutableStateOf(likedCommunities.contains(community)) }
 
+    // A card to display the community group itself
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -103,8 +113,10 @@ fun CommunityCard(community: Community, navController: NavController, likedCommu
             .padding(vertical = 8.dp)
             .clickable { navController.navigate("communityDetail/${community.name}") }
     ) {
+        // Box and column to arrange content inside the card
         Box {
             Column {
+                // Image of the community group
                 Image(
                     painter = painterResource(id = community.imageResource),
                     contentDescription = community.name,
@@ -112,28 +124,34 @@ fun CommunityCard(community: Community, navController: NavController, likedCommu
                         .fillMaxWidth()
                         .height(150.dp)
                 )
+                // Text of the community group (name)
                 Text(
                     text = community.name,
                     fontSize = 16.sp,
                     modifier = Modifier.padding(8.dp)
                 )
             }
+            // Like button to like the community group
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)
                     .background(MaterialTheme.colorScheme.background, shape = CircleShape)
             ) {
+                // Icon for the like button (filled or outlined)
                 IconButton(
                     onClick = {
                         isLiked = !isLiked
                         if (isLiked) {
+                            // Add database logic
                             likedCommunities.add(community)
                         } else {
+                            // Remove database logic
                             likedCommunities.remove(community)
                         }
                     }
                 ) {
+                    // The icon itself
                     Icon(
                         imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) stringResource(R.string.liked) else stringResource(R.string.not_liked),
@@ -160,6 +178,7 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
+            // Box for the position text
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -168,12 +187,14 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
                     .background(if (currentPage == "position") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
+                // The text itself
                 Text(
                     text = stringResource(R.string.position),
                     fontSize = 10.sp,
                     color = if (currentPage == "position") MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
                 )
             }
+            // Box for the liked text
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -182,6 +203,7 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
                     .background(if (currentPage == "liked") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
+                // The text itself
                 Text(
                     text = stringResource(R.string.liked),
                     fontSize = 10.sp,
@@ -200,33 +222,39 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
     val messages = remember { mutableStateListOf<Message>() }
 
     // Load messages from the database
+    // Replace with actual database logic
     LaunchedEffect(community.name) {
         val fetchedMessages = fetchMessages(community.name)
         messages.addAll(fetchedMessages)
     }
 
+    // Whole screen
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Box for the header of the screen
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.2f)
                 .border(1.dp, MaterialTheme.colorScheme.primary)
         ) {
+            // Image of the community group
             Image(
                 painter = painterResource(id = community.imageResource),
                 contentDescription = community.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+            // Transparent box as overlay over the image
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
             )
+            // Row for the back button, title, and info button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -234,17 +262,20 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                // Back button
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back)
                     )
                 }
+                // Title of the community group
                 Text(
                     text = community.name,
                     fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
+                // Info button to show details about the community
                 IconButton(onClick = { showDialog = true }) {
                     Icon(
                         imageVector = Icons.Default.Info,
@@ -254,9 +285,11 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Column for the messages posted in the group
         MessageBox(messages, newMessage, onMessageChange = { newMessage = it }, community)
     }
 
+    // Show a dialog with the description of the community group
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -290,6 +323,7 @@ fun getCommunityByName(name: String): Community? {
             description = "A community for donkey lovers ONLY"
         )
     )
+    // Return the community group with the given name
     return communities.find { it.name == name }
 }
 
@@ -300,16 +334,20 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
     var imageResource by remember { mutableIntStateOf(0) }
     var description by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var selectedOption by remember { mutableStateOf<String?>(null) }
 
+    // Column for the add community screen
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Header of the screen
         ScreenHeader(navController = navController, headerText = stringResource(R.string.add_new_community))
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Input fields for the name and description of the community group
         TextField(
             value = name,
             onValueChange = { name = it },
@@ -324,7 +362,8 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        // Add option to remove image if it is added
+
+        // Image picker to select an image for the community group
         if (imageBitmap != null) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -334,8 +373,7 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
                     bitmap = imageBitmap!!.asImageBitmap(),
                     contentDescription = "Selected Image",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(64.dp)
+                    modifier = Modifier.size(64.dp)
                 )
                 IconButton(onClick = { imageBitmap = null }) {
                     Icon(
@@ -350,11 +388,47 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
             text = if (imageBitmap == null) stringResource(R.string.add_image) else stringResource(R.string.change_image)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            val newCommunity = Community(name, imageResource, description)
-            onAdd(newCommunity)
-            navController.popBackStack()
-        }) {
+
+        // Clickable boxes for Private, Public, and Friends
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            listOf(stringResource(R.string.private_string), stringResource(R.string.public_string), stringResource(R.string.friends)).forEach { option ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp)
+                        .clickable { selectedOption = option }
+                        .background(
+                            if (selectedOption == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = option,
+                        color = if (selectedOption == option) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Button to add the new community group, that makes sure the input fields are filled
+        Button(
+            onClick = {
+                if (selectedOption != null) {
+                    val newCommunity = Community(name, imageResource, description)
+                    onAdd(newCommunity)
+                    navController.popBackStack()
+                } else {
+                    // Show a message to select an option
+                }
+            },
+            enabled = name.isNotBlank() && description.isNotBlank() && selectedOption != null
+        ) {
             Text(text = stringResource(R.string.add_new_community))
         }
     }

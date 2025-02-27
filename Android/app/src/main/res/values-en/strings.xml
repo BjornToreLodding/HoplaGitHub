@@ -117,5 +117,7 @@
     <string name="if_no_friends">Add friends by pressing the + sign</string>
     <string name="no_friends_match_search">No friends match what is searched</string>
     <string name="no_following_matches">No one matches the search</string>
+    <string name="private_string">Private</string>
+    <string name="public_string">Public</string>
 
 </resources>

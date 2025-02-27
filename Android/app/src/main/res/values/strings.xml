@@ -116,5 +116,7 @@
     <string name="if_no_friends">Legg til venner ved å trykke på + tegnet</string>
     <string name="no_friends_match_search">Ingen venner matcher søket</string>
     <string name="no_following_matches">Ingen du følger matcher søket</string>
+    <string name="private_string">Privat</string>
+    <string name="public_string">Offentlig</string>
 
 </resources>
