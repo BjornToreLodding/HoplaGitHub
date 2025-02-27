@@ -101,9 +101,27 @@ namespace HoplaBackend.Controllers
             return Ok(followingUsers);
         }
 
-        [HttpGet("requests/{userId}")]
-        public async Task<IActionResult> GetFriendRequestss(Guid userId)
+        [HttpGet("requests")]
+        public async Task<IActionResult> GetFriendRequestss([FromQuery] Guid? userId)
         {
+            if (!userId.HasValue) // Henter userId fra token. 
+            {
+                //Debugging, fjernes når alt virker
+                Console.WriteLine("Token claims:");
+                foreach (var claim in User.Claims)
+                {
+                    Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+                }
+
+                // Hent brukerens ID fra tokenet
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+                {
+                    return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+                }
+                userId = parsedUserId;
+            }
             var friendrequests = await _context.UserRelations
                 //.Include(fr => fr.FromUserId)
                 .Where(ur => (ur.Status == "pending" || ur.Status == "Pending") && ur.ToUserId == userId)
