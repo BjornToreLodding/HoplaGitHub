@@ -90,3 +90,16 @@ data class Following(
     val followingUserAlias: String,
     val followingUserPicture: String
 )
+
+// Class for content that are sent to database when trying to login
+@Serializable
+data class LoginRequest(
+    val email: String,
+    val password: String
+)
+
+// Class for content of error messages received from the server
+@Serializable
+data class ErrorResponse(
+    val message: String
+)

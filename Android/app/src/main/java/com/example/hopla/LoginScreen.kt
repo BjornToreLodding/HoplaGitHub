@@ -45,18 +45,13 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import android.util.Log
+import androidx.compose.material3.CircularProgressIndicator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-@Serializable
-data class LoginRequest(val email: String, val password: String)
-
-@Serializable
-data class ErrorResponse(val message: String)
-
+// Main function for the login screen
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var username by remember { mutableStateOf("") }
@@ -65,9 +60,11 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var showForgottenPasswordDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // Main column for the login screen
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,6 +72,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Logo and app name
         Image(
             painter = painterResource(id = R.drawable.logo1),
             contentDescription = "App Logo",
@@ -90,6 +88,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
         )
+        // Text fields for the email and password input
         TextField(
             value = username,
             onValueChange = { username = it },
@@ -109,6 +108,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 8.dp)
         )
+        // Forgotten password clickable text
         Text(
             text = stringResource(R.string.forgot_password),
             color = PrimaryBlack,
@@ -119,71 +119,87 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .clickable { showForgottenPasswordDialog = true },
         )
 
-        Button(
-            onClick = {
-                val trimmedUsername = username.trim()
-                val trimmedPassword = password.trim()
+        // Button for logging in, if clicked a loading indicator will be shown until logged in or
+        // an error message is shown
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        } else {
+            Button(
+                onClick = {
+                    // trim the input fields for removing leading and trailing whitespaces
+                    val trimmedUsername = username.trim()
+                    val trimmedPassword = password.trim()
 
-                if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
-                    errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
-                    showErrorDialog = true
-                } else {
-                    coroutineScope.launch {
-                        val client = HttpClient {
-                            install(ContentNegotiation) {
-                                json(Json {
-                                    ignoreUnknownKeys = true
-                                    isLenient = true
-                                    encodeDefaults = true
-                                })
-                            }
-                        }
-                        try {
-                            val response: HttpResponse = client.post(apiUrl + "users/login/") {
-                                contentType(ContentType.Application.Json)
-                                setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
-                            }
-                            Log.d("LoginScreen", "Response status: ${response.status}")
-                            when (response.status) {
-                                HttpStatusCode.OK -> {
-                                    val loginResponse = response.body<User>()
-                                    UserSession.token = loginResponse.token
-                                    UserSession.userId = loginResponse.userId
-                                    UserSession.email = loginResponse.email
-                                    UserSession.name = loginResponse.name
-                                    UserSession.alias = loginResponse.alias
-                                    UserSession.profilePictureURL = loginResponse.profilePictureURL
-                                    onLogin()
-                                }
-                                HttpStatusCode.Unauthorized -> {
-                                    val errorResponse = response.body<ErrorResponse>()
-                                    errorMessage = errorResponse.message
-                                    showErrorDialog = true
-                                    Log.d("LoginScreen", "Unauthorized: ${errorResponse.message}")
-                                }
-                                else -> {
-                                    errorMessage = context.getString(R.string.not_available_right_now)
-                                    showErrorDialog = true
-                                    Log.d("LoginScreen", "Unexpected status: ${response.status}")
+                    // check if the input fields are empty
+                    if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
+                        errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
+                        showErrorDialog = true
+                    } else {
+                        // set loading to true and send a post request to the server
+                        isLoading = true
+                        coroutineScope.launch {
+                            val client = HttpClient {
+                                install(ContentNegotiation) {
+                                    json(Json {
+                                        ignoreUnknownKeys = true
+                                        isLenient = true
+                                        encodeDefaults = true
+                                    })
                                 }
                             }
-                        } catch (e: Exception) {
-                            errorMessage = context.getString(R.string.not_available_right_now)
-                            showErrorDialog = true
-                            Log.e("LoginScreen", "Exception: ${e.message}", e)
-                        } finally {
-                            client.close()
+                            // send a post request to the server with the login data
+                            try {
+                                val response: HttpResponse = client.post(apiUrl + "users/login/") {
+                                    contentType(ContentType.Application.Json)
+                                    setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
+                                }
+                                Log.d("LoginScreen", "Response status: ${response.status}")
+                                // check the response status and show an error message if necessary
+                                when (response.status) {
+                                    // if the login was successful, save the user data in the UserSession object
+                                    HttpStatusCode.OK -> {
+                                        val loginResponse = response.body<User>()
+                                        UserSession.token = loginResponse.token
+                                        UserSession.userId = loginResponse.userId
+                                        UserSession.email = loginResponse.email
+                                        UserSession.name = loginResponse.name
+                                        UserSession.alias = loginResponse.alias
+                                        UserSession.profilePictureURL = loginResponse.profilePictureURL
+                                        onLogin()
+                                    }
+                                    // if the login was unsuccessful, show an error message
+                                    HttpStatusCode.Unauthorized -> {
+                                        val errorResponse = response.body<ErrorResponse>()
+                                        errorMessage = errorResponse.message
+                                        showErrorDialog = true
+                                        Log.d("LoginScreen", "Unauthorized: ${errorResponse.message}")
+                                    }
+                                    // General message if the server is not available
+                                    else -> {
+                                        errorMessage = context.getString(R.string.not_available_right_now)
+                                        showErrorDialog = true
+                                        Log.d("LoginScreen", "Unexpected status: ${response.status}")
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                errorMessage = context.getString(R.string.not_available_right_now)
+                                showErrorDialog = true
+                                Log.e("LoginScreen", "Exception: ${e.message}", e)
+                            } finally {
+                                client.close()
+                                isLoading = false
+                            }
                         }
                     }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-        ) {
-            Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 8.dp)
+            ) {
+                Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
+            }
         }
-
+        // Create user clickable text
         Text(
             text = stringResource(R.string.create_user),
             color = MaterialTheme.colorScheme.primary,
@@ -193,6 +209,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .clickable { showDialog = true }
         )
     }
+    // Show the dialogs for creating a user, forgotten password and error messages
     if (showDialog) {
         CreateUserDialog(onDismiss = { showDialog = false }, onCreateUser = {
             onCreateUser()
@@ -209,6 +226,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     }
 }
 
+// Dialog for showing error messages
 @Composable
 fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
@@ -238,6 +256,7 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
     }
 }
 
+// Dialog for forgotten password
 @Composable
 fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
     var email by remember { mutableStateOf("") }
@@ -294,6 +313,7 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
     }
 }
 
+// Dialog for showing information about forgotten password
 @Composable
 fun InfoDialog(onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
@@ -319,6 +339,7 @@ fun InfoDialog(onDismiss: () -> Unit) {
     }
 }
 
+// Dialog for creating a new user
 @Composable
 fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
     var email by remember { mutableStateOf("") }
