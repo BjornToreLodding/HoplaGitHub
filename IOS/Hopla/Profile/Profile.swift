@@ -94,6 +94,14 @@ struct Profile: View {
                             .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                     }
                     
+                    NavigationLink(destination: MyHorses()) {
+                        Text("My horses")
+                            .frame(width: 120, height: 50)
+                            .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                    }
+                }
+                HStack(spacing: 10) {
                     NavigationLink(destination: Friends()) {
                         Text("Friends")
                             .frame(width: 120, height: 50)

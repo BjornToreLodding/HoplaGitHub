@@ -54,6 +54,7 @@ enum FilterOption: String, CaseIterable, Identifiable {
 struct Hikes: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedFilter: FilterOption = .location
+    @State private var searchText: String = "" // Search bar
     
     @State private var hikes: [Hike] = [
         Hike(name: "Boredalstien", filters: [.asphalt, .forest, .gravel, .parking], rating: 2, isFavorite: false, imageName: "HorseImage", description: "An easy trail through a beautiful forest. There is parking available at the start and end of the trail."),
@@ -63,18 +64,15 @@ struct Hikes: View {
     ]
 
     private var filteredHikes: [Hike] {
-        switch selectedFilter {
-        case .heart:
-            return hikes.filter { $0.isFavorite }
-        default:
-            return hikes
+            let filtered = selectedFilter == .heart ? hikes.filter { $0.isFavorite } : hikes
+            return searchText.isEmpty ? filtered : filtered.filter { $0.name.lowercased().contains(searchText.lowercased()) }
         }
-    }
     
     var body: some View {
         NavigationView {
             VStack {
                 filterBar
+                searchBar
                 
                 ScrollView {
                     VStack(spacing: 10) {
@@ -111,6 +109,18 @@ struct Hikes: View {
         .frame(height: 60)
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
+    // MARK: - Search bar
+    private var searchBar: some View {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                TextField("Search hikes...", text: $searchText)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding(8)
+                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+            }
+            .padding(.horizontal)
+        }
 }
 
 

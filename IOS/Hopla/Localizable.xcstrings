@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
     "Antall" : {
       "localizations" : {
         "nb" : {
@@ -419,6 +429,9 @@
         }
       }
     },
+    "My horses" : {
+
+    },
     "My rating: " : {
 
     },
@@ -519,6 +532,12 @@
     "Search bar" : {
 
     },
+    "Search groups..." : {
+
+    },
+    "Search hikes..." : {
+
+    },
     "Send" : {
 
     },
@@ -581,6 +600,9 @@
           }
         }
       }
+    },
+    "Type a message..." : {
+
     },
     "Username" : {
       "localizations" : {

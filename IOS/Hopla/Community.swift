@@ -1,108 +1,155 @@
-//
-//  Community.swift
-//  Hopla
-//
-//  Created by Ane Marie Johnsen on 28/01/2025.
-//
-
 import SwiftUI
 
-struct Community: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    // Track selected filter
-    @State private var selectedFilter: String = "location"
-    
-    // To select a filter
-    enum FilterOption: String, CaseIterable, Identifiable {
-            case location
-            case heart
+// MARK: - Hike Model
+struct Group: Identifiable {
+    let id = UUID()
+    let name: String
+    let filters: [HikeFilter]
+    var isFavorite: Bool
+    let imageName: String
+    let description: String
+}
 
-            var id: String { self.rawValue }
-
-            var systemImage: String {
-                switch self {
-                case .location: return "location"
-                case .heart: return "heart"
-                }
-            }
-        }
+// MARK: - Filter bar Options
+enum FilterCommunity: String, CaseIterable, Identifiable {
+    case location
+    case heart
     
-    // Sample data
-    let groups = [
-        (image: "Group", comment: "This is the first group."),
-        (image: "Group2", comment: "This is the second group."),
-        (image: "Group3", comment: "This is the third group."),
-    ]
+    var id: String { self.rawValue }
     
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) { // Ensure no extra spacing
-                filterBar
-                ZStack {
-                    // Background color for the entire app
-                    AdaptiveColor.background.color(for: colorScheme)
-                        .ignoresSafeArea()
-                    VStack {
-                        // Groups list
-                        ScrollView {
-                            VStack(spacing: 10) {
-                                ForEach(groups, id: \.image) { post in
-                                    GroupContainer(imageName: post.image, comment: post.comment)
-                                }
-                            }
-                            .padding()
-                        }
-                    }
-                }
-            }
+    var systemImage: String {
+        switch self {
+        case .location: return "location"
+        case .heart: return "heart"
         }
     }
-    // MARK: - Filter Bar Below Logo
+}
+
+// MARK: - Main View
+struct Community: View {
+    @Environment(\.colorScheme) var colorScheme
+    @State private var selectedFilter: FilterCommunity = .location
+    @State private var searchText: String = ""
+    
+    @State private var groups: [Group] = [
+        Group(name: "Stall Tønneberg", filters: [.asphalt, .forest, .gravel, .parking], isFavorite: false, imageName: "Group", description: "An easy trail through a beautiful forest. There is parking available at the start and end of the trail."),
+        Group(name: "Rogaland Rideklubb", filters: [.mountain, .forest], isFavorite: false, imageName: "Group2", description: "A challenging trail with stunning mountain views. There is no parking available at the start and end of the trail."),
+        Group(name: "Barthun stall", filters: [.forest, .gravel, .parking], isFavorite: true, imageName: "Group3", description: "This hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."),
+        Group(name: "Gjøvik Gård", filters: [.asphalt, .gravel], isFavorite: false, imageName: "Gjøvik", description: "A difficult trail with beautiful views of the valley. It is best to go in the summer when the weather is good.")
+    ]
+
+    //
+    private var filteredGroups: [Group] {
+        let lowercasedSearchText = searchText.lowercased()
+        return groups.filter { group in
+            (selectedFilter == .heart ? group.isFavorite : true) &&
+            (searchText.isEmpty || group.name.lowercased().contains(lowercasedSearchText))
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                filterBar
+                searchBar
+                
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(filteredGroups, id: \ .id) { group in
+                            GroupCard(group: binding(for: group))
+                        }
+                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                    }
+                    .padding(.horizontal)
+                }
+            }
+            .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
+            
+        }
+    }
+    
+    private func binding(for group: Group) -> Binding<Group> {
+        guard let index = groups.firstIndex(where: { $0.id == group.id }) else {
+            fatalError("Group not found in list")
+        }
+        return $groups[index]
+    }
+    
+    // MARK: - Filter Bar
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
-                Image(systemName: "location").tag("location")
-                Image(systemName: "heart").tag("heart")
+                ForEach(FilterCommunity.allCases) { option in
+                    Image(systemName: option.systemImage).tag(option)
+                }
             }
+            .pickerStyle(SegmentedPickerStyle())
             .padding(.top, 30)
-            .pickerStyle(SegmentedPickerStyle()) // Makes it look like a real navigation bar
         }
         .frame(height: 60)
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme)) // Dynamic background
+        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+    }
+    
+    // MARK: - Search Bar
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+            TextField("Search groups...", text: $searchText)
+                .textFieldStyle(PlainTextFieldStyle())
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+        }
+        .padding(.horizontal)
     }
 }
 
+// MARK: - Hike Card
 
-// The posts
-struct GroupContainer: View {
-    var imageName: String
-    var comment: String
+struct GroupCard: View {
+    @Binding var group: Group
     
     var body: some View {
-        VStack {
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 360, height: 100) // Square image container
-                .clipped()
-            
-            Text(comment)
-                .padding(.bottom, 5)
-                .font(.body)
-                .multilineTextAlignment(.center)
+        NavigationLink(destination: CommunityChat(group: group)) {
+            VStack {
+                ZStack(alignment: .topLeading) {
+                    Image(group.imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 370, height: 150)
+                        .clipped()
+                    
+                    Color.black.opacity(0.4)
+                        .frame(width: 370, height: 150)
+                        .frame(maxWidth: .infinity)
+                    
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            group.isFavorite.toggle()
+                        }) {
+                            Image(systemName: group.isFavorite ? "heart.fill" : "heart")
+                                .foregroundColor(group.isFavorite ? .red : .white)
+                                .padding()
+                        }
+                    }
+                    
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Text(group.name)
+                                .foregroundStyle(.white)
+                                .padding(.leading, 10)
+                            Spacer()
+                        }
+                    }
+                    
+                }
+                
+            }
+            .clipShape(Rectangle())
+            .shadow(radius: 3)
         }
-        .frame(width: 340, height: 110) // Square container
-        .padding()
-        .background(Color.white) // Light background for each group container
+        .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
     }
-}
-
-
-#Preview("English") {
-    ContentView()
-}
-
-#Preview("Norsk") {
-    ContentView()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
 }

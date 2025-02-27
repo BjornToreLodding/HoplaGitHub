@@ -28,12 +28,3 @@ struct Following: View {
         }
     }
 }
-
-#Preview("English") {
-    ContentView()
-}
-
-#Preview("Norsk") {
-    ContentView()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
-}
