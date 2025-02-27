@@ -11,36 +11,23 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-val PrimaryWhite = Color(0xFFFFFFFF)
-val StarColor = Color(0xFFFFEE71)
-val PrimaryBlack = Color(0xFF000000)
-
+// Colors for the dark theme of the app
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF0B3D2B),        // Green
     secondary = Color(0xFF282624),      // Brown
     tertiary = Color(0xFFCFBFAF),       // light beige
     background = Color(0xFF161818),     // Dark grey
-    //surface = Color(0xFF161818),
-    //onPrimary = CustomWhite,
-    //onSecondary = CustomWhite,
-    //onTertiary = CustomWhite,
-    //onBackground = CustomWhite,
-    //onSurface = CustomWhite
 )
 
+// Colors for the light theme of the app
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF456559),        // Green
     secondary = Color(0xFF745E4D),      // Brown
     tertiary = Color(0xFF745E4D),       // light beige
     background = Color(0xFFEAE6E1),     // light beige
-    //surface = Color(0xFF161818),
-    //onPrimary = CustomWhite,
-    //onSecondary = CustomWhite,
-    //onTertiary = CustomWhite,
-    //onBackground = CustomWhite,
-    //onSurface = CustomWhite
 )
 
+// ViewModel to manage the theme state
 class ThemeViewModel : ViewModel() {
     val isDarkTheme = MutableLiveData(false)
 
@@ -49,6 +36,7 @@ class ThemeViewModel : ViewModel() {
     }
 }
 
+// Composable function to apply the theme to the app
 @Composable
 fun HoplaTheme(
     themeViewModel: ThemeViewModel = viewModel(),
