@@ -66,7 +66,8 @@ data class Community(
 data class Message(
     val id: String,
     val content: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val imageUrl: String? = null
 )
 
 @Serializable

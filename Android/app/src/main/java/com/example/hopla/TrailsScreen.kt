@@ -38,7 +38,6 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -46,7 +45,7 @@ import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
 import androidx.compose.ui.window.Dialog
-import com.google.ai.client.generativeai.type.content
+import coil.compose.rememberAsyncImagePainter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -594,33 +593,47 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
 
                     // Sample messages list
                     val messages = listOf(
-                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis()),
+                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis(), imageUrl = "https://c8.alamy.com/compde/b7n5n2/schneebedeckte-umgesturzten-baum-in-einem-wald-in-haanja-estland-b7n5n2.jpg"),
                         Message(id = "2", content = "Watch out for fallen branches.", timestamp = System.currentTimeMillis() - 3600000)
                     )
 
                     LazyColumn {
                         items(messages) { message ->
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .padding(8.dp)
-                            ) {
-                                Text(text = message.content)
-                                Text(
-                                    text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
-                                        Date(message.timestamp)
-                                    ),
-                                    fontSize = 10.sp,
-                                    modifier = Modifier.align(Alignment.End)
-                                )
-                            }
+                            MessageItem(message)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MessageItem(message: Message) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(8.dp)
+    ) {
+        message.imageUrl?.let { imageUrl ->
+            Image(
+                painter = rememberAsyncImagePainter(model = imageUrl),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        Text(text = message.content)
+        Text(
+            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(message.timestamp)),
+            fontSize = 10.sp,
+            modifier = Modifier.align(Alignment.End)
+        )
     }
 }
 
