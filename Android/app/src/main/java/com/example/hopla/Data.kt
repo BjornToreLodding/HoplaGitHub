@@ -104,3 +104,26 @@ data class LoginRequest(
 data class ErrorResponse(
     val message: String
 )
+
+enum class Difficulty {
+    EASY,
+    MEDIUM,
+    HARD
+}
+
+val presetFilters = listOf("gravel", "sand", "asphalt", "dirt")
+
+// Define the Filters class
+data class Filters(
+    val filterStrings: Set<String> = emptySet(),
+    val difficulty: Difficulty? = null
+)
+
+// Data class to hold the information for each ContentBox
+data class ContentBoxInfo(
+    val title: String,
+    val imageResource: Int,
+    val isHeartClicked: Boolean,
+    val starRating: Int,
+    val filters: Filters = Filters()
+)

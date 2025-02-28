@@ -63,6 +63,33 @@ fun TrailsScreen(navController: NavController) {
     var heartStates by remember { mutableStateOf(List(numRoutes) { false }) }
     var isRouteClicked by remember { mutableStateOf(false) }
     val selectedItems = remember { mutableStateOf(setOf<String>()) }
+    var showOnlyFavorites by remember { mutableStateOf(false) }
+
+    val testData = remember {
+        mutableStateListOf(
+            ContentBoxInfo(
+                title = "Boredalstien",
+                imageResource = R.drawable.stockimg1,
+                isHeartClicked = false,
+                starRating = 3,
+                filters = Filters(setOf(presetFilters[0], presetFilters[1]), Difficulty.EASY)
+            ),
+            ContentBoxInfo(
+                title = "Skogsstien",
+                imageResource = R.drawable.stockimg2,
+                isHeartClicked = true,
+                starRating = 4,
+                filters = Filters(setOf(presetFilters[0]), Difficulty.HARD)
+            ),
+            ContentBoxInfo(
+                title = "Fjellstien",
+                imageResource = R.drawable.stockimg1,
+                isHeartClicked = false,
+                starRating = 5,
+                filters = Filters(setOf(presetFilters[1]), Difficulty.EASY)
+            )
+        )
+    }
 
     // Whole page
     Column(
@@ -119,17 +146,10 @@ fun TrailsScreen(navController: NavController) {
                     }
                     // Third icon: Favorite, everything else is set to false
                     IconButton(onClick = {
-                        isFavoriteClicked = !isFavoriteClicked
-                        if (isFavoriteClicked) {
-                            isMapClicked = false
-                            isCloseByClicked = false
-                            isFollowingClicked = false
-                            isFiltersClicked = false
-                            isDropdownExpanded = false
-                        }
+                        showOnlyFavorites = !showOnlyFavorites
                     }) {
                         Icon(
-                            imageVector = if (isFavoriteClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                            imageVector = if (showOnlyFavorites) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = null
                         )
                     }
@@ -206,7 +226,7 @@ fun TrailsScreen(navController: NavController) {
         // If the user has clicked a specific trail, display the function RouteClicked
         if (isRouteClicked) {
             RouteClicked(navController = navController, onBackClick = { isRouteClicked = false })
-        // If the user has clicked the map icon, display the map
+            // If the user has clicked the map icon, display the map
         } else if (isMapClicked) {
             Box(
                 modifier = Modifier
@@ -216,24 +236,22 @@ fun TrailsScreen(navController: NavController) {
             ) {
                 Text(text = "Map", color = Color.Black, fontWeight = FontWeight.Bold)
             }
-        // If the user has clicked the location icon, display the trails close to you
+            // If the user has clicked the location icon, display the trails close to you
         } else {
-            val favoriteRoutes = heartStates.mapIndexedNotNull { index, isFavorite ->
-                if (isFavorite) index else null
+            val routesToDisplay = if (showOnlyFavorites) {
+                testData.filter { it.isHeartClicked }
+            } else {
+                testData
             }
             // Display the trails
             LazyColumn {
-                val routesToDisplay = if (isFavoriteClicked) favoriteRoutes else (0 until numRoutes).toList()
-
-                items(routesToDisplay.size) { displayIndex ->
-                    val actualIndex = routesToDisplay[displayIndex]
+                items(routesToDisplay.size) { index ->
+                    val contentBoxInfo = routesToDisplay[index]
                     ContentBox(
-                        isHeartClicked = heartStates[actualIndex],
-                        starRating = starRating,
+                        info = contentBoxInfo,
                         onHeartClick = {
-                            heartStates = heartStates.toMutableList().apply {
-                                this[actualIndex] = !this[actualIndex]
-                            }
+                            val newState = !contentBoxInfo.isHeartClicked
+                            testData[testData.indexOf(contentBoxInfo)] = contentBoxInfo.copy(isHeartClicked = newState)
                         },
                         onBoxClick = {
                             isRouteClicked = true
@@ -247,38 +265,36 @@ fun TrailsScreen(navController: NavController) {
 
 // Function to display the content of the trails (main page for all trails)
 @Composable
-fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Unit, onBoxClick: () -> Unit) {
+fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
-            .height(150.dp)
-            .background(MaterialTheme.colorScheme.primary)
+            .height(180.dp) // Increased height for filter box
             .clickable(onClick = onBoxClick)
     ) {
         Column {
-            // MainBox
+            // Main Image Box
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp)
-                    .height(95.dp)
+                    .height(140.dp) // Adjusted height
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                //Image of the trip
                 Image(
-                    painter = painterResource(id = R.drawable.stockimg1),
+                    painter = painterResource(id = info.imageResource),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize()
                 )
-                // Semi transparent overlay for easier visibility of icons on top of the image
+                // Overlay for visibility
                 Box(
                     modifier = Modifier
                         .matchParentSize()
                         .background(Color.Black.copy(alpha = 0.5f))
                 )
-                // Heart icon (clickable)
+                // Heart Icon
                 IconButton(
                     onClick = onHeartClick,
                     modifier = Modifier
@@ -286,12 +302,12 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                         .padding(5.dp)
                 ) {
                     Icon(
-                        imageVector = if (isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                        imageVector = if (info.isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = null,
-                        tint = PrimaryWhite
+                        tint = if (info.isHeartClicked) Color(0xFFFF6666) else PrimaryWhite
                     )
                 }
-                // Star rating of the trails
+                // Star Rating
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -299,26 +315,56 @@ fun ContentBox(isHeartClicked: Boolean, starRating: Int, onHeartClick: () -> Uni
                 ) {
                     repeat(5) { index ->
                         Icon(
-                            imageVector = if (index < starRating) Icons.Filled.Star else Icons.TwoTone.Star,
+                            imageVector = if (index < info.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
                             contentDescription = null,
                             tint = StarColor
                         )
                     }
                 }
+                // Trip Title
+                Text(
+                    text = info.title,
+                    color = PrimaryWhite,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(5.dp)
+                )
             }
-            // Text box below the image
+
+            // White box for filters
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
-                    .height(45.dp)
-                    .background(MaterialTheme.colorScheme.secondary)
+                    .background(Color.White)
+                    .padding(vertical = 5.dp, horizontal = 10.dp)
             ) {
-                Text("Boredalstien", color = PrimaryWhite, modifier = Modifier.padding(5.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Display filter names
+                    info.filters.filterStrings.forEach { filter ->
+                        Text(
+                            text = filter.replaceFirstChar { it.uppercaseChar() }, // Capitalize first letter
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    // Display difficulty if available
+                    info.filters.difficulty?.let {
+                        Text(
+                            text = it.name.lowercase().replaceFirstChar { it.uppercaseChar() }, // Capitalize first letter
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }
 }
+
 
 // Function to display the trail that have been clicked
 @Composable
