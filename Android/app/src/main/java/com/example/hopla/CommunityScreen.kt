@@ -1,6 +1,7 @@
 package com.example.hopla
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +35,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -86,7 +89,7 @@ fun CommunityScreen(navController: NavController) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 8.dp)
+                    .padding(top = 1.dp)
             ) {
                 // Display the community groups
                 items(filteredCommunities) { community ->
@@ -104,58 +107,55 @@ fun CommunityScreen(navController: NavController) {
 fun CommunityCard(community: Community, navController: NavController, likedCommunities: MutableList<Community>) {
     var isLiked by remember { mutableStateOf(likedCommunities.contains(community)) }
 
-    // A card to display the community group itself
     Card(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(0.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp, horizontal = 4.dp)
             .clickable { navController.navigate("communityDetail/${community.name}") }
     ) {
-        // Box and column to arrange content inside the card
         Box {
-            Column {
-                // Image of the community group
-                Image(
-                    painter = painterResource(id = community.imageResource),
-                    contentDescription = community.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                )
-                // Text of the community group (name)
-                Text(
-                    text = community.name,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-            // Like button to like the community group
+            Image(
+                painter = painterResource(id = community.imageResource),
+                contentDescription = community.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(125.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+            )
+            Text(
+                text = community.name,
+                fontSize = 16.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            )
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)
-                    .background(MaterialTheme.colorScheme.background, shape = CircleShape)
             ) {
-                // Icon for the like button (filled or outlined)
                 IconButton(
                     onClick = {
                         isLiked = !isLiked
                         if (isLiked) {
-                            // Add database logic
                             likedCommunities.add(community)
                         } else {
-                            // Remove database logic
                             likedCommunities.remove(community)
                         }
                     }
                 ) {
-                    // The icon itself
                     Icon(
                         imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) stringResource(R.string.liked) else stringResource(R.string.not_liked),
-                        tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        tint = if (isLiked) colorResource(id = R.color.likedHeart) else Color.White,
                     )
                 }
             }
@@ -187,11 +187,10 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
                     .background(if (currentPage == "position") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
-                // The text itself
-                Text(
-                    text = stringResource(R.string.position),
-                    fontSize = 10.sp,
-                    color = if (currentPage == "position") MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
+                // The position icon
+                Icon(
+                    imageVector = Icons.Outlined.Place,
+                    contentDescription = stringResource(R.string.position),
                 )
             }
             // Box for the liked text
@@ -203,11 +202,10 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
                     .background(if (currentPage == "liked") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
-                // The text itself
-                Text(
-                    text = stringResource(R.string.liked),
-                    fontSize = 10.sp,
-                    color = if (currentPage == "liked") MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
+                // The liked icon
+                Icon(
+                    imageVector = Icons.Outlined.FavoriteBorder,
+                    contentDescription = stringResource(R.string.liked),
                 )
             }
         }

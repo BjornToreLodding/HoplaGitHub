@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -81,19 +83,20 @@ fun SearchBar(
 // An button (used for add) that takes navigation in as a parameter
 @Composable
 fun AddButton(onClick: () -> Unit) {
-    // Box for the button
     Box(
         modifier = Modifier
+            .padding(8.dp)
             .fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
-        // Floating action button with an add icon (+)
         FloatingActionButton(
             onClick = onClick,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .size(45.dp)
         ) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
+
     }
 }
 
