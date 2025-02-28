@@ -118,5 +118,6 @@
     <string name="no_following_matches">Ingen du følger matcher søket</string>
     <string name="private_string">Privat</string>
     <string name="public_string">Offentlig</string>
+    <string name="me">Meg</string>
 
 </resources>

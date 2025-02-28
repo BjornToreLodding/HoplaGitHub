@@ -292,7 +292,7 @@ fun MessageBox(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = if (message.username == UserSession.alias) "me" else message.username, // Change username to "me"
+                                    text = if (message.username == UserSession.alias) stringResource(R.string.me) else message.username, // Change username to "me"
                                     fontSize = 10.sp,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )

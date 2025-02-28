@@ -119,5 +119,6 @@
     <string name="no_following_matches">No one matches the search</string>
     <string name="private_string">Private</string>
     <string name="public_string">Public</string>
+    <string name="me">Me</string>
 
 </resources>

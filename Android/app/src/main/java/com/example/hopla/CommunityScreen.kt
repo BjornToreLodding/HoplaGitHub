@@ -1,7 +1,6 @@
 package com.example.hopla
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -35,7 +33,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.border
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
