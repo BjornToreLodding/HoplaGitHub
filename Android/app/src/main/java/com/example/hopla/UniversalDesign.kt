@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +31,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -242,39 +246,74 @@ fun MessageBox(
     onMessageChange: (String) -> Unit,
     community: Community
 ) {
-    // Main box for the message box
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .border(3.dp, MaterialTheme.colorScheme.primary)
             .padding(16.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Scrollview for the messages
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 4.dp) // Reduced padding
             ) {
-                // The messages themselves
-                items(messages) { message ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(8.dp)
-                    ) {
-                        Text(text = message.content)
-                        Text(
-                            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
-                                Date(
-                                    message.timestamp
+                val groupedMessages = messages.groupBy { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it.timestamp)) }
+                groupedMessages.forEach { (date, messagesForDate) ->
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp), // Reduced padding
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = date,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                    items(messagesForDate) { message ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = if (message.username == UserSession.alias) Alignment.End else Alignment.Start
+                        ) {
+                            // Timestamp and name above the message box
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = if (message.username == UserSession.alias) Arrangement.End else Arrangement.Start
+                            ) {
+                                Text(
+                                    text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(message.timestamp)),
+                                    fontSize = 10.sp,
+                                    modifier = Modifier.align(Alignment.CenterVertically)
                                 )
-                            ),
-                            fontSize = 10.sp,
-                            modifier = Modifier.align(Alignment.End)
-                        )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = if (message.username == UserSession.alias) "me" else message.username, // Change username to "me"
+                                    fontSize = 10.sp,
+                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                )
+                            }
+                            // Message box with rounded corners and different background color for user's messages
+                            Card(
+                                shape = RoundedCornerShape(8.dp), // Rounded corners
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (message.username == UserSession.alias)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.surface
+                                ),
+                                modifier = Modifier.padding(8.dp) // Reduced padding
+                            ) {
+                                Text(
+                                    text = message.content,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -282,25 +321,23 @@ fun MessageBox(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Text field for the new message
                 TextField(
                     value = newMessage,
                     onValueChange = onMessageChange,
                     modifier = Modifier.weight(1f),
                     placeholder = { Text(text = stringResource(R.string.enter_you_message)) }
                 )
-                // Button to publish the message
                 Button(
                     onClick = {
                         if (newMessage.isNotBlank()) {
                             val newMsg = Message(
                                 id = UUID.randomUUID().toString(),
                                 content = newMessage,
-                                timestamp = System.currentTimeMillis()
+                                timestamp = System.currentTimeMillis(),
+                                username = UserSession.alias
                             )
                             messages.add(newMsg)
                             onMessageChange("")
-                            // Save the new message to the database
                         }
                     },
                     modifier = Modifier.padding(start = 8.dp)

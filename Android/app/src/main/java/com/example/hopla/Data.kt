@@ -70,7 +70,8 @@ data class Message(
     val id: String,
     val content: String,
     val timestamp: Long,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val username: String
 )
 
 // Class for the data for a friend (for the list of friends)

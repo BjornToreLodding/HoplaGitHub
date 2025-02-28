@@ -593,8 +593,8 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
 
                     // Sample messages list
                     val messages = listOf(
-                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis(), imageUrl = "https://c8.alamy.com/compde/b7n5n2/schneebedeckte-umgesturzten-baum-in-einem-wald-in-haanja-estland-b7n5n2.jpg"),
-                        Message(id = "2", content = "Watch out for fallen branches.", timestamp = System.currentTimeMillis() - 3600000)
+                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis(), imageUrl = "https://c8.alamy.com/compde/b7n5n2/schneebedeckte-umgesturzten-baum-in-einem-wald-in-haanja-estland-b7n5n2.jpg", username = "Bob"),
+                        Message(id = "2", content = "Watch out for fallen branches.", timestamp = System.currentTimeMillis() - 3600000, username = "Alice")
                     )
 
                     LazyColumn {

@@ -220,7 +220,6 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
     val messages = remember { mutableStateListOf<Message>() }
 
     // Load messages from the database
-    // Replace with actual database logic
     LaunchedEffect(community.name) {
         val fetchedMessages = fetchMessages(community.name)
         messages.addAll(fetchedMessages)
@@ -230,14 +229,12 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
         // Box for the header of the screen
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.2f)
-                .border(1.dp, MaterialTheme.colorScheme.primary)
         ) {
             // Image of the community group
             Image(
@@ -282,7 +279,6 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
         // Column for the messages posted in the group
         MessageBox(messages, newMessage, onMessageChange = { newMessage = it }, community)
     }

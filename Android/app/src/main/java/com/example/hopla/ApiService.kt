@@ -8,17 +8,22 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.*
 
 fun fetchMessages(messageName: String): List<Message> {
-    // Replace with actual database fetching logic
+    val currentTime = System.currentTimeMillis()
+    val oneDayInMillis = 24 * 60 * 60 * 1000
+    val yesterdayTime = currentTime - oneDayInMillis
+
     return listOf(
         Message(
             id = "1",
             content = "Welcome to the community!",
-            timestamp = System.currentTimeMillis()
+            timestamp = yesterdayTime,
+            username = "Bob"
         ),
         Message(
             id = "2",
             content = "Hello everyone!",
-            timestamp = System.currentTimeMillis()
+            timestamp = yesterdayTime,
+            username = "Maria"
         )
     )
 }
