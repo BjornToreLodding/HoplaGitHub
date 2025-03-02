@@ -125,5 +125,6 @@ data class ContentBoxInfo(
     val imageResource: Set<Int>,
     val isHeartClicked: Boolean,
     val starRating: Int,
-    val filters: Filters = Filters()
+    val filters: Filters = Filters(),
+    val description: String
 )

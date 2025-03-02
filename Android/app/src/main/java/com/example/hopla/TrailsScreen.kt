@@ -33,6 +33,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -73,21 +74,24 @@ fun TrailsScreen(navController: NavController) {
                 imageResource = setOf(R.drawable.stockimg1),
                 isHeartClicked = false,
                 starRating = 3,
-                filters = Filters(setOf(presetFilters[0], presetFilters[1]), Difficulty.EASY)
+                filters = Filters(setOf(presetFilters[0], presetFilters[1]), Difficulty.EASY),
+                description = "This is a description of the trail"
             ),
             ContentBoxInfo(
                 title = "Skogsstien",
                 imageResource = setOf( R.drawable.stockimg2),
                 isHeartClicked = true,
                 starRating = 4,
-                filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM)
+                filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM),
+                description = "The hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."
             ),
             ContentBoxInfo(
                 title = "Fjellstien",
                 imageResource = setOf( R.drawable.stockimg1, R.drawable.stockimg2),
                 isHeartClicked = false,
                 starRating = 5,
-                filters = Filters(setOf(presetFilters[1]), Difficulty.HARD)
+                filters = Filters(setOf(presetFilters[1]), Difficulty.HARD),
+                description = "This is a description of the trail"
             )
         )
     }
@@ -402,14 +406,18 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
 
     val images = contentBoxInfo.imageResource.toList()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                 .height(60.dp)
-                .background(MaterialTheme.colorScheme.secondary)
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             // Inner box header
             Box(
@@ -455,7 +463,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                         .height(250.dp)
-                        .background(MaterialTheme.colorScheme.secondary)
+                        .background(MaterialTheme.colorScheme.tertiaryContainer)
                 ) {
                     // Column for the picture
                     Column {
@@ -464,7 +472,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                                 .height(190.dp)
-                                .background(MaterialTheme.colorScheme.secondary)
+                                .background(MaterialTheme.colorScheme.tertiaryContainer)
                         ) {
                             // Display the images
                             Image(
@@ -533,7 +541,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.3f)
-                            .background(MaterialTheme.colorScheme.secondary)
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
                             .clickable { /* Handle click */ },
                         contentAlignment = Alignment.Center
                     ) {
@@ -545,7 +553,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
-                            .background(MaterialTheme.colorScheme.secondary)
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
                             .clickable {  navController.navigate("update_screen")  },
                         contentAlignment = Alignment.Center
                     ) {
@@ -565,19 +573,19 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                 ) {
                     Box(
                         modifier = Modifier
-                            .height(30.dp)
+                            .wrapContentHeight()
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondary),
+                            .background(MaterialTheme.colorScheme.tertiaryContainer),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        Text(text = stringResource(R.string.easy_trip_for_everyone_Parking), modifier = Modifier.padding(start = 8.dp))
+                        Text(text = contentBoxInfo.description, modifier = Modifier.padding(start = 8.dp))
                     }
                     // Assessment box with star rating set
                     Box(
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondary),
+                            .background(MaterialTheme.colorScheme.tertiaryContainer),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -605,7 +613,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondary),
+                            .background(MaterialTheme.colorScheme.tertiaryContainer),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -624,7 +632,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondary),
+                            .background(MaterialTheme.colorScheme.tertiaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         // Inner, clickable box for latest update
@@ -633,7 +641,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .height(30.dp)
                                 .fillMaxWidth()
                                 .padding(4.dp)
-                                .background(MaterialTheme.colorScheme.secondary)
+                                .background(MaterialTheme.colorScheme.tertiaryContainer)
                                 .clickable { showMessageBox = true },
                             contentAlignment = Alignment.Center
                         ) {

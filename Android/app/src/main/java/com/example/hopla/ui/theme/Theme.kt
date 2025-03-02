@@ -17,6 +17,7 @@ private val DarkColorScheme = darkColorScheme(
     secondary = Color(0xFF282624),      // Brown
     tertiary = Color(0xFFCFBFAF),       // light beige
     background = Color(0xFF161818),     // Dark grey
+    tertiaryContainer = Color(0xFFFFFFFF),   // White
 )
 
 // Colors for the light theme of the app
@@ -25,6 +26,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = Color(0xFF745E4D),      // Brown
     tertiary = Color(0xFF745E4D),       // light beige
     background = Color(0xFFEAE6E1),     // light beige
+    tertiaryContainer = Color(0xFFFFFFFF),   // White
 )
 
 // ViewModel to manage the theme state
