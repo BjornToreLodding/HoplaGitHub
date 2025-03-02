@@ -93,6 +93,7 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
+                            composable("map_screen") { MapScreen() }
                             composable("my_horses") { MyHorsesScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("following") { FollowingScreen(navController) }
