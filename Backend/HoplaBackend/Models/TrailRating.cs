@@ -1,12 +1,5 @@
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-//using HoplaBackend.Models;
-
 namespace HoplaBackend.Models;
-public class TrailReview
+public class TrailRating
 {
     public Guid Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)
 
@@ -17,7 +10,5 @@ public class TrailReview
     public User User { get; set; } = null!;
 
     public int Rating { get; set; } // 1-5 stjerner
-    public string Comment { get; set; } = string.Empty;
-    public string PictureUrl { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

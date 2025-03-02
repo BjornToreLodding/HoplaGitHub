@@ -5,6 +5,7 @@ using Serilog.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using Microsoft.Extensions.Configuration;
@@ -155,6 +156,7 @@ builder.Services.AddCors(options =>
                         .AllowAnyHeader());
 });
 
+builder.Services.AddMediatR(typeof(Program));
 
 var app = builder.Build();
 app.UseHttpsRedirection();

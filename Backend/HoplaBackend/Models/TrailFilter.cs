@@ -10,9 +10,7 @@ public class TrailFilter
 {
     [Key, ForeignKey("Trail")]
     public Guid Id { get; set; } // Samme som Trail.Id
-
     public Trail Trail { get; set; } = null!;
-
     public double Length { get; set; }
     public bool HasBridge { get; set; }
     public string Season { get; set; } = string.Empty; // F.eks. "Summer, Winter"

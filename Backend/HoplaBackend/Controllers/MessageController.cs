@@ -32,19 +32,19 @@ public class MessageController : ControllerBase
                 .Include(m => m.Receiver) 
                 .Where(m => (m.SUserId == userId || m.RUserId == userId) && 
                             (m.SUserId == id.Value || m.RUserId == id.Value))
-                .OrderBy(m => m.SentAt)
+                .OrderBy(m => m.CreatedAt)
                 .Select(m => new 
                 {
                     Content = m.MessageText,
-                    Timestamp = m.SentAt,
+                    Timestamp = m.CreatedAt,
                     SenderId = m.SUserId,
                     SenderName = m.Sender.Name,
                     SenderAlias = m.Sender.Alias,
-                    SenderPicture = m.Sender.ProfilePictureUrl + "?w=75&h=75&fit=crop",
+                    SenderPicture = m.Sender.PictureUrl + "?w=75&h=75&fit=crop",
                     ReceiverId = m.RUserId,
                     ReceiverName = m.Receiver.Name,
                     ReceiverAlias = m.Receiver.Alias,
-                    ReceiverPicture = m.Receiver.ProfilePictureUrl + "?w=75&h=75&fit=crop"
+                    ReceiverPicture = m.Receiver.PictureUrl + "?w=75&h=75&fit=crop"
                 })
                 .ToListAsync();
 
@@ -54,9 +54,9 @@ public class MessageController : ControllerBase
         // Hvis id IKKE er spesifisert: Hent siste melding per unike samtalepartner
         var lastMessages = await _context.Messages
             .Where(m => m.SUserId == userId || m.RUserId == userId) // Finn meldinger til/fra bruker
-            .OrderByDescending(m => m.SentAt)  // Sorter etter nyeste melding først
+            .OrderByDescending(m => m.CreatedAt)  // Sorter etter nyeste melding først
             .GroupBy(m => m.SUserId == userId ? m.RUserId : m.SUserId) // Grupper etter samtalepartner
-            .Select(g => g.OrderByDescending(m => m.SentAt).First()) // Velg kun den nyeste meldingen i hver gruppe
+            .Select(g => g.OrderByDescending(m => m.CreatedAt).First()) // Velg kun den nyeste meldingen i hver gruppe
             .ToListAsync(); // Hent resultatet før vi inkluderer brukere
 
         // Nå kan vi hente avsender- og mottakerinfo via en ny query
@@ -64,19 +64,19 @@ public class MessageController : ControllerBase
             .Where(m => lastMessages.Select(lm => lm.Id).Contains(m.Id)) // Finn meldingene vi akkurat fant
             .Include(m => m.Sender) // Henter brukerinfo
             .Include(m => m.Receiver)
-            .OrderByDescending(m => m.SentAt)
+            .OrderByDescending(m => m.CreatedAt)
             .Select(m => new
             {
                 Content = m.MessageText,
-                Timestamp = m.SentAt,
+                Timestamp = m.CreatedAt,
                 SenderId = m.SUserId,
                 SenderName = m.Sender.Name,
                 SenderAlias = m.Sender.Alias,
-                SenderPicture = m.Sender.ProfilePictureUrl + "?w=75&h=75&fit=crop",
+                SenderPicture = m.Sender.PictureUrl + "?w=75&h=75&fit=crop",
                 ReceiverId = m.RUserId,
                 ReceiverName = m.Receiver.Name,
                 ReceiverAlias = m.Receiver.Alias,
-                ReceiverPicture = m.Receiver.ProfilePictureUrl + "?w=75&h=75&fit=crop"
+                ReceiverPicture = m.Receiver.PictureUrl + "?w=75&h=75&fit=crop"
             })
             .ToListAsync();
 
@@ -105,7 +105,7 @@ public class MessageController : ControllerBase
             SUserId = requestDto.SenderId,
             RUserId = requestDto.ReceiverId,
             MessageText = requestDto.Content,
-            SentAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
         Console.WriteLine("milestone2");
         _context.Messages.Add(newMessage);
@@ -131,7 +131,7 @@ public class MessageController : ControllerBase
             receiverName = savedMessage.Receiver?.Name,
             receiverAlias = savedMessage.Receiver?.Alias,
             messageText = savedMessage.MessageText,
-            sentAt = savedMessage.SentAt
+            CreatedAt = savedMessage.CreatedAt
         });
     }
 
@@ -149,7 +149,7 @@ public class MessageController : ControllerBase
             {
                 MessageId = m.Id,
                 Content = m.MessageText,
-                Timestamp = m.SentAt,
+                Timestamp = m.CreatedAt,
                 SenderId = m.SUserId,
                 SenderName = m.Sender.Name,
                 ReceiverId = m.RUserId,

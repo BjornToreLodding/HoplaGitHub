@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Helpers;
+using MediatR;
+using HoplaBackend.Events;
 
 namespace HoplaBackend.Models;
 
@@ -15,10 +17,12 @@ namespace HoplaBackend.Models;
 public class MockController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IMediator _mediator;
 
-    public MockController(AppDbContext context)
+    public MockController(AppDbContext context, IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
     }
 
     [HttpPost("clearsystemsettings")]
@@ -65,20 +69,35 @@ public class MockController : ControllerBase
     [HttpPost("clearhorses")]
     public async Task<IActionResult> ClearHorses()
     {
-        _context.Horses.RemoveRange(_context.Horses);
+        var horses = _context.Horses.ToList();
+        if (!horses.Any()) { return NoContent(); }
+
+        _context.Horses.RemoveRange(horses);
         await _context.SaveChangesAsync();
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
-        return Ok("Horses table cleared and IDs reset.");    
+
+        // 🚀 Returner kun ID-ene på slettede hester for å unngå JSON-feil
+        return Ok(new { message = "Hester slettet!", horseIds = horses.Select(h => h.Id) });
+
+        //_context.Horses.RemoveRange(_context.Horses);
+        //await _context.SaveChangesAsync();
+        //await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
+        //return Ok("Horses table cleared and IDs reset.");    
     }
     [HttpPost("createhorses")]
     public async Task<IActionResult> CreateHorses()
     {
-        if (_context.Horses.Any()) { return NoContent(); } //rød strek under .Any
+        if (_context.Horses.Any()) { return NoContent(); }
 
-        var existingUsers = _context.Users.ToList(); //rød strek under .ToList
+        var existingUsers = _context.Users.ToList(); 
         var horses = HorseMock.CreateHorsesMock(existingUsers);
         _context.Horses.AddRange(horses);
         await _context.SaveChangesAsync();
+
+            // Publiser event for hver ny hest i feeden
+        foreach (var horse in horses)
+        {
+            await _mediator.Publish(new EntityCreatedEvent(horse.Id, "Horse", horse.UserId)); //Rød strek under IMediator.Publish
+        }
     
         return Created("", new { message = "Hester opprettet!", horses });
         //return Created(nameof(GetHorseById), new { message = "Hester opprettet!", horses });
@@ -173,7 +192,14 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", stableMessages });
 
     }
-
+   [HttpPost("clearrides")]
+    public async Task<IActionResult> ClearRides()
+    {
+        _context.Rides.RemoveRange(_context.Rides);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
+        return Ok("Rides table content cleared and IDs reset.");    
+    }
     [HttpPost("createrides")]
     public async Task<IActionResult> CreateRides()
     {
@@ -260,7 +286,7 @@ public class MockController : ControllerBase
         await CreateStables();
         //await CreateStableUSers();
         await CreateStableMessages();
-        await CreateRides();
+        //await CreateRides();
         //await CreateRideDetails();
         //await CreateRideReviews();
         //await CreateRideDetailsDatas();
@@ -274,7 +300,7 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!"});
 
     }
-    [HttpPost("databaseclear")]
+    [HttpPost("cleardatabase")]
     public async Task<IActionResult> ClearDatabase()
     {
         

@@ -19,6 +19,9 @@ public class StableUser
     [ForeignKey("StableId")]
     public required Stable Stable { get; set; }
 
+    public int LikesCount { get ; set ; } = 0 ;
+    public int CommentsCount { get ; set ; } = 0;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsOwner { get; set; } = false;
     public bool IsAdmin { get; set; } = false;

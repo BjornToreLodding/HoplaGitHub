@@ -55,8 +55,8 @@ namespace HoplaBackend.Controllers
                     FriendName = ur.FromUserId == userId ? ur.ToUser.Name : ur.FromUser.Name,
                     FriendAlias = ur.FromUserId == userId ? ur.ToUser.Alias : ur.FromUser.Alias,
                     FriendPictureURL = ur.FromUserId == userId 
-                    ? ur.ToUser.ProfilePictureUrl + "?w=64&h=64&fit=crop" 
-                    : ur.FromUser.ProfilePictureUrl + "?w=64&h=64&fit=crop"
+                    ? ur.ToUser.PictureUrl + "?w=64&h=64&fit=crop" 
+                    : ur.FromUser.PictureUrl + "?w=64&h=64&fit=crop"
                 })
                 .OrderBy(f => f.FriendAlias) // Sorter etter FriendAlias
                 .ToListAsync();
@@ -94,7 +94,7 @@ namespace HoplaBackend.Controllers
                     FollowingUserId = ur.ToUserId,
                     FollowingUserName = ur.ToUser.Name,
                     FollowingUserAlias = ur.ToUser.Alias,
-                    FollowingUserPicture = ur.ToUser.ProfilePictureUrl + "?w=64&h=64&fit=crop"
+                    FollowingUserPicture = ur.ToUser.PictureUrl + "?w=64&h=64&fit=crop"
                 })
                 .ToListAsync();
 

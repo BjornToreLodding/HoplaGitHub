@@ -18,10 +18,12 @@ public partial class UserRelation
     public required Guid ToUserId { get; set; }
     public User ToUser { get; set; } = null!;  // Navigasjons-egenskaper (for EF-relasjoner)
 
-    public required string Status { get; set; } = "pending";  //enum("pending", "accepted", "declined") Default "pending"
 
-    [Required]
-    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public required string Status { get; set; } = "pending";  //enum("pending", "accepted", "declined") Default "pending"
+    public int LikesCount { get ; set ; } = 0 ;
+    public int CommentsCount { get ; set ; } = 0;
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 /*
     [ForeignKey("FromUserId")]
     public virtual User? FromUser { get; set; }

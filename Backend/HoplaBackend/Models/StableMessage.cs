@@ -19,6 +19,9 @@ public class StableMessage
     [ForeignKey("StableId")]
     public Stable Stable { get; set; } = null!;
     public string MessageText { get; set; } = null!;
+    public int LikesCount { get ; set ; } = 0 ;
+    public int CommentsCount { get ; set ; } = 0;
+
 
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 

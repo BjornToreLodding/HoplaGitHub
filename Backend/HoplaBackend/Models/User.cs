@@ -14,11 +14,15 @@ public class User
     public string? Alias { get; set; }
 
     public required string Email { get; set; }
+    public string? Telephone { get; set; }
 
     public string? PasswordHash { get; set; }
-    public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL
+    public string? PictureUrl { get; set; } // Direkte lagring av profilbilde-URL
 
     public string? Description { get ; set; }
+    public int LikesCount { get ; set ; } = 0 ;
+    public int CommentsCount { get ; set ; } = 0;
+
 
     public bool Admin { get; set; } = false;
     public bool Premium { get; set; } = false;

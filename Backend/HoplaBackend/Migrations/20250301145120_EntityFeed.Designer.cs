@@ -3,6 +3,7 @@ using System;
 using HoplaBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250301145120_EntityFeed")]
+    partial class EntityFeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,47 +24,6 @@ namespace HoplaBackend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("HoplaBackend.Models.EntityComment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("ParentCommentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentCommentId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("EntityComments");
-                });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityFeed", b =>
                 {
@@ -73,9 +35,6 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -86,21 +45,12 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("EntityObject")
-                        .HasColumnType("text");
-
-                    b.Property<string>("EntityTitle")
-                        .HasColumnType("text");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("EntityFeeds");
+                    b.ToTable("EntityFeed");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityImage", b =>
@@ -112,20 +62,13 @@ namespace HoplaBackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ImageId")
+                    b.Property<Guid?>("ImageId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("RideDetailId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("TrailDetailId")
+                    b.Property<Guid?>("TrailDetailsId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("UserId")
@@ -137,42 +80,11 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("RideDetailId");
 
-                    b.HasIndex("TrailDetailId");
+                    b.HasIndex("TrailDetailsId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("EntityImages");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.EntityReaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Reaction")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "EntityId", "EntityName")
-                        .IsUnique();
-
-                    b.ToTable("EntityReactions");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Horse", b =>
@@ -184,23 +96,17 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("Breed")
                         .HasColumnType("text");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("Dob")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
+                    b.Property<string>("HorsePictureUrl")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
@@ -219,9 +125,6 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -229,10 +132,11 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
+                    b.Property<string>("ThumbnailUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<string>("PictureUrl")
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -247,14 +151,8 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("MessageText")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
                     b.Property<Guid>("RUserId")
@@ -262,6 +160,9 @@ namespace HoplaBackend.Migrations
 
                     b.Property<Guid>("SUserId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -387,14 +288,8 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Location")
                         .HasColumnType("text");
@@ -422,12 +317,6 @@ namespace HoplaBackend.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
 
                     b.Property<string>("MessageText")
                         .IsRequired()
@@ -457,9 +346,6 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -471,9 +357,6 @@ namespace HoplaBackend.Migrations
 
                     b.Property<bool>("IsOwner")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("NotifyNewMessage")
                         .HasColumnType("boolean");
@@ -526,9 +409,6 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -538,16 +418,10 @@ namespace HoplaBackend.Migrations
                     b.Property<double>("LatMean")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
-
                     b.Property<double>("LongMean")
                         .HasColumnType("double precision");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
                     b.Property<Guid?>("UserId")
@@ -621,6 +495,9 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("PictureUrl")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("TrailDetails");
@@ -665,19 +542,15 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("PictureUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("TrailId")
                         .HasColumnType("uuid");
@@ -706,9 +579,6 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("Alias")
                         .HasColumnType("text");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -722,22 +592,16 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
-                    b.Property<string>("PictureUrl")
-                        .HasColumnType("text");
-
                     b.Property<bool>("Premium")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Telephone")
+                    b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("text");
 
                     b.Property<bool>("VerifiedTrail")
@@ -754,17 +618,12 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("CommentsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
+                        .IsRequired()
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("FromUserId")
                         .HasColumnType("uuid");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -780,36 +639,6 @@ namespace HoplaBackend.Migrations
                     b.HasIndex("ToUserId");
 
                     b.ToTable("UserRelations");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.UserReport", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("SystemSetting", b =>
@@ -837,56 +666,31 @@ namespace HoplaBackend.Migrations
                     b.ToTable("SystemSettings");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.EntityComment", b =>
-                {
-                    b.HasOne("HoplaBackend.Models.EntityComment", "ParentComment")
-                        .WithMany()
-                        .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("HoplaBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ParentComment");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("HoplaBackend.Models.EntityImage", b =>
                 {
                     b.HasOne("HoplaBackend.Models.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ImageId");
 
-                    b.HasOne("HoplaBackend.Models.RideDetail", null)
+                    b.HasOne("HoplaBackend.Models.RideDetail", "RideDetails")
                         .WithMany("Images")
-                        .HasForeignKey("RideDetailId");
+                        .HasForeignKey("RideDetailId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("HoplaBackend.Models.TrailDetail", null)
+                    b.HasOne("HoplaBackend.Models.TrailDetail", "TrailDetails")
                         .WithMany("Images")
-                        .HasForeignKey("TrailDetailId");
+                        .HasForeignKey("TrailDetailsId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("HoplaBackend.Models.User", null)
                         .WithMany("Images")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Image");
-                });
 
-            modelBuilder.Entity("HoplaBackend.Models.EntityReaction", b =>
-                {
-                    b.HasOne("HoplaBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("RideDetails");
 
-                    b.Navigation("User");
+                    b.Navigation("TrailDetails");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Horse", b =>
@@ -1118,17 +922,6 @@ namespace HoplaBackend.Migrations
                     b.Navigation("FromUser");
 
                     b.Navigation("ToUser");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.UserReport", b =>
-                {
-                    b.HasOne("HoplaBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Ride", b =>

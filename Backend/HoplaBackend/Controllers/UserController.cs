@@ -56,7 +56,7 @@ public class UserController : ControllerBase
         //skulle vært name ikke navn, men må rette opp i js for loging osv..
         name = user.Name,
         alias = user.Alias,
-        profilePictureURL = user.ProfilePictureUrl + "?w=200&h=200&fit=crop"
+        PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop"
     });
     }
     [HttpPost("login/test")]
@@ -76,13 +76,13 @@ public class UserController : ControllerBase
         Console.WriteLine(token);
         Console.WriteLine(user.Name);
         Console.WriteLine(user.Alias);
-        Console.WriteLine(user.ProfilePictureUrl);
+        Console.WriteLine(user.PictureUrl);
         return Ok(new { 
             token,
             userId = user.Id,
             name = user.Name,
             alias = user.Alias,
-            profilePictureURL = user.ProfilePictureUrl + "?w=50&h=50&fit=crop"
+            PictureUrl = user.PictureUrl + "?w=50&h=50&fit=crop"
             });
     }
     [HttpPost("register")]
@@ -131,8 +131,8 @@ public class UserController : ControllerBase
             {
                 u.Id,
                 u.Name,
-                ProfilePictureUrl = !string.IsNullOrEmpty(u.ProfilePictureUrl) 
-                    ? $"{u.ProfilePictureUrl}?h={pictureHeight}&w={pictureWidth}&fit=crop"
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) 
+                    ? $"{u.PictureUrl}?h={pictureHeight}&w={pictureWidth}&fit=crop"
                     : "",
                 u.Alias
             })
@@ -194,9 +194,9 @@ public class UserController : ControllerBase
                 u.Alias,
                 u.Name,
                 u.Email,
-                //u.ProfilePictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
-                ProfilePictureUrl = !string.IsNullOrEmpty(u.ProfilePictureUrl) 
-                    ? $"{u.ProfilePictureUrl}?h=200&w=200&fit=crop"
+                //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) 
+                    ? $"{u.PictureUrl}?h=200&w=200&fit=crop"
                     : ""
             })
             .FirstOrDefaultAsync();
@@ -249,7 +249,7 @@ public class UserController : ControllerBase
         {
             id = user.Id,
             name = user.Name,
-            profilePictureURL = user.ProfilePictureUrl + "?w=400&h=500&fit=crop",
+            PictureUrl = user.PictureUrl + "?w=400&h=500&fit=crop",
             alias = user.Alias,
             email = user.Email,
             description = user.Description,
@@ -368,7 +368,7 @@ public class UserController : ControllerBase
         // Alias
         // Email
         // PasswordHash 
-        // ProfilePictureUrl 
+        // PictureUrl 
         // Admin = false
         // Premium = false
         // VerifiedTrail = false

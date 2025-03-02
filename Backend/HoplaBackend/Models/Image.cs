@@ -8,8 +8,10 @@ namespace HoplaBackend.Models;
 public class Image
 {
     public Guid Id { get; set; }
-    public string Url { get; set; } = null!;// Full størrelse bilde
-    public string ThumbnailUrl { get; set; } = null!; // Liten versjon
+    public string PictureUrl { get; set; } = null!;// Full størrelse bilde
     public string Description { get; set; } = null!; // Beskrivelse av bildet
+    public int LikesCount { get ; set ; } = 0 ;
+    public int CommentsCount { get ; set ; } = 0;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

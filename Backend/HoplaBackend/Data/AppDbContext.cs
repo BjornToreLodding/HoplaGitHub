@@ -7,12 +7,21 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Collections.Generic;
+using MediatR;
+using HoplaBackend.Events;
 
 namespace HoplaBackend.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly IMediator _mediator;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, IMediator mediator)
+        : base(options)
+    {
+        _mediator = mediator;
+    }
+    //public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserRelation> UserRelations { get; set; } // Endret fra Friendrequest til FriendRequest
@@ -32,7 +41,60 @@ public class AppDbContext : DbContext
     public DbSet<TrailAllCoordinate> TrailAllCoordinates { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<EntityImage> EntityImages { get; set; }
+    public DbSet<EntityFeed> EntityFeeds { get; set; }
+    public DbSet<EntityReaction> EntityReactions { get; set; }
+    public DbSet<EntityComment> EntityComments { get; set; }
+    public DbSet<UserReport> UserReports { get; set; }
 
+
+
+
+    public override int SaveChanges()
+    {
+        Console.WriteLine("SaveChanges() called");
+        PublishEntityEvents().Wait();
+        return base.SaveChanges();
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine("SaveChangesAsync() called");
+        await PublishEntityEvents();
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task PublishEntityEvents()
+    {
+        Console.WriteLine("PublishEntityEvents() started");
+
+        var addedHorses = ChangeTracker.Entries<Horse>()
+            .Where(e => e.State == EntityState.Added)
+            .Select(e => e.Entity)
+            .ToList();
+
+        Console.WriteLine($"Found {addedHorses.Count} added horses");
+
+        foreach (var horse in addedHorses)
+        {
+            Console.WriteLine($"Publishing event for added horse: {horse.Id}");
+            await _mediator.Publish(new EntityCreatedEvent(horse.Id, "Horse", horse.UserId));
+        }
+
+        var deletedHorses = ChangeTracker.Entries<Horse>()
+            .Where(e => e.State == EntityState.Deleted)
+            .Select(e => e.Entity)
+            .ToList();
+
+        Console.WriteLine($"Found {deletedHorses.Count} deleted horses");
+
+        foreach (var horse in deletedHorses)
+        {
+            Console.WriteLine($"Publishing event for deleted horse: {horse.Id}");
+            await _mediator.Publish(new EntityDeletedEvent(horse.Id, "Horse", horse.UserId));
+        }
+        
+        Console.WriteLine("PublishEntityEvents() completed");
+    }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,13 +130,7 @@ public class AppDbContext : DbContext
             .IsRequired(false) // Valgfritt, kan være null
             .OnDelete(DeleteBehavior.Cascade); // Sletter review hvis Ride slettes
 
-        // 1:M Relasjon mellom RideDetails og EntityImages
-        modelBuilder.Entity<EntityImage>()
-            .HasOne(ei => ei.RideDetails)
-            .WithMany(rd => rd.Images)
-            .HasForeignKey(ei => ei.RideDetailId)
-            .OnDelete(DeleteBehavior.Cascade); // Sletter bilder hvis RideDetails slettes
-
+       
         modelBuilder.Entity<RideTrackingData>()
             .Property(r => r.TrackingPoints)
             .HasColumnType("json")  // 🚀 Bruker JSON (ikke JSONB)
@@ -105,7 +161,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<TrailReview>()
             .HasOne(tr => tr.Trail)
-            .WithMany(t => t.TrailReviews) //Rød Strek under TrailReviews. Feilmelding:Trail' does not contain a definition for 'TrailReviews' and no accessible extension method 'TrailReviews' accepting a first argument of type 'Trail' could be found (are you missing a using directive or an assembly reference?)CS1061
+            .WithMany(t => t.TrailReviews) 
             .HasForeignKey(tr => tr.TrailId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -115,13 +171,28 @@ public class AppDbContext : DbContext
             .HasForeignKey(tc => tc.TrailAllCoordinatesId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<EntityImage>()
-            .HasOne(ei => ei.TrailDetails)
-            .WithMany(td => td.Images) 
-            .HasForeignKey(ei => ei.TrailDetailsId)
+        // Sikrer at hvis en kommentar slettes, slettes også svarene
+        modelBuilder.Entity<EntityComment>()
+            .HasOne(c => c.ParentComment)
+            .WithMany()
+            .HasForeignKey(c => c.ParentCommentId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Sikrer at en brukers likes slettes når brukeren slettes
+        modelBuilder.Entity<EntityReaction>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        //SIkrer at en bruker bare kan like ett innlegg.
+        modelBuilder.Entity<EntityReaction>()
+        .HasIndex(e => new { e.UserId, e.EntityId, e.EntityName })
+        .IsUnique();  // Hindrer at samme bruker kan like samme ting flere ganger
+
     }
+
+    
 
         /* Dette er nok ikke nødvendig mer etter omstruktureringen
         modelBuilder.Entity<EntityImage>()
