@@ -15,14 +15,28 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import android.Manifest
 import android.location.LocationManager
+import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
+import android.widget.Toast
+
+
+data class TestLocation(
+    val mainCoordinate: LatLng,
+    val name: String,
+    val tripCoordinates: List<LatLng>
+)
 
 @Composable
 fun MapScreen() {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
+    val polyline: MutableState<Polyline?> = remember { mutableStateOf(null) }
 
     AndroidView({ mapView }) {
         mapView.getMapAsync { googleMap ->
@@ -41,18 +55,53 @@ fun MapScreen() {
                 }
             }
 
-            // List of test coordinates in and around Gjøvik, Norway with individual names
-            val testCoordinates = listOf(
-                Pair(LatLng(60.7950, 10.6915), "Gjøvikløypa"),
-                Pair(LatLng(60.8000, 10.7000), "Skogsstien"),
-                Pair(LatLng(60.7900, 10.6800), "Fjellstien"),
-                Pair(LatLng(60.8050, 10.7100), "Vannstien"),
-                Pair(LatLng(60.7850, 10.6700), "Midt-vannsstien")
+            // List of test coordinates in and around Gjøvik, Norway with individual names and trip coordinates
+            val testLocations = listOf(
+                TestLocation(
+                    mainCoordinate = LatLng(60.7950, 10.6915),
+                    name = "Gjøvikløypa",
+                    tripCoordinates = listOf(
+                        LatLng(60.7960, 10.6920),
+                        LatLng(60.7970, 10.6930)
+                    )
+                ),
+                TestLocation(
+                    mainCoordinate = LatLng(60.8000, 10.7000),
+                    name = "Vannstien",
+                    tripCoordinates = listOf(
+                        LatLng(60.8010, 10.7010),
+                        LatLng(60.8020, 10.7020)
+                    )
+                ),
             )
 
-            // Add markers for each test coordinate with individual names
-            testCoordinates.forEach { (coordinates, name) ->
-                googleMap.addMarker(MarkerOptions().position(coordinates).title(name))
+            // Add markers for each test location and its trip coordinates
+            testLocations.forEach { location ->
+                val marker = googleMap.addMarker(MarkerOptions().position(location.mainCoordinate).title(location.name))
+                marker?.tag = location
+
+                googleMap.setOnMarkerClickListener { clickedMarker ->
+                    val clickedLocation = clickedMarker.tag as? TestLocation
+                    clickedLocation?.let {
+                        // Show the name of the testLocation
+                        Toast.makeText(context, it.name, Toast.LENGTH_SHORT).show()
+
+                        if (polyline.value != null) {
+                            // Remove existing polyline if any
+                            polyline.value?.remove()
+                            polyline.value = null
+                        } else {
+                            // Create a new polyline with the mainCoordinate and tripCoordinates
+                            val polylineOptions = PolylineOptions().add(it.mainCoordinate).apply {
+                                it.tripCoordinates.forEach { tripCoordinate ->
+                                    add(tripCoordinate)
+                                }
+                            }
+                            polyline.value = googleMap.addPolyline(polylineOptions)
+                        }
+                    }
+                    true
+                }
             }
         }
     }
