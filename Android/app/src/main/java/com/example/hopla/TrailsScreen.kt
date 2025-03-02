@@ -36,7 +36,9 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Button
@@ -151,7 +153,7 @@ fun TrailsScreen(navController: NavController) {
                         }
                     }) {
                         Icon(
-                            imageVector = if (isMapClicked) Icons.Outlined.Check else Icons.AutoMirrored.Outlined.List,
+                            imageVector = if (isMapClicked) Icons.Outlined.List else Icons.Outlined.Home,
                             contentDescription = null
                         )
                     }
@@ -267,11 +269,10 @@ fun TrailsScreen(navController: NavController) {
         } else if (isMapClicked) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Map", color = Color.Black, fontWeight = FontWeight.Bold)
+                MapScreen()
             }
             // If the user has clicked the location icon, display the trails close to you
         } else {
