@@ -30,12 +30,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
@@ -79,7 +81,7 @@ fun TrailsScreen(navController: NavController) {
             ),
             ContentBoxInfo(
                 title = "Skogsstien",
-                imageResource = setOf( R.drawable.stockimg2),
+                imageResource = setOf( R.drawable.stockimg2, R.drawable.stockimg2),
                 isHeartClicked = true,
                 starRating = 4,
                 filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM),
@@ -398,6 +400,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
 
 
 // Function to display the trail that have been clicked
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, onBackClick: () -> Unit) {
     var currentImageIndex by remember { mutableIntStateOf(0) }
@@ -463,7 +466,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                         .height(250.dp)
-                        .background(MaterialTheme.colorScheme.tertiaryContainer)
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     // Column for the picture
                     Column {
@@ -520,9 +523,23 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
                                 .height(50.dp)
-                                .background(MaterialTheme.colorScheme.primary)
+                                .background(MaterialTheme.colorScheme.tertiaryContainer)
                         ) {
-                            Text(contentBoxInfo.filters.filterStrings.joinToString(", "), color = PrimaryWhite)
+                            FlowRow(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                contentBoxInfo.filters.filterStrings.forEach { filter ->
+                                    Box(
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(12.dp))
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(text = filter, color = Color.Black, fontSize = 14.sp)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -541,7 +558,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.3f)
-                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                            .background(MaterialTheme.colorScheme.primary)
                             .clickable { /* Handle click */ },
                         contentAlignment = Alignment.Center
                     ) {
@@ -553,7 +570,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
-                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                            .background(MaterialTheme.colorScheme.primary)
                             .clickable {  navController.navigate("update_screen")  },
                         contentAlignment = Alignment.Center
                     ) {
