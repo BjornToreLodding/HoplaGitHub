@@ -29,9 +29,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
@@ -58,9 +61,6 @@ fun TrailsScreen(navController: NavController) {
     var isFollowingClicked by remember { mutableStateOf(false) }
     var isFiltersClicked by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
-    var starRating by remember { mutableIntStateOf(3) }
-    var numRoutes by remember { mutableIntStateOf(5) }
-    var heartStates by remember { mutableStateOf(List(numRoutes) { false }) }
     var isRouteClicked by remember { mutableStateOf(false) }
     val selectedItems = remember { mutableStateOf(setOf<String>()) }
     var showOnlyFavorites by remember { mutableStateOf(false) }
@@ -79,14 +79,14 @@ fun TrailsScreen(navController: NavController) {
                 imageResource = R.drawable.stockimg2,
                 isHeartClicked = true,
                 starRating = 4,
-                filters = Filters(setOf(presetFilters[0]), Difficulty.HARD)
+                filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM)
             ),
             ContentBoxInfo(
                 title = "Fjellstien",
                 imageResource = R.drawable.stockimg1,
                 isHeartClicked = false,
                 starRating = 5,
-                filters = Filters(setOf(presetFilters[1]), Difficulty.EASY)
+                filters = Filters(setOf(presetFilters[1]), Difficulty.HARD)
             )
         )
     }
@@ -121,6 +121,7 @@ fun TrailsScreen(navController: NavController) {
                             isFollowingClicked = false
                             isFiltersClicked = false
                             isDropdownExpanded = false
+                            showOnlyFavorites = false
                         }
                     }) {
                         Icon(
@@ -137,6 +138,7 @@ fun TrailsScreen(navController: NavController) {
                             isFollowingClicked = false
                             isFiltersClicked = false
                             isDropdownExpanded = false
+                            showOnlyFavorites = false
                         }
                     }) {
                         Icon(
@@ -147,6 +149,12 @@ fun TrailsScreen(navController: NavController) {
                     // Third icon: Favorite, everything else is set to false
                     IconButton(onClick = {
                         showOnlyFavorites = !showOnlyFavorites
+                        if (showOnlyFavorites) {
+                            isMapClicked = false
+                            isCloseByClicked = false
+                            isFavoriteClicked = false
+                            isFollowingClicked = false
+                        }
                     }) {
                         Icon(
                             imageVector = if (showOnlyFavorites) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
@@ -162,6 +170,7 @@ fun TrailsScreen(navController: NavController) {
                             isFavoriteClicked = false
                             isFiltersClicked = false
                             isDropdownExpanded = false
+                            showOnlyFavorites = false
                         }
                     }) {
                         Icon(
@@ -270,7 +279,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
-            .height(180.dp) // Increased height for filter box
+            .height(180.dp)
             .clickable(onClick = onBoxClick)
     ) {
         Column {
@@ -279,7 +288,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp)
-                    .height(140.dp) // Adjusted height
+                    .height(140.dp)
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
                 Image(
@@ -339,24 +348,37 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     .background(Color.White)
                     .padding(vertical = 5.dp, horizontal = 10.dp)
             ) {
+                val scrollState = rememberScrollState()
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.horizontalScroll(scrollState)
                 ) {
                     // Display filter names
                     info.filters.filterStrings.forEach { filter ->
-                        Text(
-                            text = filter.replaceFirstChar { it.uppercaseChar() }, // Capitalize first letter
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Box(
+                            modifier = Modifier
+                                .border(1.dp, Color.Gray)
+                                .background(Color.LightGray)
+                                .padding(2.dp)
+                                .height(18.dp)
+                        ) {
+                            Text(
+                                text = filter.replaceFirstChar { it.uppercaseChar() },
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.weight(1f))
                     // Display difficulty if available
                     info.filters.difficulty?.let {
                         Text(
-                            text = it.name.lowercase().replaceFirstChar { it.uppercaseChar() }, // Capitalize first letter
+                            text = it.name.lowercase().replaceFirstChar { it.uppercaseChar() },
                             color = Color.Gray,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp
                         )
                     }
                 }
