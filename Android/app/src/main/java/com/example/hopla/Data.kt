@@ -128,3 +128,8 @@ data class ContentBoxInfo(
     val filters: Filters = Filters(),
     val description: String
 )
+
+data class Coordinates(
+    val latitude: Double,
+    val longitude: Double
+)

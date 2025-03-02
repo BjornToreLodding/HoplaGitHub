@@ -14,6 +14,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import android.Manifest
+import android.location.LocationManager
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
 @Composable
 fun MapScreen() {
@@ -24,7 +28,32 @@ fun MapScreen() {
         mapView.getMapAsync { googleMap ->
             googleMap.uiSettings.isZoomControlsEnabled = true
             enableMyLocation(googleMap, context)
-            // Customize the map as needed
+
+            // Get the phone's location and move the camera to that location
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val locationProvider = LocationManager.GPS_PROVIDER
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                val lastKnownLocation = locationManager.getLastKnownLocation(locationProvider)
+                lastKnownLocation?.let {
+                    val userLocation = LatLng(it.latitude, it.longitude)
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10f))
+                }
+            }
+
+            // List of test coordinates in and around Gjøvik, Norway with individual names
+            val testCoordinates = listOf(
+                Pair(LatLng(60.7950, 10.6915), "Gjøvikløypa"),
+                Pair(LatLng(60.8000, 10.7000), "Skogsstien"),
+                Pair(LatLng(60.7900, 10.6800), "Fjellstien"),
+                Pair(LatLng(60.8050, 10.7100), "Vannstien"),
+                Pair(LatLng(60.7850, 10.6700), "Midt-vannsstien")
+            )
+
+            // Add markers for each test coordinate with individual names
+            testCoordinates.forEach { (coordinates, name) ->
+                googleMap.addMarker(MarkerOptions().position(coordinates).title(name))
+            }
         }
     }
 }
