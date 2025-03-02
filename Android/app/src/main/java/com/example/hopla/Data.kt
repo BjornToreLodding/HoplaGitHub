@@ -122,7 +122,7 @@ data class Filters(
 // Data class to hold the information for each ContentBox
 data class ContentBoxInfo(
     val title: String,
-    val imageResource: Int,
+    val imageResource: Set<Int>,
     val isHeartClicked: Boolean,
     val starRating: Int,
     val filters: Filters = Filters()

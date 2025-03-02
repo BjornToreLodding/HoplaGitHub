@@ -62,6 +62,7 @@ fun TrailsScreen(navController: NavController) {
     var isFiltersClicked by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var isRouteClicked by remember { mutableStateOf(false) }
+    var selectedContentBoxInfo by remember { mutableStateOf<ContentBoxInfo?>(null) }
     val selectedItems = remember { mutableStateOf(setOf<String>()) }
     var showOnlyFavorites by remember { mutableStateOf(false) }
 
@@ -69,21 +70,21 @@ fun TrailsScreen(navController: NavController) {
         mutableStateListOf(
             ContentBoxInfo(
                 title = "Boredalstien",
-                imageResource = R.drawable.stockimg1,
+                imageResource = setOf(R.drawable.stockimg1),
                 isHeartClicked = false,
                 starRating = 3,
                 filters = Filters(setOf(presetFilters[0], presetFilters[1]), Difficulty.EASY)
             ),
             ContentBoxInfo(
                 title = "Skogsstien",
-                imageResource = R.drawable.stockimg2,
+                imageResource = setOf( R.drawable.stockimg2),
                 isHeartClicked = true,
                 starRating = 4,
                 filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM)
             ),
             ContentBoxInfo(
                 title = "Fjellstien",
-                imageResource = R.drawable.stockimg1,
+                imageResource = setOf( R.drawable.stockimg1, R.drawable.stockimg2),
                 isHeartClicked = false,
                 starRating = 5,
                 filters = Filters(setOf(presetFilters[1]), Difficulty.HARD)
@@ -234,7 +235,9 @@ fun TrailsScreen(navController: NavController) {
         }
         // If the user has clicked a specific trail, display the function RouteClicked
         if (isRouteClicked) {
-            RouteClicked(navController = navController, onBackClick = { isRouteClicked = false })
+            selectedContentBoxInfo?.let { contentBoxInfo ->
+                RouteClicked(navController = navController, contentBoxInfo = contentBoxInfo, onBackClick = { isRouteClicked = false })
+            }
             // If the user has clicked the map icon, display the map
         } else if (isMapClicked) {
             Box(
@@ -263,6 +266,7 @@ fun TrailsScreen(navController: NavController) {
                             testData[testData.indexOf(contentBoxInfo)] = contentBoxInfo.copy(isHeartClicked = newState)
                         },
                         onBoxClick = {
+                            selectedContentBoxInfo = contentBoxInfo
                             isRouteClicked = true
                         }
                     )
@@ -291,8 +295,9 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     .height(140.dp)
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
+                val firstImageResource = info.imageResource.firstOrNull() ?: R.drawable.logo1
                 Image(
-                    painter = painterResource(id = info.imageResource),
+                    painter = painterResource(id = firstImageResource),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize()
@@ -390,11 +395,12 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
 
 // Function to display the trail that have been clicked
 @Composable
-fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
+fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, onBackClick: () -> Unit) {
     var currentImageIndex by remember { mutableIntStateOf(0) }
     var userRating by remember { mutableIntStateOf(0) }
-    val images = listOf(R.drawable.stockimg1, R.drawable.stockimg2)
     var showMessageBox by remember { mutableStateOf(false) }
+
+    val images = contentBoxInfo.imageResource.toList()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Header
@@ -428,7 +434,7 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
                     }
                     // Text in the header
                     Text(
-                        text = "Boredalstien",
+                        text = contentBoxInfo.title,
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
                     Spacer(modifier = Modifier.width(48.dp))
@@ -508,7 +514,7 @@ fun RouteClicked(navController: NavController, onBackClick: () -> Unit) {
                                 .height(50.dp)
                                 .background(MaterialTheme.colorScheme.primary)
                         ) {
-                            Text("Asfalt, Grus, Parkering", color = PrimaryWhite)
+                            Text(contentBoxInfo.filters.filterStrings.joinToString(", "), color = PrimaryWhite)
                         }
                     }
                 }
