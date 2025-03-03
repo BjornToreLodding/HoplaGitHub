@@ -1,0 +1,140 @@
+{
+  "" : {
+    "const-values" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hopla-master.swiftconstvalues",
+    "dependencies" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hopla-master.d",
+    "diagnostics" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hopla-master.dia",
+    "emit-module-dependencies" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hopla-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hopla-master-emit-module.dia",
+    "swift-dependencies" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hopla-master.swiftdeps"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Colors/Colors.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Colors.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Colors.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Colors.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Community.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Community.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Community.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Community.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/CommunityChat.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/CommunityChat.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/CommunityChat.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/CommunityChat.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/ContentView.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ContentView.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Following.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Following.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Following.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Following.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Friends.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Friends.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Friends.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Friends.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Hikes/HikeUpdate.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HikeUpdate.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HikeUpdate.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HikeUpdate.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Hikes/Hikes.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hikes.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hikes.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Hikes.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Hikes/HikesDetails.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HikesDetails.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HikesDetails.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HikesDetails.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Hikes/StartHike.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/StartHike.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/StartHike.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/StartHike.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Home.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Home.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Home.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Home.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/HoplaApp.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HoplaApp.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HoplaApp.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/HoplaApp.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Login.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Login.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Login.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Login.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/MapView.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MapView.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MapView.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MapView.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/MyHikes.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MyHikes.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MyHikes.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MyHikes.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/MyHorses.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MyHorses.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MyHorses.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/MyHorses.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/NewHike.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/NewHike.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/NewHike.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/NewHike.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/CameraView.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/CameraView.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/CameraView.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/CameraView.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/ChangePword.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ChangePword.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ChangePword.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ChangePword.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/ImagePicker.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ImagePicker.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ImagePicker.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ImagePicker.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/Picker.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Picker.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Picker.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Picker.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/Profile.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Profile.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Profile.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Profile.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/Settings.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Settings.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Settings.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/Settings.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/Profile/ViewModel.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ViewModel.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ViewModel.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ViewModel.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/Hopla/ViewController.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ViewController.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ViewController.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/ViewController.o"
+  },
+  "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/anemarie/Desktop/hopla/IOS/build/Hopla.build/Release-iphoneos/Hopla.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>GMSAPIKey</key>
+	<string>AIzaSyC-2qlkvP8M1pgfnRMG0rr76SlxaI6jzwQ</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Always allow this app to use my location and when in use.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Always use my location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs permission to use your location to use the map function.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs permission to save your profile picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

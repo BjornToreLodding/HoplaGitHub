@@ -1,4 +1,5 @@
 import SwiftUI
+import GoogleMaps
 
 
 struct ContentView: View {
@@ -90,12 +91,29 @@ struct ContentView: View {
     }
 }
 
+// Define MapView to embed Google Maps
+struct MapView: UIViewRepresentable {
+    @ObservedObject var locationManager = LocationManager()
 
-#Preview("English") {
-    ContentView()
-}
+    func makeUIView(context: Context) -> GMSMapView {
+        // Initialize the GMSMapView with a default camera
+        let camera = GMSCameraPosition.camera(withLatitude: 0, longitude: 0, zoom: 15) // Default location
+        let mapView = GMSMapView(frame: .zero, camera: camera) // Use the correct initializer
+        mapView.isMyLocationEnabled = true // Enable user location
+        mapView.settings.myLocationButton = true // Optional: Show location button
+        
+        return mapView
+    }
 
-#Preview("Norsk") {
-    ContentView()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
+    func updateUIView(_ mapView: GMSMapView, context: Context) {
+        if let userLocation = locationManager.userLocation {
+            // Update the camera to follow the user's location
+            let newCamera = GMSCameraPosition.camera(
+                withLatitude: userLocation.coordinate.latitude,
+                longitude: userLocation.coordinate.longitude,
+                zoom: 15
+            )
+            mapView.animate(to: newCamera) // Move camera to user location
+        }
+    }
 }

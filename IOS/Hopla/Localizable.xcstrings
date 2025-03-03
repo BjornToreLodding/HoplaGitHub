@@ -42,7 +42,14 @@
       }
     },
     "Average rating: " : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gjennomsnitt: "
+          }
+        }
+      }
     },
     "Bob" : {
 
@@ -171,16 +178,8 @@
         }
       }
     },
-    "E-mail" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-post"
-          }
-        }
-      }
+    "Distance" : {
+
     },
     "Email" : {
       "localizations" : {
@@ -379,6 +378,9 @@
         }
       }
     },
+    "Hopla" : {
+
+    },
     "Join now" : {
       "localizations" : {
         "nb" : {
@@ -430,10 +432,24 @@
       }
     },
     "My horses" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine hester"
+          }
+        }
+      }
     },
     "My rating: " : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min vurdering:"
+          }
+        }
+      }
     },
     "New Hike" : {
       "localizations" : {
@@ -533,13 +549,34 @@
 
     },
     "Search groups..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk etter grupper…"
+          }
+        }
+      }
     },
     "Search hikes..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk etter løyper…"
+          }
+        }
+      }
     },
     "Send" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        }
+      }
     },
     "Send a Report" : {
       "localizations" : {
@@ -560,6 +597,9 @@
           }
         }
       }
+    },
+    "Start" : {
+
     },
     "Start hike" : {
       "localizations" : {
@@ -601,8 +641,18 @@
         }
       }
     },
-    "Type a message..." : {
+    "Time" : {
 
+    },
+    "Type a message..." : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv en melding…"
+          }
+        }
+      }
     },
     "Username" : {
       "localizations" : {

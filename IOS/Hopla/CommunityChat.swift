@@ -4,6 +4,7 @@
 //
 //  Created by Ane Marie Johnsen on 27/02/2025.
 //
+
 import SwiftUI
 
 struct CommunityChat: View {

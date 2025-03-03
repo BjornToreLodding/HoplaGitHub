@@ -10,10 +10,11 @@ import SwiftUI
 struct Home: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
     // Track selected filter
-    @State private var selectedFilter: String = "location"
+    @State private var selectedFilter: String = "globe"
 
     // To select a filter
     enum FilterOption: String, CaseIterable, Identifiable {
+            case globe
             case location
             case people
             case star
@@ -23,6 +24,7 @@ struct Home: View {
 
             var systemImage: String {
                 switch self {
+                case .globe: return "globe"
                 case .location: return "location"
                 case .people: return "person.2"
                 case .star: return "star"
@@ -67,6 +69,7 @@ struct Home: View {
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
+                Image(systemName: "globe").tag("globe")
                 Image(systemName: "location").tag("location")
                 Image(systemName: "person.2").tag("person.2")
                 Image(systemName: "star").tag("star")

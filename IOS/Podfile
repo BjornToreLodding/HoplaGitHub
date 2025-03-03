@@ -1,0 +1,35 @@
+# Define the global platform for the project
+platform :ios, '16.0'  # Adjust this if needed
+use_frameworks!
+
+target 'Hopla' do
+  # Pods for Hopla
+  pod 'GoogleMaps', '~> 9.3.0'  # Replace with the latest stable version
+  pod 'GooglePlaces', '~> 9.3.0'
+end
+
+target 'HoplaTests' do
+  inherit! :search_paths
+  # Pods for testing
+end
+
+target 'HoplaUITests' do
+  inherit! :search_paths
+  # Pods for UI testing
+end
+
+# Post-install hook to modify build settings
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    if target.name == 'GoogleMaps'
+      target.build_configurations.each do |config|
+        # Check for the simulator target and exclude arm64 architecture for it
+        if config.name == 'Debug' || config.name == 'Release'
+          if target.platform_name == :ios && !target.name.include?("Release")
+            config.build_settings['EXCLUDED_ARCHITECTURES'] = 'arm64' 
+          end
+        end
+      end
+    end
+  end
+end

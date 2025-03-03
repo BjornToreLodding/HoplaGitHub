@@ -38,6 +38,9 @@ struct Login: View {
                         .frame(width: 170, height: 170)
                         .padding(.top, 100)
                     
+                    Text("Hopla")
+                        .font(.system(size: 60, weight: .bold, design: .rounded))
+
                     Spacer()
                     
                     // MARK: - Text fields
