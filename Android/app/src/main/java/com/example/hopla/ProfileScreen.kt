@@ -70,6 +70,7 @@ import androidx.lifecycle.AndroidViewModel
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.hopla.ui.theme.PrimaryGray
 
 // Main profile function
 @Composable
@@ -409,13 +410,13 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
         modifier = Modifier
             .size(200.dp)
             .clip(CircleShape)
-            .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+            .border(5.dp, PrimaryWhite, CircleShape)
     ) {
         Box(
             modifier = Modifier
                 .size(200.dp)
                 .clip(CircleShape)
-                .border(10.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                .border(5.dp, PrimaryWhite, CircleShape)
         ) {
             if (imageBitmap != null) {
                 Image(
@@ -458,9 +459,12 @@ fun ProfileButtons(navController: NavController) {
                     .weight(1f)
                     .padding(2.dp)
                     .height(50.dp),
-                shape = RectangleShape
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryWhite
+                )
             ) {
-                Text(text = stringResource(R.string.my_trips), color = PrimaryWhite)
+                Text(text = stringResource(R.string.my_trips), color = PrimaryBlack)
             }
             Button(
                 onClick = { navController.navigate("my_horses") },
@@ -468,9 +472,12 @@ fun ProfileButtons(navController: NavController) {
                     .weight(1f)
                     .padding(2.dp)
                     .height(50.dp),
-                shape = RectangleShape
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryWhite
+                )
             ) {
-                Text(text = stringResource(R.string.my_horses), color = PrimaryWhite)
+                Text(text = stringResource(R.string.my_horses), color = PrimaryBlack)
             }
         }
         Row(
@@ -483,9 +490,12 @@ fun ProfileButtons(navController: NavController) {
                     .weight(1f)
                     .padding(2.dp)
                     .height(50.dp),
-                shape = RectangleShape
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryWhite
+                )
             ) {
-                Text(text = stringResource(R.string.friends), color = PrimaryWhite)
+                Text(text = stringResource(R.string.friends), color = PrimaryBlack)
             }
             Button(
                 onClick = { navController.navigate("following") },
@@ -493,9 +503,12 @@ fun ProfileButtons(navController: NavController) {
                     .weight(1f)
                     .padding(2.dp)
                     .height(50.dp),
-                shape = RectangleShape
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryWhite
+                )
             ) {
-                Text(text = stringResource(R.string.following), color = PrimaryWhite)
+                Text(text = stringResource(R.string.following), color = PrimaryBlack)
             }
         }
     }
@@ -514,34 +527,40 @@ fun UserChanges(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.tertiary)
+            .background(PrimaryWhite)
     ) {
-        Column {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
             Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+            HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+            Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(R.string.username))
-            TextField(
+            CustomTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = {  },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = { }
             )
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+            Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(R.string.email))
-            TextField(
+            CustomTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                label = { }
             )
-            HorizontalDivider(thickness = 1.dp, color = PrimaryBlack)
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.change_password),
                 modifier = Modifier.clickable { showDialog = true },
                 style = TextStyle(textDecoration = TextDecoration.Underline)
             )
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
@@ -551,23 +570,20 @@ fun UserChanges(modifier: Modifier = Modifier) {
             title = { Text(text = stringResource(R.string.change_password)) },
             text = {
                 Column {
-                    TextField(
+                    CustomTextField(
                         value = currentPassword,
                         onValueChange = { currentPassword = it },
-                        label = { Text(text = stringResource(R.string.current_password)) },
-                        modifier = Modifier.fillMaxWidth()
+                        label = { Text(text = stringResource(R.string.current_password)) }
                     )
-                    TextField(
+                    CustomTextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
-                        label = { Text(text = stringResource(R.string.new_password)) },
-                        modifier = Modifier.fillMaxWidth()
+                        label = { Text(text = stringResource(R.string.new_password)) }
                     )
-                    TextField(
+                    CustomTextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
-                        label = { Text(text = stringResource(R.string.confirm_password)) },
-                        modifier = Modifier.fillMaxWidth()
+                        label = { Text(text = stringResource(R.string.confirm_password)) }
                     )
                 }
             },

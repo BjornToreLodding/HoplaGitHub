@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -47,6 +49,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -56,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.hopla.ui.theme.PrimaryGray
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -349,6 +354,40 @@ fun MessageBox(
                     Text(text = stringResource(R.string.publish))
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CustomTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: String = ""
+) {
+    Column(modifier = modifier) {
+        label?.invoke()
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.LightGray) // Background color
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                decorationBox = { innerTextField ->
+                    if (value.isEmpty()) {
+                        Text(text = placeholder, color = PrimaryGray, fontSize = 16.sp)
+                    }
+                    innerTextField()
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
