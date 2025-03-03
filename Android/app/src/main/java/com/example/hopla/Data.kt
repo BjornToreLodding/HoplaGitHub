@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 
 // Base URL for the API
@@ -129,7 +130,8 @@ data class ContentBoxInfo(
     val description: String
 )
 
-data class Coordinates(
-    val latitude: Double,
-    val longitude: Double
+data class TestLocation(
+    val mainCoordinate: LatLng,
+    val name: String,
+    val tripCoordinates: List<LatLng>
 )

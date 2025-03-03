@@ -24,13 +24,6 @@ import com.google.android.gms.maps.model.PolylineOptions
 import androidx.compose.runtime.MutableState
 import android.widget.Toast
 
-
-data class TestLocation(
-    val mainCoordinate: LatLng,
-    val name: String,
-    val tripCoordinates: List<LatLng>
-)
-
 @Composable
 fun MapScreen() {
     val mapView = rememberMapViewWithLifecycle()

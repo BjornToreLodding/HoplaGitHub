@@ -51,7 +51,12 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -64,6 +69,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
+import androidx.compose.ui.graphics.vector.ImageVector
 
 // Main profile function
 @Composable
@@ -101,7 +107,6 @@ fun ProfileScreen(navController: NavController) {
     }
 }
 
-
 @Composable
 fun SettingsScreen(
     languageViewModel: LanguageViewModel,
@@ -109,198 +114,220 @@ fun SettingsScreen(
     userViewModel: UserViewModel,
     navController: NavController
 ) {
-    // State variables for sending a report
     var showReportDialog by remember { mutableStateOf(false) }
-    var reportTitle by remember { mutableStateOf("") }
-    var reportText by remember { mutableStateOf("") }
-    // State variables for logging out
     var showLogOutDialog by remember { mutableStateOf(false) }
-    // State variables for deleting user
     var showDeleteDialog by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp)
-    ) {
-        Box(
+    Scaffold(
+        topBar = {
+            ScreenHeader(navController, stringResource(R.string.settings))
+        }
+    ) { paddingValues ->
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(8.dp)
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.settings),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(start = 16.dp)
+            item {
+                SettingsCategory(title = "General")
+                SettingsItem(
+                    icon = Icons.Default.LocationOn,
+                    title = stringResource(R.string.language),
+                    trailingContent = { LanguageSelection(languageViewModel) }
                 )
+                HorizontalDivider()
+
+                SettingsItem(
+                    icon = Icons.Default.CheckCircle,
+                    title = stringResource(R.string.mode),
+                    trailingContent = { ModeSelection(themeViewModel) }
+                )
+                HorizontalDivider()
+            }
+
+            item {
+                SettingsCategory(title = "Account")
+                SettingsClickableItem(
+                    icon = Icons.Default.Create,
+                    title = stringResource(R.string.send_a_report),
+                    onClick = { showReportDialog = true }
+                )
+                HorizontalDivider()
+
+                SettingsClickableItem(
+                    icon = Icons.AutoMirrored.Filled.ExitToApp,
+                    title = stringResource(R.string.log_out),
+                    onClick = { showLogOutDialog = true }
+                )
+                HorizontalDivider()
+
+                SettingsClickableItem(
+                    icon = Icons.Default.Delete,
+                    title = stringResource(R.string.delete_user),
+                    onClick = { showDeleteDialog = true }
+                )
+                HorizontalDivider()
             }
         }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = stringResource(R.string.language))
-            LanguageSelection(languageViewModel)
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp),
-            thickness = 1.dp,
-            color = PrimaryBlack
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = stringResource(R.string.mode))
-            ModeSelection(themeViewModel)
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp),
-            thickness = 1.dp,
-            color = PrimaryBlack
-        )
-
-        Text(
-            text = stringResource(R.string.send_a_report),
-            modifier = Modifier
-                .padding(start = 16.dp, bottom = 8.dp, top = 8.dp)
-                .clickable { showReportDialog = true },
-            style = TextStyle(textDecoration = TextDecoration.Underline)
-        )
-
-        Text(
-            text = stringResource(R.string.log_out),
-            modifier = Modifier
-                .padding(start = 16.dp, bottom = 8.dp)
-                .clickable { showLogOutDialog = true },
-            style = TextStyle(textDecoration = TextDecoration.Underline)
-        )
-
-        Text(
-            text = stringResource(R.string.delete_user),
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .clickable { showDeleteDialog = true },
-            style = TextStyle(textDecoration = TextDecoration.Underline)
-        )
     }
 
     if (showReportDialog) {
-        AlertDialog(
-            onDismissRequest = { showReportDialog = false },
-            title = { Text(text = stringResource(R.string.send_a_report)) },
-            text = {
-                Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState())
-                ) {
-                    TextField(
-                        value = reportTitle,
-                        onValueChange = { reportTitle = it },
-                        label = { Text(text = stringResource(R.string.title)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = reportText,
-                        onValueChange = { reportText = it },
-                        label = { Text(text = stringResource(R.string.report)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    // Handle sending report logic here
-                    showReportDialog = false
-                }) {
-                    Text(text = stringResource(R.string.send), color = PrimaryWhite)
-                    reportTitle = ""
-                    reportText = ""
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showReportDialog = false }) {
-                    Text(text = stringResource(R.string.cancel), color = PrimaryWhite)
-                    reportTitle = ""
-                    reportText = ""
-                }
-            }
-        )
+        ReportDialog(onDismiss = { showReportDialog = false })
     }
     if (showLogOutDialog) {
-        AlertDialog(
-            onDismissRequest = { showLogOutDialog = false },
-            title = { Text(text = stringResource(R.string.log_out)) },
-            text = { Text(text = stringResource(R.string.confirm_logout)) },
-            confirmButton = {
-                Button(onClick = {
-                    userViewModel.logOut()
-                    showLogOutDialog = false
-                }) {
-                    Text(text = stringResource(R.string.confirm), color = PrimaryWhite)
-                }
+        ConfirmDialog(
+            title = stringResource(R.string.log_out),
+            message = stringResource(R.string.confirm_logout),
+            onConfirm = {
+                userViewModel.logOut()
+                showLogOutDialog = false
             },
-            dismissButton = {
-                Button(onClick = { showLogOutDialog = false }) {
-                    Text(text = stringResource(R.string.cancel), color = PrimaryWhite)
-                }
-            }
+            onDismiss = { showLogOutDialog = false }
         )
     }
     if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text(text = stringResource(R.string.delete_user)) },
-            text = {
-                Column {
-                    TextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text(text = stringResource(R.string.confirm_password)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        PasswordConfirmDialog(
+            password = password,
+            onPasswordChange = { password = it },
+            onConfirm = {
+                userViewModel.deleteUser()
+                showDeleteDialog = false
             },
-            confirmButton = {
-                Button(onClick = {
-                    // Handle delete user logic here
-                    userViewModel.deleteUser()
-                    showDeleteDialog = false
-                }) {
-                    Text(text = stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDeleteDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            }
+            onDismiss = { showDeleteDialog = false }
         )
     }
+}
+
+// Settings Category Header
+@Composable
+fun SettingsCategory(title: String) {
+    Text(
+        text = title.uppercase(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.primary
+    )
+}
+
+// Settings Item with an Icon and Trailing Content (e.g., switch or dropdown)
+@Composable
+fun SettingsItem(icon: ImageVector, title: String, trailingContent: @Composable () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
+        Text(text = title, modifier = Modifier.weight(1f).padding(start = 16.dp))
+        trailingContent()
+    }
+}
+
+// Clickable Settings Item
+@Composable
+fun SettingsClickableItem(icon: ImageVector, title: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
+        Text(text = title, modifier = Modifier.weight(1f).padding(start = 16.dp))
+    }
+}
+
+// Report Dialog
+@Composable
+fun ReportDialog(onDismiss: () -> Unit) {
+    var reportTitle by remember { mutableStateOf("") }
+    var reportText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.send_a_report)) },
+        text = {
+            Column {
+                TextField(
+                    value = reportTitle,
+                    onValueChange = { reportTitle = it },
+                    label = { Text(text = stringResource(R.string.title)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = reportText,
+                    onValueChange = { reportText = it },
+                    label = { Text(text = stringResource(R.string.report)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.send))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+// Confirm Action Dialog (Log Out, Delete, etc.)
+@Composable
+fun ConfirmDialog(title: String, message: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(message) },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(text = stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+// Password Confirmation Dialog
+@Composable
+fun PasswordConfirmDialog(password: String, onPasswordChange: (String) -> Unit, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.delete_user)) },
+        text = {
+            Column {
+                TextField(
+                    value = password,
+                    onValueChange = onPasswordChange,
+                    label = { Text(stringResource(R.string.confirm_password)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 class LanguageViewModel(

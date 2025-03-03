@@ -46,9 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,7 +114,7 @@ fun ScreenHeader(navController: NavController, headerText: String) {
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
-            .background(MaterialTheme.colorScheme.tertiary)
+            .background(MaterialTheme.colorScheme.primary)
             .border(10.dp, MaterialTheme.colorScheme.primary)
     ) {
         // Row for the back button and the title
@@ -133,7 +135,9 @@ fun ScreenHeader(navController: NavController, headerText: String) {
         ) {
             Text(
                 text = headerText,
-                fontSize = 24.sp
+                fontSize = 24.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
             )
         }
     }
