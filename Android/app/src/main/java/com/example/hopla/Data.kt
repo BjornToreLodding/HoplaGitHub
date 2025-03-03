@@ -55,7 +55,7 @@ data class User(
     val name: String,
     val email: String,
     val alias: String,
-    val profilePictureURL: String
+    val pictureUrl: String
 )
 
 // Class for the data of a community

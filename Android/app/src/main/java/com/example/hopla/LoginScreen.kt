@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import android.util.Log
 import androidx.compose.material3.CircularProgressIndicator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -154,6 +155,8 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                                     setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
                                 }
                                 Log.d("LoginScreen", "Response status: ${response.status}")
+                                val responseBody = response.bodyAsText()
+                                Log.d("LoginScreen", "Response body: $responseBody")
                                 // check the response status and show an error message if necessary
                                 when (response.status) {
                                     // if the login was successful, save the user data in the UserSession object
@@ -164,7 +167,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                                         UserSession.email = loginResponse.email
                                         UserSession.name = loginResponse.name
                                         UserSession.alias = loginResponse.alias
-                                        UserSession.profilePictureURL = loginResponse.profilePictureURL
+                                        UserSession.profilePictureURL = loginResponse.pictureUrl
                                         onLogin()
                                     }
                                     // if the login was unsuccessful, show an error message

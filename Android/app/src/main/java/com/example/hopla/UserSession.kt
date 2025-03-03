@@ -7,4 +7,13 @@ object UserSession {
     var name: String = ""
     var alias: String = ""
     var profilePictureURL: String = ""
+
+    fun clear() {
+        token = ""
+        userId = ""
+        email = ""
+        name = ""
+        alias = ""
+        profilePictureURL = ""
+    }
 }

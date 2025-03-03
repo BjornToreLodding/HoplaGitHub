@@ -263,9 +263,11 @@ class UserViewModel : ViewModel() {
 
     fun logOut() {
         _isLoggedIn.value = false
+        UserSession.clear()
     }
     fun deleteUser() {
         _isLoggedIn.value = false
+        UserSession.clear()
     }
 }
 
