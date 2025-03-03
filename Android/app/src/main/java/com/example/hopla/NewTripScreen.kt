@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.ui.graphics.Color
+import com.example.hopla.ui.theme.PrimaryBlack
 
 @SuppressLint("DefaultLocale")
 @Preview
@@ -151,7 +152,7 @@ fun NewTripScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(75.dp)
-                .background(MaterialTheme.colorScheme.secondary)
+                .background(MaterialTheme.colorScheme.background)
                 .align(Alignment.BottomCenter),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -194,7 +195,12 @@ fun NewTripScreen() {
                             }
                         },
                         shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
-                        modifier = Modifier.size(85.dp)
+                        modifier = Modifier.size(80.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary, // Background color
+                            contentColor = PrimaryBlack // Text color
+                        )
                     ) {
                         Text(
                             text = if (isRunning) stringResource(R.string.stop) else stringResource(
