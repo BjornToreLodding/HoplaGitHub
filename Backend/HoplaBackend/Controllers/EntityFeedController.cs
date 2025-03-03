@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using HoplaBackend.Data;
+using HoplaBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +15,16 @@ public class EntityFeedController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserFeed(Guid userId)
+    [HttpGet("all")]
+    public async Task<IActionResult> GetUserFeed()
     {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+        var userId = parsedUserId;
         var feed = await _context.EntityFeeds
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.CreatedAt)
