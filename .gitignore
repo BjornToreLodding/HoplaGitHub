@@ -1,5 +1,5 @@
 Backend/HoplaBackend/bin/
-**/HoplaBackend/obj/
+**/HoplaBackend/obj/*
 Backend/*/*.log
 
 
