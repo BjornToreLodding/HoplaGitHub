@@ -7,19 +7,40 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class rendercomsync7 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "EntityFeeds",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityName = table.Column<string>(type: "text", nullable: false),
+                    EntityTitle = table.Column<string>(type: "text", nullable: true),
+                    EntityObject = table.Column<string>(type: "text", nullable: true),
+                    ActionType = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityFeeds", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Images",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    ThumbnailUrl = table.Column<string>(type: "text", nullable: false),
+                    PictureUrl = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -37,11 +58,28 @@ namespace HoplaBackend.Migrations
                     PrivateGroup = table.Column<bool>(type: "boolean", nullable: false),
                     ModeratedMessages = table.Column<bool>(type: "boolean", nullable: false),
                     SecretGroup = table.Column<bool>(type: "boolean", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Stables", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemSettings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemSettings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,18 +89,93 @@ namespace HoplaBackend.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Alias = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Telephone = table.Column<string>(type: "text", nullable: true),
                     PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    ProfilePictureUrl = table.Column<string>(type: "text", nullable: true),
+                    PictureUrl = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     Admin = table.Column<bool>(type: "boolean", nullable: false),
                     Premium = table.Column<bool>(type: "boolean", nullable: false),
                     VerifiedTrail = table.Column<bool>(type: "boolean", nullable: false),
+                    SubscriptionEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Dob = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSettings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DarkMode = table.Column<bool>(type: "boolean", nullable: false),
+                    HideFeedFriendNewFriends = table.Column<bool>(type: "boolean", nullable: false),
+                    HideFeedHorse = table.Column<bool>(type: "boolean", nullable: false),
+                    HideFeedFriendHikes = table.Column<bool>(type: "boolean", nullable: false),
+                    HideReactionFriendNewFriends = table.Column<bool>(type: "boolean", nullable: false),
+                    HideCommentFriendNewFriends = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSettings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EntityComments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityName = table.Column<string>(type: "text", nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ParentCommentId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityComments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EntityComments_EntityComments_ParentCommentId",
+                        column: x => x.ParentCommentId,
+                        principalTable: "EntityComments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EntityComments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EntityReactions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityName = table.Column<string>(type: "text", nullable: false),
+                    Reaction = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityReactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EntityReactions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,8 +186,11 @@ namespace HoplaBackend.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Breed = table.Column<string>(type: "text", nullable: true),
+                    PictureUrl = table.Column<string>(type: "text", nullable: true),
                     Dob = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,7 +211,8 @@ namespace HoplaBackend.Migrations
                     SUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     MessageText = table.Column<string>(type: "text", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    PictureUrl = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -122,6 +239,8 @@ namespace HoplaBackend.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     StableId = table.Column<Guid>(type: "uuid", nullable: false),
                     MessageText = table.Column<string>(type: "text", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -148,6 +267,8 @@ namespace HoplaBackend.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     StableId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsOwner = table.Column<bool>(type: "boolean", nullable: false),
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
@@ -172,6 +293,51 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SubscriptionOrders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Price = table.Column<float>(type: "real", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubscriptionOrders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Trails",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Distance = table.Column<double>(type: "double precision", nullable: false),
+                    LatMean = table.Column<double>(type: "double precision", nullable: false),
+                    LongMean = table.Column<double>(type: "double precision", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
+                    PictureUrl = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Trails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Trails_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserRelations",
                 columns: table => new
                 {
@@ -179,6 +345,8 @@ namespace HoplaBackend.Migrations
                     FromUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ToUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
+                    LikesCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -199,65 +367,21 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EntityImages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ImageId = table.Column<Guid>(type: "uuid", nullable: true),
-                    RideDetailId = table.Column<Guid>(type: "uuid", nullable: true),
-                    TrailDetailsId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EntityImages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_EntityImages_Images_ImageId",
-                        column: x => x.ImageId,
-                        principalTable: "Images",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_EntityImages_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RideDetails",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    LatMean = table.Column<double>(type: "double precision", nullable: true),
-                    LongMean = table.Column<double>(type: "double precision", nullable: true),
-                    LatMin = table.Column<double>(type: "double precision", nullable: true),
-                    LongMin = table.Column<double>(type: "double precision", nullable: true),
-                    LatMax = table.Column<double>(type: "double precision", nullable: true),
-                    LongMax = table.Column<double>(type: "double precision", nullable: true),
-                    JsonCoordinates50 = table.Column<string>(type: "text", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RideDetails", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RideReviews",
+                name: "UserReports",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Rating = table.Column<int>(type: "integer", nullable: false),
-                    ReviewText = table.Column<string>(type: "text", nullable: false),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityName = table.Column<string>(type: "text", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RideReviews", x => x.Id);
+                    table.PrimaryKey("PK_UserReports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RideReviews_Users_UserId",
+                        name: "FK_UserReports_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -265,90 +389,36 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rides",
+                name: "MyHikes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Length = table.Column<double>(type: "double precision", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Length = table.Column<double>(type: "double precision", nullable: true),
                     Duration = table.Column<double>(type: "double precision", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
                     HorseId = table.Column<Guid>(type: "uuid", nullable: true),
                     TrailId = table.Column<Guid>(type: "uuid", nullable: true),
+                    PictureUrl = table.Column<string>(type: "text", nullable: true),
+                    Secret = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rides", x => x.Id);
+                    table.PrimaryKey("PK_MyHikes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Rides_Horses_HorseId",
+                        name: "FK_MyHikes_Horses_HorseId",
                         column: x => x.HorseId,
                         principalTable: "Horses",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Rides_Users_UserId",
+                        name: "FK_MyHikes_Trails_TrailId",
+                        column: x => x.TrailId,
+                        principalTable: "Trails",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_MyHikes_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RideTrackingDatas",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TrackingPoints = table.Column<string>(type: "json", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RideTrackingDatas", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RideTrackingDatas_Rides_Id",
-                        column: x => x.Id,
-                        principalTable: "Rides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Trails",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    LatMean = table.Column<double>(type: "double precision", nullable: false),
-                    LongMean = table.Column<double>(type: "double precision", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    RideId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Trails", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Trails_Rides_RideId",
-                        column: x => x.RideId,
-                        principalTable: "Rides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TrackingPoints",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RideTrackingDataId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Lat = table.Column<double>(type: "double precision", nullable: false),
-                    Long = table.Column<double>(type: "double precision", nullable: false),
-                    TimeSinceLast = table.Column<double>(type: "double precision", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TrackingPoints", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TrackingPoints_RideTrackingDatas_RideTrackingDataId",
-                        column: x => x.RideTrackingDataId,
-                        principalTable: "RideTrackingDatas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -375,14 +445,12 @@ namespace HoplaBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PictureThumbURL = table.Column<string>(type: "text", nullable: true),
-                    PictureFullURL = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     LatMin = table.Column<double>(type: "double precision", nullable: true),
                     LongMin = table.Column<double>(type: "double precision", nullable: true),
                     LatMax = table.Column<double>(type: "double precision", nullable: true),
                     LongMax = table.Column<double>(type: "double precision", nullable: true),
                     JsonCoordinates50 = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
                     Notes = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -421,27 +489,55 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrailReview",
+                name: "TrailRatings",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TrailId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false),
-                    ReviewText = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrailReview", x => x.Id);
+                    table.PrimaryKey("PK_TrailRatings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrailReview_Trails_TrailId",
+                        name: "FK_TrailRatings_Trails_TrailId",
                         column: x => x.TrailId,
                         principalTable: "Trails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TrailReview_Users_UserId",
+                        name: "FK_TrailRatings_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrailReviews",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TrailId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: false),
+                    PictureUrl = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrailReviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TrailReviews_Trails_TrailId",
+                        column: x => x.TrailId,
+                        principalTable: "Trails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrailReviews_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -469,25 +565,69 @@ namespace HoplaBackend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "EntityImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ImageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EntityName = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TrailDetailId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EntityImages_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EntityImages_TrailDetails_TrailDetailId",
+                        column: x => x.TrailDetailId,
+                        principalTable: "TrailDetails",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EntityImages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EntityComments_ParentCommentId",
+                table: "EntityComments",
+                column: "ParentCommentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EntityComments_UserId",
+                table: "EntityComments",
+                column: "UserId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_EntityImages_ImageId",
                 table: "EntityImages",
                 column: "ImageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EntityImages_RideDetailId",
+                name: "IX_EntityImages_TrailDetailId",
                 table: "EntityImages",
-                column: "RideDetailId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EntityImages_TrailDetailsId",
-                table: "EntityImages",
-                column: "TrailDetailsId");
+                column: "TrailDetailId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EntityImages_UserId",
                 table: "EntityImages",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EntityReactions_UserId_EntityId_EntityName",
+                table: "EntityReactions",
+                columns: new[] { "UserId", "EntityId", "EntityName" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Horses_UserId",
@@ -505,23 +645,18 @@ namespace HoplaBackend.Migrations
                 column: "SUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RideReviews_UserId",
-                table: "RideReviews",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rides_HorseId",
-                table: "Rides",
+                name: "IX_MyHikes_HorseId",
+                table: "MyHikes",
                 column: "HorseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rides_TrailId",
-                table: "Rides",
+                name: "IX_MyHikes_TrailId",
+                table: "MyHikes",
                 column: "TrailId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rides_UserId",
-                table: "Rides",
+                name: "IX_MyHikes_UserId",
+                table: "MyHikes",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -545,9 +680,9 @@ namespace HoplaBackend.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrackingPoints_RideTrackingDataId",
-                table: "TrackingPoints",
-                column: "RideTrackingDataId");
+                name: "IX_SubscriptionOrders_UserId",
+                table: "SubscriptionOrders",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrailCoordinate_TrailAllCoordinatesId",
@@ -555,19 +690,29 @@ namespace HoplaBackend.Migrations
                 column: "TrailAllCoordinatesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrailReview_TrailId",
-                table: "TrailReview",
+                name: "IX_TrailRatings_TrailId",
+                table: "TrailRatings",
                 column: "TrailId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrailReview_UserId",
-                table: "TrailReview",
+                name: "IX_TrailRatings_UserId",
+                table: "TrailRatings",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Trails_RideId",
+                name: "IX_TrailReviews_TrailId",
+                table: "TrailReviews",
+                column: "TrailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrailReviews_UserId",
+                table: "TrailReviews",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Trails_UserId",
                 table: "Trails",
-                column: "RideId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRelations_FromUserId",
@@ -579,69 +724,32 @@ namespace HoplaBackend.Migrations
                 table: "UserRelations",
                 column: "ToUserId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_EntityImages_RideDetails_RideDetailId",
-                table: "EntityImages",
-                column: "RideDetailId",
-                principalTable: "RideDetails",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_EntityImages_TrailDetails_TrailDetailsId",
-                table: "EntityImages",
-                column: "TrailDetailsId",
-                principalTable: "TrailDetails",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_RideDetails_Rides_Id",
-                table: "RideDetails",
-                column: "Id",
-                principalTable: "Rides",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_RideReviews_Rides_Id",
-                table: "RideReviews",
-                column: "Id",
-                principalTable: "Rides",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Rides_Trails_TrailId",
-                table: "Rides",
-                column: "TrailId",
-                principalTable: "Trails",
-                principalColumn: "Id");
+            migrationBuilder.CreateIndex(
+                name: "IX_UserReports_UserId",
+                table: "UserReports",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Horses_Users_UserId",
-                table: "Horses");
+            migrationBuilder.DropTable(
+                name: "EntityComments");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_Rides_Users_UserId",
-                table: "Rides");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Trails_Rides_RideId",
-                table: "Trails");
+            migrationBuilder.DropTable(
+                name: "EntityFeeds");
 
             migrationBuilder.DropTable(
                 name: "EntityImages");
 
             migrationBuilder.DropTable(
+                name: "EntityReactions");
+
+            migrationBuilder.DropTable(
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "RideReviews");
+                name: "MyHikes");
 
             migrationBuilder.DropTable(
                 name: "StableMessages");
@@ -650,7 +758,10 @@ namespace HoplaBackend.Migrations
                 name: "StableUsers");
 
             migrationBuilder.DropTable(
-                name: "TrackingPoints");
+                name: "SubscriptionOrders");
+
+            migrationBuilder.DropTable(
+                name: "SystemSettings");
 
             migrationBuilder.DropTable(
                 name: "TrailCoordinate");
@@ -659,40 +770,40 @@ namespace HoplaBackend.Migrations
                 name: "TrailFilters");
 
             migrationBuilder.DropTable(
-                name: "TrailReview");
+                name: "TrailRatings");
+
+            migrationBuilder.DropTable(
+                name: "TrailReviews");
 
             migrationBuilder.DropTable(
                 name: "UserRelations");
 
             migrationBuilder.DropTable(
-                name: "Images");
+                name: "UserReports");
 
             migrationBuilder.DropTable(
-                name: "RideDetails");
+                name: "UserSettings");
+
+            migrationBuilder.DropTable(
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "TrailDetails");
 
             migrationBuilder.DropTable(
-                name: "Stables");
+                name: "Horses");
 
             migrationBuilder.DropTable(
-                name: "RideTrackingDatas");
+                name: "Stables");
 
             migrationBuilder.DropTable(
                 name: "TrailAllCoordinates");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Rides");
-
-            migrationBuilder.DropTable(
-                name: "Horses");
-
-            migrationBuilder.DropTable(
                 name: "Trails");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
