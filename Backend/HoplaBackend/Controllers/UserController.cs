@@ -12,6 +12,7 @@ using HoplaBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 
 namespace HoplaBackend.Controllers;
@@ -114,24 +115,28 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpGet("profile")]
-    public async Task<IActionResult> GetUserProfile([FromQuery] Guid? userId)
+    public async Task<IActionResult> GetUserProfile(
+        [FromQuery] Guid? userId,
+        [FromQuery] string? relationStatus)
     {
+        Console.WriteLine(userId);
+        Console.WriteLine(relationStatus);
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
         if (!userId.HasValue)
         {
-            Console.WriteLine("Token claims:");
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-            }
-
-            // Hent brukerens ID fra tokenet
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-
-            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
-            {
-                return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-            }
             var user = await _context.Users
                 .Where(u => u.Id == parsedUserId)
                 .Select(u => new
@@ -154,22 +159,38 @@ public class UserController : ControllerBase
         else
         {
             var user = await _context.Users.FindAsync(userId);
-
             if (user == null)
             {
                 return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
             }
-            return Ok(new
+            if (relationStatus.ToLower() == "friends") 
             {
-                id = user.Id,
-                name = user.Name,
-                PictureUrl = user.PictureUrl + "?w=400&h=500&fit=crop",
-                alias = user.Alias,
-                email = user.Email,
-                description = user.Description,
-                dob = user.Dob,
-                created_at = user.CreatedAt
-            });
+                return Ok(new
+                {
+                    id = user.Id,
+                    name = user.Name,
+                    PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop",
+                    alias = user.Alias,
+                    description = user.Description,
+                    dob = user.Dob,
+                    created_at = user.CreatedAt,
+                    //Må migrere og oppdatere databasen før jeg kan legge til disse
+                    friendsCount = 1,
+                    horseCount = 1
+                });
+            } else 
+            {
+                
+                return Ok(new
+                {
+                    id = user.Id,
+                    name = user.Name,
+                    PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop",
+                    alias = user.Alias,
+                    description = user.Description,
+                    created_at = user.CreatedAt
+                });
+            }
         }
     }
 
