@@ -7,6 +7,7 @@ public class EntityFeed
     public string EntityName { get; set; }
     public string? EntityTitle { get; set; }  // Felt for å lagre navn på hesten/turen
     public string? EntityObject { get ; set; } //Felt for å lagre navn på den/det som ble brukt på Entity
+    public string? PictureUrl { get; set; }
     public string ActionType { get; set; } // Galloperte, la til, er nå venner med , 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public Guid UserId { get; set; }

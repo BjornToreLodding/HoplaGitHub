@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
+using HoplaBackend.DTOs;
 using System.IO;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using HoplaBackend.Helpers;
+using System.Security.Claims;
 
 namespace HoplaBackend.Controllers;
 
@@ -21,6 +23,54 @@ public class TrailController : ControllerBase
     {
         _context = context;
     }
+
+    [HttpGet("user")]
+    public async Task<ActionResult<List<TrailDto>>> GetUserTrails(
+        [FromQuery] Guid? userId, 
+        [FromQuery] int? pageNumber, 
+        [FromQuery] int? pageSize)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        // Må skrives om når denne blir Authorized.
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }         
+        if (!userId.HasValue)
+        {
+            userId = parsedUserId;
+        }
+        Console.WriteLine(userId);
+        bool paging = pageNumber.HasValue && pageSize.HasValue;
+        if (paging && (pageNumber < 1 || pageSize < 1))
+            return BadRequest("pageNumber og pageSize må være større enn 0.");
+
+        var trails = _context.Trails
+            .Where(t => t.UserId == userId)
+            .OrderByDescending(t => t.CreatedAt) // Sorterer etter nyeste innlegg
+            .Select(t => new TrailDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                PictureUrl = t.PictureUrl,
+                AverageRating = _context.TrailRatings
+                    .Where(tr => tr.TrailId == t.Id)
+                    .Select(tr => (float?)tr.Rating) // Konverterer til nullable float
+                    .Average() ?? 0 // Setter 0 hvis ingen ratings finnes
+            });
+        if (paging)
+        {
+            trails = trails
+                .Skip((pageNumber.Value - 1) * pageSize.Value)
+                .Take(pageSize.Value);
+        }
+        var results = await trails.ToListAsync();
+
+        return Ok(results);
+    }
+
 
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(

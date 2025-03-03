@@ -11,6 +11,7 @@ using HoplaBackend.Helpers; //Denne har blitt grå og må legges til med linja u
 using HoplaBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 
 namespace HoplaBackend.Controllers;
@@ -48,16 +49,16 @@ public class UserController : ControllerBase
 
         var token = _authentication.GenerateJwtToken(user);
         Console.WriteLine(token);        //return Ok(new { token });
-        return Ok(new 
-    { 
-        token,
-        userId = user.Id,
-        email = user.Email,
-        //skulle vært name ikke navn, men må rette opp i js for loging osv..
-        name = user.Name,
-        alias = user.Alias,
-        PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop"
-    });
+        return Ok(new
+        {
+            token,
+            userId = user.Id,
+            email = user.Email,
+            //skulle vært name ikke navn, men må rette opp i js for loging osv..
+            name = user.Name,
+            alias = user.Alias,
+            PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop"
+        });
     }
     [HttpPost("login/test")]
     public async Task<IActionResult> Logintest([FromBody] LoginTest request)
@@ -77,13 +78,14 @@ public class UserController : ControllerBase
         Console.WriteLine(user.Name);
         Console.WriteLine(user.Alias);
         Console.WriteLine(user.PictureUrl);
-        return Ok(new { 
+        return Ok(new
+        {
             token,
             userId = user.Id,
             name = user.Name,
             alias = user.Alias,
             PictureUrl = user.PictureUrl + "?w=50&h=50&fit=crop"
-            });
+        });
     }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -110,6 +112,67 @@ public class UserController : ControllerBase
         return Ok(new { message = "Bruker registrert!" });
     }
 
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetUserProfile([FromQuery] Guid? userId)
+    {
+        if (!userId.HasValue)
+        {
+            Console.WriteLine("Token claims:");
+            foreach (var claim in User.Claims)
+            {
+                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+            }
+
+            // Hent brukerens ID fra tokenet
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+            {
+                return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+            }
+            var user = await _context.Users
+                .Where(u => u.Id == parsedUserId)
+                .Select(u => new
+                {
+                    u.Alias,
+                    u.Name,
+                    u.Email,
+                    //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
+                    PictureUrl = !string.IsNullOrEmpty(u.PictureUrl)
+                        ? $"{u.PictureUrl}?h=200&w=200&fit=crop"
+                        : ""
+                })
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Bruker ikke funnet" });
+            }
+            return Ok(user);
+        }
+        else
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
+            }
+            return Ok(new
+            {
+                id = user.Id,
+                name = user.Name,
+                PictureUrl = user.PictureUrl + "?w=400&h=500&fit=crop",
+                alias = user.Alias,
+                email = user.Email,
+                description = user.Description,
+                dob = user.Dob,
+                created_at = user.CreatedAt
+            });
+        }
+    }
+
     //Admin funksjon eller bygges om evt utvides til søkefunksjon
     //[Authorize]
     [HttpGet("all")]
@@ -131,7 +194,7 @@ public class UserController : ControllerBase
             {
                 u.Id,
                 u.Name,
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) 
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl)
                     ? $"{u.PictureUrl}?h={pictureHeight}&w={pictureWidth}&fit=crop"
                     : "",
                 u.Alias
@@ -147,25 +210,26 @@ public class UserController : ControllerBase
 
         Log.Information("📢 GetAllUsers() ble kalt! Antall brukere: {UserCount}", users.Count);
 
-        return Ok(users);    }
+        return Ok(users);
+    }
     //[Authorize]
-    [HttpGet("int/{userId}")] 
+    [HttpGet("int/{userId}")]
     public async Task<IActionResult> GetIntUser(int userId)
     {
         //var endpointName = ControllerContext.ActionDescriptor.ActionName;
         var controllerName = ControllerContext.ActionDescriptor.ControllerName;
         Guid newGuid = CustomConvert.IntToGuid(controllerName, userId);
-    
+
         return await GetUser(newGuid, false);
     }
     [Authorize]
-    [HttpGet("aut/int/{userId}")] 
+    [HttpGet("aut/int/{userId}")]
     public async Task<IActionResult> CheckAutAndGetIntUser(int userId)
     {
         //var endpointName = ControllerContext.ActionDescriptor.ActionName;
         var controllerName = ControllerContext.ActionDescriptor.ControllerName;
         Guid newGuid = CustomConvert.IntToGuid(controllerName, userId);
-    
+
         return await GetUser(newGuid, false);
     }
     [Authorize]
@@ -189,13 +253,13 @@ public class UserController : ControllerBase
 
         var user = await _context.Users
             .Where(u => u.Id == userId)
-            .Select(u => new 
+            .Select(u => new
             {
                 u.Alias,
                 u.Name,
                 u.Email,
                 //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) 
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl)
                     ? $"{u.PictureUrl}?h=200&w=200&fit=crop"
                     : ""
             })
@@ -215,7 +279,7 @@ public class UserController : ControllerBase
         Guid userId,
         [FromQuery] bool changepassword)
     {
-        
+
         var user = await _context.Users.FindAsync(userId);
 
         if (user == null)
@@ -232,31 +296,8 @@ public class UserController : ControllerBase
             created_at = user.CreatedAt
         });
     }
-    [HttpGet("profile/{userId}")]
-    public async Task<IActionResult> GetUserProfile(
-        Guid userId,
-        [FromQuery] bool changepassword)
-    {
-        
-        var user = await _context.Users.FindAsync(userId);
 
-        if (user == null)
-        {
-            return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
-        }
 
-        return Ok(new
-        {
-            id = user.Id,
-            name = user.Name,
-            PictureUrl = user.PictureUrl + "?w=400&h=500&fit=crop",
-            alias = user.Alias,
-            email = user.Email,
-            description = user.Description,
-            dob = user.Dob,
-            created_at = user.CreatedAt
-        });
-    }
     //[Authorize]
     [HttpPost("new")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)
@@ -292,7 +333,7 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(userData);
     }
-    
+
     [Authorize]
     [HttpPut("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
@@ -350,7 +391,7 @@ public class UserController : ControllerBase
         {
             Console.WriteLine("different Alias");
             userData.Alias = newUserData.Alias;
-        } 
+        }
         if (newUserData.Email != userData.Email && newUserData.Email != "" && newUserData.Email != null)
         {
             Console.WriteLine("different Email");
@@ -372,7 +413,7 @@ public class UserController : ControllerBase
         // Admin = false
         // Premium = false
         // VerifiedTrail = false
-        
+
         _context.Users.Update(userData);
         await _context.SaveChangesAsync();
 

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using HoplaBackend.Controllers;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -6,16 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("feed")]
-public class EntityFeedController : ControllerBase
+public class TrailController : ControllerBase
 {
     private readonly AppDbContext _context;
 
-    public EntityFeedController(AppDbContext context)
+    public TrailController(AppDbContext context)
     {
         _context = context;
     }
 
-    [HttpGet("all")]
+    [HttpGet("trackall")]
     public async Task<IActionResult> GetUserFeed()
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -25,11 +26,20 @@ public class EntityFeedController : ControllerBase
             return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
         }
         var userId = parsedUserId;
-        var feed = await _context.EntityFeeds
-            .Where(f => f.UserId == userId)
-            .OrderByDescending(f => f.CreatedAt)
+        var feed = await _context.Trails
+            //.Where(f => f.UserId == userId)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                PictureUrl = !string.IsNullOrEmpty(t.PictureUrl) 
+                    ? $"{t.PictureUrl}?h=64&w=64&fit=crop"
+                    : "",
+                t.TrailDetails.Description,
+                t.CreatedAt
+            })
+            .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
-
         return Ok(feed);
     }
 
