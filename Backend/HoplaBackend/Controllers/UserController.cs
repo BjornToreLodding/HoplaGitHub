@@ -441,20 +441,37 @@ public class UserController : ControllerBase
         return Ok(new { message = $"User userId was updated", userData });
     }
 
-    //[Authorize]
-    [HttpDelete("delete/{userId}")]
-    public async Task<IActionResult> DeleteUser(Guid userId)
+    [Authorize]
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteUser([FromBody] DeleteRequest password)
     {
-        var userData = await _context.Users.FindAsync(userId);
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+        var userId = await _context.Users.FindAsync(parsedUserId);
 
         // Sjekk om brukeren finnes
-        if (userData == null)
+        if (userId == null)
         {
             return NotFound(new { message = "User not found." });
         }
-
         // Slett brukeren
-        _context.Users.Remove(userData);
+        //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (!Authentication.VerifyPassword(password.Password, userId.PasswordHash))
+        {
+            return Unauthorized(new { message = "Feil passord" });
+        }
+        _context.Users.Remove(userId);
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "User removed successfully." });

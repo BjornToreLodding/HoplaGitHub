@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HoplaBackend.Helpers;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 
 namespace HoplaBackend.Controllers;
 
@@ -18,12 +20,15 @@ namespace HoplaBackend.Controllers;
 public class TrailController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly Authentication _authentication;
 
-    public TrailController(AppDbContext context)
+    public TrailController(Authentication authentication, AppDbContext context)
     {
+        _authentication = authentication;
         _context = context;
     }
 
+    [Authorize]
     [HttpGet("user")]
     public async Task<ActionResult<List<TrailDto>>> GetUserTrails(
         [FromQuery] Guid? userId, 
@@ -72,11 +77,66 @@ public class TrailController : ControllerBase
     }
 
 
+    [Authorize]
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 
         [FromQuery] double longitude,
+        [FromQuery] int? pageNumber = null, 
+        [FromQuery] int? pageSize = null,
+        [FromQuery] string? filters = null, // JSON-baserte filtre
+        [FromQuery] double? lengthMin = null,
+        [FromQuery] double? lengthMax = null) 
+    {
+        var query = _context.Trails.AsQueryable();
+
+        // Hent JSON-filtre fra querystring
+        if (!string.IsNullOrEmpty(filters))
+        {
+            try
+            {
+                var filterDict = JsonSerializer.Deserialize<Dictionary<string, object>>(filters);
+                foreach (var filter in filterDict)
+                {
+                    query = query.ApplyDynamicFilter(filter.Key, filter.Value);
+                }
+            }
+            catch (JsonException)
+            {
+                return BadRequest("Ugyldig JSON-format for 'filters'.");
+            }
+        }
+
+        // **Filtrer ut ugyldige koordinater**
+        query = query.Where(t => t.LatMean != 0 && t.LongMean != 0);
+
+        // Beregn distanse før ekskludering av trails
+        var filteredTrails = await query
+            .Where(t => (!lengthMin.HasValue || t.Distance >= lengthMin) &&  // Min lengde-filter
+                        (!lengthMax.HasValue || t.Distance  <= lengthMax))    // Maks lengde-filter
+            .ApplyPagination(pageNumber, pageSize) // Paginering skjer HER
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean),
+                })
+            .OrderBy(t => t.Distance) // Sortering skjer etter Select()
+            .ToListAsync();
+
+
+        return Ok(filteredTrails);
+    }
+
+    /*
+    [HttpGet("list")]
+    public async Task<IActionResult> GetClosestTrails(
+        [FromQuery] double latitude, 
+        [FromQuery] double longitude,
+        [FromQuery] int? pageNumber, 
+        [FromQuery] int? pageSize,
         [FromQuery] bool filter = false, // Hvis "filter" er false, returner alle trails
+        //Omskriving av filter
         [FromQuery] string? difficulty = null,
         [FromQuery] bool? riverBridge = null,
         [FromQuery] bool? cart = null,
@@ -166,7 +226,7 @@ public class TrailController : ControllerBase
         var sortedTrails = validTrails.OrderBy(t => ((dynamic)t).Distance).ToList();
         return Ok(sortedTrails);
     }
-
+*()
     [HttpGet("map")]
     public async Task<IActionResult> CreateTrailsList(
         [FromQuery] double latitude, 

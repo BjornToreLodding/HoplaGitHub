@@ -45,7 +45,9 @@ public class AppDbContext : DbContext
     public DbSet<EntityReaction> EntityReactions { get; set; }
     public DbSet<EntityComment> EntityComments { get; set; }
     public DbSet<UserReport> UserReports { get; set; }
-
+    public DbSet<TrailFilterValue> TrailFilterValues { get; set; }
+    public DbSet<TrailFilterDefinition> TrailFilterDefinitions { get; set; }
+    
     /*
     public DbSet<Ride> Rides { get; set; }
     public DbSet<RideDetail> RideDetails { get; set; }
@@ -162,11 +164,7 @@ public class AppDbContext : DbContext
             .HasForeignKey<TrailAllCoordinate>(tc => tc.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<TrailFilter>()
-            .HasOne(tf => tf.Trail)
-            .WithOne(t => t.TrailFilters)
-            .HasForeignKey<TrailFilter>(tf => tf.Id)
-            .OnDelete(DeleteBehavior.Cascade);
+
 
         modelBuilder.Entity<TrailReview>()
             .HasOne(tr => tr.Trail)

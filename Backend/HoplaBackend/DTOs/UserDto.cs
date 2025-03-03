@@ -58,3 +58,7 @@ public class UpdateUserDto
     public bool Premium { get; set; } = false;
     public bool VerifiedTrail { get; set; } = false;
 }
+public class DeleteRequest
+{
+    public string Password { get; set; }
+}
