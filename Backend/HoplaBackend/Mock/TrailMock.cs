@@ -6,13 +6,13 @@ using HoplaBackend.Models;
 
 public static class TrailMock 
 {
-    public static List<Trail> CreateTrailsMock(List<Ride> existingRides){ 
+    public static List<Trail> CreateTrailsMock(){ 
         return new List<Trail>
         {
            
         
-            new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780001"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 15.536, LatMean = 60.7925,  LongMean = 10.695  , CreatedAt = DateTime.UtcNow.AddDays(-9) }, //Gjøvik lat 60.7925, long 10.695 
-            new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780002"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 12.536, LatMean = 60.95558, LongMean = 10.6115 , CreatedAt = DateTime.UtcNow.AddDays(-8) }, //Biri //LatMean = 60.95558, LongMean = 10.6115
+            new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780001"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 15.536, LatMean = 60.7925,  LongMean = 10.695  , CreatedAt = DateTime.UtcNow.AddDays(-9), Name = "Giøviksmuget" }, //Gjøvik lat 60.7925, long 10.695 
+            new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780002"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 12.536, LatMean = 60.95558, LongMean = 10.6115 , CreatedAt = DateTime.UtcNow.AddDays(-8), Name = "Birirunden" }, //Biri //LatMean = 60.95558, LongMean = 10.6115
             new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780003"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 10.536, LatMean = 59.95  , LongMean = 10.466667, CreatedAt = DateTime.UtcNow.AddDays(-7) }, //Lommedalen
             new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780004"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 15.536, LatMean = 59.9175 , LongMean = 10.7283 , CreatedAt = DateTime.UtcNow.AddDays(-6) }, //slottsparken 59.9175, 10.7283
             new Trail { Id = Guid.Parse("12345678-0000-0000-0021-123456780005"), UserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), Distance = 15.536, LatMean = 59.94033 , LongMean = 10.940 , CreatedAt = DateTime.UtcNow.AddDays(-5) }, //lørsnskog 59.9403337386 10.940326572

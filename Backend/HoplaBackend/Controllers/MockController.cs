@@ -190,8 +190,8 @@ public class MockController : ControllerBase
 
         //return Created();
         return Created("", new { message = "opprettet!", stableMessages });
-
     }
+    /*
    [HttpPost("clearrides")]
     public async Task<IActionResult> ClearRides()
     {
@@ -210,9 +210,8 @@ public class MockController : ControllerBase
 
         //return Created();
         return Created("", new { message = "opprettet!", rides });
-
     }
-
+    */
     
     [HttpPost("createtrails")]
     public async Task<IActionResult> CreateTrails()
@@ -222,17 +221,8 @@ public class MockController : ControllerBase
             return NoContent(); 
         }
 
-        // Hent eksisterende rides fra databasen
-        var existingRides = _context.Rides.ToList();
-
-        if (!existingRides.Any())
-        {
-            return BadRequest("Cannot create trails because there are no rides in the database.");
-        }
-
         // Opprett mock trails basert på eksisterende rides
-        var trails = TrailMock.CreateTrailsMock(existingRides);
-
+        var trails = TrailMock.CreateTrailsMock();
         _context.Trails.AddRange(trails);
         await _context.SaveChangesAsync();
 
@@ -312,7 +302,7 @@ public class MockController : ControllerBase
         _context.Stables.RemoveRange(_context.Stables);
         _context.StableMessages.RemoveRange(_context.StableMessages);
         _context.StableUsers.RemoveRange(_context.StableUsers);
-        _context.Rides.RemoveRange(_context.Rides); 
+        //_context.Rides.RemoveRange(_context.Rides); 
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);
         _context.Trails.RemoveRange(_context.Trails);
@@ -333,7 +323,7 @@ public class MockController : ControllerBase
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Stables\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableMessages\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
+        //await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
 

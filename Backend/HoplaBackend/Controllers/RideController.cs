@@ -1,4 +1,4 @@
-
+/*
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -98,7 +98,7 @@ public class RideController : ControllerBase
 
         return Ok(trackingData);
     }
-    */
+    ///
         var rideTrackingData = await _context.RideTrackingDatas
             .AsNoTracking()
             .Where(rt => rt.Id == rideId)
@@ -207,7 +207,7 @@ public class RideController : ControllerBase
         _context.RideTrackingDatas.Add(rideTrackingData);
         await _context.SaveChangesAsync();
         return Ok(new { ride.Id, message = "Ride successfully created!" });
-    */
+    ///
         var rideTrackingData = new RideTrackingData
         {
             //Id = Guid.NewGuid(),
@@ -284,7 +284,7 @@ public class RideController : ControllerBase
 
             _context.EntityImages.AddRange(newEntityImages);
         }
-        */
+        //*
 
         _context.Rides.Update(ride);
         await _context.SaveChangesAsync();
@@ -292,3 +292,5 @@ public class RideController : ControllerBase
         return Ok(new { ride.Id, message = "Ride successfully updated!" });
     }
 }
+
+*/

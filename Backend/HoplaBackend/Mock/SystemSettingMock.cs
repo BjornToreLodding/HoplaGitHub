@@ -27,6 +27,9 @@ public static class SystemSettingMock
             // Hvis aktivert svarer kun Admin/-endpoints.
             new SystemSetting { Key = "EnableAPI", Value = "true", Type = "bool" },
 
+            new SystemSetting { Key = "Subscription-Price", Value = "69.00", Type = "float" },
+
+
             new SystemSetting { Key = "UserProfilePictureList-height", Value = "64", Type = "int" }, // oppgitt i pixler
             new SystemSetting { Key = "UserProfilePictureList-width", Value = "64", Type = "int" }, // oppgitt i pixler
             new SystemSetting { Key = "UserProfilePictureSelect-height", Value = "200", Type = "int" }, // oppgitt i pixler

@@ -3,6 +3,7 @@ using System;
 using HoplaBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303093803_renamed_local_database")]
+    partial class renamed_local_database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,6 +125,9 @@ namespace HoplaBackend.Migrations
                     b.Property<Guid>("ImageId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("RideDetailId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("TrailDetailId")
                         .HasColumnType("uuid");
 
@@ -131,6 +137,8 @@ namespace HoplaBackend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ImageId");
+
+                    b.HasIndex("RideDetailId");
 
                     b.HasIndex("TrailDetailId");
 
@@ -267,7 +275,7 @@ namespace HoplaBackend.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.MyHike", b =>
+            modelBuilder.Entity("HoplaBackend.Models.Ride", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -282,19 +290,13 @@ namespace HoplaBackend.Migrations
                     b.Property<Guid?>("HorseId")
                         .HasColumnType("uuid");
 
-                    b.Property<double?>("Length")
+                    b.Property<double>("Length")
                         .HasColumnType("double precision");
-
-                    b.Property<string>("PictureUrl")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Secret")
-                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("TrailId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -305,7 +307,81 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("MyHikes");
+                    b.ToTable("Rides");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("JsonCoordinates50")
+                        .HasColumnType("text");
+
+                    b.Property<double?>("LatMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LatMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LatMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("LongMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RideDetails");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RideReviews");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideTrackingData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TrackingPoints")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RideTrackingDatas");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Stable", b =>
@@ -420,26 +496,31 @@ namespace HoplaBackend.Migrations
                     b.ToTable("StableUsers");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.SubscriptionOrder", b =>
+            modelBuilder.Entity("HoplaBackend.Models.TrackingPoint", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Lat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Long")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("RideTrackingDataId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<double?>("TimeSinceLast")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("RideTrackingDataId");
 
-                    b.ToTable("SubscriptionOrders");
+                    b.ToTable("TrackingPoints");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Trail", b =>
@@ -581,33 +662,6 @@ namespace HoplaBackend.Migrations
                     b.ToTable("TrailFilters");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.TrailRating", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("TrailId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TrailId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TrailRatings");
-                });
-
             modelBuilder.Entity("HoplaBackend.Models.TrailReview", b =>
                 {
                     b.Property<Guid>("Id")
@@ -640,7 +694,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TrailReviews");
+                    b.ToTable("TrailReview");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.User", b =>
@@ -764,35 +818,6 @@ namespace HoplaBackend.Migrations
                     b.ToTable("UserReports");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.UserSetting", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("DarkMode")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HideCommentFriendNewFriends")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HideFeedFriendHikes")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HideFeedFriendNewFriends")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HideFeedHorse")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HideReactionFriendNewFriends")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserSettings");
-                });
-
             modelBuilder.Entity("SystemSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -843,6 +868,10 @@ namespace HoplaBackend.Migrations
                         .HasForeignKey("ImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("HoplaBackend.Models.RideDetail", null)
+                        .WithMany("Images")
+                        .HasForeignKey("RideDetailId");
 
                     b.HasOne("HoplaBackend.Models.TrailDetail", null)
                         .WithMany("Images")
@@ -896,7 +925,7 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.MyHike", b =>
+            modelBuilder.Entity("HoplaBackend.Models.Ride", b =>
                 {
                     b.HasOne("HoplaBackend.Models.Horse", "Horse")
                         .WithMany()
@@ -908,15 +937,53 @@ namespace HoplaBackend.Migrations
 
                     b.HasOne("HoplaBackend.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Horse");
 
                     b.Navigation("Trail");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideDetail", b =>
+                {
+                    b.HasOne("HoplaBackend.Models.Ride", "Ride")
+                        .WithOne("RideDetails")
+                        .HasForeignKey("HoplaBackend.Models.RideDetail", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideReview", b =>
+                {
+                    b.HasOne("HoplaBackend.Models.Ride", "Ride")
+                        .WithOne("RideReviews")
+                        .HasForeignKey("HoplaBackend.Models.RideReview", "Id")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("HoplaBackend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideTrackingData", b =>
+                {
+                    b.HasOne("HoplaBackend.Models.Ride", "Ride")
+                        .WithOne("RideTrackingDatas")
+                        .HasForeignKey("HoplaBackend.Models.RideTrackingData", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.StableMessage", b =>
@@ -957,15 +1024,15 @@ namespace HoplaBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.SubscriptionOrder", b =>
+            modelBuilder.Entity("HoplaBackend.Models.TrackingPoint", b =>
                 {
-                    b.HasOne("HoplaBackend.Models.User", "User")
+                    b.HasOne("HoplaBackend.Models.RideTrackingData", "RideTrackingData")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("RideTrackingDataId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("RideTrackingData");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Trail", b =>
@@ -1021,25 +1088,6 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Trail");
                 });
 
-            modelBuilder.Entity("HoplaBackend.Models.TrailRating", b =>
-                {
-                    b.HasOne("HoplaBackend.Models.Trail", "Trail")
-                        .WithMany()
-                        .HasForeignKey("TrailId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HoplaBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Trail");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("HoplaBackend.Models.TrailReview", b =>
                 {
                     b.HasOne("HoplaBackend.Models.Trail", "Trail")
@@ -1087,6 +1135,21 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.Ride", b =>
+                {
+                    b.Navigation("RideDetails");
+
+                    b.Navigation("RideReviews");
+
+                    b.Navigation("RideTrackingDatas")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.RideDetail", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Trail", b =>

@@ -27,6 +27,7 @@ public class User
     public bool Admin { get; set; } = false;
     public bool Premium { get; set; } = false;
     public bool VerifiedTrail { get; set; } = false;
+    public  DateTime? SubscriptionEndDate { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     

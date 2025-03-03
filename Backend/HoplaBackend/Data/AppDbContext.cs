@@ -24,14 +24,10 @@ public class AppDbContext : DbContext
     //public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserSetting> UserSettings { get; set; }
     public DbSet<UserRelation> UserRelations { get; set; } // Endret fra Friendrequest til FriendRequest
     public DbSet<Message> Messages { get; set; }
     public DbSet<Horse> Horses { get; set; }
-    public DbSet<Ride> Rides { get; set; }
-    public DbSet<RideDetail> RideDetails { get; set; }
-    public DbSet<RideTrackingData> RideTrackingDatas { get; set; }
-    public DbSet<TrackingPoint> TrackingPoints { get; set; }
-    public DbSet<RideReview> RideReviews { get; set; }
     public DbSet<Stable> Stables { get; set; }
     public DbSet<StableUser> StableUsers { get; set; } 
     public DbSet<StableMessage> StableMessages { get; set; }
@@ -39,6 +35,10 @@ public class AppDbContext : DbContext
     public DbSet<TrailFilter> TrailFilters { get; set; }
     public DbSet<TrailDetail> TrailDetails { get; set; }
     public DbSet<TrailAllCoordinate> TrailAllCoordinates { get; set; }
+    public DbSet<TrailReview> TrailReviews { get; set; }
+    public DbSet<TrailRating> TrailRatings { get; set; }
+    public DbSet<MyHike> MyHikes { get; set; }
+    public DbSet<SubscriptionOrder> SubscriptionOrders { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<EntityImage> EntityImages { get; set; }
     public DbSet<EntityFeed> EntityFeeds { get; set; }
@@ -46,7 +46,13 @@ public class AppDbContext : DbContext
     public DbSet<EntityComment> EntityComments { get; set; }
     public DbSet<UserReport> UserReports { get; set; }
 
-
+    /*
+    public DbSet<Ride> Rides { get; set; }
+    public DbSet<RideDetail> RideDetails { get; set; }
+    public DbSet<RideTrackingData> RideTrackingDatas { get; set; }
+    public DbSet<TrackingPoint> TrackingPoints { get; set; }
+    public DbSet<RideReview> RideReviews { get; set; }
+    */
 
 
     public override int SaveChanges()
@@ -65,6 +71,7 @@ public class AppDbContext : DbContext
 
     private async Task PublishEntityEvents()
     {
+        // Forsøke å skrive om denne til å gjelde for alle Entities
         Console.WriteLine("PublishEntityEvents() started");
 
         var addedHorses = ChangeTracker.Entries<Horse>()
@@ -108,6 +115,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(h => h.UserId) // FK ligger i Horses-tabellen
             .OnDelete(DeleteBehavior.Cascade); // Sletter hester hvis bruker slettes
         
+        /*
         // 1:1 Relasjon mellom Ride og RideDetails
         modelBuilder.Entity<RideDetail>()
             .HasOne(rd => rd.Ride)
@@ -138,6 +146,7 @@ public class AppDbContext : DbContext
                 v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),  // Konverterer til JSON
                 v => JsonSerializer.Deserialize<List<TrackingPoint>>(v, new JsonSerializerOptions()) ?? new List<TrackingPoint>()
             );
+            */
         //
         // Trail
         //
@@ -187,8 +196,8 @@ public class AppDbContext : DbContext
 
         //SIkrer at en bruker bare kan like ett innlegg.
         modelBuilder.Entity<EntityReaction>()
-        .HasIndex(e => new { e.UserId, e.EntityId, e.EntityName })
-        .IsUnique();  // Hindrer at samme bruker kan like samme ting flere ganger
+            .HasIndex(e => new { e.UserId, e.EntityId, e.EntityName })
+            .IsUnique();  // Hindrer at samme bruker kan like samme ting flere ganger
 
     }
 
