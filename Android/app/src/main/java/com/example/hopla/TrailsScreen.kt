@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Favorite
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -202,7 +204,7 @@ fun TrailsScreen(navController: NavController) {
                         }
                     }) {
                         Icon(
-                            imageVector = if (isFollowingClicked) Icons.Filled.Star else Icons.TwoTone.Star,
+                            imageVector = if (isFollowingClicked) Icons.Filled.Person else Icons.Outlined.Person,
                             contentDescription = null
                         )
                     }

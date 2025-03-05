@@ -8,7 +8,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,8 +24,15 @@ import androidx.compose.foundation.Image
 import com.example.hopla.ui.theme.PrimaryBlack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.hopla.ui.theme.PrimaryWhite
@@ -46,13 +52,13 @@ fun HomeScreen() {
 @Composable
 fun TopTextColumn() {
     val items = listOf(
-        R.string.all,
-        R.string.friends,
-        R.string.area,
-        R.string.popular,
-        R.string.updates
+        Icons.Outlined.Home,
+        Icons.Outlined.Person,
+        Icons.Outlined.FavoriteBorder,
+        Icons.Outlined.LocationOn,
+        Icons.Outlined.ThumbUp
     )
-    var selectedItem by remember { mutableIntStateOf(items[0]) }
+    var selectedItem by remember { mutableStateOf(items[0]) }
 
     Column(
         modifier = Modifier
@@ -76,10 +82,10 @@ fun TopTextColumn() {
                         .clickable { selectedItem = item },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = stringResource(item),
-                        fontSize = 10.sp,
-                        color = if (selectedItem == item) MaterialTheme.colorScheme.onSecondary
+                    Icon(
+                        imageVector = item,
+                        contentDescription = null,
+                        tint = if (selectedItem == item) MaterialTheme.colorScheme.onSecondary
                         else MaterialTheme.colorScheme.onPrimary
                     )
                 }
