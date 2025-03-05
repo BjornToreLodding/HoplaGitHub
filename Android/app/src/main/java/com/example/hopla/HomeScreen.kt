@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.hopla.ui.theme.PrimaryWhite
 
 @Composable
 fun HomeScreen() {
@@ -110,7 +111,7 @@ fun PostItem(imageRes: Int, text: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(PrimaryWhite)
             .padding(16.dp)
     ) {
         Column(
@@ -128,7 +129,7 @@ fun PostItem(imageRes: Int, text: String) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.tertiary)
+                    .background(MaterialTheme.colorScheme.background)
                     .height(40.dp),
             ) {
                 Text(

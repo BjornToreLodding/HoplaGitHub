@@ -617,34 +617,7 @@ fun MyTripsScreen(navController: NavController) {
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .background(MaterialTheme.colorScheme.tertiary)
-                .border(10.dp, MaterialTheme.colorScheme.primary)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.my_trips),
-                    fontSize = 24.sp
-                )
-            }
-        }
+        ScreenHeader(navController, stringResource(R.string.my_trips))
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
@@ -665,7 +638,7 @@ fun TripItem(trip: Trip) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(PrimaryWhite)
             .clickable { /* Handle click event */ }
             .padding(16.dp)
     ) {
@@ -789,7 +762,7 @@ fun FriendItem(friend: Friend, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(PrimaryWhite)
             .padding(16.dp)
             .clickable { /*navController.navigate("person_detail/${friend.friendId}")*/ }
     ) {
@@ -1039,7 +1012,7 @@ fun FollowingItem(following: Following, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(PrimaryWhite)
             .padding(16.dp)
             .clickable { /*navController.navigate("person_detail/${friend.friendId}")*/ }
     ) {
@@ -1203,7 +1176,7 @@ fun HorseItem(horse: Horse, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(PrimaryWhite)
             .padding(16.dp)
             .clickable {
                 navController.navigate("horse_detail/${horse.id}")
@@ -1351,7 +1324,7 @@ fun PersonItem(person: Person, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(PrimaryWhite)
             .padding(16.dp)
             .clickable { navController.navigate("person_detail/${person.name}/${person.imageResource}/${person.status}") }
     ) {
