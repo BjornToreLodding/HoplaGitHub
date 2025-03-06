@@ -42,8 +42,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,7 +84,7 @@ fun SearchBar(
                 contentDescription = stringResource(R.string.search)
             )
         },
-        singleLine = true,      // Only one line possibe
+        singleLine = true,      // Only one line possible
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -370,7 +372,7 @@ fun CustomTextField(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray) // Background color
+                .background(Color.LightGray)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             BasicTextField(
@@ -388,4 +390,57 @@ fun CustomTextField(
             )
         }
     }
+}
+
+// Report dialog
+@Composable
+fun ReportDialog(onDismiss: () -> Unit) {
+    var reportTitle by remember { mutableStateOf("") }
+    var reportText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.send_a_report)) },
+        text = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp) // Set a fixed height for the report box
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        Column {
+                            androidx.compose.material.TextField(
+                                value = reportTitle,
+                                onValueChange = { reportTitle = it },
+                                label = { Text(text = stringResource(R.string.title)) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            androidx.compose.material.TextField(
+                                value = reportText,
+                                onValueChange = { reportText = it },
+                                label = { Text(text = stringResource(R.string.report)) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp) // Set a fixed height for the text field
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.send))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        }
+    )
 }

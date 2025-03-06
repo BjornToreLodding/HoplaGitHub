@@ -42,8 +42,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.ui.unit.sp
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
@@ -241,45 +239,6 @@ fun SettingsClickableItem(icon: ImageVector, title: String, onClick: () -> Unit)
         Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
         Text(text = title, modifier = Modifier.weight(1f).padding(start = 16.dp))
     }
-}
-
-// Report Dialog
-@Composable
-fun ReportDialog(onDismiss: () -> Unit) {
-    var reportTitle by remember { mutableStateOf("") }
-    var reportText by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.send_a_report)) },
-        text = {
-            Column {
-                TextField(
-                    value = reportTitle,
-                    onValueChange = { reportTitle = it },
-                    label = { Text(text = stringResource(R.string.title)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = reportText,
-                    onValueChange = { reportText = it },
-                    label = { Text(text = stringResource(R.string.report)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.send))
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
-            }
-        }
-    )
 }
 
 // Confirm Action Dialog (Log Out, Delete, etc.)

@@ -21,16 +21,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
 import com.example.hopla.ui.theme.PrimaryBlack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -114,6 +120,8 @@ fun PostList() {
 @Composable
 fun PostItem(imageRes: Int, text: String) {
     var isLogoClicked by remember { mutableStateOf(false) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -147,13 +155,42 @@ fun PostItem(imageRes: Int, text: String) {
                 )
             }
         }
-        Image(
-            painter = painterResource(id = if (isLogoClicked) R.drawable.logo_filled_white else R.drawable.logo_white),
-            contentDescription = "Logo",
+        Row(
             modifier = Modifier
-                .size(40.dp)
                 .align(Alignment.TopEnd)
-                .clickable { isLogoClicked = !isLogoClicked }
-        )
+        ) {
+            Image(
+                painter = painterResource(id = if (isLogoClicked) R.drawable.logo_filled_white else R.drawable.logo_white),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { isLogoClicked = !isLogoClicked }
+            )
+            Box {
+                IconButton(onClick = { isDropdownExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More options",
+                        tint = PrimaryWhite
+                    )
+                }
+                DropdownMenu(
+                    expanded = isDropdownExpanded,
+                    onDismissRequest = { isDropdownExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Report") },
+                        onClick = {
+                            isDropdownExpanded = false
+                            showReportDialog = true
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    if (showReportDialog) {
+        ReportDialog(onDismiss = { showReportDialog = false })
     }
 }

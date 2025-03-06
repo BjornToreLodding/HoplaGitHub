@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
@@ -72,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
@@ -307,6 +309,9 @@ fun TrailsScreen(navController: NavController) {
 // Function to display the content of the trails (main page for all trails)
 @Composable
 fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () -> Unit) {
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -336,18 +341,43 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                         .matchParentSize()
                         .background(Color.Black.copy(alpha = 0.5f))
                 )
-                // Heart Icon
-                IconButton(
-                    onClick = onHeartClick,
+                // Row for Heart Icon and Three-dots Icon
+                Row(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(5.dp)
                 ) {
-                    Icon(
-                        imageVector = if (info.isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = null,
-                        tint = if (info.isHeartClicked) Color(0xFFFF6666) else PrimaryWhite
-                    )
+                    // Heart Icon
+                    IconButton(onClick = onHeartClick) {
+                        Icon(
+                            imageVector = if (info.isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = null,
+                            tint = if (info.isHeartClicked) HeartColor else PrimaryWhite
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(0.1.dp))
+                    // Three-dots Icon
+                    Box {
+                        IconButton(onClick = { isDropdownExpanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "More options",
+                                tint = PrimaryWhite
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = isDropdownExpanded,
+                            onDismissRequest = { isDropdownExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(R.string.report)) },
+                                onClick = {
+                                    isDropdownExpanded = false
+                                    showReportDialog = true
+                                }
+                            )
+                        }
+                    }
                 }
                 // Star Rating
                 Row(
@@ -417,6 +447,10 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                 }
             }
         }
+    }
+
+    if (showReportDialog) {
+        ReportDialog(onDismiss = { showReportDialog = false })
     }
 }
 
