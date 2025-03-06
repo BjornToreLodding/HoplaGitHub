@@ -3,7 +3,149 @@
 
 
 
-# API Endpoints
+# Hopla API Endpoints
+
+### Symbolforklaring
+
+| Symbol | Beskrivelse                        | | | Symbol | Beskrivelse                        |
+|--------|----------------------------------- |-|-|--------|----------------------------------- |
+| 🛠️ |  Status | | |🔒 | Autorisering? |
+| ✅ | Ferdig og testet | | |🌍 |Svarer alle |
+| 🟢 | Ferdig, men ikke tilstrekkelig testet | | |🔑 | Krever gyldig autenseringstoken |
+| ⚠️ | Virker delvis | | |👑 | Krever admin rettigheter |
+| ❌ | Ikke laget | | | 📧🔑 | Krever epostlenke med token
+| 🧪 | Kun for testing/Eksperimentell  | | |  🔓 | Åpent Endpoint. Test av symbol
+
+## 📖 Hvordan bruke dokumentasjonen
+
+Denne dokumentasjonen gir en detaljert oversikt over API-endepunktene og hvordan de brukes.  
+Klikk på et endepunkt for å se spesifikasjonene, inkludert:
+
+### 📖 Hva inneholder dokumentasjonen?
+- **🔓🌍 Åpent Endpoint** – Angir om endepunktet krever autentisering eller ikke.
+- **📌 Beskrivelse** – Kort forklaring på hva endepunktet gjør.
+- **📑 Tilgjengelige parametere:**
+  - 🔒 **Header** – `Authorization: Bearer Token` 🔑 (kreves for beskyttede endepunkter).
+  - 📂 **Path** – Unike identifikatorer i URL (f.eks. `<horseId>`).
+  - 🔎 **Query** – Valgfrie eller påkrevde URL-parametere (f.eks. `?userId=[Guid]`).
+  - 📥 **Body** – JSON-data som må sendes i `POST`/`PUT`-forespørsler.
+- **💾 Syntaks med Curl** – Eksempel på hvordan forespørselen kan sendes via terminal.
+- **📤 Eksempel på JSON-respons** – Hvordan en vellykket respons fra API-et ser ut.
+- **📟 HTTP-feilkoder** – Mulige feiltilstander og hva de betyr.
+
+---
+
+### 💡 **Tips for testing**
+- Bruk `curl`-eksemplene for å teste API-et direkte fra terminalen.
+- Importer `curl`-forespørslene i **Postman** eller **Insomnia** for en mer visuell fremstilling.
+- Gå først til /users/login for å motta et token for tilgang til lukkede forespørsler. 
+- Husk å inkludere `Authorization: Bearer <TOKEN>` i forespørslene der det kreves.
+
+**Klar til å begynne? Klikk på et endepunkt i dokumentasjonen!**
+
+---
+
+## Endpoints brukt og hestet av Frontend
+
+| 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
+|-----|----|--------|-------------------------------|-------------|
+| 🟢 | 🌍 | POST | [`/users/login`](#post-userslogin) | returnerer aut-token |
+| 🟢 | 🔑 | GET | [`/users/profile`](#get-usersprofile) | Henter userid fra token. Hvis userid er spesifisert, vises litt mer info som antall venner. |
+| 🟢 | 🔑 | GET | [`/horses/userhorses`](#get-horsesuserhorses) | Viser alle hester til innlogget bruker, evt til oppgitt userid (optional) |
+| 🟢 | 🔑 | GET | [`/horses/{horseid}`](#get-horseshorseid) | Vise en spesifikk hest, |
+| 🟢 | 🔑 | GET | [`/userrelations/friends/[userid]`](#get-userrelationsfriendsuserid) | Viser venner til token eller userid (optional) |
+| ❌ | 🔑 | GET | [`/userrelations/requests/`](#get-userrelationsrequests) | viser venneforspørsler |
+| 🟢 | 🔑 | GET | [`/userrelations/following/}`](#get-userrelationsfollowing) | viser hvem userId følger |
+
+## Endpoints for Adminportal
+| 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
+|-----|----|--------|-------------------------------|-------------|
+| ✅ | 👑 | GET | [`/admin/settings/all`](#get-adminsettingsall) | Alle Innstillinger og deres verdier |
+| ✅ | 👑 | GET | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | Vise verdien på en innstilling |
+| ✅ | 👑 | PUT | [`/admin/settings/{keyName}`](#put-adminsettingskeyname) | Endre en innstilling |
+
+## Endpoints for Debugging
+| 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
+|-----|----|--------|-------------------------------|-------------|
+| ⚠️ | 👑 | GET | [`/div/logging`](#get-divlogging) | Her kan man aktivere og deaktivere logging til logtail enklet så man slipper omstart (Burde muligens være POST/PUT for mest mulig RESTful?) |
+| ✅ | 🌍 | GET | [`/div/helloworld`](#get-divhelloworld) | Sjekker om APIet svarer |
+| ✅ | 🌍 | GET | [`/div/status`](#get-divstatus) | sjekker oppetid, requestcount + errorcount. |
+| ✅ | 🌍 | GET | [`/div/database`](#get-divdatabase) | Sjekker om det forbindelse mellom database og backend |
+| ✅ | 🧪 | POST | [`/users/login/test`](#post-userslogintest) | logger inn uten passord (kun for enklere testing) returnerer aut-token  |
+
+## Andre Endpoints Eksperimentell
+| 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
+|-----|----|--------|-------------------------------|-------------|
+| ✅ | 🌍 | POST | [`/users/register`](#post-usersregister) | Trenger rutine for epost osv. |
+| ✅ | | POST | [`/users/aut/changepassword`](#post-usersautchangepassword) |  |
+| ✅ | 🧪 | POST | [`/users/aut/int/{userId}`](#post-usersautintuserid) | for enkel testing om det fungerer med  |
+| ✅ | 🔑 | POST | [`/users/changepassword`](#post-userschangepassword) | authorize etablert, må sende med token. |
+| ❌ | 🌍 | POST | [`/users/forgotpassword`](#post-forgotpassword) | Regner med denne skal sende epost med mulighet for nullstilling av passord |
+| ❌ | | GET | [`/users/settings`](#get-userssettings) |  |
+| ❌ | | PUT | [`/users/settings`](#put-userssettings) |  |
+| ✅ | | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
+| ✅ | | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker (blir nok erstatet av users/profile/{usersID} )|
+| ✅ | | POST | [`/users`](#post-users) | Oppretter ny bruker |
+| ⚠️ | | PUT | [`/users/{userid}`](#put-usersuserid) | Litt mangelfull |
+| ✅ | | DELETE | [`/users/{userid}`](#delete-usersuserid) | - slette en bruker |
+| ❌ | | POST | [`/horses`](#post-horses) | Registrere ny hest på bruker |
+| ❌ | | PUT | [`/horses`](#put-horses) | |
+| ❌ | | DELETE | [`/horses`](#delete-horses) | |
+| ✅ | | GET | [`/userrelations/blocked/{userid}`](#get-userrelationsblocksuserid) | viser hvem userId blokkerer |
+| ✅ | | POST | [`/userrelations/friendrequests`](#post-userrelationsfriendrequestsuserid) | sende venneforspørsel |
+| ❌ | | POST | [`/userrelations/follow/`](#post-userrelationsfollow) | følger en bruker |
+| ✅ | | POST | [`/userrelations/block`](#post-userrelationsblock) | blokkerer en bruker |
+| ✅ | | PUT | [`/userrelations/{userrelationid}`](#put-userrelationsuserrelationid) | bytter status på en userrelation, f.eks fra request til friend eller fra friend til delete eller block |
+| ✅ | | DELETE | [`/userrelations/{fromUserId}/{toUserId}`](#delete-userrelationsfromuseridtouserid) | sletter en userrelation, f.eks blokkering |
+| ✅ | | GET | [`/trail/list`](#get-traillist) | Liste over løyper sortert etter næreste først |
+| ⚠️ | | GET | [`/trail/map`](#get-trailmap) | Løyper som passer inni kartutsnittet |
+| ❌ | | POST | [`/trail`](#post-trail) | Bruker data fra en Ride og lager en løype av det. |
+| ❌ | | PUT | [`/trail/{trailId}`](#put-trailtrailid) | evt endre en trail |
+| ❌ | | DELETE | [`/trail/{trailId}`](#delete-trailtrailid) | |
+| ✅ | | GET | [`/rides/user/{userId}`](#get-ridesuseruserid) | |
+| ✅ | | GET | [`/rides/{rideId}/details`](#get-ridesrideiddetails) | Detaljer fra en tur |
+| ✅ | | GET | [`/rides/{rideId}/trackingdata`](#get-ridesrideidtrackingdata) | Fullstendig liste med koordinater på en ride |
+| ✅ | | GET | [`/rides`](#get-rides) | |
+| ✅ | | POST | [`/rides`](#post-rides) | |
+| ❌ | | PUT | [`/rides/{rideId}`](#put-ridesrideid) | - Nesten utviklet. Trenger testing bildeopplegg |
+| ✅ | | GET | [`/messages/{userId}`](#get-messagesuserid) | Viser siste melding som userId har mottatt fra alle brukere |
+| ✅ | | GET | [`/messages/{sUserId}/{rUserId}`](#get-messagessuseridruserid) | Viser meldinger mellom 2 brukere, DESC Time |
+| ✅ | | POST | [`/messages`](#post-messages) | Sende melding til en annen bruker. |
+| ❌ | | PUT | [`/messages/{messageId}`](#put-messagesmessageid) | Rediger en melding? |
+| ❌ | | DELETE | [`/messages/{messageId}`](#delete-messagesmessageid) | Slette en melding |
+| ❌ | | GET | [`/stables/list`](#get-stableslist) | -Viser alle staller, evt nærmeste staller |
+| ❌ | | POST | [`/stables`](#post-stables) | - Registrere ny stall |
+| ❌ | | ??? | [`/stableusers`](#stableusers) | Kommer senere, men dette er medlemmer av en stall. |
+| ✅ | | GET | [`/stablemessages/{stableId}`](#get-stablemessagesstableid) | |
+| ✅ | | POST | [`/stablemessages`](#post-stablemessages) | |
+| ❌ | | PUT | [`/stablemessages/{stableMessageId}`](#put-stablemessagesstablemessageid) | Endre en melding? |
+
+---
+
+## MockData (Testdata)
+Ved å kjøre APIene under, så opprettes mockdata som er hardkodet i egne mock-filer. Disse blir det kun laget en generell dokumentasjon på som gjelder alle Mock-endpoints.
+
+| 🛠️ | 🔒 | Metode | Endpoint opprettelse | Endpoint slette | Beskrivelse |
+|----|-----|---------|-------------|----------|----|
+| ✅ | 🧪 | POST | `/mock/createdatabase` |`/mock/cleardatabase` | Oppretter eller sletter alle mockdata. |
+| ✅ | 🧪 | POST | `/mock/createusers` | `/mock/clear` | Oppretter testbrukere |
+| ✅ | 🧪 | POST | `/mock/createhorses` | `/mock/clear` | Oppretter testhester |
+| ✅ | 🧪 | POST | `/mock/createfriendrequests` |`/mock/clear` |  Genererer venneforespørsler |
+| ✅ | 🧪 | POST | `/mock/createmessages` | `/mock/clear` | Lager testmeldinger |
+| ✅ | 🧪 | POST | `/mock/createstables` | `/mock/clear` | Oppretter teststaller |
+| ❌ | 🧪 | POST | `/mock/createstableusers` | `/mock/clear` |  Oppretter brukere til staller |
+| ✅ | 🧪 | POST | `/mock/createstablemessages` | `/mock/clear` | Genererer stallmeldinger |
+| ✅ | 🧪 | POST | `/mock/createrides` | `/mock/clear` | Oppretter test-rideturer |
+| ❌ | 🧪 | POST | `/mock/createridedetails` | `/mock/clear` | Oppretter detaljer for rideturer |
+| ❌ | 🧪 | POST | `/mock/createridetrackingdata` | `/mock/clear` | Oppretter GPS-spor for rideturer |
+| ❌ | 🧪 | POST | `/mock/createridereviews` | `/mock/clear` | Oppretter anmeldelser av rideturer |
+| ✅ | 🧪 | POST | `/mock/createtrails` | `/mock/clear` | Oppretter test-løyper |
+| ❌ | 🧪 | POST | `/mock/createtraildetails` | `/mock/clear` | Oppretter detaljer om løyper |
+| ❌ | 🧪 | POST | `/mock/createtrailreviews` | `/mock/clear` | Oppretter anmeldelser av løyper |
+| ❌ | 🧪 | POST | `/mock/createtrailfilters` | `/mock/clear` | Oppretter filtre for løyper |
+| ✅ | 🧪 | POST | `/mock/createsettings` | `/mock/clearsettings` | Oppretter test-løyper |
+
+---
 
 ## Oversikt over APIets Endpoints og hvordan man bruker det.
 
@@ -12,103 +154,6 @@
 - JSON-response
 - Eksempel med curl
 - Hvilke statuskoder som kan returnere
-
----
-
-## Endpoints Oversikt ()
-
-| 🔄 | Metode | Endpoint | Beskrivelse/Parameters |
-|------|--------|-------------------------------|-------------|
-| ✅ | GET | [`/div/helloworld`](#get-divhelloworld) | Sjekker om APIet svarer |
-| ✅ | GET | [`/div/status`](#get-divstatus) | sjekker oppetid, requestcount + errorcount. |
-| ✅ | GET | [`/div/database`](#get-divdatabase) | Sjekker om det forbindelse mellom database og backend |
-| ⚠️ | GET | [`/div/logging`](#get-divlogging) | Her kan man aktivere og deaktivere logging til logtail enklet så man slipper omstart (Burde muligens være POST/PUT for mest mulig RESTful?) |
-| ✅ | GET | [`/admin/settings/all`](#get-adminsettingsall) | Alle Innstillinger og deres verdier |
-| ✅ | GET | [`/admin/settings/{keyName}`](#get-adminsettingskeyname) | Vise verdien på en innstilling |
-| ✅ | PUT | [`/admin/settings/{keyName}`](#put-adminsettingskeyname) | Endre en innstilling |
-| ✅ | POST | [`/users/register`](#post-usersregister) | Registrer ny bruker brukere |
-| ✅ | POST | [`/users/login`](#post-userslogin) | returnerer aut-token |
-| ✅ | POST | [`/users/login/test`](#post-userslogintest) | logger inn uten passord (kun for enklere testing) returnerer aut-token  |
-| ✅ | POST | [`/users/aut/changepassword`](#post-usersautchangepassword) |  |
-| ✅ | POST | [`/users/aut/int/{userId}`](#post-usersautintuserid) | for enkel testing om det fungerer med  |
-| ✅ | POST | [`/users/changepassword`](#post-userschangepassword) | authorize etablert, må sende med token. |
-| ❌ | POST | [`/users/forgotpassword`](#post-forgotpassword) | Regner med denne skal sende epost med mulighet for nullstilling av passord |
-| ❌ | POST | [`/users/resetpassword`](#post-resetpassword) | Da kommer man til denne for å sette nytt passord |
-| ❌ | GET | [`/users/settings`](#get-userssettings) |  |
-| ❌ | PUT | [`/users/settings`](#put-userssettings) |  |
-| ✅ | GET | [`/users/`](#get-usersuserid) | Viser alle registrerte brukere |
-| ✅ | GET | [`/users/{userid}`](#get-usersuserid) | - Info om en bruker (blir nok erstatet av users/profile/{usersID} )|
-| ✅ | GET | [`/users/profile/{userid}`](#get-usersprofileuserid) | Returnerer info for å vise profil |
-| ✅ | POST | [`/users`](#post-users) | Oppretter ny bruker |
-| ⚠️ | PUT | [`/users/{userid}`](#put-usersuserid) | Litt mangelfull |
-| ✅ | DELETE | [`/users/{userid}`](#delete-usersuserid) | - slette en bruker |
-| ✅ | GET | [`/horses/{userId}`](#get-horsesuserid) | Liste en brukers hester |
-| ❌ | POST | [`/horses`](#post-horses) | Registrere ny hest på bruker |
-| ❌ | PUT | [`/horses`](#put-horses) | |
-| ❌ | DELETE | [`/horses`](#delete-horses) | |
-| ✅ | GET | [`/userrelations/friends/{userid}`](#get-userrelationsfriendsuserid) | viser venner |
-| ✅ | GET | [`/userrelations/requests/{userid}`](#get-userrelationsrequestsuserid) | viser venneforspørsler |
-| ❌ | GET | [`/userrelations/follow/{userid}`](#get-userrelationsfollowuserid) | viser hvem userId følger |
-| ✅ | GET | [`/userrelations/blocked/{userid}`](#get-userrelationsblocksuserid) | viser hvem userId blokkerer |
-| ✅ | POST | [`/userrelations/friendrequests`](#post-userrelationsfriendrequestsuserid) | sende venneforspørsel |
-| ❌ | POST | [`/userrelations/follow/`](#post-userrelationsfollow) | følger en bruker |
-| ✅ | POST | [`/userrelations/block`](#post-userrelationsblock) | blokkerer en bruker |
-| ✅ | PUT | [`/userrelations/{userrelationid}`](#put-userrelationsuserrelationid) | bytter status på en userrelation, f.eks fra request til friend eller fra friend til delete eller block |
-| ✅ | DELETE | [`/userrelations/{fromUserId}/{toUserId}`](#delete-userrelationsfromuseridtouserid) | sletter en userrelation, f.eks blokkering |
-| ✅ | GET | [`/trail/list`](#get-traillist) | Liste over løyper sortert etter næreste først |
-| ⚠️ | GET | [`/trail/map`](#get-trailmap) | Løyper som passer inni kartutsnittet |
-| ❌ | POST | [`/trail`](#post-trail) | Bruker data fra en Ride og lager en løype av det. |
-| ❌ | PUT | [`/trail/{trailId}`](#put-trailtrailid) | evt endre en trail |
-| ❌ | DELETE | [`/trail/{trailId}`](#delete-trailtrailid) | |
-| ✅ | GET | [`/rides/user/{userId}`](#get-ridesuseruserid) | |
-| ✅ | GET | [`/rides/{rideId}/details`](#get-ridesrideiddetails) | Detaljer fra en tur |
-| ✅ | GET | [`/rides/{rideId}/trackingdata`](#get-ridesrideidtrackingdata) | Fullstendig liste med koordinater på en ride |
-| ✅ | GET | [`/rides`](#get-rides) | |
-| ✅ | POST | [`/rides`](#post-rides) | |
-| ❌ | PUT | [`/rides/{rideId}`](#put-ridesrideid) | - Nesten utviklet. Trenger testing bildeopplegg |
-| ✅ | GET | [`/messages/{userId}`](#get-messagesuserid) | Viser siste melding som userId har mottatt fra alle brukere |
-| ✅ | GET | [`/messages/{sUserId}/{rUserId}`](#get-messagessuseridruserid) | Viser meldinger mellom 2 brukere, DESC Time |
-| ✅ | POST | [`/messages`](#post-messages) | Sende melding til en annen bruker. |
-| ❌ | PUT | [`/messages/{messageId}`](#put-messagesmessageid) | Rediger en melding? |
-| ❌ | DELETE | [`/messages/{messageId}`](#delete-messagesmessageid) | Slette en melding |
-| ❌ | GET | [`/stables/list`](#get-stableslist) | -Viser alle staller, evt nærmeste staller |
-| ❌ | POST | [`/stables`](#post-stables) | - Registrere ny stall |
-| ❌ | ??? | [`/stableusers`](#stableusers) | Kommer senere, men dette er medlemmer av en stall. |
-| ✅ | GET | [`/stablemessages/{stableId}`](#get-stablemessagesstableid) | |
-| ✅ | POST | [`/stablemessages`](#post-stablemessages) | |
-| ❌ | PUT | [`/stablemessages/{stableMessageId}`](#put-stablemessagesstablemessageid) | Endre en melding? |
-
----
-
-## MockData (Testdata)
-Ved å kjøre APIene under, så opprettes mockdata som er hardkodet i egne mock-filer. Disse blir det kun laget en generell dokumentasjon på som gjelder alle Mock-endpoints.
-
-| Status | Metode | Endpoint | Beskrivelse |
-|--------|---------|-------------|----------|
-| ✅ | POST | `/mock/cleardatabase` | Sletter all eksempeldata |
-| ❌ | POST |  `/mock/createdatabase` | Oppretter eksempeldata |
-| ✅ | POST | `/mock/createcontent` | Oppretter eksempeldata Tenkte /createdatabase skulle erstatte denne|
-| ✅ | POST |  `/mock/createusers` | Oppretter testbrukere |
-| ✅ | POST |  `/mock/createhorses` | Oppretter testhester |
-| ✅ | POST | `/mock/createfriendrequests` | Genererer venneforespørsler |
-| ✅ | POST | `/mock/createmessages` | Lager testmeldinger |
-| ✅ | POST | `/mock/createstables` | Oppretter teststaller |
-| ❌ | POST | `/mock/createstableusers` | Oppretter brukere til staller |
-| ✅ | POST | `/mock/createstablemessages` | Genererer stallmeldinger |
-| ✅ | POST | `/mock/createrides` | Oppretter test-rideturer |
-| ❌ | POST | `/mock/createridedetails` | Oppretter detaljer for rideturer |
-| ❌ | POST | `/mock/createridetrackingdata` | Oppretter GPS-spor for rideturer |
-| ❌ | POST | `/mock/createridereviews` | Oppretter anmeldelser av rideturer |
-| ✅ | POST | `/mock/createtrails` | Oppretter test-løyper |
-| ❌ | POST | `/mock/createtraildetails` | Oppretter detaljer om løyper |
-| ❌ | POST | `/mock/createtrailreviews` | Oppretter anmeldelser av løyper |
-| ❌ | POST | `/mock/createtrailfilters` | Oppretter filtre for løyper |
-| ✅ | POST | `/mock/createsettings` | Oppretter test-løyper |
-
-✅ = Fullført
-<br>⚠️ = Utviklet, men har feil eller at ikke alle queries er utviklet. 
-<br>❌ = Ikke utviklet ennå
-
 
 ## Bruk av mock API
 
@@ -130,12 +175,13 @@ curl -X POST "https://hopla.onrender.com/mock/createcontent" \
 ## Eksempel-Endpoint med Alle Statuskoder
 
 ### GET /example/{id}
+
 **Beskrivelse:** Henter informasjon om en ressurs.
 
-📌 **Path-parametere:**
-| Parameter | Type   | Påkrevd | Beskrivelse |
-|-----------|--------|---------|-------------|
-| `id`  | string | ✅ Ja   | ID-en til ressursen |
+📌 **Parametere:**
+| Parameter | Name | Type   | Påkrevd | Beskrivelse |
+|-----------|--------|---------|-------------|----|
+| 📂 Path      | `id`   | string  | ✅ Ja   | ID-en til ressursen |
 
 📌 **Eksempel:**
 ```bash
@@ -149,39 +195,227 @@ curl -X GET "https://hopla.onrender.com/example/123"
   "status": "active"
 }
 ```
-📌 **Mulige statuskoder:**
+📌 **Eksempel på statuskoder:**
 - ✅ `200 OK` – Forespørselen var vellykket.
 - ⚠️ `400 Bad Request` – Feil i forespørselen (manglende eller ugyldige parametere).
 - ❌ `404 Not Found` – Ressursen ble ikke funnet.
 
 ---
 
+## API-detaljer
 
+### POST /users/login
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Logger inn ny bruker.
+
+🌍 **Åpent Endpoint - Krever ikke autentisering**
+
+📑 **Parametere**
+
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 📥 Body | `Email`  | String   | ✅ Ja   | brukerens epostadresse |
+| 📥 Body | `Password` | String | ✅ Ja   | brukerens passord |
+
+📥 **Request Body:**
+```json
+{
+    "Email": "test@test.no",
+    "Password": "Hopla2025!"
+}
+```
+💾 **Syntax:**
+```bash
+curl -X POST "https://hopla.onrender.com/users/login" \
+     -H "Content-Type: application/json" \
+     -d '{"Email": "test@test.no","Password": "Hopla2025!"}'
+```
+📤 **Eksempel på respons:**
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxMjM0NTY3OC0wMDAwLTAwMDAtMDAwMS0xMjM0NTY3ODAwMDEiLCJlbWFpbCI6InRlc3RAdGVzdC5ubyIsIm5iZiI6MTc0MDQ4NjkwNCwiZXhwIjoxNzQxMDkxNzA0LCJpYXQiOjE3NDA0ODY5MDR9.Tds78EAr8iZ0Y6_M0f1lcwk11sgAapfSpwXk5T9RdXU",
+    "userId": "12345678-0000-0000-0001-123456780001",
+    "name": "Magne Baller Ilufta",
+    "alias": "MangeBallerILufra",
+    "profilePictureURL": "https://images.unsplash.com/
+photo-1614203586837-1da2bef106a2?w=200&h=200&fit=crop"
+}
+
+```
+🔑 **NB Tokenet må lagres av frontend til senere bruk.**
+
+📟 **Mulige statuskoder:**
+- ✅ `200 Ok` – Forespørsel sendt.
+- ❌ `401 Unauthorized` – Feil e-post eller passord.
+
+---
+### GET /users/profile
+
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Henter ut informasjon om en bruker.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `relationStatus`  | Guid   | 🟡 Nei   | evt status mellom innlogget bruker og userId |
+
+#### 🔎 Query:
+
+`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+
+#### 💾 Syntax:
+```bash
+curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+📤 **Eksempel på respons:**
+```json
+[
+    {
+        "id": "12345678-0000-0000-0002-123456780001",
+        "name": "Flodhest",
+        "horsePictureUrl": "https://images.unsplash.com/
+        photo-1599053581540-248ea75b59cb?h=64&w=64&fit=crop"
+    },
+    {
+        "id": "12345678-0000-0000-0002-123456780018",
+        "name": "Kronprins Durek",
+        "horsePictureUrl": "https://images.unsplash.com/
+        photo-1438283173091-5dbf5c5a3206?h=64&w=64&fit=crop"
+    }
+]
+```
+📟 **Mulige statuskoder:**
+- ✅ `200 OK` – Hester ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ❌ `404 Not Found` – Ingen hester funnet for brukeren.
 
 ---
 
-## API-detaljer
+
+
+
+### GET /horses/userhorses
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Henter en liste over en brukers hester.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | Authorization | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+
+#### 🔎 Query
+`[?userId]` - 🟡 Valgfritt - userid hentes ut fra Bearer Token, hvis queryen ikke spesifiseres.
+
+#### 💾 Syntaks
+```bash
+curl -X GET "https://hopla.onrender.com/horses/userhorses?userId=[Guid]" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+📤 **Eksempel på respons:**
+```json
+[
+    {
+        "id": "12345678-0000-0000-0002-123456780001",
+        "name": "Flodhest",
+        "horsePictureUrl": "https://images.unsplash.com/
+        photo-1599053581540-248ea75b59cb?h=64&w=64&fit=crop"
+    },
+    {
+        "id": "12345678-0000-0000-0002-123456780018",
+        "name": "Kronprins Durek",
+        "horsePictureUrl": "https://images.unsplash.com/
+        photo-1438283173091-5dbf5c5a3206?h=64&w=64&fit=crop"
+    }
+]
+```
+📟 **Mulige statuskoder:(testes)**
+- ✅ `200 OK` – Hester ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ❌ `404 Not Found` – Ingen hester funnet for brukeren.
+
+---
+
+
+
+### GET /horses/{horseId}
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Henter mer informasjon om en hest.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | Authorization | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 📂 Path | `horseId`  | Guid   | ✅ Ja   | ID-en til hesten |
+
+#### 📂 Path
+`<horseId>` - ✅ Påkrevd - Gyldig `Guid` for hestens ID må spesifiseres i URL.
+
+#### 💾 Syntax:
+```bash
+curl -X GET "https://hopla.onrender.com/horses/<horseId>" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+📤 **Eksempel på respons:**
+```json
+{
+    "name": "Flodhest",
+    "horsePictureUrl": "https://images.unsplash.com/
+    photo-1599053581540-248ea75b59cb?h=200&w=200&fit=crop",
+    "dob": "2017-01-25T15:18:15.586439Z",
+    "age": 8,
+    "breed": "Zebra"
+}
+
+```
+📟 **Mulige statuskoder:**
+- ✅ `200 OK` – Hest ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ❌ `404 Not Found` – Hest ikke funnet.
+
 
 ### GET /div/helloworld
-**Beskrivelse:** Sjekker om API-et svarer.
+🔙 Tilbake til [`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
 
-📌 **Eksempel:**
+📌 **Beskrivelse:** Sjekker om API-et svarer.
+
+💾 **Syntaks:**
 ```bash
 curl -X GET "https://hopla.onrender.com/div/helloworld"
 ```
-📌 **Mulige statuskoder:**
+
+📤 **Eksempel på respons:**
+```json
+{
+    "Message": "HelloWorld"
+}
+```
+
+📟 **Mulige statuskoder:**
 - ✅ `200 OK` – API-et er oppe.
 
 ---
 
 ### GET /div/status
-**Beskrivelse:** Returnerer API-status, inkludert oppetid, request count og error count.
+🔙 Tilbake til [`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
 
-📌 **Eksempel:**
+📌 **Beskrivelse:** Returnerer API-status, inkludert oppetid, request count og error count.
+
+💾 **Syntaks:**
 ```bash
 curl -X GET "https://hopla.onrender.com/div/status"
 ```
-📌 **Eksempel på respons:**
+📤 **Eksempel på respons:**
 ```json
 {
   "uptime": "24 hours",
@@ -189,20 +423,10 @@ curl -X GET "https://hopla.onrender.com/div/status"
   "error_count": 5
 }
 ```
-📌 **Mulige statuskoder:**
+📟 **Mulige statuskoder:**
 - ✅ `200 OK` – API-status returnert.
 
-
 ---
-
-### GET /users
-
-🚧🚧🚧 *Under utvikling, kommer senere*
-
-**Beskrivelse:** Henter alle brukere registrert i databasen.
-
----
-
 ### GET /users/{userid}
 
 **Beskrivelse:** Henter informasjon om en spesifikk bruker.
@@ -347,32 +571,7 @@ curl -X DELETE "https://hopla.onrender.com/users/delete/b57f4c5c-aff5-44b2-8b1e-
 
 ---
 
-### GET /horses/{userId}
-**Beskrivelse:** Henter en liste over en brukers hester.
 
-📌 **Path-parametere:**
-| Parameter | Type   | Påkrevd | Beskrivelse |
-|-----------|--------|---------|-------------|
-| `userId`  | string | ✅ Ja   | ID-en til brukeren |
-
-📌 **Eksempel:**
-```bash
-curl -X GET "https://hopla.onrender.com/horses/12345"
-```
-📌 **Eksempel på respons:**
-```json
-{
-  "horses": [
-    { "id": "h1", "name": "Thunder", "breed": "Arabian", "age": 7 },
-    { "id": "h2", "name": "Storm", "breed": "Friesian", "age": 5 }
-  ]
-}
-```
-📌 **Mulige statuskoder:**
-- ✅ `200 OK` – Hester ble hentet.
-- ❌ `404 Not Found` – Ingen hester funnet for brukeren.
-
----
 
 
 ### POST /horses
