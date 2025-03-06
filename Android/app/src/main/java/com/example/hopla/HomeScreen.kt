@@ -23,7 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.Image
 import com.example.hopla.ui.theme.PrimaryBlack
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -113,6 +113,8 @@ fun PostList() {
 
 @Composable
 fun PostItem(imageRes: Int, text: String) {
+    var isLogoClicked by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,6 +123,7 @@ fun PostItem(imageRes: Int, text: String) {
             .padding(16.dp)
     ) {
         Column(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -131,7 +134,6 @@ fun PostItem(imageRes: Int, text: String) {
                     .height(200.dp),
                 contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -145,5 +147,13 @@ fun PostItem(imageRes: Int, text: String) {
                 )
             }
         }
+        Image(
+            painter = painterResource(id = if (isLogoClicked) R.drawable.logo_filled_white else R.drawable.logo_white),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.TopEnd)
+                .clickable { isLogoClicked = !isLogoClicked }
+        )
     }
 }
