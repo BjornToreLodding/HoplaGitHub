@@ -79,7 +79,64 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Main column for the login screen
+    fun handleLogin() {
+        val trimmedUsername = username.trim()
+        val trimmedPassword = password.trim()
+
+        if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
+            errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
+            showErrorDialog = true
+        } else {
+            isLoading = true
+            coroutineScope.launch {
+                val client = HttpClient {
+                    install(ContentNegotiation) {
+                        json(Json {
+                            ignoreUnknownKeys = true
+                            isLenient = true
+                            encodeDefaults = true
+                        })
+                    }
+                }
+                try {
+                    val response: HttpResponse = client.post(apiUrl + "users/login/") {
+                        contentType(ContentType.Application.Json)
+                        setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
+                    }
+                    when (response.status) {
+                        HttpStatusCode.OK -> {
+                            val loginResponse = response.body<User>()
+                            UserSession.token = loginResponse.token
+                            UserSession.userId = loginResponse.userId
+                            UserSession.email = loginResponse.email
+                            UserSession.name = loginResponse.name
+                            UserSession.alias = loginResponse.alias
+                            UserSession.profilePictureURL = loginResponse.pictureUrl
+                            onLogin()
+                        }
+                        HttpStatusCode.Unauthorized -> {
+                            val errorResponse = response.body<ErrorResponse>()
+                            errorMessage = errorResponse.message
+                            showErrorDialog = true
+                        }
+                        else -> {
+                            Log.e("LoginError", "Status: ${response.status}, Body: ${response.bodyAsText()}")
+                            errorMessage = context.getString(R.string.not_available_right_now)
+                            showErrorDialog = true
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("LoginError", "Exception: ${e.message}")
+                    errorMessage = context.getString(R.string.not_available_right_now)
+                    showErrorDialog = true
+                } finally {
+                    client.close()
+                    isLoading = false
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -87,7 +144,20 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo and app name
+        // REMOVE BEFORE FINISHING -> auto login
+        Button(
+            onClick = {
+                username = "test@test.no"
+                password = "Hopla2025!"
+                handleLogin()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp, vertical = 8.dp)
+        ) {
+            Text(text = "Auto-Fill and Login", color = PrimaryWhite)
+        }
+
         Image(
             painter = painterResource(id = R.drawable.logo1),
             contentDescription = "App Logo",
@@ -103,7 +173,6 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
         )
-        // Text fields for the email and password input
         TextField(
             value = username,
             onValueChange = { username = it },
@@ -123,7 +192,6 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 8.dp)
         )
-        // Forgotten password clickable text
         Text(
             text = stringResource(R.string.forgot_password),
             color = PrimaryBlack,
@@ -134,81 +202,11 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .clickable { showForgottenPasswordDialog = true },
         )
 
-        // Button for logging in, if clicked a loading indicator will be shown until logged in or
-        // an error message is shown
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         } else {
             Button(
-                onClick = {
-                    // trim the input fields for removing leading and trailing whitespaces
-                    val trimmedUsername = username.trim()
-                    val trimmedPassword = password.trim()
-
-                    // check if the input fields are empty
-                    if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
-                        errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
-                        showErrorDialog = true
-                    } else {
-                        // set loading to true and send a post request to the server
-                        isLoading = true
-                        coroutineScope.launch {
-                            val client = HttpClient {
-                                install(ContentNegotiation) {
-                                    json(Json {
-                                        ignoreUnknownKeys = true
-                                        isLenient = true
-                                        encodeDefaults = true
-                                    })
-                                }
-                            }
-                            // send a post request to the server with the login data
-                            try {
-                                val response: HttpResponse = client.post(apiUrl + "users/login/") {
-                                    contentType(ContentType.Application.Json)
-                                    setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
-                                }
-                                Log.d("LoginScreen", "Response status: ${response.status}")
-                                val responseBody = response.bodyAsText()
-                                Log.d("LoginScreen", "Response body: $responseBody")
-                                // check the response status and show an error message if necessary
-                                when (response.status) {
-                                    // if the login was successful, save the user data in the UserSession object
-                                    HttpStatusCode.OK -> {
-                                        val loginResponse = response.body<User>()
-                                        UserSession.token = loginResponse.token
-                                        UserSession.userId = loginResponse.userId
-                                        UserSession.email = loginResponse.email
-                                        UserSession.name = loginResponse.name
-                                        UserSession.alias = loginResponse.alias
-                                        UserSession.profilePictureURL = loginResponse.pictureUrl
-                                        onLogin()
-                                    }
-                                    // if the login was unsuccessful, show an error message
-                                    HttpStatusCode.Unauthorized -> {
-                                        val errorResponse = response.body<ErrorResponse>()
-                                        errorMessage = errorResponse.message
-                                        showErrorDialog = true
-                                        Log.d("LoginScreen", "Unauthorized: ${errorResponse.message}")
-                                    }
-                                    // General message if the server is not available
-                                    else -> {
-                                        errorMessage = context.getString(R.string.not_available_right_now)
-                                        showErrorDialog = true
-                                        Log.d("LoginScreen", "Unexpected status: ${response.status}")
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                errorMessage = context.getString(R.string.not_available_right_now)
-                                showErrorDialog = true
-                                Log.e("LoginScreen", "Exception: ${e.message}", e)
-                            } finally {
-                                client.close()
-                                isLoading = false
-                            }
-                        }
-                    }
-                },
+                onClick = { handleLogin() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -216,7 +214,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
             }
         }
-        // Create user clickable text
+
         Text(
             text = stringResource(R.string.create_user),
             color = MaterialTheme.colorScheme.primary,
@@ -226,7 +224,7 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                 .clickable { showCreateUserDialogue = true }
         )
     }
-    // Show the dialogs for creating a user, forgotten password and error messages
+
     if (showCreateUserDialogue) {
         CreateUserDialog(
             onDismiss = { showCreateUserDialogue = false },
