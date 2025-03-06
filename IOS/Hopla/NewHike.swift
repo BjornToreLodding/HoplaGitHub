@@ -20,16 +20,6 @@ struct NewHike: View {
                     .edgesIgnoringSafeArea(.all) // This will make the map take up the entire screen
                 
                 VStack {
-                    // Top of screen is green
-                    Rectangle()
-                        .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                        .frame(height: 110)
-                        .edgesIgnoringSafeArea(.top)
-                        // Remove the large negative padding to ensure the rectangle is visible
-                        .padding(.top, 0) // Adjust this value to move the rectangle down if needed
-                    
-                    Spacer()
-                    
                     // The time, distance and start/stop button
                     HStack {
                         Text("Time")
@@ -53,15 +43,6 @@ struct NewHike: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 75)
                     .background(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                }
-            }
-            .navigationTitle("New Hike") // Title of nav bar
-            .toolbar {
-                ToolbarItem(placement: .principal) { // Puts the logo in the center
-                    Image("LogoUtenBakgrunn")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 40)
                 }
             }
             .toolbarBackground(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme), for: .navigationBar)

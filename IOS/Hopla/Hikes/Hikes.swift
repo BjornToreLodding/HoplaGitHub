@@ -70,10 +70,7 @@ struct Hikes: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                filterBar
-                searchBar
-                
+            ZStack(alignment: .top) { // Use a ZStack to layer the views
                 ScrollView {
                     VStack(spacing: 10) {
                         ForEach(filteredHikes, id: \.id) { hike in
@@ -81,13 +78,30 @@ struct Hikes: View {
                         }
                         .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
-                    .padding(.horizontal)
+                    .padding(.top, 140) // Increase padding to make space for both bars
                 }
+                
+                VStack(spacing: 0) {
+                    filterBar
+                        .zIndex(1) // Ensure the filter bar stays on top
+                    
+                    searchBar
+                        .zIndex(1) // Ensure the search bar stays on top of content
+                        
+                }
+                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+                .frame(maxWidth: .infinity) // Ensure it spans the whole width
+                .padding(.top, 0) // Remove unnecessary top padding here, it’s managed by the ZStack
+                
             }
             .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-            
+            .navigationBarHidden(true) // Hide the navigation bar
+            .ignoresSafeArea(.all, edges: .top) // To fix the extra space at the top
         }
     }
+
+
+
     
     private func binding(for hike: Hike) -> Binding<Hike> {
         guard let index = hikes.firstIndex(where: { $0.id == hike.id }) else {
@@ -104,11 +118,10 @@ struct Hikes: View {
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
-            .padding(.top, 30)
         }
-        .frame(height: 60)
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
+
     // MARK: - Search bar
     private var searchBar: some View {
             HStack {
@@ -191,7 +204,7 @@ struct HikeCard: View {
                     .padding(.bottom, 8)
                     .padding(.leading, 5)
                 }
-                .frame(height: 25)
+                
             }
             .clipShape(Rectangle())
             .shadow(radius: 3)

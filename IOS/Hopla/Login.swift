@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KeychainAccess // For token
 
 struct Login: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
@@ -21,6 +22,8 @@ struct Login: View {
     @State private var passwordMismatchWarning: String? = nil // Check if password is the same
     
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
+    
+    @StateObject private var viewModel = LoginViewModel()
     
     var body: some View {
         NavigationStack {
@@ -40,7 +43,7 @@ struct Login: View {
                     
                     Text("Hopla")
                         .font(.system(size: 60, weight: .bold, design: .rounded))
-
+                    
                     Spacer()
                     
                     // MARK: - Text fields
@@ -114,8 +117,11 @@ struct Login: View {
                     // MARK: - Login
                     
                     Button(action: {
-                        // Simulating login, replace with actual authentication logic
-                        isLoggedIn = true
+                        if email.isEmpty || password.isEmpty {
+                            viewModel.errorMessage = "Email and password cannot be empty!"
+                        } else {
+                            viewModel.login(email: email, password: password)
+                        }
                     }) {
                         Text("Log In")
                             .foregroundColor(.white)
@@ -125,8 +131,14 @@ struct Login: View {
                             .cornerRadius(8)
                     }
                     .padding(.top, 30)
+                    .alert(isPresented: Binding<Bool>(
+                        get: { viewModel.errorMessage != nil },
+                        set: { _ in viewModel.errorMessage = nil }
+                    )) {
+                        Alert(title: Text("Login Failed"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
+                    }
+                    .padding(.top, 30)
                     .navigationBarBackButtonHidden(true) // Hide the back arrow
-                    
                     
                     Spacer()
                     
@@ -149,39 +161,39 @@ struct Login: View {
                         VStack(spacing: 20) {
                             Text("Enter your email address")
                                 .font(.headline)
-
+                            
                             TextField("Enter email address", text: $newEmail)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding()
-
+                            
                             Text("Enter a password")
                                 .font(.headline)
-
+                            
                             SecureField("Password", text: $newPassword)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding()
-
+                            
                             Text("Confirm password")
                                 .font(.headline)
-
+                            
                             SecureField("Confirm password", text: $confirmNewPassword)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding()
-
+                            
                             // Show warning if passwords do not match
                             if let warning = passwordMismatchWarning {
                                 Text(warning)
                                     .foregroundColor(.red)
                                     .font(.caption)
                             }
-
+                            
                             Text("Enter username")
                                 .font(.headline)
-
+                            
                             TextField("Username", text: $username)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding()
-
+                            
                             Button(action: {
                                 if newPassword == confirmNewPassword {
                                     password = newPassword
@@ -198,7 +210,7 @@ struct Login: View {
                                     .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                                     .cornerRadius(8)
                             }
-
+                            
                             Button("Cancel") {
                                 isShowingSignUp = false
                             }
@@ -207,6 +219,11 @@ struct Login: View {
                         .padding()
                     }
                 }
+                .onAppear {
+                                if let token = viewModel.getToken(), !token.isEmpty {
+                                    viewModel.isLoggedIn = true
+                                }
+                            }
             }
             .navigationBarHidden(true) // Hide navigation bar on the login screen
         }
@@ -226,14 +243,4 @@ struct Login: View {
         newEmail = ""
         newPassword = ""
     }
-}
-
-
-#Preview("English") {
-    Login()
-}
-
-#Preview("Norsk") {
-    Login()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
 }

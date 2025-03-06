@@ -14,7 +14,7 @@
 				5C53F63B615C49C159CEC84184FD1687 /* [CP] Copy XCFrameworks */,
 			);
 			dependencies = (
-				42F3B132831ABFB879ECB20C4CB073A6 /* PBXTargetDependency */,
+				0F8F413E4F7704C72C3DA361A4164E17 /* PBXTargetDependency */,
 			);
 			name = GooglePlaces;
 		};
@@ -25,7 +25,7 @@
 				9801DC96C44A55EEBAB39A01F1BB925C /* [CP] Copy XCFrameworks */,
 			);
 			dependencies = (
-				B0266C37F00EC34FBA122B804E71AD15 /* PBXTargetDependency */,
+				C0795BC0D8D37D9EAC34E39265C48F88 /* PBXTargetDependency */,
 			);
 			name = GoogleMaps;
 		};
@@ -33,100 +33,145 @@
 
 /* Begin PBXBuildFile section */
 		0E2710D18BE0B815C0CF65CCF230DD45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
-		3A91F58E557A084675C7D124A7C65308 /* Pods-HoplaUITests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FD7211A2F77FC072450FA5F7E3CFDDC /* Pods-HoplaUITests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		43780BF1975C0D22C11D65B4DE5E4A68 /* Pods-HoplaUITests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A26E6F2709A047410E240F69D19101CF /* Pods-HoplaUITests-dummy.m */; };
-		472EEA19A2B96E840A8649E128962790 /* Pods-Hopla-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A4149276EF532BBEAE5A71B60991311 /* Pods-Hopla-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4A2D4BD1D1E982D5144492594D8FCA25 /* Pods-HoplaTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9335F97346C074AB451C96D983771E23 /* Pods-HoplaTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0F4C08EE2CAE5F0B107F8750097D0E4D /* KeychainSwiftAccessOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2775489531D8F7BCF44E4F8ACE4E7F72 /* KeychainSwiftAccessOptions.swift */; };
+		16045CB28E4B10753B18B0DBC42757CC /* KeychainSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC9DECE7DAA39BE75EFE915ABDDBB7D /* KeychainSwift.swift */; };
+		3A91F58E557A084675C7D124A7C65308 /* Pods-HoplaUITests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 61E60DAD89AC24BE3639E3F08C90EFF0 /* Pods-HoplaUITests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		43780BF1975C0D22C11D65B4DE5E4A68 /* Pods-HoplaUITests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 19B13757AB28D73FAAB67401DB919F40 /* Pods-HoplaUITests-dummy.m */; };
+		48E25FC2E0734C378308159BC8E9A549 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EF623739FBBB58B7B65418A379CF3768 /* PrivacyInfo.xcprivacy */; };
+		4908EBE11E959B8A87033F53449EF578 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		4A2D4BD1D1E982D5144492594D8FCA25 /* Pods-HoplaTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 8023F8EB79CFD301B7F2685AB4BDD7B7 /* Pods-HoplaTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5238309692A38C0F71E77D3947CDAF52 /* TegKeychainConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7269B214F52AABE7B30CC30839FF986 /* TegKeychainConstants.swift */; };
+		6F52075060AF0BBE13D5B9A8AC90AF27 /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = FAF7C34D81FA063A8A0FBFB055ACF9D1 /* GoogleMaps.bundle */; };
+		77DBF2EE03BFCC3D1ADF93B24FEFA3A4 /* KeychainSwift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = BC0F380AC772B0960AC1E41EF2FA2B32 /* KeychainSwift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8096AF276A60A1F710EB2288E2A20FC1 /* KeychainSwift-KeychainSwift in Resources */ = {isa = PBXBuildFile; fileRef = 8C80BDFB0BFF9B8889024C8051802E85 /* KeychainSwift-KeychainSwift */; };
 		925F2EC8E4B324B43FF48F9C81A12D16 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
-		A3DF5D1028A05AEFB53A4D47B2A60F9E /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7AB5100A45144951550FA2BEB125B33C /* GoogleMaps.bundle */; };
-		E1FB3DD4F4D073BD09649F2B9D73AE82 /* GooglePlaces.bundle in Resources */ = {isa = PBXBuildFile; fileRef = C0456480E3BC28F880BDDCC03E2F0887 /* GooglePlaces.bundle */; };
-		F075E9E67436A60C533E6BD1DC89B5BD /* Pods-HoplaTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F3F2D57775309A434A8FBD43BA453 /* Pods-HoplaTests-dummy.m */; };
-		F8A7D4EAA53E024B084B75D4ECFCB2FA /* Pods-Hopla-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 28A3B7B1CF448B1A377A58BB8F709ED8 /* Pods-Hopla-dummy.m */; };
-		FC6EA5C6B0325FAA7E81B4B1198060A1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		AAB8E1585DE5C755EE84A7CFD695F50C /* GooglePlaces.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 156B3E2D6289FBF0C424DB76D34F679C /* GooglePlaces.bundle */; };
+		CA5F22E2F4367F3ACFC0DB9E9AE81EB0 /* Pods-Hopla-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FA9E024A5395CEABAA77C1906BEF1A2 /* Pods-Hopla-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E2D15EB4AE92F7598A116F90F280EAEF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		E62C65D8B50FA8305AA29B83F8D9DFCA /* KeychainSwift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C098AC99A58969D388F78EAF1FAB3E0 /* KeychainSwift-dummy.m */; };
+		F075E9E67436A60C533E6BD1DC89B5BD /* Pods-HoplaTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 505A21360C64254B64F742757C8AF804 /* Pods-HoplaTests-dummy.m */; };
+		F3CC6991A623B006D9F84DA423A4EDE3 /* Pods-Hopla-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E2D8B59E807689EAF7FF14AB33AB9F81 /* Pods-Hopla-dummy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7AA1EC76EFA854F834FE2AF9C55A9ABB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 285AAD0A8192022DACE2DAFE30D6CD52;
-			remoteInfo = "GooglePlaces-GooglePlacesResources";
-		};
-		8472F21A3D3EA01FF5A676D294EF04A4 /* PBXContainerItemProxy */ = {
+		3AE6A6A0902A5AFEBBB7BF0E6CBE34F8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = E5B4BBC6DD552AC8943C7E22772FC1D3;
 			remoteInfo = GoogleMaps;
 		};
-		C38FA8A0028D2E674FCB332F8D5197B4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0C1885900810601510E0C632060FAF26;
-			remoteInfo = GooglePlaces;
-		};
-		D858FB78FA587C1E37ABADBA81DF22C4 /* PBXContainerItemProxy */ = {
+		5932AE6BF2AEB59E622FA193802B4356 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 7B026DDDF280F148DD87281679B51154;
 			remoteInfo = "GoogleMaps-GoogleMapsResources";
 		};
+		5C11D74912E1BCF82FA9BA1432394D68 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B91D7B5B71EF69AF0B85811EF3BA2E1C;
+			remoteInfo = "KeychainSwift-KeychainSwift";
+		};
+		93DCBC100487BEBEFE81D548CAB9B075 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 285AAD0A8192022DACE2DAFE30D6CD52;
+			remoteInfo = "GooglePlaces-GooglePlacesResources";
+		};
+		DDED5DA30E8BF605A368347B65D46ED3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C1885900810601510E0C632060FAF26;
+			remoteInfo = GooglePlaces;
+		};
+		E0DF4F1D8DD2C0A232209F15F5A86B92 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07E54A78BCF82272E99319D7F7F5E8C1;
+			remoteInfo = KeychainSwift;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		024293BDB63A2A7A4C00057A05AB0F97 /* GooglePlaces.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GooglePlaces.release.xcconfig; sourceTree = "<group>"; };
-		089FF44F391BC57833B263107691370F /* Pods-Hopla.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Hopla.release.xcconfig"; sourceTree = "<group>"; };
-		0F4D2A2E51E482858899AF6A0576C3E7 /* Pods-HoplaUITests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-HoplaUITests.modulemap"; sourceTree = "<group>"; };
-		0FD7211A2F77FC072450FA5F7E3CFDDC /* Pods-HoplaUITests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-HoplaUITests-umbrella.h"; sourceTree = "<group>"; };
-		1023D750417A2046FAB89BEC7B920D50 /* Pods-Hopla-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Hopla-Info.plist"; sourceTree = "<group>"; };
-		16941AE538AF2666E900DAF6542FA325 /* Pods-Hopla.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Hopla.debug.xcconfig"; sourceTree = "<group>"; };
+		08FC8B73F06DC5FA3D3A04DFB67A33A3 /* Pods-Hopla-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Hopla-acknowledgements.markdown"; sourceTree = "<group>"; };
+		0973DB72CB8FB6C0778689DA9ADA1220 /* GMSEmpty.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GMSEmpty.h; path = Sources/GMSEmpty.h; sourceTree = "<group>"; };
+		09F8CC0EBD172A684F036BCC540421C0 /* Pods-HoplaTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		14A06B9FE050A07A8EA8992A62CBFD3F /* KeychainSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = KeychainSwift.debug.xcconfig; sourceTree = "<group>"; };
+		156B3E2D6289FBF0C424DB76D34F679C /* GooglePlaces.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GooglePlaces.bundle; path = Resources/GooglePlacesResources/GooglePlaces.bundle; sourceTree = "<group>"; };
 		191743BDA73C669882E0CA7B204BB308 /* Pods-HoplaUITests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-HoplaUITests"; path = Pods_HoplaUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1AB4313DD44C72308A6BBA7CF6E939E6 /* Pods-HoplaUITests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-HoplaUITests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		1F5E881404AE3656AC87E5E434BDF8E1 /* Pods-Hopla-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Hopla-acknowledgements.plist"; sourceTree = "<group>"; };
+		19B13757AB28D73FAAB67401DB919F40 /* Pods-HoplaUITests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-HoplaUITests-dummy.m"; sourceTree = "<group>"; };
+		19C01F1709C033BC5DE15D3BD595D74A /* ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist"; sourceTree = "<group>"; };
 		21BC9DE5EE18F27517C52ABD3FBF38ED /* GoogleMaps-GoogleMapsResources */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "GoogleMaps-GoogleMapsResources"; path = GoogleMapsResources.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		28A3B7B1CF448B1A377A58BB8F709ED8 /* Pods-Hopla-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Hopla-dummy.m"; sourceTree = "<group>"; };
-		2C199272963F1D0915CD56A1F3278582 /* GoogleMaps.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = GoogleMaps.xcframework; path = Maps/Frameworks/GoogleMaps.xcframework; sourceTree = "<group>"; };
-		2EC86CE590E1F15CCBAA0C937B244FF1 /* ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist"; sourceTree = "<group>"; };
-		32476C904355F94A02F88B52E7B09C41 /* GoogleMaps.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GoogleMaps.debug.xcconfig; sourceTree = "<group>"; };
+		2775489531D8F7BCF44E4F8ACE4E7F72 /* KeychainSwiftAccessOptions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KeychainSwiftAccessOptions.swift; path = Sources/KeychainSwiftAccessOptions.swift; sourceTree = "<group>"; };
+		286174B65597990DAB3C78C15A3A4696 /* Pods-Hopla-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Hopla-resources.sh"; sourceTree = "<group>"; };
+		29DD632BF2D70634CF15C9985B0415BD /* Pods-Hopla-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Hopla-acknowledgements.plist"; sourceTree = "<group>"; };
+		2A6FAE55B0DC4ED10AF03824ADBD1160 /* Pods-HoplaTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaTests-Info.plist"; sourceTree = "<group>"; };
 		384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		38736CD547FD0D5C37646E4B1D454A8A /* Pods-HoplaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		39B78FE23B518F52DE90AB53EF250839 /* Pods-HoplaTests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-HoplaTests"; path = Pods_HoplaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E5F3F2D57775309A434A8FBD43BA453 /* Pods-HoplaTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-HoplaTests-dummy.m"; sourceTree = "<group>"; };
+		3FA9E024A5395CEABAA77C1906BEF1A2 /* Pods-Hopla-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-Hopla-umbrella.h"; sourceTree = "<group>"; };
+		4745DF8A8AF61142F0FA5799691659FE /* ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist"; sourceTree = "<group>"; };
+		49EBBF80A81F91B8754B69BF5267A1E9 /* Pods-HoplaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4DDC6BE480370912EC5416E0A8ADD82A /* Pods-HoplaTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-HoplaTests.modulemap"; sourceTree = "<group>"; };
+		502414036C97EC6F8A1A58EBE0A1C728 /* Pods-Hopla.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-Hopla.modulemap"; sourceTree = "<group>"; };
+		505A21360C64254B64F742757C8AF804 /* Pods-HoplaTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-HoplaTests-dummy.m"; sourceTree = "<group>"; };
+		573B62AE7ECE8869A87661643ADFF236 /* Pods-HoplaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		58D55567BE5BB377C4B0D89C1322D23E /* GooglePlaces-GooglePlacesResources */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "GooglePlaces-GooglePlacesResources"; path = GooglePlacesResources.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		6A4149276EF532BBEAE5A71B60991311 /* Pods-Hopla-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-Hopla-umbrella.h"; sourceTree = "<group>"; };
-		6FE642DE423C85EE762891D06989F96C /* GooglePlaces-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "GooglePlaces-xcframeworks.sh"; sourceTree = "<group>"; };
-		79973C0E319D25F60F6AFACF8A26CE05 /* GoogleMaps-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "GoogleMaps-xcframeworks.sh"; sourceTree = "<group>"; };
-		79CD51C6A644B1A62D508302C3BCDE62 /* Pods-HoplaTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaTests-acknowledgements.plist"; sourceTree = "<group>"; };
-		7AB5100A45144951550FA2BEB125B33C /* GoogleMaps.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GoogleMaps.bundle; path = Maps/Resources/GoogleMapsResources/GoogleMaps.bundle; sourceTree = "<group>"; };
-		7CF9248A6B55F2493197860B0395FE0D /* Pods-Hopla.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-Hopla.modulemap"; sourceTree = "<group>"; };
+		5F2B308795C334192A6DC3EF94B86496 /* GoogleMaps-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "GoogleMaps-xcframeworks.sh"; sourceTree = "<group>"; };
+		61E60DAD89AC24BE3639E3F08C90EFF0 /* Pods-HoplaUITests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-HoplaUITests-umbrella.h"; sourceTree = "<group>"; };
+		633215022574C71A06D815F25D872D33 /* Pods-HoplaUITests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaUITests-acknowledgements.plist"; sourceTree = "<group>"; };
+		6DD8FD95AC222240C632EA17BC2D7590 /* GoogleMaps.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = GoogleMaps.xcframework; path = Maps/Frameworks/GoogleMaps.xcframework; sourceTree = "<group>"; };
+		8023F8EB79CFD301B7F2685AB4BDD7B7 /* Pods-HoplaTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-HoplaTests-umbrella.h"; sourceTree = "<group>"; };
+		8541CC60CD45BBFE0AD3F55B462B871F /* Pods-HoplaUITests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-HoplaUITests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		8C098AC99A58969D388F78EAF1FAB3E0 /* KeychainSwift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "KeychainSwift-dummy.m"; sourceTree = "<group>"; };
+		8C80BDFB0BFF9B8889024C8051802E85 /* KeychainSwift-KeychainSwift */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "KeychainSwift-KeychainSwift"; path = KeychainSwift.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F7C8BE31EA6E6F60D41DC765CAB01D8 /* ResourceBundle-KeychainSwift-KeychainSwift-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-KeychainSwift-KeychainSwift-Info.plist"; sourceTree = "<group>"; };
 		9030F6C9C9D9BFC6CE9611641C1E3DC0 /* Pods-Hopla */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-Hopla"; path = Pods_Hopla.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		91CD7E4EA16DD43B66CE7BC8B701C308 /* Pods-HoplaTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-HoplaTests.modulemap"; sourceTree = "<group>"; };
-		9335F97346C074AB451C96D983771E23 /* Pods-HoplaTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-HoplaTests-umbrella.h"; sourceTree = "<group>"; };
-		970387FF7B51F1F8DE8E912086FCE008 /* GMSEmpty.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GMSEmpty.h; path = Sources/GMSEmpty.h; sourceTree = "<group>"; };
+		96A52D7A288A15888C94E398B9440598 /* GooglePlaces.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = GooglePlaces.xcframework; path = Frameworks/GooglePlaces.xcframework; sourceTree = "<group>"; };
+		9A035C70D0D513A4008B271F925C1CAA /* KeychainSwift-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "KeychainSwift-Info.plist"; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9F20FDDE4F5F1A4074D069600D6326A7 /* Pods-HoplaTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaTests-Info.plist"; sourceTree = "<group>"; };
-		9F420AC84366AF9A1AF60706C0DD6F50 /* Pods-HoplaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaUITests.release.xcconfig"; sourceTree = "<group>"; };
-		A26E6F2709A047410E240F69D19101CF /* Pods-HoplaUITests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-HoplaUITests-dummy.m"; sourceTree = "<group>"; };
-		B175370FD4D9B90D5BD4574C8F8EE500 /* GooglePlaces.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GooglePlaces.debug.xcconfig; sourceTree = "<group>"; };
-		B58F8637AB0151BD70FA6854AF0A58BA /* Pods-Hopla-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Hopla-acknowledgements.markdown"; sourceTree = "<group>"; };
-		B6AD70274845DE0ADDC5FA13128378BC /* GooglePlaces.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = GooglePlaces.xcframework; path = Frameworks/GooglePlaces.xcframework; sourceTree = "<group>"; };
-		BC953C9B111D00CBFB465DA84944B5D5 /* Pods-HoplaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaTests.debug.xcconfig"; sourceTree = "<group>"; };
-		BE332EFF13C25A2FC6BB5AE107D4FB62 /* GoogleMaps.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GoogleMaps.release.xcconfig; sourceTree = "<group>"; };
-		C0456480E3BC28F880BDDCC03E2F0887 /* GooglePlaces.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GooglePlaces.bundle; path = Resources/GooglePlacesResources/GooglePlaces.bundle; sourceTree = "<group>"; };
-		C18BA670AA02E7FD3B747A25E9574863 /* GMSEmpty.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GMSEmpty.h; path = Maps/Sources/GMSEmpty.h; sourceTree = "<group>"; };
-		C91DDFF94C6F5FF291999E39A9EBCA99 /* Pods-Hopla-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Hopla-resources.sh"; sourceTree = "<group>"; };
-		E377F15204DA6C9313C0972A9E7DD152 /* Pods-HoplaUITests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaUITests-Info.plist"; sourceTree = "<group>"; };
-		E55154E2DCCC147E744F1CADA7A22A33 /* Pods-HoplaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaTests.release.xcconfig"; sourceTree = "<group>"; };
-		EB9D51B871290505EEDAE894DB75BBC3 /* Pods-HoplaUITests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaUITests-acknowledgements.plist"; sourceTree = "<group>"; };
-		F613498508B914AC4BE6D44959ECD9F9 /* Pods-HoplaTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-HoplaTests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		FE6AE565BB241F098DED3DDDD19C67A2 /* ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist"; sourceTree = "<group>"; };
+		9D9E4A694258C5BBFB9CAFA2D2EFD667 /* GooglePlaces.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GooglePlaces.debug.xcconfig; sourceTree = "<group>"; };
+		9E0FD012ADC3C7179C684035672383E5 /* KeychainSwift */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = KeychainSwift; path = KeychainSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A73A4159B7EC2F5805AAC4B25842E2BE /* Pods-Hopla.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Hopla.debug.xcconfig"; sourceTree = "<group>"; };
+		ABC9DECE7DAA39BE75EFE915ABDDBB7D /* KeychainSwift.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KeychainSwift.swift; path = Sources/KeychainSwift.swift; sourceTree = "<group>"; };
+		ABE897E61C46E3C79C10943CAE915213 /* GooglePlaces.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GooglePlaces.release.xcconfig; sourceTree = "<group>"; };
+		AD669636826CC3E618AC60B71D9197D8 /* Pods-Hopla.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Hopla.release.xcconfig"; sourceTree = "<group>"; };
+		BC0F380AC772B0960AC1E41EF2FA2B32 /* KeychainSwift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "KeychainSwift-umbrella.h"; sourceTree = "<group>"; };
+		CA8879191C01F64FA5E143C6E4002222 /* GoogleMaps.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GoogleMaps.release.xcconfig; sourceTree = "<group>"; };
+		D131E263EF515C24595E1E3D0BF9DAB6 /* Pods-HoplaUITests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-HoplaUITests.modulemap"; sourceTree = "<group>"; };
+		DC0DC5C5E8BF9B7E6273A1B9A42BEEA3 /* KeychainSwift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "KeychainSwift-prefix.pch"; sourceTree = "<group>"; };
+		DC858A1067844EBFC3A12CDEA48AA5A4 /* Pods-HoplaUITests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HoplaUITests-Info.plist"; sourceTree = "<group>"; };
+		DF7E087E910035D23059879533415EBD /* GoogleMaps.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GoogleMaps.debug.xcconfig; sourceTree = "<group>"; };
+		DFB1F0D8B0498F7AAB84617AFCE1AED9 /* Pods-HoplaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaUITests.release.xcconfig"; sourceTree = "<group>"; };
+		E2A03B08128D09B73781D5F176962969 /* GMSEmpty.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GMSEmpty.h; path = Maps/Sources/GMSEmpty.h; sourceTree = "<group>"; };
+		E2D8B59E807689EAF7FF14AB33AB9F81 /* Pods-Hopla-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Hopla-dummy.m"; sourceTree = "<group>"; };
+		E4EB5FA41C7C713565241BFAF60C67A4 /* Pods-HoplaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HoplaTests.release.xcconfig"; sourceTree = "<group>"; };
+		EF623739FBBB58B7B65418A379CF3768 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Sources/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		F0DFDE18EF353B291578420CDC6B6C31 /* GooglePlaces-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "GooglePlaces-xcframeworks.sh"; sourceTree = "<group>"; };
+		F692A074D564EA3BE031201D9947249D /* Pods-Hopla-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Hopla-Info.plist"; sourceTree = "<group>"; };
+		F7269B214F52AABE7B30CC30839FF986 /* TegKeychainConstants.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TegKeychainConstants.swift; path = Sources/TegKeychainConstants.swift; sourceTree = "<group>"; };
+		F74B4ABA73480BC7DA3B5DBBAF69BB84 /* Pods-HoplaTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-HoplaTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		F9BA47EF4C84D9C66B1A0530876CF4D6 /* Pods-Hopla-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Hopla-frameworks.sh"; sourceTree = "<group>"; };
+		FAF7C34D81FA063A8A0FBFB055ACF9D1 /* GoogleMaps.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GoogleMaps.bundle; path = Maps/Resources/GoogleMapsResources/GoogleMaps.bundle; sourceTree = "<group>"; };
+		FBFE5675999DC64EC52BAA16E30DF3E5 /* KeychainSwift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = KeychainSwift.modulemap; sourceTree = "<group>"; };
+		FDF1EF277E113A48753E56CCFE326CB0 /* KeychainSwift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = KeychainSwift.release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		2E5E3FD524ABA68D362E84CD8C398CE6 /* Frameworks */ = {
+		1E69B6911F10A4EA09B24DDE27D208B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4908EBE11E959B8A87033F53449EF578 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22503FA0B22F3A6CDEAB6827E9FB0D2D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -141,18 +186,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5CD039C7B894092D79147CC81576944B /* Frameworks */ = {
+		620345E986E876E624B8005D97BDCB02 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC6EA5C6B0325FAA7E81B4B1198060A1 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		608A2E89B9EC5545C8864270F87BCD22 /* Frameworks */ = {
+		66764611A26A78A9B6C2FBE6EF32C4C6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7D7EA1386A144548180835A8EC8F70BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2D15EB4AE92F7598A116F90F280EAEF /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,126 +219,135 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0484CF024A77792F14230D113470EF78 /* Pods-HoplaTests */ = {
+		09215D4C01CD579222468B65F889023E /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				91CD7E4EA16DD43B66CE7BC8B701C308 /* Pods-HoplaTests.modulemap */,
-				F613498508B914AC4BE6D44959ECD9F9 /* Pods-HoplaTests-acknowledgements.markdown */,
-				79CD51C6A644B1A62D508302C3BCDE62 /* Pods-HoplaTests-acknowledgements.plist */,
-				3E5F3F2D57775309A434A8FBD43BA453 /* Pods-HoplaTests-dummy.m */,
-				9F20FDDE4F5F1A4074D069600D6326A7 /* Pods-HoplaTests-Info.plist */,
-				9335F97346C074AB451C96D983771E23 /* Pods-HoplaTests-umbrella.h */,
-				BC953C9B111D00CBFB465DA84944B5D5 /* Pods-HoplaTests.debug.xcconfig */,
-				E55154E2DCCC147E744F1CADA7A22A33 /* Pods-HoplaTests.release.xcconfig */,
-			);
-			name = "Pods-HoplaTests";
-			path = "Target Support Files/Pods-HoplaTests";
-			sourceTree = "<group>";
-		};
-		4CA55AE697429CDACB037D20DDC2322F /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				C0456480E3BC28F880BDDCC03E2F0887 /* GooglePlaces.bundle */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
-		4DCB3087E87107AF76DBD0A8DD285252 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				2C199272963F1D0915CD56A1F3278582 /* GoogleMaps.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		51B8B5EB03171D86EF5E9546EDD81AC4 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				7AB5100A45144951550FA2BEB125B33C /* GoogleMaps.bundle */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
-		5407AF0228F75F2C0EC789EB61CC8CF8 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				79973C0E319D25F60F6AFACF8A26CE05 /* GoogleMaps-xcframeworks.sh */,
-				32476C904355F94A02F88B52E7B09C41 /* GoogleMaps.debug.xcconfig */,
-				BE332EFF13C25A2FC6BB5AE107D4FB62 /* GoogleMaps.release.xcconfig */,
-				2EC86CE590E1F15CCBAA0C937B244FF1 /* ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist */,
-			);
-			name = "Support Files";
-			path = "../Target Support Files/GoogleMaps";
-			sourceTree = "<group>";
-		};
-		59C5953A061D1F762E7FA1446138A160 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B6AD70274845DE0ADDC5FA13128378BC /* GooglePlaces.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		603C11A03101F4E0894B26EF5CE148B5 /* GooglePlaces */ = {
-			isa = PBXGroup;
-			children = (
-				970387FF7B51F1F8DE8E912086FCE008 /* GMSEmpty.h */,
-				59C5953A061D1F762E7FA1446138A160 /* Frameworks */,
-				4CA55AE697429CDACB037D20DDC2322F /* Resources */,
-				9BE883DCB1371AC5DB2DC599D3EBFB43 /* Support Files */,
-			);
-			name = GooglePlaces;
-			path = GooglePlaces;
-			sourceTree = "<group>";
-		};
-		65465CEA6F0434184185F6452784508D /* Pods-HoplaUITests */ = {
-			isa = PBXGroup;
-			children = (
-				0F4D2A2E51E482858899AF6A0576C3E7 /* Pods-HoplaUITests.modulemap */,
-				1AB4313DD44C72308A6BBA7CF6E939E6 /* Pods-HoplaUITests-acknowledgements.markdown */,
-				EB9D51B871290505EEDAE894DB75BBC3 /* Pods-HoplaUITests-acknowledgements.plist */,
-				A26E6F2709A047410E240F69D19101CF /* Pods-HoplaUITests-dummy.m */,
-				E377F15204DA6C9313C0972A9E7DD152 /* Pods-HoplaUITests-Info.plist */,
-				0FD7211A2F77FC072450FA5F7E3CFDDC /* Pods-HoplaUITests-umbrella.h */,
-				38736CD547FD0D5C37646E4B1D454A8A /* Pods-HoplaUITests.debug.xcconfig */,
-				9F420AC84366AF9A1AF60706C0DD6F50 /* Pods-HoplaUITests.release.xcconfig */,
-			);
-			name = "Pods-HoplaUITests";
-			path = "Target Support Files/Pods-HoplaUITests";
-			sourceTree = "<group>";
-		};
-		6ACD42B3DE65899EF1575C9B88FCB3C0 /* Targets Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				6F1F68E903D890D064DB65BF48EA75C5 /* Pods-Hopla */,
-				0484CF024A77792F14230D113470EF78 /* Pods-HoplaTests */,
-				65465CEA6F0434184185F6452784508D /* Pods-HoplaUITests */,
+				46542E63CD5390CF338C582BE60A54A7 /* Pods-Hopla */,
+				8EDE13F5A0F43F62008B564E4455BF43 /* Pods-HoplaTests */,
+				D8CAA4A6DFCC28768A6FC69BE1004F27 /* Pods-HoplaUITests */,
 			);
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
-		6F1F68E903D890D064DB65BF48EA75C5 /* Pods-Hopla */ = {
+		196816186FAAE2441E9C8F097C0F2803 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				7CF9248A6B55F2493197860B0395FE0D /* Pods-Hopla.modulemap */,
-				B58F8637AB0151BD70FA6854AF0A58BA /* Pods-Hopla-acknowledgements.markdown */,
-				1F5E881404AE3656AC87E5E434BDF8E1 /* Pods-Hopla-acknowledgements.plist */,
-				28A3B7B1CF448B1A377A58BB8F709ED8 /* Pods-Hopla-dummy.m */,
-				1023D750417A2046FAB89BEC7B920D50 /* Pods-Hopla-Info.plist */,
-				C91DDFF94C6F5FF291999E39A9EBCA99 /* Pods-Hopla-resources.sh */,
-				6A4149276EF532BBEAE5A71B60991311 /* Pods-Hopla-umbrella.h */,
-				16941AE538AF2666E900DAF6542FA325 /* Pods-Hopla.debug.xcconfig */,
-				089FF44F391BC57833B263107691370F /* Pods-Hopla.release.xcconfig */,
+				F0DFDE18EF353B291578420CDC6B6C31 /* GooglePlaces-xcframeworks.sh */,
+				9D9E4A694258C5BBFB9CAFA2D2EFD667 /* GooglePlaces.debug.xcconfig */,
+				ABE897E61C46E3C79C10943CAE915213 /* GooglePlaces.release.xcconfig */,
+				4745DF8A8AF61142F0FA5799691659FE /* ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/GooglePlaces";
+			sourceTree = "<group>";
+		};
+		46542E63CD5390CF338C582BE60A54A7 /* Pods-Hopla */ = {
+			isa = PBXGroup;
+			children = (
+				502414036C97EC6F8A1A58EBE0A1C728 /* Pods-Hopla.modulemap */,
+				08FC8B73F06DC5FA3D3A04DFB67A33A3 /* Pods-Hopla-acknowledgements.markdown */,
+				29DD632BF2D70634CF15C9985B0415BD /* Pods-Hopla-acknowledgements.plist */,
+				E2D8B59E807689EAF7FF14AB33AB9F81 /* Pods-Hopla-dummy.m */,
+				F9BA47EF4C84D9C66B1A0530876CF4D6 /* Pods-Hopla-frameworks.sh */,
+				F692A074D564EA3BE031201D9947249D /* Pods-Hopla-Info.plist */,
+				286174B65597990DAB3C78C15A3A4696 /* Pods-Hopla-resources.sh */,
+				3FA9E024A5395CEABAA77C1906BEF1A2 /* Pods-Hopla-umbrella.h */,
+				A73A4159B7EC2F5805AAC4B25842E2BE /* Pods-Hopla.debug.xcconfig */,
+				AD669636826CC3E618AC60B71D9197D8 /* Pods-Hopla.release.xcconfig */,
 			);
 			name = "Pods-Hopla";
 			path = "Target Support Files/Pods-Hopla";
 			sourceTree = "<group>";
 		};
-		9A3B043859B3A0F958AA917BC9454A90 /* Products */ = {
+		498781A579C8997CC8295392BFC127CB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C862FAE3D851C88657EFC9783ACCAA18 /* GoogleMaps */,
+				919F5A084331F368E0FE5C205229A71F /* GooglePlaces */,
+				CB9D1B05473E28CB297184EA3B4AC3BE /* KeychainSwift */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		4C5FEF9B985CFD1235A220A9E91A689A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				EF623739FBBB58B7B65418A379CF3768 /* PrivacyInfo.xcprivacy */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		6315FCE329A1D9F9F982EEFB1F94842F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				156B3E2D6289FBF0C424DB76D34F679C /* GooglePlaces.bundle */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		730A1135CCE5E525E4096617C1A9308B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FAF7C34D81FA063A8A0FBFB055ACF9D1 /* GoogleMaps.bundle */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		8731F4B23BD385423BC27B29F2EF78DB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6DD8FD95AC222240C632EA17BC2D7590 /* GoogleMaps.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8EDE13F5A0F43F62008B564E4455BF43 /* Pods-HoplaTests */ = {
+			isa = PBXGroup;
+			children = (
+				4DDC6BE480370912EC5416E0A8ADD82A /* Pods-HoplaTests.modulemap */,
+				F74B4ABA73480BC7DA3B5DBBAF69BB84 /* Pods-HoplaTests-acknowledgements.markdown */,
+				09F8CC0EBD172A684F036BCC540421C0 /* Pods-HoplaTests-acknowledgements.plist */,
+				505A21360C64254B64F742757C8AF804 /* Pods-HoplaTests-dummy.m */,
+				2A6FAE55B0DC4ED10AF03824ADBD1160 /* Pods-HoplaTests-Info.plist */,
+				8023F8EB79CFD301B7F2685AB4BDD7B7 /* Pods-HoplaTests-umbrella.h */,
+				49EBBF80A81F91B8754B69BF5267A1E9 /* Pods-HoplaTests.debug.xcconfig */,
+				E4EB5FA41C7C713565241BFAF60C67A4 /* Pods-HoplaTests.release.xcconfig */,
+			);
+			name = "Pods-HoplaTests";
+			path = "Target Support Files/Pods-HoplaTests";
+			sourceTree = "<group>";
+		};
+		919F5A084331F368E0FE5C205229A71F /* GooglePlaces */ = {
+			isa = PBXGroup;
+			children = (
+				0973DB72CB8FB6C0778689DA9ADA1220 /* GMSEmpty.h */,
+				C927DE2AB0C8278DC7FD4530DD3D3B27 /* Frameworks */,
+				6315FCE329A1D9F9F982EEFB1F94842F /* Resources */,
+				196816186FAAE2441E9C8F097C0F2803 /* Support Files */,
+			);
+			name = GooglePlaces;
+			path = GooglePlaces;
+			sourceTree = "<group>";
+		};
+		9FF540BE5AEF7BE7C6668C3986397F1D /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				5F2B308795C334192A6DC3EF94B86496 /* GoogleMaps-xcframeworks.sh */,
+				DF7E087E910035D23059879533415EBD /* GoogleMaps.debug.xcconfig */,
+				CA8879191C01F64FA5E143C6E4002222 /* GoogleMaps.release.xcconfig */,
+				19C01F1709C033BC5DE15D3BD595D74A /* ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/GoogleMaps";
+			sourceTree = "<group>";
+		};
+		B6E8532915E3B143229DCFD0AA8F80D7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				21BC9DE5EE18F27517C52ABD3FBF38ED /* GoogleMaps-GoogleMapsResources */,
 				58D55567BE5BB377C4B0D89C1322D23E /* GooglePlaces-GooglePlacesResources */,
+				9E0FD012ADC3C7179C684035672383E5 /* KeychainSwift */,
+				8C80BDFB0BFF9B8889024C8051802E85 /* KeychainSwift-KeychainSwift */,
 				9030F6C9C9D9BFC6CE9611641C1E3DC0 /* Pods-Hopla */,
 				39B78FE23B518F52DE90AB53EF250839 /* Pods-HoplaTests */,
 				191743BDA73C669882E0CA7B204BB308 /* Pods-HoplaUITests */,
@@ -294,45 +355,35 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9BE883DCB1371AC5DB2DC599D3EBFB43 /* Support Files */ = {
+		C862FAE3D851C88657EFC9783ACCAA18 /* GoogleMaps */ = {
 			isa = PBXGroup;
 			children = (
-				6FE642DE423C85EE762891D06989F96C /* GooglePlaces-xcframeworks.sh */,
-				B175370FD4D9B90D5BD4574C8F8EE500 /* GooglePlaces.debug.xcconfig */,
-				024293BDB63A2A7A4C00057A05AB0F97 /* GooglePlaces.release.xcconfig */,
-				FE6AE565BB241F098DED3DDDD19C67A2 /* ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist */,
-			);
-			name = "Support Files";
-			path = "../Target Support Files/GooglePlaces";
-			sourceTree = "<group>";
-		};
-		9EDA996275FBD64932558D6348420E26 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				B1F899EF16C439538BA8E47CABD3C017 /* GoogleMaps */,
-				603C11A03101F4E0894B26EF5CE148B5 /* GooglePlaces */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		B1F899EF16C439538BA8E47CABD3C017 /* GoogleMaps */ = {
-			isa = PBXGroup;
-			children = (
-				B5A79635033870AA76ED4D76A05EF171 /* Maps */,
-				5407AF0228F75F2C0EC789EB61CC8CF8 /* Support Files */,
+				D3B2EE0F5E3D23EDBE045ADB35B8438F /* Maps */,
+				9FF540BE5AEF7BE7C6668C3986397F1D /* Support Files */,
 			);
 			name = GoogleMaps;
 			path = GoogleMaps;
 			sourceTree = "<group>";
 		};
-		B5A79635033870AA76ED4D76A05EF171 /* Maps */ = {
+		C927DE2AB0C8278DC7FD4530DD3D3B27 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C18BA670AA02E7FD3B747A25E9574863 /* GMSEmpty.h */,
-				4DCB3087E87107AF76DBD0A8DD285252 /* Frameworks */,
-				51B8B5EB03171D86EF5E9546EDD81AC4 /* Resources */,
+				96A52D7A288A15888C94E398B9440598 /* GooglePlaces.xcframework */,
 			);
-			name = Maps;
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CB9D1B05473E28CB297184EA3B4AC3BE /* KeychainSwift */ = {
+			isa = PBXGroup;
+			children = (
+				ABC9DECE7DAA39BE75EFE915ABDDBB7D /* KeychainSwift.swift */,
+				2775489531D8F7BCF44E4F8ACE4E7F72 /* KeychainSwiftAccessOptions.swift */,
+				F7269B214F52AABE7B30CC30839FF986 /* TegKeychainConstants.swift */,
+				4C5FEF9B985CFD1235A220A9E91A689A /* Resources */,
+				D81771FF440A5757528ABAB15DAFE425 /* Support Files */,
+			);
+			name = KeychainSwift;
+			path = KeychainSwift;
 			sourceTree = "<group>";
 		};
 		CF1408CF629C7361332E53B88F7BD30C = {
@@ -340,9 +391,9 @@
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
 				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
-				9EDA996275FBD64932558D6348420E26 /* Pods */,
-				9A3B043859B3A0F958AA917BC9454A90 /* Products */,
-				6ACD42B3DE65899EF1575C9B88FCB3C0 /* Targets Support Files */,
+				498781A579C8997CC8295392BFC127CB /* Pods */,
+				B6E8532915E3B143229DCFD0AA8F80D7 /* Products */,
+				09215D4C01CD579222468B65F889023E /* Targets Support Files */,
 			);
 			sourceTree = "<group>";
 		};
@@ -352,6 +403,48 @@
 				E4801F62A6B08CD9B5410329F1A18FDE /* iOS */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D3B2EE0F5E3D23EDBE045ADB35B8438F /* Maps */ = {
+			isa = PBXGroup;
+			children = (
+				E2A03B08128D09B73781D5F176962969 /* GMSEmpty.h */,
+				8731F4B23BD385423BC27B29F2EF78DB /* Frameworks */,
+				730A1135CCE5E525E4096617C1A9308B /* Resources */,
+			);
+			name = Maps;
+			sourceTree = "<group>";
+		};
+		D81771FF440A5757528ABAB15DAFE425 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				FBFE5675999DC64EC52BAA16E30DF3E5 /* KeychainSwift.modulemap */,
+				8C098AC99A58969D388F78EAF1FAB3E0 /* KeychainSwift-dummy.m */,
+				9A035C70D0D513A4008B271F925C1CAA /* KeychainSwift-Info.plist */,
+				DC0DC5C5E8BF9B7E6273A1B9A42BEEA3 /* KeychainSwift-prefix.pch */,
+				BC0F380AC772B0960AC1E41EF2FA2B32 /* KeychainSwift-umbrella.h */,
+				14A06B9FE050A07A8EA8992A62CBFD3F /* KeychainSwift.debug.xcconfig */,
+				FDF1EF277E113A48753E56CCFE326CB0 /* KeychainSwift.release.xcconfig */,
+				8F7C8BE31EA6E6F60D41DC765CAB01D8 /* ResourceBundle-KeychainSwift-KeychainSwift-Info.plist */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/KeychainSwift";
+			sourceTree = "<group>";
+		};
+		D8CAA4A6DFCC28768A6FC69BE1004F27 /* Pods-HoplaUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D131E263EF515C24595E1E3D0BF9DAB6 /* Pods-HoplaUITests.modulemap */,
+				8541CC60CD45BBFE0AD3F55B462B871F /* Pods-HoplaUITests-acknowledgements.markdown */,
+				633215022574C71A06D815F25D872D33 /* Pods-HoplaUITests-acknowledgements.plist */,
+				19B13757AB28D73FAAB67401DB919F40 /* Pods-HoplaUITests-dummy.m */,
+				DC858A1067844EBFC3A12CDEA48AA5A4 /* Pods-HoplaUITests-Info.plist */,
+				61E60DAD89AC24BE3639E3F08C90EFF0 /* Pods-HoplaUITests-umbrella.h */,
+				573B62AE7ECE8869A87661643ADFF236 /* Pods-HoplaUITests.debug.xcconfig */,
+				DFB1F0D8B0498F7AAB84617AFCE1AED9 /* Pods-HoplaUITests.release.xcconfig */,
+			);
+			name = "Pods-HoplaUITests";
+			path = "Target Support Files/Pods-HoplaUITests";
 			sourceTree = "<group>";
 		};
 		E4801F62A6B08CD9B5410329F1A18FDE /* iOS */ = {
@@ -365,6 +458,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		44DA79D4929176968629197A65EB901F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77DBF2EE03BFCC3D1ADF93B24FEFA3A4 /* KeychainSwift-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6963DB499B75B7CBAE746F214CA47670 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -381,24 +482,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7262076E908EB720C8189477E22BFD2B /* Headers */ = {
+		811E61B82679BD48D376A08FC87A3A76 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				472EEA19A2B96E840A8649E128962790 /* Pods-Hopla-umbrella.h in Headers */,
+				CA5F22E2F4367F3ACFC0DB9E9AE81EB0 /* Pods-Hopla-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		07E54A78BCF82272E99319D7F7F5E8C1 /* KeychainSwift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB3ADBEA51DB679547C8F3B6DAA986A6 /* Build configuration list for PBXNativeTarget "KeychainSwift" */;
+			buildPhases = (
+				44DA79D4929176968629197A65EB901F /* Headers */,
+				CF32726050F3F639FD1638004543B6E1 /* Sources */,
+				1E69B6911F10A4EA09B24DDE27D208B1 /* Frameworks */,
+				2FDCB5797507073E121083A2AFA1DDE5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E1AD425A5CB0DDBC37522890A7A23356 /* PBXTargetDependency */,
+			);
+			name = KeychainSwift;
+			productName = KeychainSwift;
+			productReference = 9E0FD012ADC3C7179C684035672383E5 /* KeychainSwift */;
+			productType = "com.apple.product-type.framework";
+		};
 		285AAD0A8192022DACE2DAFE30D6CD52 /* GooglePlaces-GooglePlacesResources */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5CD72C17C73B6808B9FAA542E186D868 /* Build configuration list for PBXNativeTarget "GooglePlaces-GooglePlacesResources" */;
+			buildConfigurationList = AB085FD43C7CF729ECA86AA1D6691083 /* Build configuration list for PBXNativeTarget "GooglePlaces-GooglePlacesResources" */;
 			buildPhases = (
-				FA6E8948DE53E787B1FAFE8C2E752775 /* Sources */,
-				608A2E89B9EC5545C8864270F87BCD22 /* Frameworks */,
-				C2D941B1F48A9393F3C3195F091A04DF /* Resources */,
+				C15F9BFB206087DF198B11A66C401AC9 /* Sources */,
+				620345E986E876E624B8005D97BDCB02 /* Frameworks */,
+				1016EAB734C527CD51203F0B9241BF75 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -411,11 +531,11 @@
 		};
 		7B026DDDF280F148DD87281679B51154 /* GoogleMaps-GoogleMapsResources */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 338F03E05ABB97E7573ECD02B49D82D6 /* Build configuration list for PBXNativeTarget "GoogleMaps-GoogleMapsResources" */;
+			buildConfigurationList = 39EC720AAA7B13D32A540D4EC129E994 /* Build configuration list for PBXNativeTarget "GoogleMaps-GoogleMapsResources" */;
 			buildPhases = (
-				62E0FF6969BB2BF233FE2401610ECFFF /* Sources */,
-				2E5E3FD524ABA68D362E84CD8C398CE6 /* Frameworks */,
-				988A17215F75005EB00D83A4357739C4 /* Resources */,
+				437A033378A6B41C606B16B0F6D0BE48 /* Sources */,
+				66764611A26A78A9B6C2FBE6EF32C4C6 /* Frameworks */,
+				E5A569B3AAF9165356904AE3BD1C22AE /* Resources */,
 			);
 			buildRules = (
 			);
@@ -428,23 +548,41 @@
 		};
 		A9C33B862752CCC103960C382F65918E /* Pods-Hopla */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 94CD4F2BB73E3CD7BCE16C48422744D3 /* Build configuration list for PBXNativeTarget "Pods-Hopla" */;
+			buildConfigurationList = AEA62F9E47E3216882E4CBC9B85C6F40 /* Build configuration list for PBXNativeTarget "Pods-Hopla" */;
 			buildPhases = (
-				7262076E908EB720C8189477E22BFD2B /* Headers */,
-				1B3DF62C1BA1B831730A8FA8F0EA5359 /* Sources */,
-				5CD039C7B894092D79147CC81576944B /* Frameworks */,
-				515F36CC4BA4E22CB534BE1E82F5C4F4 /* Resources */,
+				811E61B82679BD48D376A08FC87A3A76 /* Headers */,
+				A8D8CC9BC4B9F498CF965927656CB0C2 /* Sources */,
+				7D7EA1386A144548180835A8EC8F70BE /* Frameworks */,
+				97568CBEED15D9C9B79A79254E3163E7 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E1C05338568407120942B1D9FFBBAC32 /* PBXTargetDependency */,
-				822873D1A71D3EE7CEE081A2024E30AD /* PBXTargetDependency */,
+				CFBDEE9F00EA3A76BA59ABD4CCE3E9A4 /* PBXTargetDependency */,
+				DA486916D1C17C2C153E69990CA1ED94 /* PBXTargetDependency */,
+				B87D2378DD116B0778F587DB45ABD951 /* PBXTargetDependency */,
 			);
 			name = "Pods-Hopla";
 			productName = Pods_Hopla;
 			productReference = 9030F6C9C9D9BFC6CE9611641C1E3DC0 /* Pods-Hopla */;
 			productType = "com.apple.product-type.framework";
+		};
+		B91D7B5B71EF69AF0B85811EF3BA2E1C /* KeychainSwift-KeychainSwift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD83C3885E346CC84DE2FBFEA83088D1 /* Build configuration list for PBXNativeTarget "KeychainSwift-KeychainSwift" */;
+			buildPhases = (
+				8EB096F4E671ABFA8C22B7127C51CC3F /* Sources */,
+				22503FA0B22F3A6CDEAB6827E9FB0D2D /* Frameworks */,
+				58A5CF8309AD2CCCF07E6E566BB479C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "KeychainSwift-KeychainSwift";
+			productName = KeychainSwift;
+			productReference = 8C80BDFB0BFF9B8889024C8051802E85 /* KeychainSwift-KeychainSwift */;
+			productType = "com.apple.product-type.bundle";
 		};
 		BFB73154E9865B6D81FF3600C7C613F2 /* Pods-HoplaTests */ = {
 			isa = PBXNativeTarget;
@@ -502,7 +640,7 @@
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
 			minimizedProjectReferenceProxies = 0;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 9A3B043859B3A0F958AA917BC9454A90 /* Products */;
+			productRefGroup = B6E8532915E3B143229DCFD0AA8F80D7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -510,6 +648,8 @@
 				7B026DDDF280F148DD87281679B51154 /* GoogleMaps-GoogleMapsResources */,
 				0C1885900810601510E0C632060FAF26 /* GooglePlaces */,
 				285AAD0A8192022DACE2DAFE30D6CD52 /* GooglePlaces-GooglePlacesResources */,
+				07E54A78BCF82272E99319D7F7F5E8C1 /* KeychainSwift */,
+				B91D7B5B71EF69AF0B85811EF3BA2E1C /* KeychainSwift-KeychainSwift */,
 				A9C33B862752CCC103960C382F65918E /* Pods-Hopla */,
 				BFB73154E9865B6D81FF3600C7C613F2 /* Pods-HoplaTests */,
 				D3C5246F270569C0C94FD25C577D45EE /* Pods-HoplaUITests */,
@@ -518,10 +658,27 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		515F36CC4BA4E22CB534BE1E82F5C4F4 /* Resources */ = {
+		1016EAB734C527CD51203F0B9241BF75 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAB8E1585DE5C755EE84A7CFD695F50C /* GooglePlaces.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2FDCB5797507073E121083A2AFA1DDE5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8096AF276A60A1F710EB2288E2A20FC1 /* KeychainSwift-KeychainSwift in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		58A5CF8309AD2CCCF07E6E566BB479C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48E25FC2E0734C378308159BC8E9A549 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,11 +689,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		988A17215F75005EB00D83A4357739C4 /* Resources */ = {
+		97568CBEED15D9C9B79A79254E3163E7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3DF5D1028A05AEFB53A4D47B2A60F9E /* GoogleMaps.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,11 +703,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C2D941B1F48A9393F3C3195F091A04DF /* Resources */ = {
+		E5A569B3AAF9165356904AE3BD1C22AE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1FB3DD4F4D073BD09649F2B9D73AE82 /* GooglePlaces.bundle in Resources */,
+				6F52075060AF0BBE13D5B9A8AC90AF27 /* GoogleMaps.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -595,14 +751,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1B3DF62C1BA1B831730A8FA8F0EA5359 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F8A7D4EAA53E024B084B75D4ECFCB2FA /* Pods-Hopla-dummy.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		323F529D4EE69B58EAC4CE925D210A7E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -611,17 +759,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		62E0FF6969BB2BF233FE2401610ECFFF /* Sources */ = {
+		437A033378A6B41C606B16B0F6D0BE48 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FA6E8948DE53E787B1FAFE8C2E752775 /* Sources */ = {
+		8EB096F4E671ABFA8C22B7127C51CC3F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A8D8CC9BC4B9F498CF965927656CB0C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F3CC6991A623B006D9F84DA423A4EDE3 /* Pods-Hopla-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C15F9BFB206087DF198B11A66C401AC9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CF32726050F3F639FD1638004543B6E1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16045CB28E4B10753B18B0DBC42757CC /* KeychainSwift.swift in Sources */,
+				E62C65D8B50FA8305AA29B83F8D9DFCA /* KeychainSwift-dummy.m in Sources */,
+				0F4C08EE2CAE5F0B107F8750097D0E4D /* KeychainSwiftAccessOptions.swift in Sources */,
+				5238309692A38C0F71E77D3947CDAF52 /* TegKeychainConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -636,53 +810,48 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		42F3B132831ABFB879ECB20C4CB073A6 /* PBXTargetDependency */ = {
+		0F8F413E4F7704C72C3DA361A4164E17 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "GooglePlaces-GooglePlacesResources";
 			target = 285AAD0A8192022DACE2DAFE30D6CD52 /* GooglePlaces-GooglePlacesResources */;
-			targetProxy = 7AA1EC76EFA854F834FE2AF9C55A9ABB /* PBXContainerItemProxy */;
+			targetProxy = 93DCBC100487BEBEFE81D548CAB9B075 /* PBXContainerItemProxy */;
 		};
-		822873D1A71D3EE7CEE081A2024E30AD /* PBXTargetDependency */ = {
+		B87D2378DD116B0778F587DB45ABD951 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = GooglePlaces;
-			target = 0C1885900810601510E0C632060FAF26 /* GooglePlaces */;
-			targetProxy = C38FA8A0028D2E674FCB332F8D5197B4 /* PBXContainerItemProxy */;
+			name = KeychainSwift;
+			target = 07E54A78BCF82272E99319D7F7F5E8C1 /* KeychainSwift */;
+			targetProxy = E0DF4F1D8DD2C0A232209F15F5A86B92 /* PBXContainerItemProxy */;
 		};
-		B0266C37F00EC34FBA122B804E71AD15 /* PBXTargetDependency */ = {
+		C0795BC0D8D37D9EAC34E39265C48F88 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "GoogleMaps-GoogleMapsResources";
 			target = 7B026DDDF280F148DD87281679B51154 /* GoogleMaps-GoogleMapsResources */;
-			targetProxy = D858FB78FA587C1E37ABADBA81DF22C4 /* PBXContainerItemProxy */;
+			targetProxy = 5932AE6BF2AEB59E622FA193802B4356 /* PBXContainerItemProxy */;
 		};
-		E1C05338568407120942B1D9FFBBAC32 /* PBXTargetDependency */ = {
+		CFBDEE9F00EA3A76BA59ABD4CCE3E9A4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = GoogleMaps;
 			target = E5B4BBC6DD552AC8943C7E22772FC1D3 /* GoogleMaps */;
-			targetProxy = 8472F21A3D3EA01FF5A676D294EF04A4 /* PBXContainerItemProxy */;
+			targetProxy = 3AE6A6A0902A5AFEBBB7BF0E6CBE34F8 /* PBXContainerItemProxy */;
+		};
+		DA486916D1C17C2C153E69990CA1ED94 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = GooglePlaces;
+			target = 0C1885900810601510E0C632060FAF26 /* GooglePlaces */;
+			targetProxy = DDED5DA30E8BF605A368347B65D46ED3 /* PBXContainerItemProxy */;
+		};
+		E1AD425A5CB0DDBC37522890A7A23356 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "KeychainSwift-KeychainSwift";
+			target = B91D7B5B71EF69AF0B85811EF3BA2E1C /* KeychainSwift-KeychainSwift */;
+			targetProxy = 5C11D74912E1BCF82FA9BA1432394D68 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		027F13E43433D1A09B59D484F6BFB482 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = B175370FD4D9B90D5BD4574C8F8EE500 /* GooglePlaces.debug.xcconfig */;
-			buildSettings = {
-				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GooglePlaces";
-				IBSC_MODULE = GooglePlaces;
-				INFOPLIST_FILE = "Target Support Files/GooglePlaces/ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_NAME = GooglePlacesResources;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
 		0294E14E225E1D28BFB9CB27413C3E81 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 024293BDB63A2A7A4C00057A05AB0F97 /* GooglePlaces.release.xcconfig */;
+			baseConfigurationReference = ABE897E61C46E3C79C10943CAE915213 /* GooglePlaces.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -701,7 +870,7 @@
 		};
 		03AF7043535FFDA7AE31F2CE8246A436 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B175370FD4D9B90D5BD4574C8F8EE500 /* GooglePlaces.debug.xcconfig */;
+			baseConfigurationReference = 9D9E4A694258C5BBFB9CAFA2D2EFD667 /* GooglePlaces.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -719,7 +888,7 @@
 		};
 		04B5D4EFCC712770E3400CC3F0E1EB86 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 38736CD547FD0D5C37646E4B1D454A8A /* Pods-HoplaUITests.debug.xcconfig */;
+			baseConfigurationReference = 573B62AE7ECE8869A87661643ADFF236 /* Pods-HoplaUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -758,7 +927,7 @@
 		};
 		10F56B4DCD9C061397AFD68BE715CBA1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E55154E2DCCC147E744F1CADA7A22A33 /* Pods-HoplaTests.release.xcconfig */;
+			baseConfigurationReference = E4EB5FA41C7C713565241BFAF60C67A4 /* Pods-HoplaTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -796,9 +965,43 @@
 			};
 			name = Release;
 		};
+		20017338B42FAB5BACEBE490CD4FDF2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 14A06B9FE050A07A8EA8992A62CBFD3F /* KeychainSwift.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/KeychainSwift";
+				IBSC_MODULE = KeychainSwift;
+				INFOPLIST_FILE = "Target Support Files/KeychainSwift/ResourceBundle-KeychainSwift-KeychainSwift-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_NAME = KeychainSwift;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		274AE4C942F27615B7E1880A6FA08699 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FDF1EF277E113A48753E56CCFE326CB0 /* KeychainSwift.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/KeychainSwift";
+				IBSC_MODULE = KeychainSwift;
+				INFOPLIST_FILE = "Target Support Files/KeychainSwift/ResourceBundle-KeychainSwift-KeychainSwift-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_NAME = KeychainSwift;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
 		2C01DB20066103C1FE51FECC7AE3EA84 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9F420AC84366AF9A1AF60706C0DD6F50 /* Pods-HoplaUITests.release.xcconfig */;
+			baseConfigurationReference = DFB1F0D8B0498F7AAB84617AFCE1AED9 /* Pods-HoplaUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -900,7 +1103,7 @@
 		};
 		420E148215EC1473E460FB1F347E336C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32476C904355F94A02F88B52E7B09C41 /* GoogleMaps.debug.xcconfig */;
+			baseConfigurationReference = DF7E087E910035D23059879533415EBD /* GoogleMaps.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -917,9 +1120,142 @@
 			};
 			name = Debug;
 		};
-		792BB1372CC6430CB8D138B536DE1FBA /* Release */ = {
+		4C1E48F682589AA758D9734E82FB9B0A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 024293BDB63A2A7A4C00057A05AB0F97 /* GooglePlaces.release.xcconfig */;
+			baseConfigurationReference = FDF1EF277E113A48753E56CCFE326CB0 /* KeychainSwift.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/KeychainSwift/KeychainSwift-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/KeychainSwift/KeychainSwift-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/KeychainSwift/KeychainSwift.modulemap";
+				PRODUCT_MODULE_NAME = KeychainSwift;
+				PRODUCT_NAME = KeychainSwift;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		71F68DB21B89FE7CD2687B7163CE883E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF7E087E910035D23059879533415EBD /* GoogleMaps.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleMaps";
+				IBSC_MODULE = GoogleMaps;
+				INFOPLIST_FILE = "Target Support Files/GoogleMaps/ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = GoogleMapsResources;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		736EAF625707DBBD08916A6837432283 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA8879191C01F64FA5E143C6E4002222 /* GoogleMaps.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleMaps";
+				IBSC_MODULE = GoogleMaps;
+				INFOPLIST_FILE = "Target Support Files/GoogleMaps/ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = GoogleMapsResources;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		7A940B3B88AB0D5BA298A76C3C86862B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 14A06B9FE050A07A8EA8992A62CBFD3F /* KeychainSwift.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/KeychainSwift/KeychainSwift-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/KeychainSwift/KeychainSwift-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/KeychainSwift/KeychainSwift.modulemap";
+				PRODUCT_MODULE_NAME = KeychainSwift;
+				PRODUCT_NAME = KeychainSwift;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		83657721E415D61FAC94F93214A91C8C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA8879191C01F64FA5E143C6E4002222 /* GoogleMaps.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				EXCLUDED_ARCHITECTURES = arm64;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9C2325F1CE833B55286CA619CF5BF606 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = ABE897E61C46E3C79C10943CAE915213 /* GooglePlaces.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GooglePlaces";
@@ -934,29 +1270,9 @@
 			};
 			name = Release;
 		};
-		83657721E415D61FAC94F93214A91C8C /* Release */ = {
+		9E5CB42E9A9EFD624DD3276B14FF73A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BE332EFF13C25A2FC6BB5AE107D4FB62 /* GoogleMaps.release.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				EXCLUDED_ARCHITECTURES = arm64;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		885485537AF4B3716AFE8818DFD8FC8C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 16941AE538AF2666E900DAF6542FA325 /* Pods-Hopla.debug.xcconfig */;
+			baseConfigurationReference = A73A4159B7EC2F5805AAC4B25842E2BE /* Pods-Hopla.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -993,26 +1309,9 @@
 			};
 			name = Debug;
 		};
-		9DBC742FB08F81C77724EAAEDA602568 /* Debug */ = {
+		CD9E678C7DE68132A4C8F4D6E87A5F0A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32476C904355F94A02F88B52E7B09C41 /* GoogleMaps.debug.xcconfig */;
-			buildSettings = {
-				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleMaps";
-				IBSC_MODULE = GoogleMaps;
-				INFOPLIST_FILE = "Target Support Files/GoogleMaps/ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_NAME = GoogleMapsResources;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
-		C2E6CA80334E548D5C0C40686EED3330 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 089FF44F391BC57833B263107691370F /* Pods-Hopla.release.xcconfig */;
+			baseConfigurationReference = AD669636826CC3E618AC60B71D9197D8 /* Pods-Hopla.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -1050,22 +1349,22 @@
 			};
 			name = Release;
 		};
-		EAAADBB3EE189833CCCA547A952EF142 /* Release */ = {
+		E19B83958DAA286AD580E6ED523CA818 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BE332EFF13C25A2FC6BB5AE107D4FB62 /* GoogleMaps.release.xcconfig */;
+			baseConfigurationReference = 9D9E4A694258C5BBFB9CAFA2D2EFD667 /* GooglePlaces.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleMaps";
-				IBSC_MODULE = GoogleMaps;
-				INFOPLIST_FILE = "Target Support Files/GoogleMaps/ResourceBundle-GoogleMapsResources-GoogleMaps-Info.plist";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GooglePlaces";
+				IBSC_MODULE = GooglePlaces;
+				INFOPLIST_FILE = "Target Support Files/GooglePlaces/ResourceBundle-GooglePlacesResources-GooglePlaces-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_NAME = GoogleMapsResources;
+				PRODUCT_NAME = GooglePlacesResources;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
-			name = Release;
+			name = Debug;
 		};
 		F4FF6A0D1970CA9705974E3CB2134802 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1135,7 +1434,7 @@
 		};
 		F82F4A73139DC620B91AF2F6A714431F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BC953C9B111D00CBFB465DA84944B5D5 /* Pods-HoplaTests.debug.xcconfig */;
+			baseConfigurationReference = 49EBBF80A81F91B8754B69BF5267A1E9 /* Pods-HoplaTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -1184,11 +1483,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		338F03E05ABB97E7573ECD02B49D82D6 /* Build configuration list for PBXNativeTarget "GoogleMaps-GoogleMapsResources" */ = {
+		39EC720AAA7B13D32A540D4EC129E994 /* Build configuration list for PBXNativeTarget "GoogleMaps-GoogleMapsResources" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9DBC742FB08F81C77724EAAEDA602568 /* Debug */,
-				EAAADBB3EE189833CCCA547A952EF142 /* Release */,
+				71F68DB21B89FE7CD2687B7163CE883E /* Debug */,
+				736EAF625707DBBD08916A6837432283 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1220,20 +1519,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5CD72C17C73B6808B9FAA542E186D868 /* Build configuration list for PBXNativeTarget "GooglePlaces-GooglePlacesResources" */ = {
+		AB085FD43C7CF729ECA86AA1D6691083 /* Build configuration list for PBXNativeTarget "GooglePlaces-GooglePlacesResources" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				027F13E43433D1A09B59D484F6BFB482 /* Debug */,
-				792BB1372CC6430CB8D138B536DE1FBA /* Release */,
+				E19B83958DAA286AD580E6ED523CA818 /* Debug */,
+				9C2325F1CE833B55286CA619CF5BF606 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		94CD4F2BB73E3CD7BCE16C48422744D3 /* Build configuration list for PBXNativeTarget "Pods-Hopla" */ = {
+		AEA62F9E47E3216882E4CBC9B85C6F40 /* Build configuration list for PBXNativeTarget "Pods-Hopla" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				885485537AF4B3716AFE8818DFD8FC8C /* Debug */,
-				C2E6CA80334E548D5C0C40686EED3330 /* Release */,
+				9E5CB42E9A9EFD624DD3276B14FF73A9 /* Debug */,
+				CD9E678C7DE68132A4C8F4D6E87A5F0A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1243,6 +1542,24 @@
 			buildConfigurations = (
 				03AF7043535FFDA7AE31F2CE8246A436 /* Debug */,
 				0294E14E225E1D28BFB9CB27413C3E81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD83C3885E346CC84DE2FBFEA83088D1 /* Build configuration list for PBXNativeTarget "KeychainSwift-KeychainSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20017338B42FAB5BACEBE490CD4FDF2D /* Debug */,
+				274AE4C942F27615B7E1880A6FA08699 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DB3ADBEA51DB679547C8F3B6DAA986A6 /* Build configuration list for PBXNativeTarget "KeychainSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A940B3B88AB0D5BA298A76C3C86862B /* Debug */,
+				4C1E48F682589AA758D9734E82FB9B0A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

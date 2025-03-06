@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "FFE71454-B194-43C1-A4B0-A3B3C544882D",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Hopla.xcodeproj",
+      "identifier" : "B706E9652D3FE03A008496F9",
+      "name" : "Hopla"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Hopla.xcodeproj",
+        "identifier" : "B706E9752D3FE03D008496F9",
+        "name" : "HoplaTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Hopla.xcodeproj",
+        "identifier" : "B706E97F2D3FE03D008496F9",
+        "name" : "HoplaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

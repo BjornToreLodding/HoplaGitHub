@@ -3,20 +3,24 @@ PODS:
     - GoogleMaps/Maps (= 9.3.0)
   - GoogleMaps/Maps (9.3.0)
   - GooglePlaces (9.3.0)
+  - KeychainSwift (24.0.0)
 
 DEPENDENCIES:
   - GoogleMaps (~> 9.3.0)
   - GooglePlaces (~> 9.3.0)
+  - KeychainSwift
 
 SPEC REPOS:
   trunk:
     - GoogleMaps
     - GooglePlaces
+    - KeychainSwift
 
 SPEC CHECKSUMS:
   GoogleMaps: b58e9627004f47043897eeae830c3ef023678f3b
   GooglePlaces: 310d8c240eb4bf7aaeecec0de71fe75d086dbf4a
+  KeychainSwift: 007c4647486e4563adca839cf02cef00deb3b670
 
-PODFILE CHECKSUM: ca2b0f21f9b341c8ed4b00ec85baadff705dff62
+PODFILE CHECKSUM: 01c8a1d0bd7d82faa68f3ccfda29b5adfa751bdb
 
 COCOAPODS: 1.16.2

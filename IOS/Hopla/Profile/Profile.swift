@@ -34,20 +34,12 @@ struct Profile: View {
                 .ignoresSafeArea(edges: .all)
             
             VStack {
-                Rectangle()
-                    .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    .frame(height: 110)
-                    .edgesIgnoringSafeArea(.top)
-                    .padding(.top, -420)
-            }
-            
-            VStack {
                 // Profile Image Section
                 ZStack {
                     Circle()
                         .frame(width: 200, height: 200)
                         .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                        .padding(.top, 70)
+                        .padding(.top, 10)
                     
                     if let profileImage = vm.image {
                         Image(uiImage: profileImage)
@@ -55,14 +47,14 @@ struct Profile: View {
                             .scaledToFill()
                             .frame(width: 180, height: 180)
                             .clipShape(Circle())
-                            .padding(.top, 70)
+                            .padding(.top, 10)
                     } else {
                         Image("Profile")
                             .resizable()
                             .scaledToFill()
                             .frame(width: 180, height: 180)
                             .clipShape(Circle())
-                            .padding(.top, 70)
+                            .padding(.top, 10)
                     }
                 }
                 
@@ -89,31 +81,31 @@ struct Profile: View {
                 HStack(spacing: 10) {
                     NavigationLink(destination: MyHikes()) {
                         Text("My hikes")
-                            .frame(width: 120, height: 50)
-                            .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .frame(width: 180, height: 50)
+                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
                     
                     NavigationLink(destination: MyHorses()) {
                         Text("My horses")
-                            .frame(width: 120, height: 50)
-                            .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .frame(width: 180, height: 50)
+                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
                 }
                 HStack(spacing: 10) {
                     NavigationLink(destination: Friends()) {
                         Text("Friends")
-                            .frame(width: 120, height: 50)
-                            .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .frame(width: 180, height: 50)
+                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
                     
                     NavigationLink(destination: Following()) {
                         Text("Following")
-                            .frame(width: 120, height: 50)
-                            .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .frame(width: 180, height: 50)
+                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
                 }
                 
@@ -175,27 +167,15 @@ struct Profile: View {
                         .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                 }
                 .padding(.trailing, 20)
-                .padding(.top, 60)
+                .padding(.top, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         }
         .sheet(isPresented: $vm.showPicker) {
             ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image)
         }
-        .navigationTitle("Profile")
     }
 
     
 }
 
-
-#Preview("English") {
-    ContentView()
-        .environmentObject(ViewModel())
-}
-
-#Preview("Norsk") {
-    ContentView()
-        .environmentObject(ViewModel())
-        .environment(\.locale, Locale(identifier: "nb_NO"))
-}

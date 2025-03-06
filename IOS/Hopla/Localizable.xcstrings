@@ -411,6 +411,9 @@
         }
       }
     },
+    "Login Failed" : {
+
+    },
     "My hikes" : {
       "localizations" : {
         "nb" : {
@@ -440,6 +443,9 @@
           }
         }
       }
+    },
+    "My Horses" : {
+
     },
     "My rating: " : {
       "localizations" : {
@@ -491,6 +497,9 @@
         }
       }
     },
+    "OK" : {
+
+    },
     "Password" : {
       "localizations" : {
         "nb" : {
@@ -515,6 +524,7 @@
 
     },
     "Posts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {

@@ -7,9 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AE2EFF87356641EAB4F26C51 /* Pods_HoplaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FED9F4EAADBC3DC445D5B653 /* Pods_HoplaTests.framework */; };
-		D396F09C77DA4ABCB0A35AB1 /* Pods_Hopla.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DFC96A8ED5B10C00A22A76D /* Pods_Hopla.framework */; };
-		FC3F69F74621605AB64557F8 /* Pods_HoplaUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3013672E20A4867D1BAC3056 /* Pods_HoplaUITests.framework */; };
+		763D7B70C63CE9E1BBCE91E3 /* Pods_HoplaUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74BDF98EF7A5F4E0C7D39906 /* Pods_HoplaUITests.framework */; };
+		7EFB2EEC1D385BEE46CA8ECB /* Pods_Hopla.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0C1E8C9DB5888B62F90ED5C /* Pods_Hopla.framework */; };
+		B7267AD72D77461B00A9A81A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B7267AD62D77461B00A9A81A /* KeychainAccess */; };
+		B7267B742D774EA000A9A81A /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B7267B732D774EA000A9A81A /* KeychainSwift */; };
+		B77813642D787E9200517150 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B77813632D787E9200517150 /* KeychainAccess */; };
+		C2EEDBCADD713D88D7327363 /* Pods_HoplaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 564B4385E9C316C87D4DE659 /* Pods_HoplaTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,18 +33,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1DFC96A8ED5B10C00A22A76D /* Pods_Hopla.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hopla.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3013672E20A4867D1BAC3056 /* Pods_HoplaUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HoplaUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		45E7E5CC0C425DF643D48593 /* Pods-HoplaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaUITests.release.xcconfig"; path = "Target Support Files/Pods-HoplaUITests/Pods-HoplaUITests.release.xcconfig"; sourceTree = "<group>"; };
-		52B9D7FDF7EBF9B23A461941 /* Pods-HoplaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaTests.debug.xcconfig"; path = "Target Support Files/Pods-HoplaTests/Pods-HoplaTests.debug.xcconfig"; sourceTree = "<group>"; };
-		5CF3C2309C7096468381D8BB /* Pods-HoplaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaTests.release.xcconfig"; path = "Target Support Files/Pods-HoplaTests/Pods-HoplaTests.release.xcconfig"; sourceTree = "<group>"; };
-		60A21EFEBC952B17EFC79311 /* Pods-Hopla.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hopla.release.xcconfig"; path = "Target Support Files/Pods-Hopla/Pods-Hopla.release.xcconfig"; sourceTree = "<group>"; };
-		768CA3CA402BEB88F91A71E1 /* Pods-Hopla.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hopla.debug.xcconfig"; path = "Target Support Files/Pods-Hopla/Pods-Hopla.debug.xcconfig"; sourceTree = "<group>"; };
+		110B9A1D4146694E77D73FEF /* Pods-Hopla.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hopla.release.xcconfig"; path = "Target Support Files/Pods-Hopla/Pods-Hopla.release.xcconfig"; sourceTree = "<group>"; };
+		2A51E914E5EDBBB41D1C3FA2 /* Pods-HoplaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaTests.debug.xcconfig"; path = "Target Support Files/Pods-HoplaTests/Pods-HoplaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4646C06C8AE948D920C9AF42 /* Pods-HoplaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaTests.release.xcconfig"; path = "Target Support Files/Pods-HoplaTests/Pods-HoplaTests.release.xcconfig"; sourceTree = "<group>"; };
+		564B4385E9C316C87D4DE659 /* Pods_HoplaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HoplaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7051B62F6C49059D8F1246BF /* Pods-HoplaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaUITests.debug.xcconfig"; path = "Target Support Files/Pods-HoplaUITests/Pods-HoplaUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		74BDF98EF7A5F4E0C7D39906 /* Pods_HoplaUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HoplaUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD280C7FE9967439802CB1A2 /* Pods-Hopla.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hopla.debug.xcconfig"; path = "Target Support Files/Pods-Hopla/Pods-Hopla.debug.xcconfig"; sourceTree = "<group>"; };
+		B2B2A1544AFF6B817B389A96 /* Pods-HoplaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaUITests.release.xcconfig"; path = "Target Support Files/Pods-HoplaUITests/Pods-HoplaUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B706E9662D3FE03A008496F9 /* Hopla.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hopla.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B706E9762D3FE03D008496F9 /* HoplaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HoplaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B706E9802D3FE03D008496F9 /* HoplaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HoplaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D310C0DFAF3102BE71C4A72B /* Pods-HoplaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HoplaUITests.debug.xcconfig"; path = "Target Support Files/Pods-HoplaUITests/Pods-HoplaUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		FED9F4EAADBC3DC445D5B653 /* Pods_HoplaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HoplaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0C1E8C9DB5888B62F90ED5C /* Pods_Hopla.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hopla.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -80,7 +83,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D396F09C77DA4ABCB0A35AB1 /* Pods_Hopla.framework in Frameworks */,
+				B77813642D787E9200517150 /* KeychainAccess in Frameworks */,
+				B7267B742D774EA000A9A81A /* KeychainSwift in Frameworks */,
+				B7267AD72D77461B00A9A81A /* KeychainAccess in Frameworks */,
+				7EFB2EEC1D385BEE46CA8ECB /* Pods_Hopla.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,7 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE2EFF87356641EAB4F26C51 /* Pods_HoplaTests.framework in Frameworks */,
+				C2EEDBCADD713D88D7327363 /* Pods_HoplaTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,19 +102,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC3F69F74621605AB64557F8 /* Pods_HoplaUITests.framework in Frameworks */,
+				763D7B70C63CE9E1BBCE91E3 /* Pods_HoplaUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8E886AB2E4FA101BB1D72ABC /* Frameworks */ = {
+		3B31EFAD00F7AEF3B4165CC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1DFC96A8ED5B10C00A22A76D /* Pods_Hopla.framework */,
-				FED9F4EAADBC3DC445D5B653 /* Pods_HoplaTests.framework */,
-				3013672E20A4867D1BAC3056 /* Pods_HoplaUITests.framework */,
+				D0C1E8C9DB5888B62F90ED5C /* Pods_Hopla.framework */,
+				564B4385E9C316C87D4DE659 /* Pods_HoplaTests.framework */,
+				74BDF98EF7A5F4E0C7D39906 /* Pods_HoplaUITests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -121,7 +127,7 @@
 				B706E9832D3FE03D008496F9 /* HoplaUITests */,
 				B706E9672D3FE03A008496F9 /* Products */,
 				C1902BE88E7BE785C34EFB2E /* Pods */,
-				8E886AB2E4FA101BB1D72ABC /* Frameworks */,
+				3B31EFAD00F7AEF3B4165CC2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -138,12 +144,12 @@
 		C1902BE88E7BE785C34EFB2E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				768CA3CA402BEB88F91A71E1 /* Pods-Hopla.debug.xcconfig */,
-				60A21EFEBC952B17EFC79311 /* Pods-Hopla.release.xcconfig */,
-				52B9D7FDF7EBF9B23A461941 /* Pods-HoplaTests.debug.xcconfig */,
-				5CF3C2309C7096468381D8BB /* Pods-HoplaTests.release.xcconfig */,
-				D310C0DFAF3102BE71C4A72B /* Pods-HoplaUITests.debug.xcconfig */,
-				45E7E5CC0C425DF643D48593 /* Pods-HoplaUITests.release.xcconfig */,
+				AD280C7FE9967439802CB1A2 /* Pods-Hopla.debug.xcconfig */,
+				110B9A1D4146694E77D73FEF /* Pods-Hopla.release.xcconfig */,
+				2A51E914E5EDBBB41D1C3FA2 /* Pods-HoplaTests.debug.xcconfig */,
+				4646C06C8AE948D920C9AF42 /* Pods-HoplaTests.release.xcconfig */,
+				7051B62F6C49059D8F1246BF /* Pods-HoplaUITests.debug.xcconfig */,
+				B2B2A1544AFF6B817B389A96 /* Pods-HoplaUITests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -155,11 +161,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B706E98A2D3FE03D008496F9 /* Build configuration list for PBXNativeTarget "Hopla" */;
 			buildPhases = (
-				8F5A576AB3CB21781EEB52B6 /* [CP] Check Pods Manifest.lock */,
+				166D37700B4372328E53F030 /* [CP] Check Pods Manifest.lock */,
 				B706E9622D3FE03A008496F9 /* Sources */,
 				B706E9632D3FE03A008496F9 /* Frameworks */,
 				B706E9642D3FE03A008496F9 /* Resources */,
-				FCA0ADA027D00D72E0C08037 /* [CP] Copy Pods Resources */,
+				07C7BA60643EF7E74F8F1811 /* [CP] Embed Pods Frameworks */,
+				2B3CF0036963D6585E4D6771 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -177,7 +184,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B706E98D2D3FE03D008496F9 /* Build configuration list for PBXNativeTarget "HoplaTests" */;
 			buildPhases = (
-				4F610AF96860C2F35F2C7063 /* [CP] Check Pods Manifest.lock */,
+				820B7BEAC6D25456F3A78AC3 /* [CP] Check Pods Manifest.lock */,
 				B706E9722D3FE03D008496F9 /* Sources */,
 				B706E9732D3FE03D008496F9 /* Frameworks */,
 				B706E9742D3FE03D008496F9 /* Resources */,
@@ -199,7 +206,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B706E9902D3FE03D008496F9 /* Build configuration list for PBXNativeTarget "HoplaUITests" */;
 			buildPhases = (
-				D105CDCF4B677AF20D35068F /* [CP] Check Pods Manifest.lock */,
+				30CD326B1B5B34443F810325 /* [CP] Check Pods Manifest.lock */,
 				B706E97C2D3FE03D008496F9 /* Sources */,
 				B706E97D2D3FE03D008496F9 /* Frameworks */,
 				B706E97E2D3FE03D008496F9 /* Resources */,
@@ -250,6 +257,10 @@
 			);
 			mainGroup = B706E95D2D3FE03A008496F9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B7267AD52D77461B00A9A81A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				B7267B722D774EA000A9A81A /* XCRemoteSwiftPackageReference "keychain-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B706E9672D3FE03A008496F9 /* Products */;
 			projectDirPath = "";
@@ -287,29 +298,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4F610AF96860C2F35F2C7063 /* [CP] Check Pods Manifest.lock */ = {
+		07C7BA60643EF7E74F8F1811 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-HoplaTests-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8F5A576AB3CB21781EEB52B6 /* [CP] Check Pods Manifest.lock */ = {
+		166D37700B4372328E53F030 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -331,7 +337,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D105CDCF4B677AF20D35068F /* [CP] Check Pods Manifest.lock */ = {
+		2B3CF0036963D6585E4D6771 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		30CD326B1B5B34443F810325 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -353,21 +376,26 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FCA0ADA027D00D72E0C08037 /* [CP] Copy Pods Resources */ = {
+		820B7BEAC6D25456F3A78AC3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HoplaTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Hopla/Pods-Hopla-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -533,10 +561,11 @@
 		};
 		B706E98B2D3FE03D008496F9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 768CA3CA402BEB88F91A71E1 /* Pods-Hopla.debug.xcconfig */;
+			baseConfigurationReference = AD280C7FE9967439802CB1A2 /* Pods-Hopla.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Hopla/Preview Content\"";
@@ -565,10 +594,11 @@
 		};
 		B706E98C2D3FE03D008496F9 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 60A21EFEBC952B17EFC79311 /* Pods-Hopla.release.xcconfig */;
+			baseConfigurationReference = 110B9A1D4146694E77D73FEF /* Pods-Hopla.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Hopla/Preview Content\"";
@@ -597,7 +627,7 @@
 		};
 		B706E98E2D3FE03D008496F9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 52B9D7FDF7EBF9B23A461941 /* Pods-HoplaTests.debug.xcconfig */;
+			baseConfigurationReference = 2A51E914E5EDBBB41D1C3FA2 /* Pods-HoplaTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -616,7 +646,7 @@
 		};
 		B706E98F2D3FE03D008496F9 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5CF3C2309C7096468381D8BB /* Pods-HoplaTests.release.xcconfig */;
+			baseConfigurationReference = 4646C06C8AE948D920C9AF42 /* Pods-HoplaTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -635,7 +665,7 @@
 		};
 		B706E9912D3FE03D008496F9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D310C0DFAF3102BE71C4A72B /* Pods-HoplaUITests.debug.xcconfig */;
+			baseConfigurationReference = 7051B62F6C49059D8F1246BF /* Pods-HoplaUITests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -652,7 +682,7 @@
 		};
 		B706E9922D3FE03D008496F9 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 45E7E5CC0C425DF643D48593 /* Pods-HoplaUITests.release.xcconfig */;
+			baseConfigurationReference = B2B2A1544AFF6B817B389A96 /* Pods-HoplaUITests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -707,6 +737,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B7267AD52D77461B00A9A81A /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		B7267B722D774EA000A9A81A /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 24.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B7267AD62D77461B00A9A81A /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7267AD52D77461B00A9A81A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		B7267B732D774EA000A9A81A /* KeychainSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7267B722D774EA000A9A81A /* XCRemoteSwiftPackageReference "keychain-swift" */;
+			productName = KeychainSwift;
+		};
+		B77813632D787E9200517150 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7267AD52D77461B00A9A81A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B706E95E2D3FE03A008496F9 /* Project object */;
 }
