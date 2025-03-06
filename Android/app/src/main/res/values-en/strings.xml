@@ -129,5 +129,6 @@
     <string name="additional_user_info">Userinfo</string>
     <string name="select_image">Select image</string>
     <string name="fill_inn_marked_fields">Marked fields must be filled</string>
+    <string name="remove_image">Remove image</string>
 
 </resources>

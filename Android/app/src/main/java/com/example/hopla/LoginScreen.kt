@@ -52,6 +52,19 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import android.graphics.Bitmap
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import com.example.hopla.ui.theme.PrimaryGray
 
 // Main function for the login screen
 @Composable
@@ -510,10 +523,34 @@ fun AdditionalUserInfoDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
+
+                // Image Picker Section
                 ImagePicker(
                     onImageSelected = { bitmap -> imageBitmap = bitmap },
-                    text = stringResource(R.string.select_image)
+                    text = if (imageBitmap == null) stringResource(R.string.select_image) else stringResource(R.string.change_image)
                 )
+
+                imageBitmap?.let { bitmap ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = stringResource(R.string.selected_image),
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(CircleShape)
+                                .border(1.dp, PrimaryGray, CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(onClick = { imageBitmap = null }) {
+                            Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.remove_image))
+                        }
+                    }
+                }
+
                 if (showError) {
                     Text(
                         text = errorMessage,
@@ -521,6 +558,7 @@ fun AdditionalUserInfoDialog(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
+
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -544,3 +582,4 @@ fun AdditionalUserInfoDialog(
         }
     }
 }
+
