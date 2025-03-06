@@ -58,30 +58,58 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+// Define the communities list
+val communities = listOf(
+    Community(
+        name = "Horse community",
+        imageResource = R.drawable.stockimg1,
+        description = "A stable for horses ONLY",
+        communityMemberStatus = CommunityMemberStatus.MEMBER,
+        communityStatus = CommunityStatus.PUBLIC
+    ),
+    Community(
+        name = "Ponny community",
+        imageResource = R.drawable.stockimg2,
+        description = "A stable for ponies ONLY",
+        communityMemberStatus = CommunityMemberStatus.REQUEST,
+        communityStatus = CommunityStatus.PRIVATE
+    ),
+    Community(
+        name = "Donkey community",
+        imageResource = R.drawable.stockimg1,
+        description = "A stable for donkeys ONLY",
+        communityMemberStatus = CommunityMemberStatus.NONE,
+        communityStatus = CommunityStatus.PUBLIC
+    ),
+    Community(
+        name = "Unicorn community",
+        imageResource = R.drawable.stockimg1,
+        description = "A stable for unicorns ONLY",
+        communityMemberStatus = CommunityMemberStatus.NONE,
+        communityStatus = CommunityStatus.PRIVATE
+    ),
+    Community(
+        name = "Pegasus community",
+        imageResource = R.drawable.stockimg1,
+        description = "A stable for pegasuses ONLY",
+        communityMemberStatus = CommunityMemberStatus.MEMBER,
+        communityStatus = CommunityStatus.PRIVATE
+    ),
+    Community(
+        name = "Zebra community",
+        imageResource = R.drawable.stockimg1,
+        description = "A stable for Zebras ONLY",
+        communityMemberStatus = CommunityMemberStatus.ADMIN,
+        communityStatus = CommunityStatus.PRIVATE
+    )
+)
+
 // Composable function to display the community screen
 @Composable
 fun CommunityScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var showLikedOnly by remember { mutableStateOf(false) }
     val likedCommunities = remember { mutableStateListOf<Community>() }
-    // List of community groups (replace with database)
-    val communities = listOf(
-        Community(
-            name = "Horse community",
-            imageResource = R.drawable.stockimg1,
-            description = "A stable for horses ONLY"
-        ),
-        Community(
-            name = "Ponny community",
-            imageResource = R.drawable.stockimg2,
-            description = "A stable for ponies ONLY"
-        ),
-        Community(
-            name = "Donkey community",
-            imageResource = R.drawable.stockimg1,
-            description = "A stable for donkeys ONLY"
-        )
-    )
 
     // Filter the communities based on the search query and liked status
     val filteredCommunities = communities.filter {
@@ -355,7 +383,6 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
         )
     }
 
-
     if (showReportDialog) {
         ReportDialog(onDismiss = { showReportDialog = false })
     }
@@ -364,23 +391,6 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
 // Function to retrieve the CommunityGroup object based on the communityName
 @Composable
 fun getCommunityByName(name: String): Community? {
-    val communities = listOf(
-        Community(
-            name = "Horse community",
-            imageResource = R.drawable.stockimg1,
-            description = "A community for horse lovers ONLY"
-        ),
-        Community(
-            name = "Ponny community",
-            imageResource = R.drawable.stockimg2,
-            description = "A community for ponny lovers ONLY"
-        ),
-        Community(
-            name = "Donkey community",
-            imageResource = R.drawable.stockimg1,
-            description = "A community for donkey lovers ONLY"
-        )
-    )
     // Return the community group with the given name
     return communities.find { it.name == name }
 }
@@ -452,7 +462,7 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf(stringResource(R.string.private_string), stringResource(R.string.public_string), stringResource(R.string.friends)).forEach { option ->
+            listOf(stringResource(R.string.private_string), stringResource(R.string.public_string)).forEach { option ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -478,7 +488,11 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
         Button(
             onClick = {
                 if (selectedOption != null) {
-                    val newCommunity = Community(name, imageResource, description)
+                    val newCommunity = Community(
+                        name, imageResource, description,
+                        communityMemberStatus = CommunityMemberStatus.ADMIN,
+                        communityStatus = CommunityStatus.PRIVATE
+                    )
                     onAdd(newCommunity)
                     navController.popBackStack()
                 } else {

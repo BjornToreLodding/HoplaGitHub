@@ -106,7 +106,7 @@ fun TrailsScreen(navController: NavController) {
             ),
             ContentBoxInfo(
                 title = "Skogsstien",
-                imageResource = setOf( R.drawable.stockimg2, R.drawable.stockimg2),
+                imageResource = setOf(R.drawable.stockimg2, R.drawable.stockimg2),
                 isHeartClicked = true,
                 starRating = 4,
                 filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM),
@@ -114,7 +114,7 @@ fun TrailsScreen(navController: NavController) {
             ),
             ContentBoxInfo(
                 title = "Fjellstien",
-                imageResource = setOf( R.drawable.stockimg1, R.drawable.stockimg2),
+                imageResource = setOf(R.drawable.stockimg1, R.drawable.stockimg2),
                 isHeartClicked = false,
                 starRating = 5,
                 filters = Filters(setOf(presetFilters[1]), Difficulty.HARD),
@@ -123,14 +123,12 @@ fun TrailsScreen(navController: NavController) {
         )
     }
 
-    // Whole page
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(bottom = 8.dp)
     ) {
-        // If the user has not clicked a specific trail
         if (!isRouteClicked) {
             Box(
                 modifier = Modifier
@@ -139,92 +137,120 @@ fun TrailsScreen(navController: NavController) {
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(vertical = 8.dp)
             ) {
-                // Row to display the different icons next to each other
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    // First icon: List or Map, everything else is set to false
-                    IconButton(onClick = {
-                        isMapClicked = !isMapClicked
-                        if (isMapClicked) {
-                            isCloseByClicked = false
-                            isFavoriteClicked = false
-                            isFollowingClicked = false
-                            isFiltersClicked = false
-                            isDropdownExpanded = false
-                            showOnlyFavorites = false
-                        }
-                    }) {
+                    IconButton(
+                        onClick = {
+                            isMapClicked = !isMapClicked
+                            if (isMapClicked) {
+                                isCloseByClicked = false
+                                isFavoriteClicked = false
+                                isFollowingClicked = false
+                                isFiltersClicked = false
+                                isDropdownExpanded = false
+                                showOnlyFavorites = false
+                            }
+                        },
+                        modifier = Modifier
+                            .background(
+                                if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !isFiltersClicked && !showOnlyFavorites)) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                    ) {
                         Icon(
                             imageVector = if (isMapClicked) Icons.Outlined.List else Icons.Outlined.Home,
                             contentDescription = null
                         )
                     }
-                    // Second icon: Location/close to you, everything else is set to false
-                    IconButton(onClick = {
-                        isCloseByClicked = !isCloseByClicked
-                        if (isCloseByClicked) {
-                            isMapClicked = false
-                            isFavoriteClicked = false
-                            isFollowingClicked = false
-                            isFiltersClicked = false
-                            isDropdownExpanded = false
-                            showOnlyFavorites = false
-                        }
-                    }) {
+                    IconButton(
+                        onClick = {
+                            isCloseByClicked = !isCloseByClicked
+                            if (isCloseByClicked) {
+                                isMapClicked = false
+                                isFavoriteClicked = false
+                                isFollowingClicked = false
+                                isFiltersClicked = false
+                                isDropdownExpanded = false
+                                showOnlyFavorites = false
+                            }
+                        },
+                        modifier = Modifier
+                            .background(
+                                if (isCloseByClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                    ) {
                         Icon(
-                            imageVector = if (isCloseByClicked) Icons.Filled.LocationOn else Icons.Outlined.LocationOn,
+                            imageVector = Icons.Outlined.LocationOn,
                             contentDescription = null
                         )
                     }
-                    // Third icon: Favorite, everything else is set to false
-                    IconButton(onClick = {
-                        showOnlyFavorites = !showOnlyFavorites
-                        if (showOnlyFavorites) {
-                            isMapClicked = false
-                            isCloseByClicked = false
-                            isFavoriteClicked = false
-                            isFollowingClicked = false
-                        }
-                    }) {
+                    IconButton(
+                        onClick = {
+                            showOnlyFavorites = !showOnlyFavorites
+                            if (showOnlyFavorites) {
+                                isMapClicked = false
+                                isCloseByClicked = false
+                                isFavoriteClicked = false
+                                isFollowingClicked = false
+                            }
+                        },
+                        modifier = Modifier
+                            .background(
+                                if (showOnlyFavorites) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                    ) {
                         Icon(
-                            imageVector = if (showOnlyFavorites) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                            imageVector = Icons.Outlined.FavoriteBorder,
                             contentDescription = null
                         )
                     }
-                    // Fourth icon: Following, everything else is set to false
-                    IconButton(onClick = {
-                        isFollowingClicked = !isFollowingClicked
-                        if (isFollowingClicked) {
-                            isMapClicked = false
-                            isCloseByClicked = false
-                            isFavoriteClicked = false
-                            isFiltersClicked = false
-                            isDropdownExpanded = false
-                            showOnlyFavorites = false
-                        }
-                    }) {
+                    IconButton(
+                        onClick = {
+                            isFollowingClicked = !isFollowingClicked
+                            if (isFollowingClicked) {
+                                isMapClicked = false
+                                isCloseByClicked = false
+                                isFavoriteClicked = false
+                                isFiltersClicked = false
+                                isDropdownExpanded = false
+                                showOnlyFavorites = false
+                            }
+                        },
+                        modifier = Modifier
+                            .background(
+                                if (isFollowingClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                    ) {
                         Icon(
-                            imageVector = if (isFollowingClicked) Icons.Filled.Person else Icons.Outlined.Person,
+                            imageVector = Icons.Outlined.Person,
                             contentDescription = null
                         )
                     }
-                    // Fifth icon: Filters. Column->Box with a dropdown menu
                     Column {
                         Box {
-                            IconButton(onClick = { isDropdownExpanded = !isDropdownExpanded }) {
+                            IconButton(
+                                onClick = { isDropdownExpanded = !isDropdownExpanded },
+                                modifier = Modifier
+                                    .background(
+                                        if (isFiltersClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                            ) {
                                 Icon(
                                     imageVector = Icons.Outlined.KeyboardArrowDown,
                                     contentDescription = "Filters"
                                 )
                             }
-                            // Create the dropdown menu
                             DropdownMenu(
                                 expanded = isDropdownExpanded,
                                 onDismissRequest = { isDropdownExpanded = false }
                             ) {
-                                val items = listOf("Parkering", "Lite trafikk", "Asfalt", "Grus") // All items in the dropdown menue
+                                val items = listOf("Parkering", "Lite trafikk", "Asfalt", "Grus")
                                 items.forEach { item ->
                                     val isSelected = selectedItems.value.contains(item)
                                     DropdownMenuItem(
@@ -264,12 +290,10 @@ fun TrailsScreen(navController: NavController) {
                 }
             }
         }
-        // If the user has clicked a specific trail, display the function RouteClicked
         if (isRouteClicked) {
             selectedContentBoxInfo?.let { contentBoxInfo ->
                 RouteClicked(navController = navController, contentBoxInfo = contentBoxInfo, onBackClick = { isRouteClicked = false })
             }
-            // If the user has clicked the map icon, display the map
         } else if (isMapClicked) {
             Box(
                 modifier = Modifier
@@ -278,14 +302,12 @@ fun TrailsScreen(navController: NavController) {
             ) {
                 MapScreen()
             }
-            // If the user has clicked the location icon, display the trails close to you
         } else {
             val routesToDisplay = if (showOnlyFavorites) {
                 testData.filter { it.isHeartClicked }
             } else {
                 testData
             }
-            // Display the trails
             LazyColumn {
                 items(routesToDisplay.size) { index ->
                     val contentBoxInfo = routesToDisplay[index]

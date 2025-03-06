@@ -63,8 +63,22 @@ data class User(
 data class Community(
     val name: String,
     val imageResource: Int,
-    val description: String
+    val description: String,
+    val communityMemberStatus: CommunityMemberStatus,
+    val communityStatus: CommunityStatus
 )
+
+enum class CommunityMemberStatus{
+    NONE,
+    REQUEST,
+    MEMBER,
+    ADMIN
+}
+
+enum class CommunityStatus{
+    PUBLIC,
+    PRIVATE
+}
 
 // Class for the data of a post
 data class Message(
