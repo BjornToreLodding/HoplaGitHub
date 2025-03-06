@@ -51,13 +51,14 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import android.graphics.Bitmap
 
 // Main function for the login screen
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(false) }
+    var showCreateUserDialogue by remember { mutableStateOf(false) }
     var showForgottenPasswordDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -209,15 +210,18 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
             textDecoration = TextDecoration.Underline,
             modifier = Modifier
                 .padding(top = 16.dp)
-                .clickable { showDialog = true }
+                .clickable { showCreateUserDialogue = true }
         )
     }
     // Show the dialogs for creating a user, forgotten password and error messages
-    if (showDialog) {
-        CreateUserDialog(onDismiss = { showDialog = false }, onCreateUser = {
-            onCreateUser()
-            onLogin()
-        })
+    if (showCreateUserDialogue) {
+        CreateUserDialog(
+            onDismiss = { showCreateUserDialogue = false },
+            onCreateUser = { email, password ->
+                onCreateUser()
+            },
+            onLogin = onLogin
+        )
     }
 
     if (showForgottenPasswordDialog) {
@@ -344,11 +348,16 @@ fun InfoDialog(onDismiss: () -> Unit) {
 
 // Dialog for creating a new user
 @Composable
-fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
+fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Unit, onLogin: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmedPassword by remember { mutableStateOf("") }
-    var displayName by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var showAdditionalUserInfoDialog by remember { mutableStateOf(false) }
+
+    val allFieldsRequiredMessage = stringResource(R.string.all_fields_are_required)
+    val passwordsDoNotMatchMessage = stringResource(R.string.passwords_do_not_match)
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -362,10 +371,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
             ) {
                 Text(
                     text = stringResource(R.string.create_user),
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
@@ -373,6 +379,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
                     onValueChange = { email = it },
                     label = { Text(text = stringResource(R.string.email)) },
                     singleLine = true,
+                    isError = showError && email.isEmpty(),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
                 TextField(
@@ -381,6 +388,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
                     label = { Text(text = stringResource(R.string.password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
+                    isError = showError && password.isEmpty(),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
                 TextField(
@@ -389,15 +397,16 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
                     label = { Text(text = stringResource(R.string.confirm_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
+                    isError = showError && (confirmedPassword.isEmpty() || password != confirmedPassword),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
-                TextField(
-                    value = displayName,
-                    onValueChange = { displayName = it },
-                    label = { Text(text = stringResource(R.string.username)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
+                if (showError) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -406,10 +415,129 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: () -> Unit) {
                         Text(text = stringResource(R.string.cancel))
                     }
                     Button(onClick = {
-                        onCreateUser()
-                        onDismiss()
+                        if (email.isEmpty() || password.isEmpty() || confirmedPassword.isEmpty()) {
+                            errorMessage = allFieldsRequiredMessage
+                            showError = true
+                        } else if (password != confirmedPassword) {
+                            errorMessage = passwordsDoNotMatchMessage
+                            showError = true
+                        } else {
+                            onCreateUser(email, password)
+                            showAdditionalUserInfoDialog = true
+                        }
                     }) {
                         Text(text = stringResource(R.string.create_user))
+                    }
+                }
+            }
+        }
+    }
+
+    if (showAdditionalUserInfoDialog) {
+        AdditionalUserInfoDialog(onDismiss = { showAdditionalUserInfoDialog = false }, onConfirm = { alias, name, description, birthDate, phone, imageBitmap ->
+            // Handle the additional user info and log in the user
+            onLogin()
+        })
+    }
+}
+
+@Composable
+fun AdditionalUserInfoDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String, String, String, String, String?, Bitmap?) -> Unit
+) {
+    var alias by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var birthDate by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    val allFieldsRequiredMessage = stringResource(R.string.fill_inn_marked_fields)
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.additional_user_info),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                TextField(
+                    value = alias,
+                    onValueChange = { alias = it },
+                    label = { Text(text = stringResource(R.string.alias)) },
+                    singleLine = true,
+                    isError = showError && alias.isEmpty(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                )
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(text = stringResource(R.string.name)) },
+                    singleLine = true,
+                    isError = showError && name.isEmpty(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                )
+                TextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text(text = stringResource(R.string.description)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                )
+                TextField(
+                    value = birthDate,
+                    onValueChange = { birthDate = it },
+                    label = { Text(text = stringResource(R.string.birth_date)) },
+                    singleLine = true,
+                    isError = showError && birthDate.isEmpty(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                )
+                TextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text(text = stringResource(R.string.phone)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                )
+                ImagePicker(
+                    onImageSelected = { bitmap -> imageBitmap = bitmap },
+                    text = stringResource(R.string.select_image)
+                )
+                if (showError) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = onDismiss) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                    Button(onClick = {
+                        if (alias.isEmpty() || name.isEmpty() || birthDate.isEmpty()) {
+                            errorMessage = allFieldsRequiredMessage
+                            showError = true
+                        } else {
+                            onConfirm(alias, name, description, birthDate, phone, imageBitmap)
+                            onDismiss()
+                        }
+                    }) {
+                        Text(text = stringResource(R.string.confirm))
                     }
                 }
             }

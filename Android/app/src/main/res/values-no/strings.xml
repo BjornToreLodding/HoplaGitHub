@@ -120,5 +120,14 @@
     <string name="private_string">Privat</string>
     <string name="public_string">Offentlig</string>
     <string name="me">Meg</string>
+    <string name="all_fields_are_required">Alle felt må fylles inn</string>
+    <string name="passwords_do_not_match">Passordene er ikke like</string>
+    <string name="selected_image">Valgte bilde</string>
+    <string name="phone">Tlf</string>
+    <string name="birth_date">Fødselsdato</string>
+    <string name="alias">Alias</string>
+    <string name="additional_user_info">Brukerinfo</string>
+    <string name="select_image">Velg bilde</string>
+    <string name="fill_inn_marked_fields">Markerte felt må fylles inn</string>
 
 </resources>

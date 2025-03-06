@@ -120,5 +120,14 @@
     <string name="private_string">Private</string>
     <string name="public_string">Public</string>
     <string name="me">Me</string>
+    <string name="all_fields_are_required">All fields are required</string>
+    <string name="passwords_do_not_match">The passwords do not match</string>
+    <string name="selected_image">Selected image</string>
+    <string name="phone">Num</string>
+    <string name="birth_date">Birthdate</string>
+    <string name="alias">Alias</string>
+    <string name="additional_user_info">Userinfo</string>
+    <string name="select_image">Select image</string>
+    <string name="fill_inn_marked_fields">Marked fields must be filled</string>
 
 </resources>
