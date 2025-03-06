@@ -33,25 +33,31 @@ struct Login: View {
                     .fill(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                     .ignoresSafeArea() // Fill the entire screen
                 
+                GeometryReader { geometry in
+                    
                 VStack {
-                    // Logo
-                    Image("LogoUtenBakgrunn")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 170, height: 170)
-                        .padding(.top, 100)
+                    VStack {
+                        // Logo
+                        Image("LogoUtenBakgrunn")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 170, height: 170)
+                            
+                        Text("Hopla")
+                            .font(.system(size: 50, weight: .bold, design: .rounded))
+                        
+                        Spacer()
+                    }
+                    .padding(.top, 150)
                     
-                    Text("Hopla")
-                        .font(.system(size: 60, weight: .bold, design: .rounded))
-                    
-                    Spacer()
+                   
                     
                     // MARK: - Text fields
                     
                     // Username Label & TextField
                     Text("Email")
                         .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
-                        .padding(.top, 50)
+                        .padding(.top, 10)
                     
                     TextField("Enter your email", text: $email)
                         .padding()
@@ -85,6 +91,8 @@ struct Login: View {
                                 isShowingForgottenPassword = true // Show sheet
                             }
                     }
+                    
+                    
                     .sheet(isPresented: $isShowingForgottenPassword, onDismiss: {
                         resetEmail() // Reset fields when closing
                     }) {
@@ -130,7 +138,7 @@ struct Login: View {
                             .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                             .cornerRadius(8)
                     }
-                    .padding(.top, 30)
+                    
                     .alert(isPresented: Binding<Bool>(
                         get: { viewModel.errorMessage != nil },
                         set: { _ in viewModel.errorMessage = nil }
@@ -140,7 +148,6 @@ struct Login: View {
                     .padding(.top, 30)
                     .navigationBarBackButtonHidden(true) // Hide the back arrow
                     
-                    Spacer()
                     
                     // MARK: - Sign up
                     
@@ -155,92 +162,99 @@ struct Login: View {
                                 isShowingSignUp = true
                             }
                     }
-                    .sheet(isPresented: $isShowingSignUp, onDismiss: {
-                        resetTextFields()
-                    }) {
-                        VStack(spacing: 20) {
-                            Text("Enter your email address")
-                                .font(.headline)
-                            
-                            TextField("Enter email address", text: $newEmail)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            Text("Enter a password")
-                                .font(.headline)
-                            
-                            SecureField("Password", text: $newPassword)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            Text("Confirm password")
-                                .font(.headline)
-                            
-                            SecureField("Confirm password", text: $confirmNewPassword)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            // Show warning if passwords do not match
-                            if let warning = passwordMismatchWarning {
-                                Text(warning)
-                                    .foregroundColor(.red)
-                                    .font(.caption)
-                            }
-                            
-                            Text("Enter username")
-                                .font(.headline)
-                            
-                            TextField("Username", text: $username)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            Button(action: {
-                                if newPassword == confirmNewPassword {
-                                    password = newPassword
-                                    isLoggedIn = true
-                                    passwordMismatchWarning = nil // Clear warning if passwords match
-                                } else {
-                                    passwordMismatchWarning = "Passwords do not match!"
-                                }
-                            }) {
-                                Text("Join now")
-                                    .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                        .sheet(isPresented: $isShowingSignUp, onDismiss: {
+                            resetTextFields()
+                        }) {
+                            VStack(spacing: 20) {
+                                Text("Enter your email address")
+                                    .font(.headline)
+                                
+                                TextField("Enter email address", text: $newEmail)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .padding()
-                                    .frame(width: 200, height: 50)
-                                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                                    .cornerRadius(8)
-                            }
-                            
-                            Button("Cancel") {
-                                isShowingSignUp = false
+                                
+                                Text("Enter a password")
+                                    .font(.headline)
+                                
+                                SecureField("Password", text: $newPassword)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+                                
+                                Text("Confirm password")
+                                    .font(.headline)
+                                
+                                SecureField("Confirm password", text: $confirmNewPassword)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+                                
+                                // Show warning if passwords do not match
+                                if let warning = passwordMismatchWarning {
+                                    Text(warning)
+                                        .foregroundColor(.red)
+                                        .font(.caption)
+                                }
+                                
+                                Text("Enter username")
+                                    .font(.headline)
+                                
+                                TextField("Username", text: $username)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+                                
+                                Button(action: {
+                                    if newPassword == confirmNewPassword {
+                                        password = newPassword
+                                        isLoggedIn = true
+                                        passwordMismatchWarning = nil // Clear warning if passwords match
+                                    } else {
+                                        passwordMismatchWarning = "Passwords do not match!"
+                                    }
+                                }) {
+                                    Text("Join now")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .frame(width: 200, height: 50)
+                                        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                                        .cornerRadius(8)
+                                }
+                                
+                                Button("Cancel") {
+                                    isShowingSignUp = false
+                                }
+                                .padding()
                             }
                             .padding()
                         }
-                        .padding()
-                    }
                 }
                 .onAppear {
-                                if let token = viewModel.getToken(), !token.isEmpty {
-                                    viewModel.isLoggedIn = true
-                                }
-                            }
+                    if let token = viewModel.getToken(), !token.isEmpty {
+                        viewModel.isLoggedIn = true
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .center) // Ensure content is centered
+                .frame(maxHeight: geometry.size.height * 0.9) // Limit height to prevent overflow
             }
-            .navigationBarHidden(true) // Hide navigation bar on the login screen
+                .padding(.bottom, 100)
         }
+        .navigationBarHidden(true) // Hide navigation bar on the login screen
     }
-    
-    
-    // MARK: - Functions Sheets
-    
-    // Resets email
-    private func resetEmail() {
-        email = ""
-    }
-    
-    // Resets all fields sign up
-    private func resetTextFields() {
-        username = ""
-        newEmail = ""
-        newPassword = ""
-    }
+}
+
+
+// MARK: - Functions Sheets
+
+// Resets email
+private func resetEmail() {
+    email = ""
+}
+
+// Resets all fields sign up
+private func resetTextFields() {
+    username = ""
+    newEmail = ""
+    newPassword = ""
+}
 }

@@ -51,12 +51,6 @@
         }
       }
     },
-    "Bob" : {
-
-    },
-    "bob@mail.no" : {
-
-    },
     "Camera" : {
       "localizations" : {
         "nb" : {
@@ -390,6 +384,9 @@
           }
         }
       }
+    },
+    "Loading profile..." : {
+
     },
     "Log In" : {
       "localizations" : {

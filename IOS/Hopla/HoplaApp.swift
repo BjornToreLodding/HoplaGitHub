@@ -15,6 +15,7 @@ struct HoplaApp: App {
     @StateObject private var vm = ViewModel()
     @Environment(\.colorScheme) var colorScheme
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
 
     var body: some Scene {
         WindowGroup {
@@ -88,7 +89,7 @@ struct MainTabView: View {
                     Text("Community")
                 }
             
-            NavigationStack { Profile() }
+            NavigationStack { Profile(loginViewModel: LoginViewModel()) }
                 .tabItem {
                     Image(systemName: "person")
                     Text("Profile")
