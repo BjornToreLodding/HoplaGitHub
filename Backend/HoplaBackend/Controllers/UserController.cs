@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace HoplaBackend.Controllers;
@@ -24,10 +26,12 @@ public class UserController : ControllerBase
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
 
-    public UserController(Authentication authentication, AppDbContext context)
+    private readonly UserRelationService _userRelationService;
+    public UserController(Authentication authentication, AppDbContext context, UserRelationService userRelationService)
     {
         _authentication = authentication;
         _context = context;
+        _userRelationService = userRelationService;
     }
 
     [HttpPost("login")]
@@ -115,12 +119,9 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpGet("profile")]
-    public async Task<IActionResult> GetUserProfile(
-        [FromQuery] Guid? userId,
-        [FromQuery] string? relationStatus)
+    public async Task<IActionResult> GetUserProfile([FromQuery] Guid? userId)
     {
         Console.WriteLine(userId);
-        Console.WriteLine(relationStatus);
         Console.WriteLine("Token claims:");
         foreach (var claim in User.Claims)
         {
@@ -135,7 +136,7 @@ public class UserController : ControllerBase
         {
             return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
         }
-        if (!userId.HasValue)
+        if (!userId.HasValue) // Query parameter ikke spesifisert. Returner egen bruker
         {
             var user = await _context.Users
                 .Where(u => u.Id == parsedUserId)
@@ -163,7 +164,11 @@ public class UserController : ControllerBase
             {
                 return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
             }
-            if (relationStatus.ToLower() == "friends") 
+            Console.WriteLine(_userRelationService.RelationStatus(parsedUserId, userId.Value));
+            Console.WriteLine(_userRelationService.RelationStatus(userId.Value, parsedUserId));
+
+            string relationStatus = _userRelationService.RelationStatus(parsedUserId, userId.Value);
+            if (relationStatus.ToLower() == "friend" || relationStatus.ToLower() == "friends")
             {
                 return Ok(new
                 {

@@ -261,7 +261,6 @@ photo-1614203586837-1da2bef106a2?w=200&h=200&fit=crop"
 |------|-----------|--------|---------|-------------|
 | 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
 | 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
-| 🔎 Query | `relationStatus`  | Guid   | 🟡 Nei   | evt status mellom innlogget bruker og userId |
 
 #### 🔎 Query:
 
@@ -273,27 +272,54 @@ curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer <TOKEN>"
 ```
-📤 **Eksempel på respons:**
+📤 **Eksempel på respons uten query:**
 ```json
-[
-    {
-        "id": "12345678-0000-0000-0002-123456780001",
-        "name": "Flodhest",
-        "horsePictureUrl": "https://images.unsplash.com/
-        photo-1599053581540-248ea75b59cb?h=64&w=64&fit=crop"
-    },
-    {
-        "id": "12345678-0000-0000-0002-123456780018",
-        "name": "Kronprins Durek",
-        "horsePictureUrl": "https://images.unsplash.com/
-        photo-1438283173091-5dbf5c5a3206?h=64&w=64&fit=crop"
-    }
-]
+{
+    "alias": "MangeBallerILufra",
+    "name": "Magne Baller Ilufta",
+    "email": "test@test.no",
+    "profilePictureUrl": "https://images.unsplash.com/
+photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
+}
 ```
+📤 **Eksempel på respons med query når bruker fra token er venner med userId fra query:**
+```json
+{
+    "id": "12345678-0000-0000-0001-123456780002",
+    "name": "Kamuf Larsen",
+    "pictureUrl": "https://plus.unsplash.com/premium_photo-1661868397660-8c52f33c5934?w=200&h=200&fit=crop",
+    "alias": "Kamuflasjen",
+    "description": "Har utmerket meg spesielt i kunsten å balansere en pinnsvin på hodet mens jeg hopper på trampoline. Er den eneste i historien som har vunnet en sjakkturnering ved å blunke strategisk til motstanderne. Har en medfødt evne til å forstå hva lamaer prøver å si, og kan navigere i ukjente byer ved å lukte seg frem til nærmeste pannekakebod. En gang syklet jeg over en innsjø – ingen vet helt hvordan, men teoriene involverer både helium og viljestyrke.",
+    "dob": "2025-03-03T11:06:09.918987Z",
+    "created_at": "2025-03-03T11:06:09.918987Z",
+    "friendsCount": 1,
+    "horseCount": 1
+}
+```
+
+📤 **Eksempel på respons med query når bruker fra token ikke er venner med userId fra query:**
+```json
+{
+    "id": "12345678-0000-0000-0001-123456780009",
+    "name": "Dag Jesper Lang",
+    "pictureUrl": "https://images.unsplash.com/photo-1568038479111-87bf80659645?w=200&h=200&fit=crop",
+    "alias": "JesperDagenLang",
+    "description": "Jeg har en fascinerende evne til å snakke lenge om ting jeg egentlig ikke forstår. En gang forklarte jeg kvantefysikk for en gjeng måker – de var ikke imponert. Jeg mener fortsatt at jeg burde fått en æresdoktorgrad i ‘usannsynlige livsvalg’ og ‘avansert prokrastinering’. På CV-en min står det at jeg er en ‘problemløser’, men det gjelder hovedsakelig problemer jeg selv har skapt.",
+    "created_at": "2025-03-03T11:06:11.324384Z"
+}
+```
+
+📤 **Eksempel på respons med query når bruker fra token er blokkert av userId fra query:**
+```json
+{ Tomt? skal vi vise noe i det hele tatt? }
+```
+
+
+
 📟 **Mulige statuskoder:**
 - ✅ `200 OK` – Hester ble hentet.
 - ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
-- ❌ `404 Not Found` – Ingen hester funnet for brukeren.
+- ❌ `404 Not Found` – Bruker ikke funnet.
 
 ---
 
