@@ -31,17 +31,6 @@ struct MyHorses: View {
     
     var body: some View {
         VStack {
-            // This part remains fixed at the top
-            VStack {
-                Text("My Horses")
-                    .font(.title)
-                    .bold()
-                    .padding()
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 40)
-            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-            .foregroundColor(AdaptiveColor(light: .white, dark: .white).color(for: colorScheme))
             NavigationView {
                 VStack {
                     ScrollView {
@@ -54,6 +43,7 @@ struct MyHorses: View {
                     }
                 }
                 .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
+                
             }
         }
     }

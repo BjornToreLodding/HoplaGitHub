@@ -27,15 +27,6 @@ struct Settings: View {
             AdaptiveColor.background.color(for: colorScheme)
                 .ignoresSafeArea(edges: .all)
             
-            VStack {
-                // Top green rectangle (Navigation Bar background effect)
-                Rectangle()
-                    .fill(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    .frame(height: 110)
-                    .edgesIgnoringSafeArea(.top)
-                    .padding(.top, -435)
-            }
-            
             NavigationView {
                 Form {
                     Section(header: Text(LocalizedStringKey("Display"))) {
@@ -106,7 +97,6 @@ struct Settings: View {
                 }
                 .background(AdaptiveColor.background.color(for: colorScheme)) // Set Form background
                 .scrollContentBackground(.hidden) // Hide default Form background
-                .navigationTitle(LocalizedStringKey("Settings"))
                 .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
                 .sheet(isPresented: $showPasswordConfirmation) {
                     PasswordConfirmationView(password: $password, isLoggedIn: $isLoggedIn, showPasswordConfirmation: $showPasswordConfirmation)

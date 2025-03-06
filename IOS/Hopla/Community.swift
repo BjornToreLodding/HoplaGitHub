@@ -64,7 +64,8 @@ struct Community: View {
                 }
             }
             .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-            
+            .navigationBarHidden(true) // Hide the navigation bar
+            .ignoresSafeArea(.all, edges: .top) // To fix the extra space at the top
         }
     }
     
@@ -84,9 +85,9 @@ struct Community: View {
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
-            .padding(.top, 30)
+            
         }
-        .frame(height: 60)
+        //.frame(height: 60) LEGG TIL
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
     

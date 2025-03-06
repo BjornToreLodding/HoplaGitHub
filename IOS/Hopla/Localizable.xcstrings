@@ -444,9 +444,6 @@
         }
       }
     },
-    "My Horses" : {
-
-    },
     "My rating: " : {
       "localizations" : {
         "nb" : {
@@ -599,6 +596,7 @@
       }
     },
     "Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
