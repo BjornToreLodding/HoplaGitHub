@@ -37,7 +37,7 @@ public class AppDbContext : DbContext
     public DbSet<TrailAllCoordinate> TrailAllCoordinates { get; set; }
     public DbSet<TrailReview> TrailReviews { get; set; }
     public DbSet<TrailRating> TrailRatings { get; set; }
-    public DbSet<MyHike> MyHikes { get; set; }
+    public DbSet<UserHike> UserHikes { get; set; }
     public DbSet<SubscriptionOrder> SubscriptionOrders { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<EntityImage> EntityImages { get; set; }
@@ -107,7 +107,10 @@ public class AppDbContext : DbContext
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
+    
     {
+        modelBuilder.HasDefaultSchema("public"); // Sikrer at EF bruker public schema
+        
         base.OnModelCreating(modelBuilder);
         // Relasjon: En bruker kan ha mange hester
         // ?Dette er ikke nødvendig, da EF forstår dette automatisk, men må brukes hvis man bruker Fluent API

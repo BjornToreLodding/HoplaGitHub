@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HoplaBackend.Models;
 
-public class MyHike
+public class UserHike
 {
     public Guid Id { get; set; }
 
@@ -22,7 +22,7 @@ public class MyHike
     [ForeignKey("TrailId")]
     public Trail? Trail { get; set; }
     public string? PictureUrl  { get; set; }
+    public string? Comment { get; set; }
     public bool Secret { get;  set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
 }

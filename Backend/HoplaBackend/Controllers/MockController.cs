@@ -212,6 +212,14 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", rides });
     }
     */
+    [HttpPost("cleartrails")]
+    public async Task<IActionResult> ClearTrails()
+    {
+        _context.Trails.RemoveRange(_context.Trails); 
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
+        return Ok("Database cleared and IDs reset.");    
+    }
     
     [HttpPost("createtrails")]
     public async Task<IActionResult> CreateTrails()
@@ -230,6 +238,28 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", trails });
 
     }
+    [HttpPost("clearuserhikes")]
+    public async Task<IActionResult> ClearUserHikes()
+    {
+        _context.UserHikes.RemoveRange(_context.UserHikes); 
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Userhikes\" RESTART IDENTITY CASCADE");
+        return Ok("Database cleared and IDs reset.");    
+    }
+
+    [HttpPost("createuserhikes")]
+    public async Task<IActionResult> CreateUserHikes() 
+    {
+        if (_context.UserHikes.Any()) { return NoContent(); } 
+
+        var userHikes = UserHikeMock.CreateUserHikeMock();
+        _context.UserHikes.AddRange(userHikes);
+        await _context.SaveChangesAsync();
+
+        return Created("", new { message = "Success!" }); // Hvis URL ikke trengs
+    
+    }
+
 
 
     [HttpGet("testdist")] // Bare en test
@@ -281,6 +311,7 @@ public class MockController : ControllerBase
         //await CreateRideReviews();
         //await CreateRideDetailsDatas();
         await CreateTrails();
+        await CreateUserHikes();
         //await CreateTrailDetails();
         //await CreateTrailReviews();
         //await CreateTrailFilters;
@@ -308,7 +339,7 @@ public class MockController : ControllerBase
         _context.Trails.RemoveRange(_context.Trails);
         //_context.TrailReviews.RemoveRange(_context.TrailReviews);
         //_context.TrailFilters(_context.TrailFilters);
-
+        _context.UserHikes.RemoveRange(_context.UserHikes);
 
 
         await _context.SaveChangesAsync();

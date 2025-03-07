@@ -6,3 +6,4 @@ public class TrailDto
     public string PictureUrl { get; set; }
     public float AverageRating { get; set; }
 }
+//Lage flere underklasser ettersom hva som skal overføres.

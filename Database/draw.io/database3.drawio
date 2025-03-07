@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" version="26.0.16">
   <diagram name="Page-1" id="IOWVgG1AvCVQDRDtN9gQ">
-    <mxGraphModel dx="776" dy="1076" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -34,7 +34,7 @@
         <mxCell id="gPTDMWWFhpVJp35PD3i--21" value="Name&lt;div&gt;UserId {FK}&lt;/div&gt;&lt;div&gt;Birth&lt;/div&gt;&lt;div&gt;Breed&lt;/div&gt;&lt;div&gt;StableId {FK}&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;CreatedAt&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="gPTDMWWFhpVJp35PD3i--19" vertex="1">
           <mxGeometry y="50" width="140" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="gPTDMWWFhpVJp35PD3i--23" value="MyHikes 11" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="gPTDMWWFhpVJp35PD3i--23" value="UserHikes 11" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="400" y="480" width="140" height="170" as="geometry">
             <mxRectangle x="340" y="230" width="80" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -42,7 +42,7 @@
         <mxCell id="gPTDMWWFhpVJp35PD3i--24" value="Id{PK}&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;UserId&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;{FK}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;HorseId {FK}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Secret&lt;/div&gt;&lt;/div&gt;&lt;div&gt;TrailId {FK}&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Duration&lt;/div&gt;&lt;div&gt;Comment&lt;/div&gt;&lt;div&gt;PictureUrl&lt;/div&gt;&lt;div&gt;CreatedAt&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="gPTDMWWFhpVJp35PD3i--23" vertex="1">
           <mxGeometry y="30" width="140" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="gPTDMWWFhpVJp35PD3i--27" value="MyHikeDetails 13" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="gPTDMWWFhpVJp35PD3i--27" value="UserHikeDetails 13" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="440" y="790" width="140" height="170" as="geometry">
             <mxRectangle x="340" y="230" width="80" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -194,7 +194,7 @@
         <mxCell id="fNIAOVJN_iBSwc1ofUwP-9" value="TrailId{PK}&lt;div&gt;&amp;lt;Coordinates&amp;gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;Lat&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;Long&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="fNIAOVJN_iBSwc1ofUwP-8" vertex="1">
           <mxGeometry y="30" width="140" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="fNIAOVJN_iBSwc1ofUwP-10" value="MyHikeTrackingDatas 14" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="fNIAOVJN_iBSwc1ofUwP-10" value="UserHikeTrackingDatas 14" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="440" y="1030" width="140" height="110" as="geometry">
             <mxRectangle x="340" y="230" width="80" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -245,7 +245,7 @@
         <mxCell id="1gQ5bbxrZdW89yTNANwc-29" value="Id {PK}&lt;div&gt;&lt;div&gt;EntityId&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;EntityType&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;ImageId&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="1gQ5bbxrZdW89yTNANwc-28" vertex="1">
           <mxGeometry y="30" width="140" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="1gQ5bbxrZdW89yTNANwc-31" value="MyHikesLikes 26" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="1gQ5bbxrZdW89yTNANwc-31" value="UserHikesLikes 26" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="30" y="740" width="140" height="90" as="geometry">
             <mxRectangle x="340" y="230" width="80" height="30" as="alternateBounds" />
           </mxGeometry>

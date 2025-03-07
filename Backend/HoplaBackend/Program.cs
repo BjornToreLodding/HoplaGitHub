@@ -140,6 +140,8 @@ builder.Services.AddScoped<IUserService, UserService>();  // 🔹 Registrer User
 builder.Services.AddScoped<Authentication>();
 builder.Services.AddScoped<SystemSettingService>();
 builder.Services.AddScoped<UserRelationService>();
+builder.Services.AddScoped<TrailService>();
+builder.Services.AddScoped<UserHikeService>();
 
 /*
 builder.Services.AddCors(options =>

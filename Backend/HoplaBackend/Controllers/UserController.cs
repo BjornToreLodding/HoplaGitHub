@@ -27,11 +27,13 @@ public class UserController : ControllerBase
     private readonly Authentication _authentication;
 
     private readonly UserRelationService _userRelationService;
-    public UserController(Authentication authentication, AppDbContext context, UserRelationService userRelationService)
+    private readonly UserHikeService _userHikeService;
+    public UserController(Authentication authentication, AppDbContext context, UserRelationService userRelationService, UserHikeService userHikeService)
     {
         _authentication = authentication;
         _context = context;
         _userRelationService = userRelationService;
+        _userHikeService = userHikeService;
     }
 
     [HttpPost("login")]
@@ -168,6 +170,11 @@ public class UserController : ControllerBase
             Console.WriteLine(_userRelationService.RelationStatus(userId.Value, parsedUserId));
 
             string relationStatus = _userRelationService.RelationStatus(parsedUserId, userId.Value);
+            var userHikes = await _userHikeService.GetUserHikes(userId.Value, 1,3);
+            Console.WriteLine("---");
+            Console.WriteLine(userHikes);
+            Console.WriteLine("---");
+                
             if (relationStatus.ToLower() == "friend" || relationStatus.ToLower() == "friends")
             {
                 return Ok(new
@@ -181,7 +188,11 @@ public class UserController : ControllerBase
                     created_at = user.CreatedAt,
                     //Må migrere og oppdatere databasen før jeg kan legge til disse
                     friendsCount = 1,
-                    horseCount = 1
+                    horseCount = 1,
+                    relationStatus,
+                    userHikes,
+                    page = 1,
+                    size = 3
                 });
             } else 
             {
@@ -193,7 +204,11 @@ public class UserController : ControllerBase
                     PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop",
                     alias = user.Alias,
                     description = user.Description,
-                    created_at = user.CreatedAt
+                    created_at = user.CreatedAt,
+                    relationStatus,
+                    userHikes,
+                    page = 1,
+                    size = 3
                 });
             }
         }

@@ -17,6 +17,7 @@ namespace HoplaBackend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -60,7 +61,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EntityComments");
+                    b.ToTable("EntityComments", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityFeed", b =>
@@ -95,12 +96,15 @@ namespace HoplaBackend.Migrations
                     b.Property<int>("LikesCount")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PictureUrl")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("EntityFeeds");
+                    b.ToTable("EntityFeeds", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityImage", b =>
@@ -136,7 +140,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EntityImages");
+                    b.ToTable("EntityImages", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityReaction", b =>
@@ -167,7 +171,7 @@ namespace HoplaBackend.Migrations
                     b.HasIndex("UserId", "EntityId", "EntityName")
                         .IsUnique();
 
-                    b.ToTable("EntityReactions");
+                    b.ToTable("EntityReactions", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Horse", b =>
@@ -205,7 +209,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Horses");
+                    b.ToTable("Horses", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Image", b =>
@@ -233,7 +237,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Message", b =>
@@ -264,48 +268,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("SUserId");
 
-                    b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.MyHike", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<double>("Duration")
-                        .HasColumnType("double precision");
-
-                    b.Property<Guid?>("HorseId")
-                        .HasColumnType("uuid");
-
-                    b.Property<double?>("Length")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("PictureUrl")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Secret")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid?>("TrailId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HorseId");
-
-                    b.HasIndex("TrailId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("MyHikes");
+                    b.ToTable("Messages", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Stable", b =>
@@ -341,7 +304,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stables");
+                    b.ToTable("Stables", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.StableMessage", b =>
@@ -375,7 +338,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("StableMessages");
+                    b.ToTable("StableMessages", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.StableUser", b =>
@@ -417,7 +380,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("StableUsers");
+                    b.ToTable("StableUsers", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.SubscriptionOrder", b =>
@@ -439,7 +402,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SubscriptionOrders");
+                    b.ToTable("SubscriptionOrders", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Trail", b =>
@@ -479,7 +442,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Trails");
+                    b.ToTable("Trails", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailAllCoordinate", b =>
@@ -489,7 +452,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TrailAllCoordinates");
+                    b.ToTable("TrailAllCoordinates", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailCoordinate", b =>
@@ -513,7 +476,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("TrailAllCoordinatesId");
 
-                    b.ToTable("TrailCoordinate");
+                    b.ToTable("TrailCoordinate", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailDetail", b =>
@@ -545,7 +508,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TrailDetails");
+                    b.ToTable("TrailDetails", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailFilter", b =>
@@ -578,7 +541,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TrailFilters");
+                    b.ToTable("TrailFilters", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailRating", b =>
@@ -605,7 +568,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TrailRatings");
+                    b.ToTable("TrailRatings", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailReview", b =>
@@ -640,7 +603,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TrailReviews");
+                    b.ToTable("TrailReviews", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.User", b =>
@@ -697,7 +660,51 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", "public");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.UserHike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Duration")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid?>("HorseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("Length")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("PictureUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Secret")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("TrailId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HorseId");
+
+                    b.HasIndex("TrailId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserHikes", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.UserRelation", b =>
@@ -731,7 +738,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("ToUserId");
 
-                    b.ToTable("UserRelations");
+                    b.ToTable("UserRelations", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.UserReport", b =>
@@ -761,7 +768,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserReports");
+                    b.ToTable("UserReports", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.UserSetting", b =>
@@ -790,7 +797,7 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserSettings");
+                    b.ToTable("UserSettings", "public");
                 });
 
             modelBuilder.Entity("SystemSetting", b =>
@@ -815,7 +822,54 @@ namespace HoplaBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SystemSettings");
+                    b.ToTable("SystemSettings", "public");
+                });
+
+            modelBuilder.Entity("TrailFilterDefinition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DataType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrailFilterDefinitions", "public");
+                });
+
+            modelBuilder.Entity("TrailFilterValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FilterDefinitionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TrailFilterDefinitionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TrailId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrailFilterDefinitionId");
+
+                    b.HasIndex("TrailId");
+
+                    b.ToTable("TrailFilterValues", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityComment", b =>
@@ -894,29 +948,6 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.MyHike", b =>
-                {
-                    b.HasOne("HoplaBackend.Models.Horse", "Horse")
-                        .WithMany()
-                        .HasForeignKey("HorseId");
-
-                    b.HasOne("HoplaBackend.Models.Trail", "Trail")
-                        .WithMany()
-                        .HasForeignKey("TrailId");
-
-                    b.HasOne("HoplaBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Horse");
-
-                    b.Navigation("Trail");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.StableMessage", b =>
@@ -1013,8 +1044,8 @@ namespace HoplaBackend.Migrations
             modelBuilder.Entity("HoplaBackend.Models.TrailFilter", b =>
                 {
                     b.HasOne("HoplaBackend.Models.Trail", "Trail")
-                        .WithOne("TrailFilters")
-                        .HasForeignKey("HoplaBackend.Models.TrailFilter", "Id")
+                        .WithMany()
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1059,6 +1090,29 @@ namespace HoplaBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HoplaBackend.Models.UserHike", b =>
+                {
+                    b.HasOne("HoplaBackend.Models.Horse", "Horse")
+                        .WithMany()
+                        .HasForeignKey("HorseId");
+
+                    b.HasOne("HoplaBackend.Models.Trail", "Trail")
+                        .WithMany()
+                        .HasForeignKey("TrailId");
+
+                    b.HasOne("HoplaBackend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Horse");
+
+                    b.Navigation("Trail");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("HoplaBackend.Models.UserRelation", b =>
                 {
                     b.HasOne("HoplaBackend.Models.User", "FromUser")
@@ -1089,6 +1143,25 @@ namespace HoplaBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TrailFilterValue", b =>
+                {
+                    b.HasOne("TrailFilterDefinition", "TrailFilterDefinition")
+                        .WithMany()
+                        .HasForeignKey("TrailFilterDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HoplaBackend.Models.Trail", "Trail")
+                        .WithMany("TrailFilters")
+                        .HasForeignKey("TrailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trail");
+
+                    b.Navigation("TrailFilterDefinition");
+                });
+
             modelBuilder.Entity("HoplaBackend.Models.Trail", b =>
                 {
                     b.Navigation("TrailAllCoordinates")
@@ -1097,8 +1170,7 @@ namespace HoplaBackend.Migrations
                     b.Navigation("TrailDetails")
                         .IsRequired();
 
-                    b.Navigation("TrailFilters")
-                        .IsRequired();
+                    b.Navigation("TrailFilters");
 
                     b.Navigation("TrailReviews");
                 });
