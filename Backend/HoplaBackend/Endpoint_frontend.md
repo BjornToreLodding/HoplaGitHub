@@ -1,4 +1,5 @@
 
+
 # Profil
 
 <table>
@@ -332,10 +333,36 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
     "pictureUrl": "https://plus.unsplash.com/premium_photo-1661868397660-8c52f33c5934?w=200&h=200&fit=crop",
     "alias": "Kamuflasjen",
     "description": "Har utmerket meg spesielt i kunsten å balansere en pinnsvin på hodet mens jeg hopper på trampoline. Er den eneste i historien som har vunnet en sjakkturnering ved å blunke strategisk til motstanderne. Har en medfødt evne til å forstå hva lamaer prøver å si, og kan navigere i ukjente byer ved å lukte seg frem til nærmeste pannekakebod. En gang syklet jeg over en innsjø – ingen vet helt hvordan, men teoriene involverer både helium og viljestyrke.",
-    "dob": "2025-03-03T11:06:09.918987Z",
-    "created_at": "2025-03-03T11:06:09.918987Z",
+    "dob": "2025-03-07T21:41:44.639116Z",
+    "created_at": "2025-03-07T21:41:44.639116Z",
     "friendsCount": 1,
-    "horseCount": 1
+    "horseCount": 1,
+    "relationStatus": "FRIENDS",
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0011-123456780029",
+            "trailName": "Stabekkløypa",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780028",
+            "trailName": "Høvikrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780027",
+            "trailName": "Fornebutravbane",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 1,
+    "size": 3
 }
 ```
 
@@ -395,6 +422,64 @@ Profil -\> Mine turer
 GET request
 
 Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venner)
+
+**BT: Har laget dette endpointet:**
+### GET /usershikes/user
+
+📌 **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
+| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+
+
+#### 🔎 Query:
+
+`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+`?userId=[Guid]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+`?userId=[Guid]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+
+#### 💾 Syntax:
+```bash
+curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+
+📤 **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+```json
+{
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0011-123456780017",
+            "trailName": "Høvikrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780016",
+            "trailName": "Fornebutravbane",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 7,
+    "size": 2
+}
+```
+
+
+📟 **Mulige statuskoder:**
+- ✅ `200 OK` – Hester ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ❌ `404 Not Found` – Bruker ikke funnet.
+
 </td>
 </tr>
 <tr>

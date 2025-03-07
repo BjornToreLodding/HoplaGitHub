@@ -55,7 +55,8 @@ Klikk på et endepunkt for å se spesifikasjonene, inkludert:
 | 🟢 | 🔑 | GET | [`/horses/{horseid}`](#get-horseshorseid) | Vise en spesifikk hest, |
 | 🟢 | 🔑 | GET | [`/userrelations/friends/[userid]`](#get-userrelationsfriendsuserid) | Viser venner til token eller userid (optional) |
 | ❌ | 🔑 | GET | [`/userrelations/requests/`](#get-userrelationsrequests) | viser venneforspørsler |
-| 🟢 | 🔑 | GET | [`/userrelations/following/}`](#get-userrelationsfollowing) | viser hvem userId følger |
+| 🟢 | 🔑 | GET | [`/userrelations/following/`](#get-userrelationsfollowing) | viser hvem userId følger |
+| 🟢 | 🔑 | GET | [`/userhikes/user`](#get-userhikesuser) | viser turene til innlogget bruker ELLER oppgitt userID  |
 
 ## Endpoints for Adminportal
 | 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
@@ -431,6 +432,68 @@ curl -X GET "https://hopla.onrender.com/div/helloworld"
 - ✅ `200 OK` – API-et er oppe.
 
 ---
+
+
+### GET /usershikes/user
+
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
+| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+
+
+#### 🔎 Query:
+
+`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+`?userId=[Guid]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+`?userId=[Guid]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+
+#### 💾 Syntax:
+```bash
+curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+
+📤 **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+```json
+{
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0011-123456780017",
+            "trailName": "Høvikrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780016",
+            "trailName": "Fornebutravbane",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 7,
+    "size": 2
+}
+```
+
+
+📟 **Mulige statuskoder:**
+- ✅ `200 OK` – Hester ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ❌ `404 Not Found` – Bruker ikke funnet.
+
+---
+
 
 ### GET /div/status
 🔙 Tilbake til [`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
