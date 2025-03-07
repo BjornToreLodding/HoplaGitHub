@@ -2,6 +2,8 @@ package com.example.hopla
 
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 // Base URL for the API
 const val apiUrl = "https://hopla.onrender.com/"
@@ -149,3 +151,23 @@ data class TestLocation(
     val name: String,
     val tripCoordinates: List<LatLng>
 )
+
+@Serializable
+data class FriendProfile(
+    val id: String,
+    val name: String,
+    val pictureUrl: String,
+    val alias: String,
+    val description: String?,
+    val dob: String,
+    val created_at: String?,
+    val friendsCount: Int,
+    val horseCount: Int
+)
+
+fun formatDate(dateString: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val date = inputFormat.parse(dateString)
+    return outputFormat.format(date)
+}

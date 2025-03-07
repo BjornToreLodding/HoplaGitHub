@@ -140,6 +140,13 @@ class MainActivity : ComponentActivity() {
                                 PersonDetailScreen(navController, person)
                             }
                             composable(
+                                "friend_profile/{userId}",
+                                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                            ) { backStackEntry ->
+                                val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                                FriendProfileScreen(navController, userId)
+                            }
+                            composable(
                                 "horse_detail/{horseId}",
                                 arguments = listOf(
                                     navArgument("horseId") { type = NavType.StringType }

@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
 fun fetchMessages(messageName: String): List<Message> {
     val currentTime = System.currentTimeMillis()
@@ -91,3 +92,22 @@ suspend fun fetchFollowing(token: String): List<Following> {
         response.body()
     }
 }
+
+suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get("https://hopla.onrender.com/users/profile?userId=$userId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}
+

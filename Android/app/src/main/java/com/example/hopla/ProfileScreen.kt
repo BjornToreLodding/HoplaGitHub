@@ -46,6 +46,7 @@ import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import android.app.Application
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +55,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.runtime.LaunchedEffect
@@ -68,6 +71,7 @@ import androidx.lifecycle.AndroidViewModel
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.hopla.ui.theme.PrimaryGray
 
 // Main profile function
@@ -723,7 +727,9 @@ fun FriendItem(friend: Friend, navController: NavController) {
             .padding(8.dp)
             .background(PrimaryWhite)
             .padding(16.dp)
-            .clickable { /*navController.navigate("person_detail/${friend.friendId}")*/ }
+            .clickable {
+                navController.navigate("friend_profile/${friend.friendId}")
+            }
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = friend.friendPictureURL),
@@ -738,6 +744,106 @@ fun FriendItem(friend: Friend, navController: NavController) {
             Text(text = friend.friendName, style = MaterialTheme.typography.bodyLarge)
             Text(text = friend.friendAlias, style = MaterialTheme.typography.bodySmall)
         }
+    }
+}
+
+// Details about a friend
+@Composable
+fun FriendProfileScreen(navController: NavController, userId: String) {
+    var friendProfile by remember { mutableStateOf<FriendProfile?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
+    var showFullDescription by remember { mutableStateOf(false) }
+
+    LaunchedEffect(userId) {
+        coroutineScope.launch {
+            try {
+                friendProfile = fetchFriendProfile(userId, token)
+            } catch (e: Exception) {
+                Log.e("FriendProfileScreen", "Error fetching friend profile", e)
+            }
+        }
+    }
+
+    friendProfile?.let { profile ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = profile.alias, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(3.dp))
+            Row(
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = profile.pictureUrl),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .border(5.dp, PrimaryWhite, CircleShape)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = profile.name, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
+                        style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                        modifier = Modifier.clickable { /* Handle friends click */ }
+                    )
+                    Text(
+                        text = stringResource(R.string.horses) + ": ${profile.horseCount}",
+                        style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                        modifier = Modifier.clickable { /* Handle horses click */ }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(8.dp)
+                    .animateContentSize() // Animate size changes
+            ) {
+                Column {
+                    Text(
+                        text = if (showFullDescription) profile.description ?: "" else profile.description?.take(100)?.plus("...") ?: "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = if (showFullDescription) Int.MAX_VALUE else 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if ((profile.description?.length ?: 0) > 100) {
+                        IconButton(onClick = { showFullDescription = !showFullDescription }) {
+                            Icon(
+                                imageVector = if (showFullDescription) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = if (showFullDescription) "Show less" else "Show more"
+                            )
+                        }
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val formattedDate = profile.created_at?.let { formatDate(it) } ?: "Unknown"
+                Text(
+                    text = "Created at: $formattedDate",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
+                )
+            }
+        }
+    } ?: run {
+        // Show a loading indicator or error message
+        Text(text = "Loading...", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -781,7 +887,7 @@ fun PersonDetailScreen(navController: NavController, person: Person) {
                     modifier = Modifier
                         .size(150.dp)
                         .clip(CircleShape)
-                        .border(5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        .border(5.dp, PrimaryWhite, CircleShape)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
