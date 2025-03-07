@@ -243,7 +243,7 @@ public class MockController : ControllerBase
     {
         _context.UserHikes.RemoveRange(_context.UserHikes); 
         await _context.SaveChangesAsync();
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Userhikes\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserHikes\" RESTART IDENTITY CASCADE");
         return Ok("Database cleared and IDs reset.");    
     }
 

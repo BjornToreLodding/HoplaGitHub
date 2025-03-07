@@ -304,10 +304,16 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(både of
 |------|-----------|--------|---------|-------------|
 | 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
 | 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
+| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+
 
 #### 🔎 Query:
 
 `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+`?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+`?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+
 
 #### 💾 Syntax:
 ```bash
@@ -386,7 +392,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 
 
 📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Hester ble hentet.
+- ✅ `200 OK` – Brukeren ble hentet.
 - ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
 - ❌ `404 Not Found` – Bruker ikke funnet.
 
@@ -440,8 +446,8 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 #### 🔎 Query:
 
 `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-`?userId=[Guid]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
-`?userId=[Guid]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+`?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+`?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 #### 💾 Syntax:
 ```bash
@@ -476,9 +482,9 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 
 
 📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Hester ble hentet.
+- ✅ `200 OK` – Brukeren ble hentet.
 - ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
-- ❌ `404 Not Found` – Bruker ikke funnet.
+- ❌ `500 Internal Server Error` – Server feil.
 
 </td>
 </tr>
