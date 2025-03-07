@@ -50,7 +50,7 @@ Klikk på et endepunkt for å se spesifikasjonene, inkludert:
 | 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
 |-----|----|--------|-------------------------------|-------------|
 | 🟢 | 🌍 | POST | [`/users/login`](#post-userslogin) | returnerer aut-token |
-| 🟢 | 🔑 | GET | [`/users/profile`](#get-usersprofile) | Henter userid fra token. Hvis userid er spesifisert, vises litt mer info som antall venner. |
+| 🟢 | 🔑 | GET | [`/users/profile`](#get-usersprofile) | Henter userid fra token. Hvis userid er spesifisert, vises litt mer info som antall venner og hester samt de siste turene |
 | 🟢 | 🔑 | GET | [`/horses/userhorses`](#get-horsesuserhorses) | Viser alle hester til innlogget bruker, evt til oppgitt userid (optional) |
 | 🟢 | 🔑 | GET | [`/horses/{horseid}`](#get-horseshorseid) | Vise en spesifikk hest, |
 | 🟢 | 🔑 | GET | [`/userrelations/friends/[userid]`](#get-userrelationsfriendsuserid) | Viser venner til token eller userid (optional) |
@@ -255,17 +255,23 @@ photo-1614203586837-1da2bef106a2?w=200&h=200&fit=crop"
 
 🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
 
-📌 **Beskrivelse:** Henter ut informasjon om en bruker.
+📌 **Beskrivelse:** Henter ut informasjon om en bruker, eller en brukers venn. Endpointet vil tilpasse innholdet ettersom ?userId er oppgitt, om brukeren fra token og user id er venner, følger eller blokkerer. Kanskje også man skulle returnert status? slik at når man åpner profilen så står det at dem er venner? Hvis det ikke blir masse styr?
 
 📑 **Parametere:**
 |Parameter| Name | Type     | Påkrevd | Beskrivelse |
 |------|-----------|--------|---------|-------------|
 | 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
 | 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
+| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+
 
 #### 🔎 Query:
 
-`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+
 
 #### 💾 Syntax:
 ```bash
@@ -291,10 +297,36 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
     "pictureUrl": "https://plus.unsplash.com/premium_photo-1661868397660-8c52f33c5934?w=200&h=200&fit=crop",
     "alias": "Kamuflasjen",
     "description": "Har utmerket meg spesielt i kunsten å balansere en pinnsvin på hodet mens jeg hopper på trampoline. Er den eneste i historien som har vunnet en sjakkturnering ved å blunke strategisk til motstanderne. Har en medfødt evne til å forstå hva lamaer prøver å si, og kan navigere i ukjente byer ved å lukte seg frem til nærmeste pannekakebod. En gang syklet jeg over en innsjø – ingen vet helt hvordan, men teoriene involverer både helium og viljestyrke.",
-    "dob": "2025-03-03T11:06:09.918987Z",
-    "created_at": "2025-03-03T11:06:09.918987Z",
+    "dob": "2025-03-07T21:41:44.639116Z",
+    "created_at": "2025-03-07T21:41:44.639116Z",
     "friendsCount": 1,
-    "horseCount": 1
+    "horseCount": 1,
+    "relationStatus": "FRIENDS",
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0011-123456780029",
+            "trailName": "Stabekkløypa",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780028",
+            "trailName": "Høvikrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780027",
+            "trailName": "Fornebutravbane",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 1,
+    "size": 3
 }
 ```
 
@@ -306,7 +338,33 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
     "pictureUrl": "https://images.unsplash.com/photo-1568038479111-87bf80659645?w=200&h=200&fit=crop",
     "alias": "JesperDagenLang",
     "description": "Jeg har en fascinerende evne til å snakke lenge om ting jeg egentlig ikke forstår. En gang forklarte jeg kvantefysikk for en gjeng måker – de var ikke imponert. Jeg mener fortsatt at jeg burde fått en æresdoktorgrad i ‘usannsynlige livsvalg’ og ‘avansert prokrastinering’. På CV-en min står det at jeg er en ‘problemløser’, men det gjelder hovedsakelig problemer jeg selv har skapt.",
-    "created_at": "2025-03-03T11:06:11.324384Z"
+    "created_at": "2025-03-07T19:20:35.720707Z",
+    "relationStatus": "PENDING",
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0011-123456780062",
+            "trailName": "Lommedalsrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780061",
+            "trailName": "Gjøviksruta",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780060",
+            "trailName": "Biriløypa",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 1,
+    "size": 3
 }
 ```
 
@@ -318,9 +376,10 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 
 
 📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Hester ble hentet.
+- ✅ `200 OK` – Brukeren ble hentet.
 - ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
 - ❌ `404 Not Found` – Bruker ikke funnet.
+- ❌ `500 Internal Server Error` – Server Feil.
 
 ---
 
@@ -451,9 +510,9 @@ curl -X GET "https://hopla.onrender.com/div/helloworld"
 
 #### 🔎 Query:
 
-`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-`?userId=[Guid]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
-`?userId=[Guid]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 #### 💾 Syntax:
 ```bash
@@ -488,9 +547,10 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 
 
 📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Hester ble hentet.
-- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ✅ `200 OK` – Brukeren ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.'
 - ❌ `404 Not Found` – Bruker ikke funnet.
+- ❌ `500 Internal Server Error` – Server feil.
 
 ---
 

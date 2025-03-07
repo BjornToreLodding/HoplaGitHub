@@ -380,10 +380,33 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
     "pictureUrl": "https://images.unsplash.com/photo-1568038479111-87bf80659645?w=200&h=200&fit=crop",
     "alias": "JesperDagenLang",
     "description": "Jeg har en fascinerende evne til å snakke lenge om ting jeg egentlig ikke forstår. En gang forklarte jeg kvantefysikk for en gjeng måker – de var ikke imponert. Jeg mener fortsatt at jeg burde fått en æresdoktorgrad i ‘usannsynlige livsvalg’ og ‘avansert prokrastinering’. På CV-en min står det at jeg er en ‘problemløser’, men det gjelder hovedsakelig problemer jeg selv har skapt.",
-    "created_at": "2025-03-03T11:06:11.324384Z",
+    "created_at": "2025-03-07T19:20:35.720707Z",
+    "relationStatus": "PENDING",
     "userHikes": [
-      (fikk ikke testet)
-    ]
+        {
+            "id": "12345678-0000-0000-0011-123456780062",
+            "trailName": "Lommedalsrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780061",
+            "trailName": "Gjøviksruta",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780060",
+            "trailName": "Biriløypa",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 1,
+    "size": 3
 }
 ```
 
@@ -488,7 +511,8 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 
 📟 **Mulige statuskoder:**
 - ✅ `200 OK` – Brukeren ble hentet.
-- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.'
+- ❌ `404 Not Found` – Bruker ikke funnet.
 - ❌ `500 Internal Server Error` – Server feil.
 
 </td>
