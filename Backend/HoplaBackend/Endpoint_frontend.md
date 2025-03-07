@@ -310,9 +310,9 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(både of
 
 #### 🔎 Query:
 
-`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-`?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
-`?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 
 #### 💾 Syntax:
@@ -380,7 +380,10 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
     "pictureUrl": "https://images.unsplash.com/photo-1568038479111-87bf80659645?w=200&h=200&fit=crop",
     "alias": "JesperDagenLang",
     "description": "Jeg har en fascinerende evne til å snakke lenge om ting jeg egentlig ikke forstår. En gang forklarte jeg kvantefysikk for en gjeng måker – de var ikke imponert. Jeg mener fortsatt at jeg burde fått en æresdoktorgrad i ‘usannsynlige livsvalg’ og ‘avansert prokrastinering’. På CV-en min står det at jeg er en ‘problemløser’, men det gjelder hovedsakelig problemer jeg selv har skapt.",
-    "created_at": "2025-03-03T11:06:11.324384Z"
+    "created_at": "2025-03-03T11:06:11.324384Z",
+    "userHikes": [
+      (fikk ikke testet)
+    ]
 }
 ```
 
@@ -395,6 +398,8 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 - ✅ `200 OK` – Brukeren ble hentet.
 - ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
 - ❌ `404 Not Found` – Bruker ikke funnet.
+- ❌ `500 Internal Server Error` – Server Feil.
+
 
 </td>
 </tr>
@@ -445,9 +450,9 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 
 #### 🔎 Query:
 
-`?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-`?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
-`?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 #### 💾 Syntax:
 ```bash

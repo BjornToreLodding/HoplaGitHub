@@ -17,9 +17,9 @@ public static class UserRelationMock
             new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780004"), Status = "FRIENDS" }, //, CreatedAt = 
             new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780005"), Status = "FRIENDS" },
             new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780006"), Status = "FRIENDS" },
-            new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780007"), Status = "PENDING" },
-            new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780008"), Status = "PENDING" },
-            new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780009"), Status = "PENDING" },
+            new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780007"), Status = "FOLLOWING" },
+            new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780008"), Status = "FOLLOWING" },
+            new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780009"), Status = "FOLLOWING" },
             new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780010"), Status = "PENDING" },
             new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780011"), Status = "PENDING" },
             new UserRelation { FromUserId = Guid.Parse("12345678-0000-0000-0001-123456780001"), ToUserId = Guid.Parse("12345678-0000-0000-0001-123456780012"), Status = "PENDING" },
