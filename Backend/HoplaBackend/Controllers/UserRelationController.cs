@@ -48,8 +48,8 @@ namespace HoplaBackend.Controllers
                 userId = parsedUserId;
             }
             var friends = await _context.UserRelations
-            //Det skal være lagret som "FRIENDS", men
-                .Where(ur => (ur.Status == "friends" || ur.Status == "FRIENDS" || ur.Status == "Friends") && (ur.FromUserId == userId || ur.ToUserId == userId))
+            //Det skal være lagret som "FRIENDS", men har vært ombygd og kan være noe gammelt friend, friends, Friends, Friend eller FRIEND som jeg ikke har fanget opp.
+                .Where(ur => (ur.Status == "FRIENDS") && (ur.FromUserId == userId || ur.ToUserId == userId))
                 .Select(ur => new
                 {
                     FriendId = ur.FromUserId == userId ? ur.ToUserId : ur.FromUserId,
