@@ -91,7 +91,7 @@ public class TrailController : ControllerBase
         var query = _context.Trails.AsQueryable();
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(t => t.Name.Contains(search));  
+            query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));  
         }
 
         var trails = await query
