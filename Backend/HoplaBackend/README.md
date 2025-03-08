@@ -57,6 +57,9 @@ Klikk på et endepunkt for å se spesifikasjonene, inkludert:
 | ❌ | 🔑 | GET | [`/userrelations/requests/`](#get-userrelationsrequests) | viser venneforspørsler |
 | 🟢 | 🔑 | GET | [`/userrelations/following/`](#get-userrelationsfollowing) | viser hvem userId følger |
 | 🟢 | 🔑 | GET | [`/userhikes/user`](#get-userhikesuser) | viser turene til innlogget bruker ELLER oppgitt userID  |
+| 🟢 | 🔑 | GET | [`/trails/all`](#get-trailsall) | viser løypene i databasen, evt som matcher søkefelt |
+| 🟢 | 🔑 | GET | [`/trails/list`](#get-trailslist) | viser løypene nærmest brukerens posisjon |
+
 
 ## Endpoints for Adminportal
 | 🛠️ | 🔒 | Metode | Endpoint | Beskrivelse/Parameters |
@@ -564,54 +567,130 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 |Parameter| Name | Type     | Påkrevd | Beskrivelse |
 |------|-----------|--------|---------|-------------|
 | 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
-| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `search`  | string   | 🟡 Nei   | Søkefelt for navn på en runde |
+| 🔎 Query | `sort`  | string   | 🟡 Nei   | Ikke kodet, men hardkodet at den sorterer på avrundet rangering |
 | 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
 | 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
 
 
 #### 🔎 Query:
 
-* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?search=[String]` - 🟡 Valgfritt: Hvis oppgitt, så søker den etter ordene som er oppgitt her.
+* `?sort=[String]` - 🟡 Valgfritt: Hvis oppgitt, så sorterer den, men dette er kun hardkodet nå.
 * `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
 * `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 #### 💾 Syntax:
 ```bash
-curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
+curl -X GET "https://hopla.onrender.com/trails/all?search=[string]&sort[string]&pageNumber=[int]&pageSize=[int]" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer <TOKEN>"
 ```
 
-📤 **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+📤 **Eksempel på respons med queryene pageNumber=1 og pageSize=2**
 ```json
 {
     "userHikes": [
         {
-            "id": "12345678-0000-0000-0011-123456780017",
-            "trailName": "Høvikrunden",
-            "length": 16.54,
-            "duration": 50.75,
-            "pictureUrl": ""
+            "id": "12345678-0000-0000-0021-123456780015",
+            "name": "SandvikaLøypa",
+            "pictureUrl": null,
+            "averageRating": 3
         },
         {
-            "id": "12345678-0000-0000-0011-123456780016",
-            "trailName": "Fornebutravbane",
-            "length": 16.54,
-            "duration": 50.75,
-            "pictureUrl": ""
+            "id": "12345678-0000-0000-0021-123456780014",
+            "name": "LysakerLøypa",
+            "pictureUrl": null,
+            "averageRating": 3
         }
     ],
-    "page": 7,
+    "page": 1,
     "size": 2
 }
 ```
 
 
 📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Brukeren ble hentet.
+- ✅ `200 OK` – Løyper ble hentet.
 - ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.'
-- ❌ `404 Not Found` – Bruker ikke funnet.
+- ❌ `404 Not Found` – Løyper ikke funnet (legger inn senere at denne sjekkes)
 - ❌ `500 Internal Server Error` – Server feil.
+
+
+### GET /trails/list
+
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Henter alle turer som skal returneres til liste sortert etter avstand.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 🔎 Query | `latitude`  | double   | ✅ Ja   | Brukerens posisjon oppgitt som latitude |
+| 🔎 Query | `longitide`  | double   | ✅ Ja   | Brukeres posisjon oppgitt som longitide |
+| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
+| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+| 🔎 Query | `filter`  | string-JSON   | 🟡 Nei   | IKKE implementert, men brukes hvis man ønsker å filtrere noe |
+
+
+#### 🔎 Query: (Dette er også oppgitt i tabell ovenfor, så det blir smør på flesk. Vurder å ta bort?)
+
+* `?latitude=[double]` - ✅ Brukerens posisjon som latitude.
+* `?longitide=[double]` - ✅ Brukerens posisjon som longitude.
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?filter=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+
+#### 💾 Syntax:
+```bash
+curl -X GET "https://hopla.onrender.com/trails/all?search=[string]&sort[string]&pageNumber=[int]&pageSize=[int]" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+
+📤 **Eksempel på respons med queryene pageNumber=1 og pageSize=2**
+```json
+{
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0021-123456780015",
+            "name": "SandvikaLøypa",
+            "pictureUrl": null,
+            "distance": 1.0848015268282347
+        },
+        {
+            "id": "12345678-0000-0000-0021-123456780014",
+            "name": "LysakerLøypa",
+            "pictureUrl": null,
+            "distance": 18.3370760175382
+        }
+    ],
+    "page": 1,
+    "size": 2
+}
+```
+
+
+📟 **Mulige statuskoder:**
+- ✅ `200 OK` – Løyper ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.'
+- ❌ `404 Not Found` – Løyper ikke funnet (legger inn senere at denne sjekkes)
+- ❌ `500 Internal Server Error` – Server feil.
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
