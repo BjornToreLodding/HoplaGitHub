@@ -80,13 +80,21 @@ public class TrailController : ControllerBase
     [Authorize]
     [HttpGet("all")]
     public async Task<IActionResult> GetAllTrails(
+        [FromQuery] string? search, 
         [FromQuery] string? sort, 
+
         [FromQuery] int? pageNumber = 1, 
         [FromQuery] int? pageSize = 10)
     {
         int page = pageNumber ?? 1;
         int size = pageSize ?? 10;
-        var trails = await _context.Trails
+        var query = _context.Trails.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(t => t.Name.Contains(search));  
+        }
+
+        var trails = await query
             .OrderByDescending(t => Math.Round(t.AverageRating ?? 0)) // Først etter avrundet rating
             .ThenByDescending(t => t.CreatedAt) // Deretter etter CreatedAt for likeverdige ratings
             .Skip((page - 1) * size)

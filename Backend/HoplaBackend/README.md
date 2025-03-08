@@ -554,6 +554,67 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 
 ---
 
+### GET /trails/all
+
+🔙 Tilbake til[`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
+
+📌 **Beskrivelse:** Henter alle turer som skal returneres i Løyper -> ALT.
+
+📑 **Parametere:**
+|Parameter| Name | Type     | Påkrevd | Beskrivelse |
+|------|-----------|--------|---------|-------------|
+| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
+| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
+| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
+| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+
+
+#### 🔎 Query:
+
+* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+
+#### 💾 Syntax:
+```bash
+curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer <TOKEN>"
+```
+
+📤 **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+```json
+{
+    "userHikes": [
+        {
+            "id": "12345678-0000-0000-0011-123456780017",
+            "trailName": "Høvikrunden",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        },
+        {
+            "id": "12345678-0000-0000-0011-123456780016",
+            "trailName": "Fornebutravbane",
+            "length": 16.54,
+            "duration": 50.75,
+            "pictureUrl": ""
+        }
+    ],
+    "page": 7,
+    "size": 2
+}
+```
+
+
+📟 **Mulige statuskoder:**
+- ✅ `200 OK` – Brukeren ble hentet.
+- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.'
+- ❌ `404 Not Found` – Bruker ikke funnet.
+- ❌ `500 Internal Server Error` – Server feil.
+
+
+
 
 ### GET /div/status
 🔙 Tilbake til [`Endpoints brukt og testet av frontend`](#endpoints-brukt-og-testet-av-frontend)
