@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250307212935_UserHike")]
-    partial class UserHike
+    [Migration("20250308220027_TrailFavoritesAndAvegareRating")]
+    partial class TrailFavoritesAndAvegareRating
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -414,6 +414,9 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<double?>("AverageRating")
+                        .HasColumnType("double precision");
+
                     b.Property<int>("CommentsCount")
                         .HasColumnType("integer");
 
@@ -440,6 +443,9 @@ namespace HoplaBackend.Migrations
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -512,6 +518,27 @@ namespace HoplaBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TrailDetails", "public");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.TrailFavorite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TrailId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrailId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TrailFavorites", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailFilter", b =>
@@ -1042,6 +1069,25 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("Trail");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.TrailFavorite", b =>
+                {
+                    b.HasOne("HoplaBackend.Models.Trail", "Trail")
+                        .WithMany()
+                        .HasForeignKey("TrailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HoplaBackend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trail");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailFilter", b =>

@@ -47,6 +47,7 @@ public class AppDbContext : DbContext
     public DbSet<UserReport> UserReports { get; set; }
     public DbSet<TrailFilterValue> TrailFilterValues { get; set; }
     public DbSet<TrailFilterDefinition> TrailFilterDefinitions { get; set; }
+    public DbSet<TrailFavorite> TrailFavorites { get; set; }
     
     /*
     public DbSet<Ride> Rides { get; set; }

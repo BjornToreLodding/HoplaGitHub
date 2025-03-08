@@ -12,6 +12,7 @@ using HoplaBackend.Helpers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
+using Microsoft.VisualBasic;
 
 namespace HoplaBackend.Controllers;
 
@@ -79,7 +80,7 @@ public class TrailController : ControllerBase
     [Authorize]
     [HttpGet("all")]
     public async Task<IActionResult> GetAllTrails(
-        [FromQuery] string sort, 
+        [FromQuery] string? sort, 
         [FromQuery] int? pageNumber = 1, 
         [FromQuery] int? pageSize = 10)
     {
@@ -96,13 +97,18 @@ public class TrailController : ControllerBase
                 Name = t.Name,
                 PictureUrl = t.PictureUrl,
                 AverageRating = t.AverageRating ?? 0
+                
                 //lag riktig DTO for dette
             })
             .ToListAsync();
-            return Ok(trails);
+            var response = new 
+            {
+                Trails = trails,
+                PageNumber = page,
+                PageSize = size
+            };
+            return Ok(response);
     }
-
-
 
     [Authorize]
     [HttpGet("list")]
@@ -134,25 +140,50 @@ public class TrailController : ControllerBase
             }
         }
 
-        // **Filtrer ut ugyldige koordinater**
-        query = query.Where(t => t.LatMean != 0 && t.LongMean != 0);
+        // **Filtrer ut:
+        //  Mrekelige koordinater, 
+        // Skjulte ruter, dvs 0 = public
+        // hvis venn dvs visibulity = 1, så skal den også vises**
+        //Må fullføre dette senere. Ble masse trøbbel :(
+        query = query.Where(t => t.LatMean != 0 && t.LongMean != 0 && t.Visibility == 0); // && (t.Visibility == 1 && t.UserId == "FRIENDS"));
 
-        // Beregn distanse før ekskludering av trails
-        var filteredTrails = await query
-            .Where(t => (!lengthMin.HasValue || t.Distance >= lengthMin) &&  // Min lengde-filter
-                        (!lengthMax.HasValue || t.Distance  <= lengthMax))    // Maks lengde-filter
-            .ApplyPagination(pageNumber, pageSize) // Paginering skjer HER
+        // **Filtrer etter lengde før vi henter ut data fra databasen**
+        query = query.Where(t => (!lengthMin.HasValue || t.Distance >= lengthMin) &&  
+                                (!lengthMax.HasValue || t.Distance <= lengthMax));
+            // Hent dataene fra databasen først (uten sortering på distanse)
+        var trails = await query
             .Select(t => new
             {
                 t.Id,
                 t.Name,
-                Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean),
-                })
-            .OrderBy(t => t.Distance) // Sortering skjer etter Select()
-            .ToListAsync();
+                t.LatMean,
+                t.LongMean
+            })
+            .ToListAsync(); // Henter dataene til minnet
+
+        // **Sorter etter distanse i minnet**
+        var sortedTrails = trails
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean)
+            })
+            .OrderBy(t => t.Distance) // Nå fungerer det siden vi er i minnet
+            .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
+            .Take(pageSize ?? 10)
+            .ToList(); // Utfør paginering i minnet
+            var response = new 
+            
+            {
+                Trails = sortedTrails,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            return Ok(response);
 
 
-        return Ok(filteredTrails);
+    
     }
 
     /*

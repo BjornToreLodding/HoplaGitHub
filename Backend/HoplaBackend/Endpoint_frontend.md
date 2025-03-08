@@ -1,5 +1,6 @@
 
 
+
 # Profil
 
 <table>
@@ -548,19 +549,81 @@ Trenger iallfall endpoint for å bytte profilbilde her
 
 **Løyper -\> Første side**
 
+https://hopla.onrender.com/trails/all
+
+**query:**
+* sort= (ikke i bruk enda, men tenkte stars skulle være option. Akuratt nå er det hardcoded at den sorterer på averagerating(stars))
+* pageNumber Optional. Hvis ikke oppgitt, settes den til 1
+* pageSize Optional. Hvis ikke oppgitt settes den til 10
+
+**eks**
+
+https://localhost:7128/trails/all?pagenumber=1&pagesize=2
+
+**Response eksempel**
+```json
+{
+    "trails": [
+        {
+            "id": "12345678-0000-0000-0021-123456780021",
+            "name": "Sjølystturen",
+            "pictureUrl": null,
+            "averageRating": 0
+        },
+        {
+            "id": "12345678-0000-0000-0021-123456780020",
+            "name": "BjerkeTravbanespurten",
+            "pictureUrl": null,
+            "averageRating": 0
+        }
+    ],
+    "pageNumber": 1,
+    "pageSize": 2
+}
+``` 
+
+
 * Vise alle løyper som brukere har lagt inn i appen. Flest stjerner øverst (hvis likt antall stjerner, nyeste av de øverst. Runde opp så det er f.eks 5 istede for 4.6 så sortere). Løypene må være offentlig eller fra venner
 
 **Løyper -\> Icon 2 fra venstre**
 
 * Vise løyper nærmest brukerens posisjon
 
+**eks**
+
+https://localhost:7128/trails/list?latitude=60.95458&longitude=10.6315
+
+**Respose eks**
+```json
+{
+    "trails": [
+        {
+            "id": "12345678-0000-0000-0021-123456780002",
+            "name": "Gjøviksruta",
+            "distance": 1.0848015268282347
+        },
+        {
+            "id": "12345678-0000-0000-0021-123456780001",
+            "name": "Biriløypa",
+            "distance": 18.3370760175382
+        }
+    ],
+    "pageNumber": 1,
+    "pageSize": 2
+}
+```
+
 **Løyper -\> Hjerte ikon**
 
 * Kun løyper som brukeren har trykket liker på
 
+https://localhost:7128/trails/favorites 
+
 **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
 
 * Løyper til brukere brukeren følger og venner med
+
+http://localhost:7128/trails/relations ?friends=true & following=true
 </td>
 </tr>
 <tr>

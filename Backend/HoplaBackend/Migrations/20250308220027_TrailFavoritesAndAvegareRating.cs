@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class UserHike : Migration
+    public partial class TrailFavoritesAndAvegareRating : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -368,6 +368,8 @@ namespace HoplaBackend.Migrations
                     LikesCount = table.Column<int>(type: "integer", nullable: false),
                     CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     PictureUrl = table.Column<string>(type: "text", nullable: true),
+                    AverageRating = table.Column<double>(type: "double precision", nullable: true),
+                    Visibility = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -478,6 +480,34 @@ namespace HoplaBackend.Migrations
                         column: x => x.Id,
                         principalSchema: "public",
                         principalTable: "Trails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrailFavorites",
+                schema: "public",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TrailId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrailFavorites", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TrailFavorites_Trails_TrailId",
+                        column: x => x.TrailId,
+                        principalSchema: "public",
+                        principalTable: "Trails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrailFavorites_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "public",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -792,6 +822,18 @@ namespace HoplaBackend.Migrations
                 column: "TrailAllCoordinatesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TrailFavorites_TrailId",
+                schema: "public",
+                table: "TrailFavorites",
+                column: "TrailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrailFavorites_UserId",
+                schema: "public",
+                table: "TrailFavorites",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TrailFilterValues_TrailFilterDefinitionId",
                 schema: "public",
                 table: "TrailFilterValues",
@@ -911,6 +953,10 @@ namespace HoplaBackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "TrailCoordinate",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "TrailFavorites",
                 schema: "public");
 
             migrationBuilder.DropTable(

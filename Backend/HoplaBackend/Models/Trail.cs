@@ -21,6 +21,7 @@ public class Trail
     public int CommentsCount { get ; set ; } = 0;
     public string? PictureUrl { get; set; }
     public double? AverageRating { get; set; } = 0;
+    public TrailVisibility Visibility { get; set; } = 0; // Enum, lenger ned
 
     public ICollection<TrailFilterValue> TrailFilters { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -28,6 +29,12 @@ public class Trail
     public TrailAllCoordinate TrailAllCoordinates { get; set; } = null!;
     //public TrailFilter TrailFilters { get; set; } = null!;
     public List<TrailReview> TrailReviews { get; set; } = new();
+}
+public enum TrailVisibility
+{
+    Public = 0,
+    FriendsOnly = 1,
+    Private = 2
 }
 /*
 public partial class Trail
