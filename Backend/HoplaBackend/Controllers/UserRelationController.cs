@@ -48,7 +48,8 @@ namespace HoplaBackend.Controllers
                 userId = parsedUserId;
             }
             var friends = await _context.UserRelations
-                .Where(ur => (ur.Status == "friend" || ur.Status == "FRIEND" || ur.Status == "Friend") && (ur.FromUserId == userId || ur.ToUserId == userId))
+            //Det skal være lagret som "FRIENDS", men
+                .Where(ur => (ur.Status == "friends" || ur.Status == "FRIENDS" || ur.Status == "Friends") && (ur.FromUserId == userId || ur.ToUserId == userId))
                 .Select(ur => new
                 {
                     FriendId = ur.FromUserId == userId ? ur.ToUserId : ur.FromUserId,
