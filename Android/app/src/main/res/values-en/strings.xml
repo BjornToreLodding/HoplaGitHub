@@ -131,5 +131,8 @@
     <string name="fill_inn_marked_fields">Marked fields must be filled</string>
     <string name="remove_image">Remove image</string>
     <string name="horses">Horses</string>
+    <string name="relation_status">Relation</string>
+    <string name="trips">Trips</string>
+    <string name="load_more">Load more</string>
 
 </resources>

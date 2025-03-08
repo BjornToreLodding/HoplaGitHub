@@ -130,5 +130,8 @@
     <string name="fill_inn_marked_fields">Markerte felt må fylles inn</string>
     <string name="remove_image">Fjern bilde</string>
     <string name="horses">Hester</string>
+    <string name="relation_status">Relasjon</string>
+    <string name="trips">Turer</string>
+    <string name="load_more">Last ned mer</string>
 
 </resources>

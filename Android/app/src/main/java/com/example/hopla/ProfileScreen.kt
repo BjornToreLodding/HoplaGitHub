@@ -803,6 +803,10 @@ fun FriendProfileScreen(navController: NavController, userId: String) {
                         style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
                         modifier = Modifier.clickable { /* Handle horses click */ }
                     )
+                    Text(
+                        text = stringResource(R.string.relation_status) + ": ${profile.relationStatus}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -830,6 +834,21 @@ fun FriendProfileScreen(navController: NavController, userId: String) {
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(R.string.trips), style = MaterialTheme.typography.headlineSmall)
+            profile.userHikes.forEach { hike ->
+                HikeItem(hike)
+            }
+            Box(
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(100.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable { /* Handle load more click */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Load More", style = MaterialTheme.typography.bodyMedium, color = PrimaryBlack)
+            }
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -844,6 +863,23 @@ fun FriendProfileScreen(navController: NavController, userId: String) {
     } ?: run {
         // Show a loading indicator or error message
         Text(text = "Loading...", style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun HikeItem(hike: Hike) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(PrimaryWhite)
+            .padding(16.dp)
+    ) {
+        Text(text = hike.trailName, style = MaterialTheme.typography.bodyLarge)
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = "${hike.length} km", style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = "${hike.duration} min", style = MaterialTheme.typography.bodyMedium)
     }
 }
 

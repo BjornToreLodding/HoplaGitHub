@@ -162,7 +162,18 @@ data class FriendProfile(
     val dob: String,
     val created_at: String?,
     val friendsCount: Int,
-    val horseCount: Int
+    val horseCount: Int,
+    val relationStatus: String,
+    val userHikes: List<Hike>
+)
+
+@Serializable
+data class Hike(
+    val id: String,
+    val trailName: String,
+    val length: Double,
+    val duration: Double,
+    val pictureUrl: String
 )
 
 fun formatDate(dateString: String): String {
