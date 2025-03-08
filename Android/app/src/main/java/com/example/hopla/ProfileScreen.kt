@@ -1115,7 +1115,9 @@ fun FollowingItem(following: Following, navController: NavController) {
             .padding(8.dp)
             .background(PrimaryWhite)
             .padding(16.dp)
-            .clickable { /*navController.navigate("person_detail/${friend.friendId}")*/ }
+            .clickable {
+                navController.navigate("friend_profile/${following.followingUserId}")
+            }
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = following.followingUserPicture),

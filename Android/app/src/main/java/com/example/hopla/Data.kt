@@ -158,13 +158,13 @@ data class FriendProfile(
     val name: String,
     val pictureUrl: String,
     val alias: String,
-    val description: String?,
-    val dob: String,
-    val created_at: String?,
-    val friendsCount: Int,
-    val horseCount: Int,
-    val relationStatus: String,
-    val userHikes: List<Hike>
+    val description: String? = null,
+    val dob: String? = null,
+    val created_at: String? = null,
+    val friendsCount: Int? = null,
+    val horseCount: Int? = null,
+    val relationStatus: String? = null,
+    val userHikes: List<Hike> = emptyList()
 )
 
 @Serializable
@@ -176,9 +176,9 @@ data class Hike(
     val pictureUrl: String
 )
 
-fun formatDate(dateString: String): String {
+fun formatDate(dateString: String): String? {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
     val outputFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val date = inputFormat.parse(dateString)
-    return outputFormat.format(date)
+    return date?.let { outputFormat.format(it) }
 }
