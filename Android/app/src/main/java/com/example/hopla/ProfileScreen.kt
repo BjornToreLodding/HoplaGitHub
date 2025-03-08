@@ -665,60 +665,6 @@ fun TripItem(trip: Trip) {
     }
 }
 
-@Composable
-fun FriendsScreen(navController: NavController) {
-    var friends by remember { mutableStateOf<List<Friend>>(emptyList()) }
-    var searchQuery by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            try {
-                friends = fetchFriends(UserSession.token)
-            } catch (e: Exception) {
-                Log.e("FriendsScreen", "Error fetching friends", e)
-            }
-        }
-    }
-
-    val filteredFriends = friends.filter {
-        it.friendName.contains(searchQuery, ignoreCase = true) ||
-                it.friendAlias.contains(searchQuery, ignoreCase = true)
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-        ) {
-            ScreenHeader(navController, stringResource(R.string.friends))
-
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it }
-            )
-
-            if (filteredFriends.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.no_friends_match_search),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(filteredFriends) { friend ->
-                        UserItemComposable(friend, navController)
-                    }
-                }
-            }
-        }
-        AddButton(onClick = { navController.navigate("addFriendScreen") })
-    }
-}
-
 // Details about a person
 @Composable
 fun UsersProfileScreen(navController: NavController, userId: String) {
@@ -1026,24 +972,28 @@ fun PersonDetailScreen(navController: NavController, person: Person) {
 }
 
 @Composable
-fun FollowingScreen(navController: NavController) {
-    var following by remember { mutableStateOf<List<Following>>(emptyList()) }
+fun UserListScreen(
+    navController: NavController,
+    title: String,
+    fetchUsers: suspend (String) -> List<UserItem>
+) {
+    var users by remember { mutableStateOf<List<UserItem>>(emptyList()) }
     var searchQuery by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
-                following = fetchFollowing(UserSession.token)
+                users = fetchUsers(UserSession.token)
             } catch (e: Exception) {
-                Log.e("FollowingScreen", "Error fetching following", e)
+                Log.e("UserListScreen", "Error fetching users", e)
             }
         }
     }
 
-    val filteredFollowing = following.filter {
-        it.followingUserName.contains(searchQuery, ignoreCase = true) ||
-                it.followingUserAlias.contains(searchQuery, ignoreCase = true)
+    val filteredUsers = users.filter {
+        it.name.contains(searchQuery, ignoreCase = true) ||
+                it.alias.contains(searchQuery, ignoreCase = true)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -1052,16 +1002,16 @@ fun FollowingScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            ScreenHeader(navController, stringResource(R.string.following))
+            ScreenHeader(navController, title)
 
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
             )
 
-            if (filteredFollowing.isEmpty()) {
+            if (filteredUsers.isEmpty()) {
                 Text(
-                    text = stringResource(R.string.no_following_matches),
+                    text = stringResource(R.string.no_matches),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -1069,14 +1019,32 @@ fun FollowingScreen(navController: NavController) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(filteredFollowing) { person ->
-                        UserItemComposable(person, navController)
+                    items(filteredUsers) { user ->
+                        UserItemComposable(user, navController)
                     }
                 }
             }
         }
         AddButton(onClick = { navController.navigate("addFriendScreen") })
     }
+}
+
+@Composable
+fun FriendsScreen(navController: NavController) {
+    UserListScreen(
+        navController = navController,
+        title = stringResource(R.string.friends),
+        fetchUsers = { token -> fetchFriends(token) }
+    )
+}
+
+@Composable
+fun FollowingScreen(navController: NavController) {
+    UserListScreen(
+        navController = navController,
+        title = stringResource(R.string.following),
+        fetchUsers = { token -> fetchFollowing(token) }
+    )
 }
 
 @Composable

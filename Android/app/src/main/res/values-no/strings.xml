@@ -134,5 +134,6 @@
     <string name="relation_status">Relasjon</string>
     <string name="trips">Turer</string>
     <string name="load_more">Last ned mer</string>
+    <string name="no_matches">Ingen treff</string>
 
 </resources>
