@@ -779,8 +779,10 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             }
         }
     } ?: run {
-        // Show a loading indicator or error message
-        Text(text = "Loading...", style = MaterialTheme.typography.bodyLarge)
+        // Show a loading indicator
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
 

@@ -102,7 +102,7 @@ suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get("https://hopla.onrender.com/users/profile?userId=$userId") {
+        val response: HttpResponse = client.get(apiUrl + "users/profile?userId=$userId") {
             headers {
                 append("Authorization", "Bearer $token")
             }
