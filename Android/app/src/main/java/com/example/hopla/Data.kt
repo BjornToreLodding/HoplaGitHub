@@ -91,6 +91,13 @@ data class Message(
     val username: String
 )
 
+interface UserItem {
+    val id: String
+    val name: String
+    val alias: String
+    val pictureUrl: String
+}
+
 // Class for the data for a friend (for the list of friends)
 @Serializable
 data class Friend(
@@ -98,16 +105,26 @@ data class Friend(
     val friendName: String,
     val friendAlias: String,
     val friendPictureURL: String
-)
+) : UserItem {
+    override val id: String get() = friendId
+    override val name: String get() = friendName
+    override val alias: String get() = friendAlias
+    override val pictureUrl: String get() = friendPictureURL
+}
 
-// Class for the data for a person the user follows (for the list of following)
+// Class for the data for a following user (for the list of following users)
 @Serializable
 data class Following(
     val followingUserId: String,
     val followingUserName: String,
     val followingUserAlias: String,
     val followingUserPicture: String
-)
+) : UserItem {
+    override val id: String get() = followingUserId
+    override val name: String get() = followingUserName
+    override val alias: String get() = followingUserAlias
+    override val pictureUrl: String get() = followingUserPicture
+}
 
 // Class for content that are sent to database when trying to login
 @Serializable

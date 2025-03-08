@@ -710,7 +710,7 @@ fun FriendsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredFriends) { friend ->
-                        FriendItem(friend, navController)
+                        UserItemComposable(friend, navController)
                     }
                 }
             }
@@ -719,37 +719,9 @@ fun FriendsScreen(navController: NavController) {
     }
 }
 
+// Details about a person
 @Composable
-fun FriendItem(friend: Friend, navController: NavController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(PrimaryWhite)
-            .padding(16.dp)
-            .clickable {
-                navController.navigate("friend_profile/${friend.friendId}")
-            }
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(model = friend.friendPictureURL),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Text(text = friend.friendName, style = MaterialTheme.typography.bodyLarge)
-            Text(text = friend.friendAlias, style = MaterialTheme.typography.bodySmall)
-        }
-    }
-}
-
-// Details about a friend
-@Composable
-fun FriendProfileScreen(navController: NavController, userId: String) {
+fun UsersProfileScreen(navController: NavController, userId: String) {
     var friendProfile by remember { mutableStateOf<FriendProfile?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
@@ -1098,7 +1070,7 @@ fun FollowingScreen(navController: NavController) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredFollowing) { person ->
-                        FollowingItem(person, navController)
+                        UserItemComposable(person, navController)
                     }
                 }
             }
@@ -1108,7 +1080,7 @@ fun FollowingScreen(navController: NavController) {
 }
 
 @Composable
-fun FollowingItem(following: Following, navController: NavController) {
+fun UserItemComposable(userItem: UserItem, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -1116,11 +1088,11 @@ fun FollowingItem(following: Following, navController: NavController) {
             .background(PrimaryWhite)
             .padding(16.dp)
             .clickable {
-                navController.navigate("friend_profile/${following.followingUserId}")
+                navController.navigate("friend_profile/${userItem.id}")
             }
     ) {
         Image(
-            painter = rememberAsyncImagePainter(model = following.followingUserPicture),
+            painter = rememberAsyncImagePainter(model = userItem.pictureUrl),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -1129,8 +1101,8 @@ fun FollowingItem(following: Following, navController: NavController) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = following.followingUserName, style = MaterialTheme.typography.bodyLarge)
-            Text(text = following.followingUserAlias, style = MaterialTheme.typography.bodySmall)
+            Text(text = userItem.name, style = MaterialTheme.typography.bodyLarge)
+            Text(text = userItem.alias, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
