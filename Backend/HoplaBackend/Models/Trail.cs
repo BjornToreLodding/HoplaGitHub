@@ -20,6 +20,7 @@ public class Trail
     public int LikesCount { get ; set ; } = 0 ;
     public int CommentsCount { get ; set ; } = 0;
     public string? PictureUrl { get; set; }
+    public double? AverageRating { get; set; } = 0;
 
     public ICollection<TrailFilterValue> TrailFilters { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

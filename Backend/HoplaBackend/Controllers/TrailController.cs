@@ -32,8 +32,8 @@ public class TrailController : ControllerBase
     [HttpGet("user")]
     public async Task<ActionResult<List<TrailDto>>> GetUserTrails(
         [FromQuery] Guid? userId, 
-        [FromQuery] int? pageNumber, 
-        [FromQuery] int? pageSize)
+        [FromQuery] int? pageNumber = 1, 
+        [FromQuery] int? pageSize = 10)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
@@ -76,14 +76,41 @@ public class TrailController : ControllerBase
         return Ok(results);
     }
 
+    [Authorize]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllTrails(
+        [FromQuery] string sort, 
+        [FromQuery] int? pageNumber = 1, 
+        [FromQuery] int? pageSize = 10)
+    {
+        int page = pageNumber ?? 1;
+        int size = pageSize ?? 10;
+        var trails = await _context.Trails
+            .OrderByDescending(t => Math.Round(t.AverageRating ?? 0)) // Først etter avrundet rating
+            .ThenByDescending(t => t.CreatedAt) // Deretter etter CreatedAt for likeverdige ratings
+            .Skip((page - 1) * size)
+            .Take(size)
+            .Select(t => new TrailDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                PictureUrl = t.PictureUrl,
+                AverageRating = t.AverageRating ?? 0
+                //lag riktig DTO for dette
+            })
+            .ToListAsync();
+            return Ok(trails);
+    }
+
+
 
     [Authorize]
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 
         [FromQuery] double longitude,
-        [FromQuery] int? pageNumber = null, 
-        [FromQuery] int? pageSize = null,
+        [FromQuery] int? pageNumber = 1, 
+        [FromQuery] int? pageSize = 10,
         [FromQuery] string? filters = null, // JSON-baserte filtre
         [FromQuery] double? lengthMin = null,
         [FromQuery] double? lengthMax = null) 

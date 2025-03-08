@@ -23,6 +23,8 @@ public class TrailService
                 {
                     Id = t.Id,
                     Name = t.Name,
+                    PictureUrl = t.PictureUrl,
+                    AverageRating = (double)t.AverageRating
                     //lag riktig DTO for dette
                 })
                 .ToListAsync();
