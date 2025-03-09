@@ -118,8 +118,7 @@ data class UserHikesResponse(
     val userHikes: List<Hike>
 )
 
-suspend fun fetchUserHikes(token: String): List<Hike> {
-    val pageNumb = 1
+suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -128,13 +127,13 @@ suspend fun fetchUserHikes(token: String): List<Hike> {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"userhikes/user?pageNumber=$pageNumb") {
+        val response: HttpResponse = client.get(apiUrl+"userhikes/user?pageNumber=$pageNumber") {
             headers {
                 append("Authorization", "Bearer $token")
             }
         }
         val responseBody: String = response.bodyAsText()
-        Log.d("UserHikesScreen", "PageNumb: $pageNumb")
+        Log.d("UserHikesScreen", "PageNumb: $pageNumber")
         Log.d("UserHikesScreen", "Response: $responseBody")
         val userHikesResponse: UserHikesResponse = response.body()
         userHikesResponse.userHikes

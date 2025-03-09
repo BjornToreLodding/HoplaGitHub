@@ -570,13 +570,15 @@ fun UserChanges(modifier: Modifier = Modifier) {
 @Composable
 fun MyTripsScreen(navController: NavController) {
     var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
+    var pageNumber by remember { mutableIntStateOf(1) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(pageNumber) {
         coroutineScope.launch {
             try {
-                userHikes = fetchUserHikes(token)
+                val newHikes = fetchUserHikes(token, pageNumber)
+                userHikes = userHikes + newHikes
             } catch (e: Exception) {
                 Log.e("UserHikesScreen", "Error fetching user hikes", e)
             }
@@ -604,7 +606,7 @@ fun MyTripsScreen(navController: NavController) {
                     }
                     item {
                         Button(
-                            onClick = { /* Handle load more logic here */ },
+                            onClick = { pageNumber++ },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
