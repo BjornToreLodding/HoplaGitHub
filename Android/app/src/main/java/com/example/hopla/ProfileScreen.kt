@@ -704,6 +704,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     var showFullDescription by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    var pageNumber by remember { mutableStateOf(1) }
+    var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
 
     LaunchedEffect(userId) {
         coroutineScope.launch {
@@ -711,6 +713,18 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 friendProfile = fetchFriendProfile(userId, token)
             } catch (e: Exception) {
                 Log.e("FriendProfileScreen", "Error fetching friend profile", e)
+            }
+        }
+    }
+
+    fun loadMoreHikes() {
+        coroutineScope.launch {
+            try {
+                pageNumber += 1
+                val updatedProfile = fetchFriendProfile(userId, token)
+                userHikes = userHikes + updatedProfile.userHikes
+            } catch (e: Exception) {
+                Log.e("FriendProfileScreen", "Error loading more hikes", e)
             }
         }
     }
@@ -827,7 +841,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     .height(50.dp)
                     .width(100.dp)
                     .background(MaterialTheme.colorScheme.primary)
-                    .clickable { /* Handle load more click */ },
+                    .clickable { loadMoreHikes() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "Load More", style = MaterialTheme.typography.bodyMedium, color = PrimaryBlack)

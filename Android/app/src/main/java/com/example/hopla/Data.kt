@@ -181,7 +181,9 @@ data class FriendProfile(
     val friendsCount: Int? = null,
     val horseCount: Int? = null,
     val relationStatus: String? = null,
-    val userHikes: List<Hike> = emptyList()
+    val userHikes: List<Hike> = emptyList(),
+    val page: Int? = null,
+    val size: Int? = null
 )
 
 @Serializable
