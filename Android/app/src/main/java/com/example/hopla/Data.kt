@@ -190,7 +190,10 @@ data class Hike(
     val trailName: String,
     val length: Double,
     val duration: Double,
-    val pictureUrl: String
+    val pictureUrl: String,
+    val page: Int? = null,
+    val size: Int? = null
+
 )
 
 fun formatDate(dateString: String): String? {

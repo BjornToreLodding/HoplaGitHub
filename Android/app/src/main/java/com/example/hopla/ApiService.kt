@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 fun fetchMessages(messageName: String): List<Message> {
@@ -111,3 +112,26 @@ suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
     }
 }
 
+@Serializable
+data class UserHikesResponse(
+    val userHikes: List<Hike>
+)
+
+suspend fun fetchUserHikes(token: String): List<Hike> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl+"userhikes/user") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        val userHikesResponse: UserHikesResponse = response.body()
+        userHikesResponse.userHikes
+    }
+}

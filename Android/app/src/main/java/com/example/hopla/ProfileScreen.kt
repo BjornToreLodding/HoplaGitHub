@@ -569,24 +569,40 @@ fun UserChanges(modifier: Modifier = Modifier) {
 
 @Composable
 fun MyTripsScreen(navController: NavController) {
-    val trips = listOf(
-        Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
-        Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
-        Trip("Beach run", "2023-08-20", "8", "1.5", R.drawable.stockimg2),
-    )
+    var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        ScreenHeader(navController, stringResource(R.string.my_trips))
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                userHikes = fetchUserHikes(token)
+            } catch (e: Exception) {
+                Log.e("UserHikesScreen", "Error fetching user hikes", e)
+            }
+        }
+    }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
         ) {
-            items(trips) { trip ->
-                TripItem(trip)
+            ScreenHeader(navController, stringResource(R.string.my_trips))
+
+            if (userHikes.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(userHikes) { hike ->
+                        HikeItem(hike)
+                    }
+                }
             }
         }
     }
@@ -794,12 +810,24 @@ fun HikeItem(hike: Hike) {
             .padding(8.dp)
             .background(PrimaryWhite)
             .padding(16.dp)
+            .clickable {
+                // Handle item click
+            }
     ) {
-        Text(text = hike.trailName, style = MaterialTheme.typography.bodyLarge)
+        Image(
+            painter = rememberAsyncImagePainter(model = hike.pictureUrl),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+        )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = "${hike.length} km", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = "${hike.duration} min", style = MaterialTheme.typography.bodyMedium)
+        Column {
+            Text(text = hike.trailName, style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Length: ${hike.length} km", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Duration: ${hike.duration} min", style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
