@@ -155,3 +155,21 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
         response.body()
     }
 }
+
+suspend fun fetchTrails(token: String, pageNumber: Int): TrailsResponse {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get("https://hopla.onrender.com/trails/all?pageNumber=$pageNumber") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}

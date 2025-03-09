@@ -704,7 +704,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     var showFullDescription by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
-    var pageNumber by remember { mutableStateOf(1) }
+    var pageNumber by remember { mutableIntStateOf(1) }
     var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
 
     LaunchedEffect(userId) {

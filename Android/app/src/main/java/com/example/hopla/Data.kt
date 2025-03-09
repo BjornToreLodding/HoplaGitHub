@@ -145,8 +145,6 @@ enum class Difficulty {
     HARD
 }
 
-val presetFilters = listOf("gravel", "sand", "asphalt", "dirt")
-
 // Define the Filters class
 data class Filters(
     val filterStrings: Set<String> = emptySet(),
@@ -156,7 +154,7 @@ data class Filters(
 // Data class to hold the information for each ContentBox
 data class ContentBoxInfo(
     val title: String,
-    val imageResource: Set<Int>,
+    val imageResource: List<Any>,
     val isHeartClicked: Boolean,
     val starRating: Int,
     val filters: Filters = Filters(),
@@ -204,3 +202,21 @@ fun formatDate(dateString: String): String? {
     val date = inputFormat.parse(dateString)
     return date?.let { outputFormat.format(it) }
 }
+
+@Serializable
+data class Trail(
+    val id: String,
+    val name: String,
+    val pictureUrl: String?,
+    val averageRating: Int,
+    val difficulty: String? = "EASY",
+    val heartClicked: Boolean? = false,
+    val filters: List<String>? = listOf("gravel", "sand", "asphalt", "dirt")
+)
+
+@Serializable
+data class TrailsResponse(
+    val trails: List<Trail>,
+    val pageNumber: Int,
+    val pageSize: Int
+)

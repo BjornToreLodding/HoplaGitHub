@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,11 +30,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Favorite
@@ -55,11 +53,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +77,7 @@ import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -93,34 +94,19 @@ fun TrailsScreen(navController: NavController) {
     var selectedContentBoxInfo by remember { mutableStateOf<ContentBoxInfo?>(null) }
     val selectedItems = remember { mutableStateOf(setOf<String>()) }
     var showOnlyFavorites by remember { mutableStateOf(false) }
+    var trails by remember { mutableStateOf<List<Trail>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
-    val testData = remember {
-        mutableStateListOf(
-            ContentBoxInfo(
-                title = "Boredalstien",
-                imageResource = setOf(R.drawable.stockimg1),
-                isHeartClicked = false,
-                starRating = 3,
-                filters = Filters(setOf(presetFilters[0], presetFilters[1]), Difficulty.EASY),
-                description = "This is a description of the trail"
-            ),
-            ContentBoxInfo(
-                title = "Skogsstien",
-                imageResource = setOf(R.drawable.stockimg2, R.drawable.stockimg2),
-                isHeartClicked = true,
-                starRating = 4,
-                filters = Filters(setOf(presetFilters[0], presetFilters[1], presetFilters[2], presetFilters[3]), Difficulty.MEDIUM),
-                description = "The hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."
-            ),
-            ContentBoxInfo(
-                title = "Fjellstien",
-                imageResource = setOf(R.drawable.stockimg1, R.drawable.stockimg2),
-                isHeartClicked = false,
-                starRating = 5,
-                filters = Filters(setOf(presetFilters[1]), Difficulty.HARD),
-                description = "This is a description of the trail"
-            )
-        )
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                val trailsResponse = fetchTrails(token, 1)
+                trails = trailsResponse.trails
+            } catch (e: Exception) {
+                Log.e("TrailsScreen", "Error fetching trails", e)
+            }
+        }
     }
 
     Column(
@@ -155,7 +141,9 @@ fun TrailsScreen(navController: NavController) {
                         },
                         modifier = Modifier
                             .background(
-                                if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !isFiltersClicked && !showOnlyFavorites)) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !isFiltersClicked && !showOnlyFavorites)) Color.White.copy(
+                                    alpha = 0.5f
+                                ) else Color.Transparent,
                                 shape = RoundedCornerShape(8.dp)
                             )
                     ) {
@@ -292,7 +280,10 @@ fun TrailsScreen(navController: NavController) {
         }
         if (isRouteClicked) {
             selectedContentBoxInfo?.let { contentBoxInfo ->
-                RouteClicked(navController = navController, contentBoxInfo = contentBoxInfo, onBackClick = { isRouteClicked = false })
+                RouteClicked(
+                    navController = navController,
+                    contentBoxInfo = contentBoxInfo,
+                    onBackClick = { isRouteClicked = false })
             }
         } else if (isMapClicked) {
             Box(
@@ -304,21 +295,43 @@ fun TrailsScreen(navController: NavController) {
             }
         } else {
             val routesToDisplay = if (showOnlyFavorites) {
-                testData.filter { it.isHeartClicked }
+                trails.filter { it.heartClicked == true }
             } else {
-                testData
+                trails
             }
             LazyColumn {
                 items(routesToDisplay.size) { index ->
-                    val contentBoxInfo = routesToDisplay[index]
+                    val trail = routesToDisplay[index]
                     ContentBox(
-                        info = contentBoxInfo,
+                        info = ContentBoxInfo(
+                            title = trail.name,
+                            imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(R.drawable.stockimg1),
+                            isHeartClicked = trail.heartClicked ?: false,
+                            starRating = trail.averageRating,
+                            filters = Filters(
+                                trail.filters?.toSet() ?: emptySet(),
+                                Difficulty.valueOf(trail.difficulty ?: "EASY")
+                            ),
+                            description = "This is a description of the trail"
+                        ),
                         onHeartClick = {
-                            val newState = !contentBoxInfo.isHeartClicked
-                            testData[testData.indexOf(contentBoxInfo)] = contentBoxInfo.copy(isHeartClicked = newState)
+                            val newState = !(trail.heartClicked ?: false)
+                            trails = trails.toMutableList().apply {
+                                this[index] = trail.copy(heartClicked = newState)
+                            }
                         },
                         onBoxClick = {
-                            selectedContentBoxInfo = contentBoxInfo
+                            selectedContentBoxInfo = ContentBoxInfo(
+                                title = trail.name,
+                                imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(R.drawable.stockimg1),
+                                isHeartClicked = trail.heartClicked ?: false,
+                                starRating = trail.averageRating,
+                                filters = Filters(
+                                    trail.filters?.toSet() ?: emptySet(),
+                                    Difficulty.valueOf(trail.difficulty ?: "EASY")
+                                ),
+                                description = "This is a description of the trail"
+                            )
                             isRouteClicked = true
                         }
                     )
@@ -351,8 +364,13 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
                 val firstImageResource = info.imageResource.firstOrNull() ?: R.drawable.logo1
+                val painter = when (firstImageResource) {
+                    is String -> rememberAsyncImagePainter(model = firstImageResource)
+                    is Int -> painterResource(id = firstImageResource)
+                    else -> painterResource(id = R.drawable.stockimg1)
+                }
                 Image(
-                    painter = painterResource(id = firstImageResource),
+                    painter = painter,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize()
@@ -556,8 +574,14 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .background(MaterialTheme.colorScheme.tertiaryContainer)
                         ) {
                             // Display the images
+                            val painter = when (val imageResource = images[currentImageIndex]) {
+                                is String -> rememberAsyncImagePainter(model = imageResource)
+                                is Int -> painterResource(id = imageResource)
+                                else -> painterResource(id = R.drawable.stockimg1)
+                            }
+
                             Image(
-                                painter = painterResource(id = images[currentImageIndex]),
+                                painter = painter,
                                 contentDescription = "Route Image",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
