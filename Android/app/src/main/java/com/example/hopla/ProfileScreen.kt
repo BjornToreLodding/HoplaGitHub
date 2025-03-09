@@ -58,6 +58,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -72,6 +73,7 @@ import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import com.example.hopla.ui.theme.PrimaryGray
 
 // Main profile function
@@ -700,6 +702,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
     var showFullDescription by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
         coroutineScope.launch {
@@ -719,7 +723,38 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = profile.alias, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Text(text = profile.alias, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
+                }
+                IconButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More options")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = stringResource(R.string.block_user)) },
+                        onClick = { /* Handle block user */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = stringResource(R.string.report_user)) },
+                        onClick = { showReportDialog = true }
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(3.dp))
             Row(
                 verticalAlignment = Alignment.Top,
@@ -811,6 +846,9 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
+    }
+    if (showReportDialog) {
+        ReportDialog(onDismiss = { showReportDialog = false })
     }
 }
 

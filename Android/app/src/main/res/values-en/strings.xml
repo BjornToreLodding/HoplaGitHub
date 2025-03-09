@@ -135,5 +135,7 @@
     <string name="trips">Trips</string>
     <string name="load_more">Load more</string>
     <string name="no_matches">No matches</string>
+    <string name="block_user">Block user</string>
+    <string name="report_user">Report user</string>
 
 </resources>
