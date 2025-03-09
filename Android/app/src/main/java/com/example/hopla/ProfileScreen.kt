@@ -73,7 +73,6 @@ import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.DpOffset
 import com.example.hopla.ui.theme.PrimaryGray
 
 // Main profile function
