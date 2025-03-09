@@ -91,6 +91,10 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.NewTrip.route) { NewTripScreen() }
                             composable(Screen.Community.route) { CommunityScreen(navController) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
+                            composable("friends_list/{userId}") { backStackEntry ->
+                                val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
+                                FriendsListScreen(navController, userId)
+                            }
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
                             composable("map_screen") { MapScreen() }

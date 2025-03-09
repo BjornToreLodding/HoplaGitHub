@@ -139,3 +139,19 @@ suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
         userHikesResponse.userHikes
     }
 }
+
+suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get("https://hopla.onrender.com/userrelations/friends?userid=$userId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}

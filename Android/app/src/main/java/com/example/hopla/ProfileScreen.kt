@@ -777,7 +777,9 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     Text(
                         text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
                         style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                        modifier = Modifier.clickable { /* Handle friends click */ }
+                        modifier = Modifier.clickable {
+                            navController.navigate("friends_list/${profile.id}")
+                        }
                     )
                     Text(
                         text = stringResource(R.string.horses) + ": ${profile.horseCount}",
@@ -849,6 +851,47 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     }
     if (showReportDialog) {
         ReportDialog(onDismiss = { showReportDialog = false })
+    }
+}
+
+@Composable
+fun FriendsListScreen(navController: NavController, userId: String) {
+    var friends by remember { mutableStateOf<List<Friend>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
+
+    LaunchedEffect(userId) {
+        coroutineScope.launch {
+            try {
+                friends = fetchUserFriends(userId, token)
+            } catch (e: Exception) {
+                Log.e("FriendsListScreen", "Error fetching friends", e)
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            ScreenHeader(navController, stringResource(R.string.friends))
+
+            if (friends.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(friends) { friend ->
+                        UserItemComposable(friend, navController)
+                    }
+                }
+            }
+        }
     }
 }
 
