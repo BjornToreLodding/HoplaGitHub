@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -118,6 +119,7 @@ data class UserHikesResponse(
 )
 
 suspend fun fetchUserHikes(token: String): List<Hike> {
+    val pageNumb = 1
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -126,11 +128,14 @@ suspend fun fetchUserHikes(token: String): List<Hike> {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"userhikes/user") {
+        val response: HttpResponse = client.get(apiUrl+"userhikes/user?pageNumber=$pageNumb") {
             headers {
                 append("Authorization", "Bearer $token")
             }
         }
+        val responseBody: String = response.bodyAsText()
+        Log.d("UserHikesScreen", "PageNumb: $pageNumb")
+        Log.d("UserHikesScreen", "Response: $responseBody")
         val userHikesResponse: UserHikesResponse = response.body()
         userHikesResponse.userHikes
     }

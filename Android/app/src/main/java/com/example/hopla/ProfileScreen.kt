@@ -602,6 +602,16 @@ fun MyTripsScreen(navController: NavController) {
                     items(userHikes) { hike ->
                         HikeItem(hike)
                     }
+                    item {
+                        Button(
+                            onClick = { /* Handle load more logic here */ },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text(text = stringResource(R.string.load_more))
+                        }
+                    }
                 }
             }
         }
