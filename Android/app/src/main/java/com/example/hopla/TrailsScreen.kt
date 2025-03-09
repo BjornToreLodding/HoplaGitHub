@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
@@ -38,12 +40,12 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -56,7 +58,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -97,14 +98,19 @@ fun TrailsScreen(navController: NavController) {
     var trails by remember { mutableStateOf<List<Trail>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
+    var pageNumber by remember { mutableIntStateOf(1) }
+    var isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
-                val trailsResponse = fetchTrails(token, 1)
-                trails = trailsResponse.trails
+                isLoading = true
+                val trailsResponse = fetchTrails(token, pageNumber)
+                trails = trails + trailsResponse.trails
             } catch (e: Exception) {
                 Log.e("TrailsScreen", "Error fetching trails", e)
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -148,7 +154,7 @@ fun TrailsScreen(navController: NavController) {
                             )
                     ) {
                         Icon(
-                            imageVector = if (isMapClicked) Icons.Outlined.List else Icons.Outlined.Home,
+                            imageVector = if (isMapClicked) Icons.AutoMirrored.Outlined.List else Icons.Outlined.Home,
                             contentDescription = null
                         )
                     }
@@ -299,13 +305,18 @@ fun TrailsScreen(navController: NavController) {
             } else {
                 trails
             }
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
                 items(routesToDisplay.size) { index ->
                     val trail = routesToDisplay[index]
                     ContentBox(
                         info = ContentBoxInfo(
                             title = trail.name,
-                            imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(R.drawable.stockimg1),
+                            imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
+                                R.drawable.stockimg1
+                            ),
                             isHeartClicked = trail.heartClicked ?: false,
                             starRating = trail.averageRating,
                             filters = Filters(
@@ -323,7 +334,9 @@ fun TrailsScreen(navController: NavController) {
                         onBoxClick = {
                             selectedContentBoxInfo = ContentBoxInfo(
                                 title = trail.name,
-                                imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(R.drawable.stockimg1),
+                                imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
+                                    R.drawable.stockimg1
+                                ),
                                 isHeartClicked = trail.heartClicked ?: false,
                                 starRating = trail.averageRating,
                                 filters = Filters(
@@ -335,6 +348,33 @@ fun TrailsScreen(navController: NavController) {
                             isRouteClicked = true
                         }
                     )
+                }
+                item {
+                    if (isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        LaunchedEffect(Unit) {
+                            coroutineScope.launch {
+                                pageNumber++
+                                isLoading = true
+                                try {
+                                    val trailsResponse = fetchTrails(token, pageNumber)
+                                    trails = trails + trailsResponse.trails
+                                } catch (e: Exception) {
+                                    Log.e("TrailsScreen", "Error fetching trails", e)
+                                } finally {
+                                    isLoading = false
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -716,9 +756,9 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         ) {
                             Text(text = stringResource(R.string.assessment))
                             Row {
-                                repeat(5) {
+                                repeat(5) { index ->
                                     Icon(
-                                        imageVector = Icons.Filled.Star,
+                                        imageVector = if (index < contentBoxInfo.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
                                         contentDescription = null,
                                         tint = StarColor,
                                         modifier = Modifier.size(20.dp)
