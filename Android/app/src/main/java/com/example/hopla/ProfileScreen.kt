@@ -83,7 +83,7 @@ fun ProfileScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -502,20 +502,50 @@ fun UserChanges(modifier: Modifier = Modifier) {
             HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(R.string.username))
-            CustomTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = stringResource(R.string.username),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .clickable {
+                            // Handle username update logic here
+                        }
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(R.string.email))
-            CustomTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = stringResource(R.string.email),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .clickable {
+                            // Handle email update logic here
+                        }
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
             Spacer(modifier = Modifier.height(8.dp))
@@ -534,28 +564,38 @@ fun UserChanges(modifier: Modifier = Modifier) {
             title = { Text(text = stringResource(R.string.change_password)) },
             text = {
                 Column {
-                    CustomTextField(
+                    TextField(
                         value = currentPassword,
                         onValueChange = { currentPassword = it },
                         label = { Text(text = stringResource(R.string.current_password)) }
                     )
-                    CustomTextField(
+                    TextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
                         label = { Text(text = stringResource(R.string.new_password)) }
                     )
-                    CustomTextField(
+                    TextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
                         label = { Text(text = stringResource(R.string.confirm_password)) }
                     )
+                    if (newPassword != confirmPassword) {
+                        Text(
+                            text = stringResource(R.string.passwords_do_not_match),
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             },
             confirmButton = {
-                Button(onClick = {
-                    // Handle password change logic here
-                    showDialog = false
-                }) {
+                Button(
+                    onClick = {
+                        // Handle password change logic here
+                        showDialog = false
+                    },
+                    enabled = newPassword == confirmPassword
+                ) {
                     Text(text = stringResource(R.string.confirm))
                 }
             },
