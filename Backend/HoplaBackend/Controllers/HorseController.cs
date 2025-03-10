@@ -23,23 +23,25 @@ namespace HoplaBackend.Controllers
     
     [Authorize]
     [HttpGet("userhorses")]
-    public async Task<IActionResult> GetUserHorses()
+    public async Task<IActionResult> GetUserHorses([FromQuery] Guid? userId)
     {
         Console.WriteLine("Token claims:");
         foreach (var claim in User.Claims)
         {
             Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
         }
-
+        if (!userId.HasValue)
+        {
         // Hent brukerens ID fra tokenet
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
 
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
         {
             return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
         }
-
+        userId = parsedUserId;
+        }
         // Hent brukerens hester
         var horses = await _context.Horses
             .Where(h => h.User.Id == userId) // Sammenligner riktig Guid
