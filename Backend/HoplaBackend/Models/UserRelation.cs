@@ -24,12 +24,13 @@ public partial class UserRelation
     public int CommentsCount { get ; set ; } = 0;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-/*
-    [ForeignKey("FromUserId")]
-    public virtual User? FromUser { get; set; }
-    
-    [ForeignKey("ToUserId")]
-    public virtual User? ToUser { get; set; }
+
+    /*
+[ForeignKey("FromUserId")]
+public virtual User? FromUser { get; set; }
+
+[ForeignKey("ToUserId")]
+public virtual User? ToUser { get; set; }
 
 */
 }
