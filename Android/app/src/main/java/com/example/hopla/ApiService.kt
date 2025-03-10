@@ -38,7 +38,23 @@ suspend fun fetchHorses(token: String): List<Horse> {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"horses/userhorses/") {
+        val response: HttpResponse = client.get(apiUrl+"horses/userhorses") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}
+
+suspend fun fetchFriendHorses(userId: String, token: String): List<Horse> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "horses/userhorses?userid=$userId") {
             headers {
                 append("Authorization", "Bearer $token")
             }

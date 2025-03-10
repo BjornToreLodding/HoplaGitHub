@@ -837,7 +837,9 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     Text(
                         text = stringResource(R.string.horses) + ": ${profile.horseCount}",
                         style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                        modifier = Modifier.clickable { /* Handle horses click */ }
+                        modifier = Modifier.clickable {
+                            navController.navigate("user_horses/$userId")
+                        }
                     )
                     Text(
                         text = stringResource(R.string.relation_status) + ": ${profile.relationStatus}",
@@ -904,6 +906,36 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     }
     if (showReportDialog) {
         ReportDialog(onDismiss = { showReportDialog = false })
+    }
+}
+
+@Composable
+fun UserHorsesScreen(navController: NavController, userId: String) {
+    var horses by remember { mutableStateOf<List<Horse>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
+
+    LaunchedEffect(userId) {
+        coroutineScope.launch {
+            try {
+                horses = fetchFriendHorses(userId, token)
+            } catch (e: Exception) {
+                Log.e("UserHorsesScreen", "Error fetching horses", e)
+            }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.padding(8.dp)) {
+            ScreenHeader(navController, stringResource(R.string.horses))
+        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(horses) { horse ->
+                HorseItem(horse, navController)
+            }
+        }
     }
 }
 

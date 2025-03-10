@@ -100,6 +100,10 @@ class MainActivity : ComponentActivity() {
                             composable("map_screen") { MapScreen() }
                             composable("my_horses") { MyHorsesScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
+                            composable("user_horses/{userId}") { backStackEntry ->
+                                val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
+                                UserHorsesScreen(navController, userId)
+                            }
                             composable("following") { FollowingScreen(navController) }
                             composable(
                                 "communityDetail/{communityName}",
