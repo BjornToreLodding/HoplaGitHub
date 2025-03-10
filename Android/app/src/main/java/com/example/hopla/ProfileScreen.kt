@@ -918,7 +918,7 @@ fun UserHorsesScreen(navController: NavController, userId: String) {
     LaunchedEffect(userId) {
         coroutineScope.launch {
             try {
-                horses = fetchFriendHorses(userId, token)
+                horses = fetchHorses(userId, token)
             } catch (e: Exception) {
                 Log.e("UserHorsesScreen", "Error fetching horses", e)
             }
@@ -1290,7 +1290,7 @@ fun MyHorsesScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            horses = fetchHorses(UserSession.token)
+            horses = fetchHorses(UserSession.userId, UserSession.token)
         }
     }
 
