@@ -22,11 +22,12 @@ public class TrailController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
-
-    public TrailController(Authentication authentication, AppDbContext context)
+    private readonly TrailFavoriteService _trailFavoriteService;
+    public TrailController(Authentication authentication, AppDbContext context, TrailFavoriteService trailFavoriteService)
     {
         _authentication = authentication;
         _context = context;
+        _trailFavoriteService = trailFavoriteService;
     }
 
     [Authorize]
@@ -82,41 +83,60 @@ public class TrailController : ControllerBase
     public async Task<IActionResult> GetAllTrails(
         [FromQuery] string? search, 
         [FromQuery] string? sort, 
-
         [FromQuery] int? pageNumber = 1, 
         [FromQuery] int? pageSize = 10)
     {
         int page = pageNumber ?? 1;
         int size = pageSize ?? 10;
+
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
         var query = _context.Trails.AsQueryable();
+
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));  
         }
 
         var trails = await query
-            .OrderByDescending(t => Math.Round(t.AverageRating ?? 0)) // Først etter avrundet rating
-            .ThenByDescending(t => t.CreatedAt) // Deretter etter CreatedAt for likeverdige ratings
+            .OrderByDescending(t => Math.Round(t.AverageRating ?? 0))
+            .ThenByDescending(t => t.CreatedAt)
             .Skip((page - 1) * size)
             .Take(size)
-            .Select(t => new TrailDto
-            {
-                Id = t.Id,
-                Name = t.Name,
-                PictureUrl = t.PictureUrl,
-                AverageRating = t.AverageRating ?? 0
-                
-                //lag riktig DTO for dette
-            })
             .ToListAsync();
-            var response = new 
+
+        var trailDtos = new List<TrailDto>();
+
+        foreach (var trail in trails)
+        {
+            bool isFavorite = await _trailFavoriteService.IsTrailFavoriteAsync(parsedUserId, trail.Id);
+            
+            trailDtos.Add(new TrailDto
             {
-                Trails = trails,
-                PageNumber = page,
-                PageSize = size
-            };
-            return Ok(response);
+                Id = trail.Id,
+                Name = trail.Name,
+                PictureUrl = trail.PictureUrl + "?h=140&fit=crop",
+                AverageRating = trail.AverageRating ?? 0,
+                IsFavorite = isFavorite
+            });
+        }
+
+        var response = new 
+        {
+            Trails = trailDtos,
+            PageNumber = page,
+            PageSize = size
+        };
+
+        return Ok(response);
     }
+
+    
 
     [Authorize]
     [HttpGet("list")]

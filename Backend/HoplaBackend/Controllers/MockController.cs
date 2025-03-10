@@ -338,6 +338,7 @@ public class MockController : ControllerBase
         //await CreateTrailReviews();
         //await CreateTrailFilters;
         await CreateSystemSettings();
+        await CreateTrailFavorites();
 
         //return Created();
         return Created("", new { message = "opprettet!"});

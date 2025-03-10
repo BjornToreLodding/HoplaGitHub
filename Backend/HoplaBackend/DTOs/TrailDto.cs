@@ -7,5 +7,6 @@ public class TrailDto
     public string Name { get; set; }
     public string PictureUrl { get; set; }
     public double AverageRating { get; set; }
+    public bool IsFavorite { get; set; }
 }
 //Lage flere underklasser ettersom hva som skal overføres.
