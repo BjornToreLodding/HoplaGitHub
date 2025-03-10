@@ -103,13 +103,20 @@ public class TrailController : ControllerBase
             query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));  
         }
 
+        // Hent ALLE favoritt-trail IDs for brukeren i ett kall, isteden for hente for å sjekke hver tur
+        var favoriteTrailIds = await _context.TrailFavorites
+        .Where(tf => tf.UserId == parsedUserId)
+        .Select(tf => tf.TrailId)
+        .ToListAsync();
+
         var trails = await query
             .OrderByDescending(t => Math.Round(t.AverageRating ?? 0))
             .ThenByDescending(t => t.CreatedAt)
             .Skip((page - 1) * size)
             .Take(size)
             .ToListAsync();
-
+        /*
+        //Gammel metode, erstattet med metoden under
         var trailDtos = new List<TrailDto>();
 
         foreach (var trail in trails)
@@ -125,7 +132,16 @@ public class TrailController : ControllerBase
                 IsFavorite = isFavorite
             });
         }
+        */
 
+        var trailDtos = trails.Select(trail => new TrailDto
+        {
+            Id = trail.Id,
+            Name = trail.Name,
+            PictureUrl = trail.PictureUrl + "?h=140&fit=crop",
+            AverageRating = trail.AverageRating ?? 0,
+            IsFavorite = favoriteTrailIds.Contains(trail.Id) // Effektiv sjekk
+        }).ToList();
         var response = new 
         {
             Trails = trailDtos,
@@ -149,8 +165,16 @@ public class TrailController : ControllerBase
         [FromQuery] double? lengthMin = null,
         [FromQuery] double? lengthMax = null) 
     {
-        var query = _context.Trails.AsQueryable();
+        
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var query = _context.Trails.AsQueryable();
+         
         // Hent JSON-filtre fra querystring
         if (!string.IsNullOrEmpty(filters))
         {
@@ -172,46 +196,67 @@ public class TrailController : ControllerBase
         //  Mrekelige koordinater, 
         // Skjulte ruter, dvs 0 = public
         // hvis venn dvs visibulity = 1, så skal den også vises**
-        //Må fullføre dette senere. Ble masse trøbbel :(
+        
+        //Ble masse trøbbel :(
+        //Må fullføre dette senere når dynamiske filtere er laget. 
+        // Sjekker om løype er offentlig, eller om venner only OG at man er venn med personen som har laget løypa.
         query = query.Where(t => t.LatMean != 0 && t.LongMean != 0 && t.Visibility == 0); // && (t.Visibility == 1 && t.UserId == "FRIENDS"));
 
         // **Filtrer etter lengde før vi henter ut data fra databasen**
         query = query.Where(t => (!lengthMin.HasValue || t.Distance >= lengthMin) &&  
                                 (!lengthMax.HasValue || t.Distance <= lengthMax));
             // Hent dataene fra databasen først (uten sortering på distanse)
-        var trails = await query
-            .Select(t => new
+
+        var favoriteTrailIds = await _context.TrailFavorites
+        .Where(tf => tf.UserId == parsedUserId)
+        .Select(tf => tf.TrailId)
+        .ToListAsync();
+
+        var trailList = await query
+        .Select(t => new
+        {
+            t.Id,
+            t.Name,
+            t.LatMean,
+            t.LongMean,
+            t.PictureUrl,
+            t.AverageRating,
+            t.Distance
+        })
+        .ToListAsync(); // 🚀 Flytter dataene til minnet
+
+        // 🚀 Nå kan vi bruke `DistanceCalc.SimplePytagoras()` i minnet
+        var sortedTrails = trailList
+        .Select(t => new
+        {
+            t.Id,
+            t.Name,
+            Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean),
+            t.AverageRating,
+            t.PictureUrl
+        })
+        .OrderBy(t => t.Distance) // Nå fungerer det siden vi er i minnet
+        .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
+        .Take(pageSize ?? 10)
+        .ToList(); // Utfør paginering i minnet
+
+        var response = new 
+        {
+            Trails = sortedTrails.Select(t => new
             {
                 t.Id,
                 t.Name,
-                t.LatMean,
-                t.LongMean
-            })
-            .ToListAsync(); // Henter dataene til minnet
+                t.Distance,
+                favorite = favoriteTrailIds.Contains(t.Id),
+                t.AverageRating,
+                t.PictureUrl
+            }),
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
 
-        // **Sorter etter distanse i minnet**
-        var sortedTrails = trails
-            .Select(t => new
-            {
-                t.Id,
-                t.Name,
-                Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean)
-            })
-            .OrderBy(t => t.Distance) // Nå fungerer det siden vi er i minnet
-            .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
-            .Take(pageSize ?? 10)
-            .ToList(); // Utfør paginering i minnet
-            var response = new 
-            
-            {
-                Trails = sortedTrails,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
-            return Ok(response);
+        return Ok(response);
 
-
-    
     }
 
     /*
