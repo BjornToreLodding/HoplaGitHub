@@ -23,12 +23,12 @@ using System.Net.Http;
 var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Legg til støtte for forskjellige miljøer (Development / Production)
-builder.Configuration
+/*builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
-/*
+
 
 var logtailUrl = "https://s1209901.eu-nbg-2.betterstackdata.com:443/SqQyvVrV6jWshrdibjNdoKkM";
 

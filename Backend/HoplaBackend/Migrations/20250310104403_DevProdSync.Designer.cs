@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250308220027_TrailFavoritesAndAvegareRating")]
-    partial class TrailFavoritesAndAvegareRating
+    [Migration("20250310104403_DevProdSync")]
+    partial class DevProdSync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

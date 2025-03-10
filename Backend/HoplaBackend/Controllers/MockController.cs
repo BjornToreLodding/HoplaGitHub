@@ -260,6 +260,28 @@ public class MockController : ControllerBase
     
     }
 
+    [HttpPost("cleartrailfavorites")]
+    public async Task<IActionResult> ClearTrailFavorites()
+    {
+        _context.TrailFavorites.RemoveRange(_context.TrailFavorites); 
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"TrailFavorites\" RESTART IDENTITY CASCADE");
+        return Ok("Database cleared and IDs reset.");    
+    }
+
+    [HttpPost("createtrailfavorites")]
+    public async Task<IActionResult> CreateTrailFavorites() 
+    {
+        if (_context.TrailFavorites.Any()) { return NoContent(); } 
+
+        var trailFavorites = TrailFavoriteMock.CreateTrailFavoriteMock();
+        _context.TrailFavorites.AddRange(trailFavorites);
+        await _context.SaveChangesAsync();
+
+        return Created("", new { message = "Success!" }); // Hvis URL ikke trengs
+    
+    }
+
 
 
     [HttpGet("testdist")] // Bare en test
@@ -326,6 +348,7 @@ public class MockController : ControllerBase
     {
         
         _context.SystemSettings.RemoveRange(_context.SystemSettings); //ingen rød strek her
+        _context.TrailFavorites.RemoveRange(_context.TrailFavorites);
         _context.Users.RemoveRange(_context.Users); //ingen rød strek her
         _context.Horses.RemoveRange(_context.Horses);//ingen rød strek her
         _context.UserRelations.RemoveRange(_context.UserRelations); //ingen rød strek her
@@ -347,6 +370,7 @@ public class MockController : ControllerBase
         //En merkelig feil, gjør at sekvensene for Id på Stables og Rides ikke starter på 1 etter cleardatabase og createcontent. 
         // Da blir det feil når Mock skal opprettes for StableMessages og Trails, da Id refererer til noe som ikke eksisterer
         //Det er ikke nødvendig og kjøre dette på Users og Horses, men de er med da det virker mest logisk.
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"TrailFavorites\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserRelations\" RESTART IDENTITY CASCADE");
