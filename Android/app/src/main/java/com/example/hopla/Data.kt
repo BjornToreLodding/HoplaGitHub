@@ -61,6 +61,14 @@ data class User(
     val pictureUrl: String
 )
 
+@Serializable
+data class OtherUsers(
+    val id: String,
+    val name: String,
+    val pictureUrl: String,
+    val alias: String
+)
+
 // Class for the data of a community
 data class Community(
     val name: String,

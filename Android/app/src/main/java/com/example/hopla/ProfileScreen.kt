@@ -1457,18 +1457,23 @@ fun AddNewType(
     var breedOrFriendType by remember { mutableStateOf("") }
     var ageOrFriendAge by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
+    var users by remember { mutableStateOf<List<OtherUsers>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
-    val testNonFriends = listOf(
-        Person("Penny", R.drawable.friend1, PersonStatus.NONE),
-        Person("Sheldon", R.drawable.friend2, PersonStatus.NONE),
-        Person("Amy", R.drawable.friend3, PersonStatus.PENDING),
-        Person("Leonard", R.drawable.friend1, PersonStatus.NONE),
-        Person("Howard", R.drawable.friend2, PersonStatus.NONE),
-        Person("Bernadette", R.drawable.friend3, PersonStatus.PENDING)
-    )
-    // Search for adding new friends/followers
-    val filteredPersons = testNonFriends.filter {
-        it.name.contains(searchQuery, ignoreCase = true)
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                users = fetchAllUsers(token)
+            } catch (e: Exception) {
+                Log.e("AddNewType", "Error fetching users", e)
+            }
+        }
+    }
+
+    val filteredUsers = users.filter {
+        it.name.contains(searchQuery, ignoreCase = true) ||
+                it.alias.contains(searchQuery, ignoreCase = true)
     }
 
     Column(
@@ -1478,7 +1483,6 @@ fun AddNewType(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // When it is a horse that is supposed to be added
         when (type) {
             "Horse" -> {
                 Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
@@ -1511,7 +1515,6 @@ fun AddNewType(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-                // Add option to remove image if it is added
                 if (imageBitmap != null) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -1521,8 +1524,7 @@ fun AddNewType(
                             bitmap = imageBitmap!!.asImageBitmap(),
                             contentDescription = "Selected Image",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(64.dp)
+                            modifier = Modifier.size(64.dp)
                         )
                         IconButton(onClick = { imageBitmap = null }) {
                             Icon(
@@ -1545,11 +1547,9 @@ fun AddNewType(
                     Text(text = "Add $type")
                 }
             }
-            // If it is a friend/follow that is supposed to be added
             else -> {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     SearchBar(
                         searchQuery = searchQuery,
@@ -1559,8 +1559,8 @@ fun AddNewType(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(filteredPersons) { persons ->
-                            PersonItem(persons, navController)
+                        items(filteredUsers) { user ->
+                            UserItemComposable(user, navController)
                         }
                     }
                 }
@@ -1570,24 +1570,25 @@ fun AddNewType(
 }
 
 @Composable
-fun PersonItem(person: Person, navController: NavController) {
+fun UserItemComposable(user: OtherUsers, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(PrimaryWhite)
             .padding(16.dp)
-            .clickable { navController.navigate("person_detail/${person.name}/${person.imageResource}/${person.status}") }
+            .clickable { navController.navigate("friend_profile/${user.id}") }
     ) {
         Image(
-            painter = painterResource(id = person.imageResource),
+            painter = rememberAsyncImagePainter(model = user.pictureUrl),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
+            modifier = Modifier.size(64.dp).clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = person.name, style = MaterialTheme.typography.bodyLarge)
+        Column {
+            Text(text = user.name, style = MaterialTheme.typography.bodyLarge)
+            Text(text = user.alias, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
