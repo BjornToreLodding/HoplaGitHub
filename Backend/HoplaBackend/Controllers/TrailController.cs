@@ -258,7 +258,73 @@ public class TrailController : ControllerBase
         return Ok(response);
 
     }
+    [Authorize]
+    [HttpGet("favorites")]
+    public async Task<IActionResult> GetFavoriteTrails(
+        [FromQuery] bool following, 
+        [FromQuery] bool friends,
+        [FromQuery] int? pageNumber = 1, 
+        [FromQuery] int? pageSize = 10,
+        [FromQuery] string? filters = null, // JSON-baserte filtre
+        [FromQuery] double? lengthMin = null,
+        [FromQuery] double? lengthMax = null) 
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var query = _context.Trails.AsQueryable();
+
+        var favoriteTrailIds = await _context.TrailFavorites
+        .Where(tf => tf.UserId == parsedUserId)
+        .Select(tf => tf.TrailId)
+        .ToListAsync();
+
+                var trailList = await query
+        .Select(t => new
+        {
+            t.Id,
+            t.Name,
+            t.PictureUrl,
+            t.AverageRating,
+        })
+        .ToListAsync(); // 🚀 Flytter dataene til minnet
+
+        // 🚀 Nå kan vi bruke `DistanceCalc.SimplePytagoras()` i minnet
+        var sortedTrails = trailList
+        .Select(t => new
+        {
+            t.Id,
+            t.Name,
+            t.AverageRating,
+            t.PictureUrl,
+            IsFavorite = favoriteTrailIds.Contains(t.Id)
+        })
+        .Where(t => t.IsFavorite)
+        .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
+        .Take(pageSize ?? 10)
+        .ToList(); // Utfør paginering i minnet
+
+        var response = new 
+        {
+            Trails = sortedTrails.Select(t => new
+            {
+                t.Id,
+                t.Name,
+                favorite = favoriteTrailIds.Contains(t.Id),
+                t.AverageRating,
+                t.PictureUrl
+            }),
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        return Ok(response);
+
+    }
     /*
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
