@@ -154,6 +154,7 @@ builder.Services.AddScoped<SystemSettingService>();
 builder.Services.AddScoped<UserRelationService>();
 builder.Services.AddScoped<TrailService>();
 builder.Services.AddScoped<UserHikeService>();
+builder.Services.AddScoped<TrailFavoriteService>();
 
 /*
 builder.Services.AddCors(options =>
