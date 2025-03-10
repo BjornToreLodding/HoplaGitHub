@@ -28,6 +28,12 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
+Console.WriteLine("");
+Console.WriteLine("");
+Console.WriteLine($"🌍 Miljø: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"🛢 Brukt connection string: {builder.Configuration.GetConnectionString("DefaultConnection")}");
+Console.WriteLine("");
+Console.WriteLine("");
 /*
 
 var logtailUrl = "https://s1209901.eu-nbg-2.betterstackdata.com:443/SqQyvVrV6jWshrdibjNdoKkM";
