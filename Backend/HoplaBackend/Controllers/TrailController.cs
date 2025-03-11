@@ -281,7 +281,7 @@ public class TrailController : ControllerBase
         .Where(tf => tf.UserId == parsedUserId)
         .Select(tf => tf.TrailId)
         .ToListAsync();
-        //psudokode slutt
+
 
         var trailList = await query
         .Select(t => new
@@ -325,104 +325,114 @@ public class TrailController : ControllerBase
 
     }
 
-    [Authorize]
-    [HttpGet("relations")]
-    public async Task<IActionResult> GetFavoriteTrails(
-        [FromQuery] bool? following = false, 
-        [FromQuery] bool? friends = false,
-        [FromQuery] int? pageNumber = 1, 
-        [FromQuery] int? pageSize = 10,
-        [FromQuery] string? filters = null, // JSON-baserte filtre
-        [FromQuery] double? lengthMin = null,
-        [FromQuery] double? lengthMax = null) 
+[Authorize]
+[HttpGet("relations")]
+public async Task<IActionResult> GetFavoriteTrails(
+    [FromQuery] bool? following = false, 
+    [FromQuery] bool? friends = false,
+    [FromQuery] int? pageNumber = 1, 
+    [FromQuery] int? pageSize = 10,
+    [FromQuery] string? filters = null, // JSON-baserte filtre
+    [FromQuery] double? lengthMin = null,
+    [FromQuery] double? lengthMax = null) 
+{
+    var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
     {
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-
-        // Liste for å samle relevante bruker-ID-er
-        List<Guid> relevantUserIds = new() ;
-
-        // Hvis `following == true`, legg til ID-ene til de brukeren følger
-        if (following == true)
-        {
-            var followedUserIds = await _context.UserRelations
-                .Where(ur => ur.FromUserId == parsedUserId && ur.Status == "FOLLOWING")
-                .Select(ur => ur.ToUserId)
-                .ToListAsync();
-
-            relevantUserIds.AddRange(followedUserIds);
-        }
-
-        // Hvis `friends == true`, legg til ID-ene til vennene
-        if (friends == true)
-        {
-            var friendUserIds = await _context.UserRelations
-                .Where(ur => (ur.FromUserId == parsedUserId || ur.ToUserId == parsedUserId) && ur.Status == "FRIENDS")
-                .Select(ur => ur.FromUserId == parsedUserId ? ur.ToUserId : ur.FromUserId)
-                .ToListAsync();
-
-            relevantUserIds.AddRange(friendUserIds);
-        }
-
-        // Fjern duplikater
-        relevantUserIds = relevantUserIds.Distinct().ToList();
-
-        // Hent alle favorittstier for de relevante brukerne
-        var favoriteTrailIds = await _context.TrailFavorites
-            .Where(tf => relevantUserIds.Contains(tf.UserId))
-            .Select(tf => tf.TrailId)
-            .ToListAsync();
-
-        // Filtrer trailene basert på favoritter
-        var query = _context.Trails
-            .Where(t => favoriteTrailIds.Contains(t.Id));
-
-        /*
-        if (lengthMin.HasValue)
-        {
-            query = query.Where(t => t.Length >= lengthMin.Value);
-        }
-
-        if (lengthMax.HasValue)
-        {
-            query = query.Where(t => t.Length <= lengthMax.Value);
-        }
-        */
-
-        // Paginering og seleksjon
-        var trails = await query
-            .Select(t => new
-            {
-                t.Id,
-                t.Name,
-                t.PictureUrl,
-                t.AverageRating,
-                IsFavorite = favoriteTrailIds.Contains(t.Id)
-            })
-            .OrderByDescending(t => t.AverageRating) // Sortering
-            .ThenByDescending(t => t.Name)
-            .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
-            .Take(pageSize ?? 10)
-            .ToListAsync();
-
-        return Ok(new 
-        {
-            Trails = trails.Select(t => new
-            {
-                t.Id,
-                t.Name,
-                t.IsFavorite,
-                t.AverageRating,
-                t.PictureUrl
-            }),
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        });
+        return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
     }
+
+    // Liste for å samle relevante bruker-ID-er
+    List<Guid> relevantUserIds = new();
+
+    // Hvis `following == true`, legg til ID-ene til de brukeren følger
+    if (following == true)
+    {
+        var followedUserIds = await _context.UserRelations
+            .Where(ur => ur.FromUserId == parsedUserId && ur.Status == "FOLLOWING")
+            .Select(ur => ur.ToUserId)
+            .ToListAsync();
+
+        relevantUserIds.AddRange(followedUserIds);
+    }
+
+    // Hvis `friends == true`, legg til ID-ene til vennene
+    if (friends == true)
+    {
+        var friendUserIds = await _context.UserRelations
+            .Where(ur => (ur.FromUserId == parsedUserId || ur.ToUserId == parsedUserId) && ur.Status == "FRIENDS")
+            .Select(ur => ur.FromUserId == parsedUserId ? ur.ToUserId : ur.FromUserId)
+            .ToListAsync();
+
+        relevantUserIds.AddRange(friendUserIds);
+    }
+
+    // Fjern duplikater
+    relevantUserIds = relevantUserIds.Distinct().ToList();
+
+    // Hent favorittløypene til venner/følgere
+    var favoriteTrailIds = await _context.TrailFavorites
+        .Where(tf => relevantUserIds.Contains(tf.UserId))
+        .Select(tf => tf.TrailId)
+        .Distinct()
+        .ToListAsync();
+
+    // Hent favorittløypene til den innloggede brukeren
+    var userFavoriteTrailIds = await _context.TrailFavorites
+        .Where(tf => tf.UserId == parsedUserId)
+        .Select(tf => tf.TrailId)
+        .ToListAsync(); //teste denne først.
+        //.ToHashSetAsync(); // Bruker HashSet for raskere oppslag
+
+
+    // Filtrer trailene basert på favoritter fra venner/følgere
+    var query = _context.Trails
+        .Where(t => favoriteTrailIds.Contains(t.Id));
+
+    /*
+    if (lengthMin.HasValue)
+    {
+        query = query.Where(t => t.Length >= lengthMin.Value);
+    }
+
+    if (lengthMax.HasValue)
+    {
+        query = query.Where(t => t.Length <= lengthMax.Value);
+    }
+    */
+
+    // Paginering og seleksjon
+    var trails = await query
+        .Select(t => new
+        {
+            t.Id,
+            t.Name,
+            t.PictureUrl,
+            t.AverageRating,
+            IsFavorite = userFavoriteTrailIds.Contains(t.Id) // Sjekker om den innloggede brukeren har denne løypa som favoritt
+        })
+        .OrderByDescending(t => t.AverageRating) // Sortering
+        .ThenByDescending(t => t.Name)
+        .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
+        .Take(pageSize ?? 10)
+        .ToListAsync();
+
+    return Ok(new 
+    {
+        Trails = trails.Select(t => new
+        {
+            t.Id,
+            t.Name,
+            t.IsFavorite,
+            t.AverageRating,
+            t.PictureUrl
+        }),
+        PageNumber = pageNumber,
+        PageSize = pageSize
+    });
+}
+
 
     [HttpGet("map")]
     public async Task<IActionResult> CreateTrailsList(

@@ -1,6 +1,4 @@
 
-
-
 # Profil
 
 <table>
@@ -64,8 +62,7 @@ Main profil side
   * **(Bilde: bruker size 200.dp og clip circleshape)**
 * \*\*GET med Authorization:
   * \*\*GET \*\***https://hopla.onrender.com/users/myprofile** Denne erstattes av den under (/users/profile)
-  * \*\*Get \*\***https://hopla.onrender.com/users/profile** Denne kan også brukes til å hente andre brukere ved å spesifisere optional ?userid=Guid
-  f.eks https://hopla.onrender.com/users/profile?userid=12345678-0000-0000-0001-123456780002 Mer om dette lenger ned.
+  * \*\*Get \*\***https://hopla.onrender.com/users/profile** Denne kan også brukes til å hente andre brukere ved å spesifisere optional ?userid=Guid f.eks https://hopla.onrender.com/users/profile?userid=12345678-0000-0000-0001-123456780002 Mer om dette lenger ned.
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
@@ -88,6 +85,8 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 ![image.png](/vakvaer/hopla/-/wikis/uploads/68cec6509720727d6fcc482677031ce9/image.png){width="324" height="565"} <br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
 
 `Android: nå lagt inn`
+
+`Kan det lages så jeg kan hente andre brukers hester også?`
 </td>
 <td>
 
@@ -167,7 +166,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 **Status:** \
 BT: Denne skal virke nå
 
-`Android: Lagt til venner liste side`
+`Android: Lagt til venner liste side & venners venner`
 </td>
 <td>
 
@@ -285,6 +284,8 @@ Denne henter følgere til oppgitt userid
 <td>
 
 Har ikke bilde for øyeblikket, profil -\> Venner -\> Trykke på spesifikk venn
+
+`Android: Lagt til må bare fikse det bedre i frontend`
 </td>
 <td>
 
@@ -298,31 +299,33 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(både of
 
 **BT:**
 
-📌 **Beskrivelse:** Henter ut informasjon om en bruker, eller en brukers venn. Endpointet vil tilpasse innholdet ettersom ?userId er oppgitt, om brukeren fra token og user id er venner, følger eller blokkerer. Kanskje også man skulle returnert status? slik at når man åpner profilen så står det at dem er venner? Hvis det ikke blir masse styr?
+:pushpin: **Beskrivelse:** Henter ut informasjon om en bruker, eller en brukers venn. Endpointet vil tilpasse innholdet ettersom ?userId er oppgitt, om brukeren fra token og user id er venner, følger eller blokkerer. Kanskje også man skulle returnert status? slik at når man åpner profilen så står det at dem er venner? Hvis det ikke blir masse styr?
 
-📑 **Parametere:**
-|Parameter| Name | Type     | Påkrevd | Beskrivelse |
-|------|-----------|--------|---------|-------------|
-| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
-| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
-| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
-| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+:bookmark_tabs: **Parametere:**
 
+| Parameter | Name | Type | Påkrevd | Beskrivelse |
+|-----------|------|------|---------|-------------|
+| :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
+| :mag_right: Query | `userId` | Guid | 🟡 Nei | ID-en til brukeren |
+| :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
+| :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
 
-#### 🔎 Query:
+#### :mag_right: Query:
 
 * `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
 * `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
+#### :floppy_disk: Syntax:
 
-#### 💾 Syntax:
 ```bash
 curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer <TOKEN>"
 ```
-📤 **Eksempel på respons uten query:**
+
+:outbox_tray: **Eksempel på respons uten query:**
+
 ```json
 {
     "alias": "MangeBallerILufra",
@@ -332,7 +335,9 @@ curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
 photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
 ```
-📤 **Eksempel på respons med query når bruker fra token er venner med userId fra query:**
+
+:outbox_tray: **Eksempel på respons med query når bruker fra token er venner med userId fra query:**
+
 ```json
 {
     "id": "12345678-0000-0000-0001-123456780002",
@@ -373,7 +378,8 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
 ```
 
-📤 **Eksempel på respons med query når bruker fra token ikke er venner med userId fra query:**
+:outbox_tray: **Eksempel på respons med query når bruker fra token ikke er venner med userId fra query:**
+
 ```json
 {
     "id": "12345678-0000-0000-0001-123456780009",
@@ -411,26 +417,26 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
 ```
 
-📤 **Eksempel på respons med query når bruker fra token er blokkert av userId fra query:**
+:outbox_tray: **Eksempel på respons med query når bruker fra token er blokkert av userId fra query:**
+
 ```json
 { Tomt? skal vi vise noe i det hele tatt? }
 ```
 
+:pager: **Mulige statuskoder:**
 
-
-📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Brukeren ble hentet.
-- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.
-- ❌ `404 Not Found` – Bruker ikke funnet.
-- ❌ `500 Internal Server Error` – Server Feil.
-
-
+- :white_check_mark: `200 OK` – Brukeren ble hentet.
+- :x: `401 Unauthorized` - Ingen eller ugyldig token sendt.
+- :x: `404 Not Found` – Bruker ikke funnet.
+- :x: `500 Internal Server Error` – Server Feil.
 </td>
 </tr>
 <tr>
 <td>
 
 Har ikke bilde for øyeblikket, profil -\> Følger -\> Trykke på spesifikk person
+
+`Android: Samme som over`
 </td>
 <td>
 
@@ -449,6 +455,8 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(bare off
 <td>
 
 ![Screenshot_20250303_144252_com.example.hopla\[1\].jpg](uploads/6ba2e122049ff6aefa3667996dcc60e3/Screenshot_20250303_144252_com.example.hopla_1_.jpg){width="283" height="567"}
+
+`Android: Lagt til med pagenumber øker når knappen last mer trykkes på`
 </td>
 <td>
 
@@ -459,33 +467,36 @@ GET request
 Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venner)
 
 **BT: Har laget dette endpointet:**
+
 ### GET /usershikes/user
 
-📌 **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
+:pushpin: **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
 
-📑 **Parametere:**
-|Parameter| Name | Type     | Påkrevd | Beskrivelse |
-|------|-----------|--------|---------|-------------|
-| 🔒 Header | `Authorization` | Bearer Token  | 🔑 Ja | Krever autenseringstoken | 
-| 🔎 Query | `userId`  | Guid   | 🟡 Nei   | ID-en til brukeren |
-| 🔎 Query | `pageNumber`  | int   | 🟡 Nei   | Side nummer |
-| 🔎 Query | `pageSize`  | int   | 🟡 Nei   | Antall resultater pr side |
+:bookmark_tabs: **Parametere:**
 
+| Parameter | Name | Type | Påkrevd | Beskrivelse |
+|-----------|------|------|---------|-------------|
+| :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
+| :mag_right: Query | `userId` | Guid | 🟡 Nei | ID-en til brukeren |
+| :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
+| :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
 
-#### 🔎 Query:
+#### :mag_right: Query:
 
 * `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1. 
+* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
 * `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
-#### 💾 Syntax:
+#### :floppy_disk: Syntax:
+
 ```bash
 curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer <TOKEN>"
 ```
 
-📤 **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+:outbox_tray: **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+
 ```json
 {
     "userHikes": [
@@ -509,13 +520,12 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 }
 ```
 
+:pager: **Mulige statuskoder:**
 
-📟 **Mulige statuskoder:**
-- ✅ `200 OK` – Brukeren ble hentet.
-- ❌ `401 Unauthorized` - Ingen eller ugyldig token sendt.'
-- ❌ `404 Not Found` – Bruker ikke funnet.
-- ❌ `500 Internal Server Error` – Server feil.
-
+- :white_check_mark: `200 OK` – Brukeren ble hentet.
+- :x: `401 Unauthorized` - Ingen eller ugyldig token sendt.'
+- :x: `404 Not Found` – Bruker ikke funnet.
+- :x: `500 Internal Server Error` – Server feil.
 </td>
 </tr>
 <tr>
@@ -536,6 +546,8 @@ Trenger iallfall endpoint for å bytte profilbilde her
 <td>
 
 ![image.png](uploads/46a60d398a0249dff5e40c607f8e2e20/image.png){width="320" height="579"}
+
+`Android: Lagt til løyper første side, mangler om logget inn bruker har likt løypen eller ikke`
 </td>
 <td>
 
@@ -552,36 +564,40 @@ Trenger iallfall endpoint for å bytte profilbilde her
 https://hopla.onrender.com/trails/all
 
 **query:**
+
+* search= Skriv inn noe som matcher navnet på løypa.
 * sort= (ikke i bruk enda, men tenkte stars skulle være option. Akuratt nå er det hardcoded at den sorterer på averagerating(stars))
 * pageNumber Optional. Hvis ikke oppgitt, settes den til 1
 * pageSize Optional. Hvis ikke oppgitt settes den til 10
 
 **eks**
 
-https://localhost:7128/trails/all?pagenumber=1&pagesize=2
+[https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5](https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5)
 
 **Response eksempel**
+
 ```json
 {
     "trails": [
         {
-            "id": "12345678-0000-0000-0021-123456780021",
-            "name": "Sjølystturen",
-            "pictureUrl": null,
-            "averageRating": 0
+            "id": "12345678-0000-0000-0021-123456780017",
+            "name": "Høvikrunden",
+            "pictureUrl": "https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?h=140&fit=crop",
+            "averageRating": 4,
+            "isFavorite": false
         },
         {
-            "id": "12345678-0000-0000-0021-123456780020",
-            "name": "BjerkeTravbanespurten",
-            "pictureUrl": null,
-            "averageRating": 0
+            "id": "12345678-0000-0000-0021-123456780002",
+            "name": "Gjøviksruta",
+            "pictureUrl": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?h=140&fit=crop",
+            "averageRating": 1,
+            "isFavorite": true
         }
     ],
     "pageNumber": 1,
-    "pageSize": 2
+    "pageSize": 5
 }
-``` 
-
+```
 
 * Vise alle løyper som brukere har lagt inn i appen. Flest stjerner øverst (hvis likt antall stjerner, nyeste av de øverst. Runde opp så det er f.eks 5 istede for 4.6 så sortere). Løypene må være offentlig eller fra venner
 
@@ -591,21 +607,42 @@ https://localhost:7128/trails/all?pagenumber=1&pagesize=2
 
 **eks**
 
-https://localhost:7128/trails/list?latitude=60.95458&longitude=10.6315
+[https://localhost:7128/trails/list](https://localhost:7128/trails/list)
+
+Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
+
+**query**
+
+*  ?latitude= må være med
+*  ?longitude= må være med.
+*  ?pageNumber= optional settes til 1 som er første side hvis ikke oppgitt
+*  ?pageSize= optional. antall resultater som returneres. settes til 10 hvis ikke oppgitt
+
+**eks postmann**
+
+https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 
 **Respose eks**
+
 ```json
 {
     "trails": [
         {
             "id": "12345678-0000-0000-0021-123456780002",
             "name": "Gjøviksruta",
-            "distance": 1.0848015268282347
+            "distance": 1.0848015268282347,
+            "favorite": false,
+            "averageRating": 1,
+            "pictureUrl": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e"
         },
         {
             "id": "12345678-0000-0000-0021-123456780001",
             "name": "Biriløypa",
-            "distance": 18.3370760175382
+            "distance": 18.3370760175382,
+            "favorite": true,
+            "averageRating": 1,
+            "pictureUrl": "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5"
+
         }
     ],
     "pageNumber": 1,
@@ -615,15 +652,85 @@ https://localhost:7128/trails/list?latitude=60.95458&longitude=10.6315
 
 **Løyper -\> Hjerte ikon**
 
-* Kun løyper som brukeren har trykket liker på
+* Kun løyper som brukeren har trykket liker på 
 
-https://localhost:7128/trails/favorites 
+[https://localhost:7128/trails/favorites](https://localhost:7128/trails/favorites)
+
+**query**
+
+* ?pageNumber= optional, settes til å vise første side hvis ikke spesifisert. sidenummer
+* ?pageSize= optional hvis ikke oppgitt, settes denne til 10. Antall resultater pr side
+* ?filter= optional. kommer senere.
+
+**eks**
+
+https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
+
+
+
+```json{
+    "trails": [
+        {
+            "id": "12345678-0000-0000-0021-123456780001",
+            "name": "Biriløypa",
+            "favorite": true,
+            "averageRating": 1,
+            "pictureUrl": "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5"
+        },
+        {
+            "id": "12345678-0000-0000-0021-123456780003",
+            "name": "Lommedalsrunden",
+            "favorite": true,
+            "averageRating": 1,
+            "pictureUrl": "https://images.unsplash.com/photo-1494625927555-6ec4433b1571"
+        }
+    ],
+    "pageNumber": 1,
+    "pageSize": 2
+}
+```
 
 **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
 
 * Løyper til brukere brukeren følger og venner med
 
-http://localhost:7128/trails/relations ?friends=true & following=true
+[http://localhost:7128/trails/relations](http://localhost:7128/trails/relations) ?friends=true & following=true
+
+**query**
+
+* ?friends= hvis true så returneres venners favorittløyper.
+* ?following= hvis true så returneres følgeres favorittløyper.
+* ?pageNumber= optional, som over
+* ?pageSize= optional, som ovenfor
+
+**eks*
+
+https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumber=1&pagesize=2
+
+```json
+{
+    "trails": [
+        {
+            "id": "12345678-0000-0000-0021-123456780021",
+            "name": "Sjølystturen",
+            "isFavorite": true,
+            "averageRating": 5,
+            "pictureUrl": "https://images.unsplash.com/photo-1504893524553-b855bce32c67"
+        },
+        {
+            "id": "12345678-0000-0000-0021-123456780023",
+            "name": "Hønefossrunden",
+            "isFavorite": true,
+            "averageRating": 5,
+            "pictureUrl": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e"
+        }
+    ],
+    "pageNumber": 1,
+    "pageSize": 2
+}
+```
+
+**Akuratt nå er det en liten feil her, som gjør at IsFavorite sjekker ikke om brukeren, men viser true for om vennene&følgerne har løypa som favoritt. Skal rette opp i denne feilen etterhvert.** 
 </td>
 </tr>
 <tr>
@@ -715,7 +822,7 @@ Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backen
 </td>
 <td>
 
-Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene. 
+Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene.
 
 Nå har jeg det satt opp slik (ikke lagt til "riktig" filter):
 
@@ -733,9 +840,41 @@ Løyper -\> Kart
 
 Hente alle start-koordinater til løyper (longitude og latitude)
 
-\-\> Hvordan skal man hente de innenfor kartutsnittet?
+\-\> Q: Hvordan skal man hente de innenfor kartutsnittet?
 
-BT oppdaterer 
+\-\> A: Dette gjøres veldig enkelt ved å bruke zoom level for å beregne kartets lat/long-min/max verdier. Så brukes disse verdiene for å sjekke om noen løyper kan være innenfor kartutsnittet.
+
+BT oppdaterer
+
+[https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlevel=14](https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlevel=14)
+
+**query**
+* ?latitude= påkrevd
+* ?longitude= påkrevd
+* ?zoomlevel= påkrevd
+* ?height= optional. Beregner høyde/bredde-forhold på skjermen, slik at man finner longmax/min
+* ?width= optional. Hvis ikke oppgitt, så settes dette til 2400/1080 som er vanlig skjermstørrelse
+
+
+```json
+[
+    {
+        "id": "12345678-0000-0000-0021-123456780016",
+        "name": "Fornebutravbane",
+        "latMean": 59.8833,
+        "longMean": 10.6167,
+        "trailAllCoordinates": null
+    },
+    {
+        "id": "12345678-0000-0000-0021-123456780022",
+        "name": "Snarøyatråkket",
+        "latMean": 59.879,
+        "longMean": 10.608,
+        "trailAllCoordinates": null
+    }
+]
+```
+
 </td>
 </tr>
 <tr>
@@ -761,17 +900,17 @@ BT oppdaterer
 
 Community/Fellesskap/Grupper
 
-Ta bort hjerte, bytte hjerte symbol med "mine grupper symbol" 
+Ta bort hjerte, bytte hjerte symbol med "mine grupper symbol"
 
 Symbol av "checked symbol" som viser at du er medlem ellers ikke noe
 
-For å bli med: offentlig bare å trykke på  bli med, hvis privat må man sende forespørsel 
+For å bli med: offentlig bare å trykke på bli med, hvis privat må man sende forespørsel
 
-Hente: navn, bilde, id, medlemstatus sorteres etter nærmest brukeren 
+Hente: navn, bilde, id, medlemstatus sorteres etter nærmest brukeren
 
 Hvis man henter eks. 10 og 10 grupper etter som brukeren blar nedover.
 
-hvordan gjøres det med muligheten til å søke gjennom grupper (sende med hver og hver bokstav etterhvert som man skriver som da viser de 10 øverste som passer hvis man ikke blar nedover) 
+hvordan gjøres det med muligheten til å søke gjennom grupper (sende med hver og hver bokstav etterhvert som man skriver som da viser de 10 øverste som passer hvis man ikke blar nedover)
 </td>
 </tr>
 </table>
