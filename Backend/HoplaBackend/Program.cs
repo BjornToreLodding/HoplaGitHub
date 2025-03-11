@@ -155,6 +155,8 @@ builder.Services.AddScoped<UserRelationService>();
 builder.Services.AddScoped<TrailService>();
 builder.Services.AddScoped<UserHikeService>();
 builder.Services.AddScoped<TrailFavoriteService>();
+builder.Services.AddScoped<EmailService>();
+
 
 /*
 builder.Services.AddCors(options =>

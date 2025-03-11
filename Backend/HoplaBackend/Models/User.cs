@@ -14,6 +14,7 @@ public class User
     public string? Alias { get; set; }
 
     public required string Email { get; set; }
+    public bool IsEmailVerified { get; set; } = false;
     public string? Telephone { get; set; }
 
     public string? PasswordHash { get; set; }

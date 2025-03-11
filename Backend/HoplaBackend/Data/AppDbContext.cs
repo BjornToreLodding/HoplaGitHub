@@ -24,6 +24,7 @@ public class AppDbContext : DbContext
     //public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<EmailVerification> EmailVerifications { get; set; }
     public DbSet<UserSetting> UserSettings { get; set; }
     public DbSet<UserRelation> UserRelations { get; set; } // Endret fra Friendrequest til FriendRequest
     public DbSet<Message> Messages { get; set; }
@@ -113,6 +114,9 @@ public class AppDbContext : DbContext
         modelBuilder.HasDefaultSchema("public"); // Sikrer at EF bruker public schema
         
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<EmailVerification>()
+                .HasIndex(e => new { e.Email, e.Token })
+                .IsUnique();
         // Relasjon: En bruker kan ha mange hester
         // ?Dette er ikke nødvendig, da EF forstår dette automatisk, men må brukes hvis man bruker Fluent API
         modelBuilder.Entity<Horse>()

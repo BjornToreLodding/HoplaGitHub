@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 
 
 namespace HoplaBackend.Controllers;
@@ -25,15 +26,84 @@ public class UserController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
+     private readonly EmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     private readonly UserRelationService _userRelationService;
     private readonly UserHikeService _userHikeService;
-    public UserController(Authentication authentication, AppDbContext context, UserRelationService userRelationService, UserHikeService userHikeService)
+    public UserController(Authentication authentication, AppDbContext context, EmailService emailService, IConfiguration configuration, UserRelationService userRelationService, UserHikeService userHikeService)
     {
         _authentication = authentication;
         _context = context;
+        _emailService = emailService;
+        _configuration = configuration;
+
         _userRelationService = userRelationService;
         _userHikeService = userHikeService;
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest("E-postadresse er påkrevd.");
+
+        var userExists = await _context.Users.AnyAsync(u => u.Email == request.Email);
+        if (userExists)
+            return BadRequest("E-postadressen er allerede registrert.");
+
+        // Generer token
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+        // Logg FrontendUrl for å sikre at den blir lest riktig
+        var frontendUrl = _configuration["FrontendUrl"];
+        Console.WriteLine($"FrontendUrl: {frontendUrl}");
+
+        // Lagre i databasen
+        var verification = new EmailVerification
+        {
+            Email = request.Email,
+            Token = token,
+            ExpiryDate = DateTime.UtcNow.AddHours(24)
+        };
+
+        _context.EmailVerifications.Add(verification);
+        await _context.SaveChangesAsync();
+
+        // Send e-post
+        var confirmationLink = $"{_configuration["FrontendUrl"]}/users/complete-registration?token={token}";
+        await _emailService.SendEmailAsync(request.Email, "Bekreft registrering",
+            $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>");
+
+        return Ok("E-post sendt.");
+    }
+    [HttpPost("complete-registration")]
+    public async Task<IActionResult> CompleteRegistration([FromBody] CompleteRegistrationRequest request) 
+    {
+        Console.WriteLine("complete-registration-endpoint enter");
+        var verification = await _context.EmailVerifications
+            .FirstOrDefaultAsync(ev => ev.Token == request.Token && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
+
+        if (verification == null)
+            return BadRequest("Ugyldig eller utløpt token.");
+        Console.WriteLine("complete-registration-endpoint checkpoint1");
+
+        // Opprett brukeren
+        var newUser = new User
+        {
+            Email = verification.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            IsEmailVerified = true //Rød Strek IsEmailVerified
+        };
+        Console.WriteLine("complete-registration-endpoint checkpoint2");
+
+        _context.Users.Add(newUser);
+        verification.IsUsed = true;
+
+        await _context.SaveChangesAsync();
+        Console.WriteLine("complete-registration-endpoint checkpoint3");
+
+        return Ok("Bruker registrert.");
     }
 
     [HttpPost("login")]
@@ -93,30 +163,6 @@ public class UserController : ControllerBase
             alias = user.Alias,
             PictureUrl = user.PictureUrl + "?w=50&h=50&fit=crop"
         });
-    }
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-    {
-        // 🔹 Sjekk om e-posten allerede finnes
-        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (existingUser != null)
-        {
-            return BadRequest(new { message = "E-post er allerede i bruk" });
-        }
-
-        // 🔹 Hashe passordet før vi lagrer det
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-        var newUser = new User
-        {
-            Email = request.Email,
-            PasswordHash = hashedPassword // Lagre det hash'ede passordet
-        };
-
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Bruker registrert!" });
     }
 
     [Authorize]
@@ -497,3 +543,31 @@ public class UserController : ControllerBase
         return Ok(new { message = "User removed successfully." });
     }
 }
+
+/*
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        // 🔹 Sjekk om e-posten allerede finnes
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (existingUser != null)
+        {
+            return BadRequest(new { message = "E-post er allerede i bruk" });
+        }
+
+        // 🔹 Hashe passordet før vi lagrer det
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        var newUser = new User
+        {
+            Email = request.Email,
+            PasswordHash = hashedPassword // Lagre det hash'ede passordet
+        };
+
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Bruker registrert!" });
+    }
+
+*/
