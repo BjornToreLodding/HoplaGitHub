@@ -237,6 +237,7 @@ public class UserController : ControllerBase
             alias = user.Alias,
             telephone = user.Telephone,
             description = user.Description,
+            dob = user.Dob,
             pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? user.PictureUrl + "?w=200&h=200&fit=crop" : "",
             redirect = loginRedirect
         });

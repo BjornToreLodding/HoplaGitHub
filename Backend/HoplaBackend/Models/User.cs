@@ -33,7 +33,7 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     //[Required]
-    public DateTime? Dob { get; set; } = DateTime.UtcNow;
+    public DateTime? Dob { get; set; }
     public List<EntityImage> Images { get; set; } = new(); // Henter via EntityImageId
     public ICollection<Horse> Horses { get; set; } = new List<Horse>();
 

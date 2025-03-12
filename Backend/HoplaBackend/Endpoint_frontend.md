@@ -8,6 +8,15 @@
 ![image.png](/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"} <br><br>**Status:** <br>si ifra hvis det ønskes forandringer
 
 `Android: Nå mulig å logge inn`
+
+`NB. Har fått en annen response.` 
+
+`Hvis redirect = profile, så sendes brukeren til profilsiden.` 
+
+`Hvis redirect = update, må brukeren oppdatere brukerinformasjonen sin`
+
+`Det for profil-siden er det nok noe overflødig informasjon, men dette kan bare ignoreres. Det er nødvendig for "update"`
+
 </td>
 <td>
 
@@ -29,21 +38,37 @@ Body:
 }
 ```
 
-JSON-Response:
+JSON-Response hvis bruker ikke har registrert name eller alias (f.eks akuratt bekreftet epostadressen.):
 
 ```postman_json
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOi
-IxMjM0NTY3OC0wMDAwLTAwMDAtMDAwMS0xMjM0NTY3ODAwMDEiLCJlbWFpbCI6InR
-lc3RAdGVzdC5ubyIsIm5iZiI6MTc0MDQ4NjkwNCwiZXhwIjoxNzQxMDkxNzA0LCJp
-YXQiOjE3NDA0ODY5MDR9.Tds78EAr8iZ0Y6_M0f1lcwk11sgAapfSpwXk5T9RdXU",
-    "userId": "12345678-0000-0000-0001-123456780001",
-    "name": "Magne Baller Ilufta",
-    "alias": "MangeBallerILufra",
-    "profilePictureURL": "https://images.unsplash.com/
-photo-1614203586837-1da2bef106a2?w=200&h=200&fit=crop"
+    "token": "123xyz...XYZ",
+    "userId": "2b46f82a-2e38-47b6-a08e-cc62d10f4503",
+    "name": null,
+    "alias": null,
+    "telephone": null,
+    "description": null,
+    "dob": "2025-03-12T09:38:46.8994Z",
+    "pictureUrl": "",
+    "redirect": "update"
 }
 ```
+**For update, se lengere ned i dokumenter om registrering**
+
+JSON-Response for brukere som har registrert navn og alias
+```json
+    "token": "123xyz...XYZ",
+    "userId": "2b46f82a-2e38-47b6-a08e-cc62d10f4503",
+    "name": Hest,
+    "alias": Test,
+    "telephone": null,
+    "description": "Jeg tester hester",
+    "dob": "2025-03-12T09:38:46.8994Z",
+    "pictureUrl": "",
+    "redirect": "profile"
+```
+
+
 </td>
 </tr>
 <tr>
@@ -84,9 +109,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 
 ![image.png](/vakvaer/hopla/-/wikis/uploads/68cec6509720727d6fcc482677031ce9/image.png){width="324" height="565"} <br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
 
-`Android: nå lagt inn`
-
-`Kan det lages så jeg kan hente andre brukers hester også?`
+`Android: Lagt inn`
 </td>
 <td>
 
@@ -98,6 +121,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
   * \*\*GET GET \*\***https://hopla.onrender.com/horses/userhorses/**
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
+* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003  -\> Hester tilhørende brukerid
 
 **Eksempel på response body JSON**
 
@@ -194,6 +218,8 @@ Denne henter vennene til innlogget bruker
 
 GET https://hopla.onrender.com/userrelations/friends?userid=12345678-0000-0000-0001-123456780003 \
 Denne henter vennen til oppgitt userid
+
+Alle brukere: https://hopla.onrender.com/users/all
 
 **NB!! Begge må ha authorization Bearer Token**
 
@@ -296,6 +322,8 @@ Profil -\> Venner -\> "navn"
 Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(både offentlig og venner), antall venner, vennestatus
 
 (Skal komme knapp der man kan trykke på deres venner og deres hester, knapp til resten av turene deres)
+
+Vilde bruker: https://hopla.onrender.com/users/profile?userId=12345678-0000-0000-0001-123456780001&pageNumber=1
 
 **BT:**
 
@@ -572,7 +600,7 @@ https://hopla.onrender.com/trails/all
 
 **eks**
 
-[https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5](https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5)
+https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 **Response eksempel**
 
@@ -613,10 +641,10 @@ Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
 
 **query**
 
-*  ?latitude= må være med
-*  ?longitude= må være med.
-*  ?pageNumber= optional settes til 1 som er første side hvis ikke oppgitt
-*  ?pageSize= optional. antall resultater som returneres. settes til 10 hvis ikke oppgitt
+* ?latitude= må være med
+* ?longitude= må være med.
+* ?pageNumber= optional settes til 1 som er første side hvis ikke oppgitt
+* ?pageSize= optional. antall resultater som returneres. settes til 10 hvis ikke oppgitt
 
 **eks postmann**
 
@@ -652,7 +680,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 
 **Løyper -\> Hjerte ikon**
 
-* Kun løyper som brukeren har trykket liker på 
+* Kun løyper som brukeren har trykket liker på
 
 [https://localhost:7128/trails/favorites](https://localhost:7128/trails/favorites)
 
@@ -665,8 +693,6 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 **eks**
 
 https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
-
-
 
 ```json{
     "trails": [
@@ -703,7 +729,7 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 * ?pageNumber= optional, som over
 * ?pageSize= optional, som ovenfor
 
-**eks*
+\*_eks_
 
 https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumber=1&pagesize=2
 
@@ -729,8 +755,6 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
     "pageSize": 2
 }
 ```
-
-**Akuratt nå er det en liten feil her, som gjør at IsFavorite sjekker ikke om brukeren, men viser true for om vennene&følgerne har løypa som favoritt. Skal rette opp i denne feilen etterhvert.** 
 </td>
 </tr>
 <tr>
@@ -784,9 +808,68 @@ Glemt passord: sender med en epost i requesten, som den da må sjekke at den fin
 
 Opprett bruker:
 
-trinn 1: epost, passord
+**Trinn 1:** Registrer epost, passord
 
-trinn 2: alias, navn, beskrivelse (optional), fødselsdato, tlf (optional), bilde (optional)
+POST https://hopla.onrender.com/users/register
+```json
+{
+    "Email": "betjent-epost@domene.com",
+    "Password": "Hopla2025!"
+}
+```
+
+**response:**
+```message
+E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost.
+```
+**Trinn 2:** Bekreft epostadressen
+
+**Mail innboks/søppelpost:**
+```email
+FROM: Ikke svar (noreply@hopla.no)
+Klikk på lenken for å fullføre registreringen: Bekreft e-post
+```
+
+**Når man trykker bekreft, sendes man hit:**
+
+GET https://hopla.onrender.com/users/confirm-email?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
+
+**eksempel på response:**
+```http_message
+E-post bekreftet! Du kan nå gå tilbake til appen og logge inn med epost og passord.
+```
+
+**Trinn 3:** Logg inn for videre registrering
+**logger inn med endpoint for login:**
+
+Når man logger inn her får man: 
+* Token
+* redirect = "update"
+(hvis registreringen er fullført, dvs name og alias er registrert, vil man få redirect = "profile" )
+
+*Se nærmere info om login på enpoint først i dokumentet.*
+
+**Trinn 4** Oppdatere profilinfo: alias, navn, beskrivelse (optional), fødselsdato, tlf (optional), bilde (optional)
+
+PUT https://lhopla.onrender.com/users/update
+
+Body:
+```json
+{
+    "id": "2b46f82a-2e38-47b6-a08e-cc62d10f4503",
+    "name": "Test",
+    "alias": "Hest",
+    "description": null,
+    "dob": "2005-03-13T09:38:46.8994Z",
+    "pictureUrl": ""
+}
+```
+
+**eksempel på response**
+```postman_message
+Brukerinformasjon oppdatert.
+```
+
 </td>
 </tr>
 <tr>
@@ -846,15 +929,15 @@ Hente alle start-koordinater til løyper (longitude og latitude)
 
 BT oppdaterer
 
-[https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlevel=14](https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlevel=14)
+https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlevel=14
 
 **query**
+
 * ?latitude= påkrevd
 * ?longitude= påkrevd
 * ?zoomlevel= påkrevd
 * ?height= optional. Beregner høyde/bredde-forhold på skjermen, slik at man finner longmax/min
 * ?width= optional. Hvis ikke oppgitt, så settes dette til 2400/1080 som er vanlig skjermstørrelse
-
 
 ```json
 [
@@ -874,7 +957,6 @@ BT oppdaterer
     }
 ]
 ```
-
 </td>
 </tr>
 <tr>
