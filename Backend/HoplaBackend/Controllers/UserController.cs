@@ -76,7 +76,7 @@ public class UserController : ControllerBase
         var confirmEmailUrl = _configuration["ConfirmEmailUrl"];
         Console.WriteLine(confirmEmailUrl);
 
-        var confirmationLink = $"{_configuration["ConfirmEmailUrl"]}/users/confirm-email?token={Uri.EscapeDataString(token)}";
+        var confirmationLink = $"{_configuration["ConfirmEmailUrl"]}?token={Uri.EscapeDataString(token)}";
         await _emailService.SendEmailAsync(request.Email, "Bekreft registrering",
             $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>");
 

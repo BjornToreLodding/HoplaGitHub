@@ -16,7 +16,7 @@ public class EmailService
 
         var bodyBuilder = new BodyBuilder { HtmlBody = htmlMessage };
         emailMessage.Body = bodyBuilder.ToMessageBody();
-
+        
         using (var client = new SmtpClient())
         {
             await client.ConnectAsync("smtp.domeneshop.no", 587, MailKit.Security.SecureSocketOptions.StartTls);
