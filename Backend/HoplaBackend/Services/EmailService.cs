@@ -16,11 +16,13 @@ public class EmailService
 
         var bodyBuilder = new BodyBuilder { HtmlBody = htmlMessage };
         emailMessage.Body = bodyBuilder.ToMessageBody();
-        
+
         using (var client = new SmtpClient())
         {
-            await client.ConnectAsync("smtp.domeneshop.no", 587, MailKit.Security.SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync("noreply@hopla.no", "Calibra2006!");
+            //
+            //await client.ConnectAsync("smtp.domeneshop.no", 587, MailKit.Security.SecureSocketOptions.StartTls);
+            await client.ConnectAsync("email-smtp.us-east-1.amazonaws.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync("AKIAWIJIUWJKZ223VLF3", "UYBpoD5Ef8vpUl5qpgv1AjqYvchzKWJlp5FVClsf");
             await client.SendAsync(emailMessage);
             await client.DisconnectAsync(true);
         }
