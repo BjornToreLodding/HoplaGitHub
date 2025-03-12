@@ -12,9 +12,7 @@ public class User
     //public guid Id { get; set; } //Bruker kanskje denne senere
     public string? Name { get; set; }
     public string? Alias { get; set; }
-
     public required string Email { get; set; }
-    public bool IsEmailVerified { get; set; } = false;
     public string? Telephone { get; set; }
 
     public string? PasswordHash { get; set; }
@@ -24,7 +22,9 @@ public class User
     public int LikesCount { get ; set ; } = 0 ;
     public int CommentsCount { get ; set ; } = 0;
 
-
+    public bool IsRegistrationCompleted => !string.IsNullOrWhiteSpace(Name) 
+                                           && !string.IsNullOrWhiteSpace(Alias); 
+                                           //&& !string.IsNullOrWhiteSpace(Telephone);
     public bool Admin { get; set; } = false;
     public bool Premium { get; set; } = false;
     public bool VerifiedTrail { get; set; } = false;

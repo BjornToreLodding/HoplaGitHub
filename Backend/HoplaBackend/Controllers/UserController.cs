@@ -45,6 +45,92 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            return BadRequest("E-post og passord er påkrevd.");
+
+        var existingUser = await _context.Users.AnyAsync(u => u.Email == request.Email);
+        if (existingUser)
+            return BadRequest("E-postadressen er allerede registrert.");
+
+        var existingVerification = await _context.EmailVerifications.AnyAsync(ev => ev.Email == request.Email && !ev.IsUsed);
+        if (existingVerification)
+            return BadRequest("En verifikasjonsprosess er allerede i gang. Sjekk e-posten din og evt søppelpost.");
+
+        // Hash passordet
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        // Generer token
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+        var verification = new EmailVerification
+        {
+            Email = request.Email,
+            PasswordHash = passwordHash,  // 📌 Lagres her til e-posten er bekreftet
+            Token = token,
+            ExpiryDate = DateTime.UtcNow.AddHours(24)
+        };
+
+        _context.EmailVerifications.Add(verification);
+        await _context.SaveChangesAsync();
+
+        // Send e-post
+        var confirmationLink = $"{_configuration["FrontendUrl"]}/users/confirm-email?token={Uri.EscapeDataString(token)}";
+        await _emailService.SendEmailAsync(request.Email, "Bekreft registrering",
+            $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>");
+
+        return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost.");
+    }
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
+    {
+        var verification = await _context.EmailVerifications
+            .FirstOrDefaultAsync(ev => ev.Token == token && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
+
+        if (verification == null)
+            return BadRequest("Ugyldig eller utløpt token.");
+
+        // Sjekk om brukeren allerede eksisterer (kan skje hvis de klikker på lenken flere ganger)
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.Email);
+        if (existingUser != null)
+            return BadRequest("E-posten er allerede bekreftet.");
+
+        // Opprett ny bruker i Users-tabellen
+        var newUser = new User
+        {
+            Email = verification.Email,
+            PasswordHash = verification.PasswordHash,
+        };
+
+        _context.Users.Add(newUser);
+        verification.IsUsed = true;  // Marker token som brukt
+        await _context.SaveChangesAsync();
+
+        return Ok("E-post bekreftet! Du kan nå gå tilbake til appen og logge inn med epost og passord.");
+    }
+        
+    [HttpPut("users/update")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
+        if (user == null)
+            return NotFound("Bruker ikke funnet.");
+
+        // Oppdater informasjon
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            user.Name = request.Name;
+
+        if (!string.IsNullOrWhiteSpace(request.Alias))
+            user.Alias = request.Alias;
+
+        await _context.SaveChangesAsync();
+
+        return Ok("Brukerinformasjon oppdatert.");
+    }
+
+
+/*    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
         if (string.IsNullOrWhiteSpace(request.Email))
             return BadRequest("E-postadresse er påkrevd.");
 
@@ -77,13 +163,16 @@ public class UserController : ControllerBase
 
         return Ok("E-post sendt.");
     }
-    [HttpPost("complete-registration")]
-    public async Task<IActionResult> CompleteRegistration([FromBody] CompleteRegistrationRequest request) 
+    //[HttpPost("complete-registration")]
+    [HttpGet("complete-registration")]
+    
+    public async Task<IActionResult> CompleteRegistration([FromQuery] string tokenrequest) 
     {
         Console.WriteLine("complete-registration-endpoint enter");
+        //var verification = await _context.EmailVerifications
+        //    .FirstOrDefaultAsync(ev => ev.Token == request.Token && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
         var verification = await _context.EmailVerifications
-            .FirstOrDefaultAsync(ev => ev.Token == request.Token && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
-
+            .FirstOrDefaultAsync(ev => ev.Token == tokenrequest && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
         if (verification == null)
             return BadRequest("Ugyldig eller utløpt token.");
         Console.WriteLine("complete-registration-endpoint checkpoint1");
@@ -105,7 +194,7 @@ public class UserController : ControllerBase
 
         return Ok("Bruker registrert.");
     }
-
+*/
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -126,16 +215,29 @@ public class UserController : ControllerBase
 
         var token = _authentication.GenerateJwtToken(user);
         Console.WriteLine(token);        //return Ok(new { token });
+        string loginRedirect = user.IsRegistrationCompleted ? "profile" : "update";
+        
         return Ok(new
         {
             token,
             userId = user.Id,
             email = user.Email,
-            //skulle vært name ikke navn, men må rette opp i js for loging osv..
+            alias = user.Alias,
+            description = user.Description,
+            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? user.PictureUrl + "?w=200&h=200&fit=crop" : "",
+            redirect = loginRedirect
+        });
+        /*
+        return Ok(new
+        {
+            token,
+            userId = user.Id,
+            email = user.Email,
             name = user.Name,
             alias = user.Alias,
-            PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop"
+            PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? user.PictureUrl + "?w=200&h=200&fit=crop" : ""
         });
+        */
     }
     [HttpPost("login/test")]
     public async Task<IActionResult> Logintest([FromBody] LoginTest request)
@@ -458,7 +560,7 @@ public class UserController : ControllerBase
         return Ok(new { message = "Passordet er endret!" });
     }
 
-
+/*
     [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
     public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
     {
@@ -506,6 +608,7 @@ public class UserController : ControllerBase
 
         return Ok(new { message = $"User userId was updated", userData });
     }
+    */
 
     [Authorize]
     [HttpDelete("delete")]

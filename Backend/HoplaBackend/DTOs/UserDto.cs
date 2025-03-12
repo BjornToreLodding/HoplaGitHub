@@ -48,16 +48,23 @@ public class UpdateUserDto
     //public guid Id { get; set; } //Bruker kanskje denne senere
     public string? Name { get; set; }
     public string? Alias { get; set; }
+    public string? Telephone { get; set; }
 
-    public string? Email { get; set; }
+    //public string? PictureUrl { get; set; } // Direkte lagring av profilbilde-URL
 
-    public string? PasswordHash { get; set; }
-    public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL
+    public string? Description { get ; set; }
+    public DateTime? Dob { get; set; }
 
+
+    //public string? PasswordHash { get; set; }
+    //public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL
+}
+/*
     public bool Admin { get; set; } = false;
     public bool Premium { get; set; } = false;
     public bool VerifiedTrail { get; set; } = false;
 }
+*/
 public class DeleteRequest
 {
     public string Password { get; set; }
