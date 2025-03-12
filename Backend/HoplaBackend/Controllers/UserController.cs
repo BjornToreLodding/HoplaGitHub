@@ -112,10 +112,16 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
         Console.WriteLine("users/update åpnet");
-        Console.WriteLine(request.Id);
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
         Console.WriteLine(request.Name);
         Console.WriteLine(request.Alias);
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == parsedUserId);
         if (user == null)
             return NotFound("Bruker ikke funnet.");
         Console.WriteLine("users/update checkpoint bruker ikke funnet");
