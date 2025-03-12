@@ -30,7 +30,7 @@ struct Profile: View {
                 .ignoresSafeArea(edges: .all)
             
             VStack {
-                if let user = loginViewModel.userProfile {
+                if let user = loginViewModel.userProfile { // If data on user is available
                     // Profile Image Section
                     ZStack {
                         Circle()

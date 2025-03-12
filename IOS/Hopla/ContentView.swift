@@ -1,5 +1,6 @@
 import SwiftUI
 import GoogleMaps
+import GooglePlaces
 
 struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -17,17 +18,25 @@ struct ContentView: View {
 
 // Define MapView to embed Google Maps
 struct MapView: UIViewRepresentable {
-    @ObservedObject var locationManager = LocationManager()
+    @StateObject var locationManager = LocationManager()
 
     func makeUIView(context: Context) -> GMSMapView {
-            // Initialize the GMSMapView with a default camera
-            let camera = GMSCameraPosition.camera(withLatitude: 0, longitude: 0, zoom: 15) // Default location
-            let mapView = GMSMapView(frame: .zero, camera: camera)
-            mapView.isMyLocationEnabled = true // Enable user location
-            mapView.settings.myLocationButton = true // Optional: Show location button
-            
-            return mapView
+        let mapView = GMSMapView(frame: .zero)
+        mapView.isMyLocationEnabled = true
+        mapView.settings.myLocationButton = true
+
+        // Wait for user location before setting camera
+        if let userLocation = locationManager.userLocation {
+            let camera = GMSCameraPosition.camera(
+                withLatitude: userLocation.coordinate.latitude,
+                longitude: userLocation.coordinate.longitude,
+                zoom: 15
+            )
+            mapView.camera = camera
         }
+
+        return mapView
+    }
 
     func updateUIView(_ mapView: GMSMapView, context: Context) {
         if let userLocation = locationManager.userLocation {
@@ -36,7 +45,9 @@ struct MapView: UIViewRepresentable {
                 longitude: userLocation.coordinate.longitude,
                 zoom: 15
             )
-            mapView.animate(to: newCamera) // Move camera to user location
+            mapView.animate(to: newCamera)
         }
     }
 }
+
+

@@ -11,6 +11,12 @@
         }
       }
     },
+    "Add" : {
+
+    },
+    "Add a Horse" : {
+
+    },
     "Antall" : {
       "localizations" : {
         "nb" : {
@@ -175,6 +181,9 @@
     "Distance" : {
 
     },
+    "Done" : {
+
+    },
     "Email" : {
       "localizations" : {
         "nb" : {
@@ -224,6 +233,9 @@
           }
         }
       }
+    },
+    "Enter horse name" : {
+
     },
     "Enter new password" : {
       "localizations" : {
@@ -373,6 +385,9 @@
       }
     },
     "Hopla" : {
+
+    },
+    "Horse Details" : {
 
     },
     "Join now" : {
@@ -571,6 +586,9 @@
           }
         }
       }
+    },
+    "Select Image" : {
+
     },
     "Send" : {
       "localizations" : {

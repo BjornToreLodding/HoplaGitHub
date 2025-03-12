@@ -10,35 +10,33 @@ import GoogleMaps
 import GooglePlaces
 
 struct NewHike: View {
-    @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    
+    @Environment(\.colorScheme) var colorScheme
+    @StateObject private var locationManager = LocationManager() // Shared instance
+
     var body: some View {
         NavigationStack {
             ZStack {
-                // Embed MapView here so it takes the entire screen
-                MapView()
-                    .edgesIgnoringSafeArea(.all) // This will make the map take up the entire screen
+                MapView(locationManager: locationManager) // Pass it to MapView
+                    .edgesIgnoringSafeArea(.all)
                 
                 VStack {
-                    // The time, distance and start/stop button
                     HStack {
                         Text("Time")
-                            .frame(maxWidth: .infinity, alignment: .center) // Make Text take up equal space and align it in the center
+                            .frame(maxWidth: .infinity, alignment: .center)
                         
                         Button(action: {}) {
                             Text("Start")
-                                .foregroundColor(.white)  // Set the text color to white (or any color)
-                                .frame(width: 70, height: 70)  // Define width and height to make it a circle
+                                .foregroundColor(.white)
+                                .frame(width: 70, height: 70)
                                 .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                                .clipShape(Circle())  // Make the button circular
-                                .overlay(Circle().stroke(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme), lineWidth: 4))  // Optional: Adds a border around the circle
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme), lineWidth: 4))
                         }
-                        .frame(maxWidth: .infinity, alignment: .center) // Make Button take up equal space and align it in the center
+                        .frame(maxWidth: .infinity, alignment: .center)
                         
                         Text("Distance")
-                            .frame(maxWidth: .infinity, alignment: .center) // Make Text take up equal space and align it in the center
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
-
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 75)
@@ -46,17 +44,8 @@ struct NewHike: View {
                 }
             }
             .toolbarBackground(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme), for: .navigationBar)
-            .toolbarColorScheme(.light, for: .navigationBar) // Ensures icons and text are readable
+            .toolbarColorScheme(.light, for: .navigationBar)
         }
     }
 }
 
-
-#Preview("English") {
-    ContentView()
-}
-
-#Preview("Norsk") {
-    ContentView()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
-}

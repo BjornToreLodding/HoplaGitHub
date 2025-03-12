@@ -26,7 +26,6 @@ struct Home: View {
 
                 VStack(spacing: 0) { // **Spacing set to 0**
                     filterBar
-                        .frame(height: 40) // **Ensure no extra height**
 
                     ScrollView {
                         VStack(spacing: 10) {
@@ -52,7 +51,7 @@ struct Home: View {
             }
             .pickerStyle(SegmentedPickerStyle())
         }
-        .frame(height: 40)
+        
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
 }
@@ -80,7 +79,7 @@ struct PostContainer: View {
                     .font(.body)
                     .adaptiveTextColor(light: .black, dark: .white)
             }
-            .frame(width: 340, height: 320)
+            .frame(width: 370, height: 320)
             .padding()
         }
     }

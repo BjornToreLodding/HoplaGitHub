@@ -33,8 +33,8 @@ struct Login: View {
                     .fill(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                     .ignoresSafeArea() // Fill the entire screen
                 
-                GeometryReader { geometry in
-                    
+                //   GeometryReader { geometry in
+                
                 VStack {
                     VStack {
                         // Logo
@@ -42,7 +42,7 @@ struct Login: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 170, height: 170)
-                            
+                        
                         Text("Hopla")
                             .font(.system(size: 50, weight: .bold, design: .rounded))
                         
@@ -50,7 +50,7 @@ struct Login: View {
                     }
                     .padding(.top, 150)
                     
-                   
+                    
                     
                     // MARK: - Text fields
                     
@@ -127,6 +127,8 @@ struct Login: View {
                     Button(action: {
                         if email.isEmpty || password.isEmpty {
                             viewModel.errorMessage = "Email and password cannot be empty!"
+                        } else if !isValidEmail(email){
+                            viewModel.errorMessage = "Enter a valid email!"
                         } else {
                             viewModel.login(email: email, password: password)
                         }
@@ -235,26 +237,33 @@ struct Login: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .center) // Ensure content is centered
-                .frame(maxHeight: geometry.size.height * 0.9) // Limit height to prevent overflow
-            }
+                .frame(maxHeight: .infinity) // Limit height to prevent overflow
+                //  }
                 .padding(.bottom, 100)
+            }
+            .navigationBarHidden(true) // Hide navigation bar on the login screen
         }
-        .navigationBarHidden(true) // Hide navigation bar on the login screen
     }
-}
+    
+    
+    // MARK: - Functions Sheets
+    
+    // Resets email
+    private func resetEmail() {
+        email = ""
+    }
+    
+    // Resets all fields sign up
+    private func resetTextFields() {
+        username = ""
+        newEmail = ""
+        newPassword = ""
+    }
+    
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailFormat = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let predicate = NSPredicate(format: "SELF MATCHES %@", emailFormat)
+        return predicate.evaluate(with: email)
+    }
 
-
-// MARK: - Functions Sheets
-
-// Resets email
-private func resetEmail() {
-    email = ""
-}
-
-// Resets all fields sign up
-private func resetTextFields() {
-    username = ""
-    newEmail = ""
-    newPassword = ""
-}
 }

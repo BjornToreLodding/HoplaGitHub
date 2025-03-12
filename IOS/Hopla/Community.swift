@@ -37,7 +37,7 @@ struct Community: View {
         Group(name: "Barthun stall", filters: [.forest, .gravel, .parking], isFavorite: true, imageName: "Group3", description: "This hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."),
         Group(name: "Gjøvik Gård", filters: [.asphalt, .gravel], isFavorite: false, imageName: "Gjøvik", description: "A difficult trail with beautiful views of the valley. It is best to go in the summer when the weather is good.")
     ]
-
+    
     //
     private var filteredGroups: [Group] {
         let lowercasedSearchText = searchText.lowercased()
@@ -48,10 +48,14 @@ struct Community: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack {
-                filterBar
-                searchBar
+        VStack {
+            filterBar
+            searchBar
+        }
+        .frame(maxWidth: .infinity)
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+        ZStack {
+            NavigationView {
                 
                 ScrollView {
                     VStack(spacing: 10) {
@@ -62,11 +66,11 @@ struct Community: View {
                     }
                     .padding(.horizontal)
                 }
+                .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
             }
-            .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-            .navigationBarHidden(true) // Hide the navigation bar
-            .ignoresSafeArea(.all, edges: .top) // To fix the extra space at the top
         }
+        .navigationBarHidden(true)
+        
     }
     
     private func binding(for group: Group) -> Binding<Group> {

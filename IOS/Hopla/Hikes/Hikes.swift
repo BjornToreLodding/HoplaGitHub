@@ -62,15 +62,24 @@ struct Hikes: View {
         Hike(name: "Skogsstien", filters: [.forest, .gravel, .parking], rating: 5, isFavorite: true, imageName: "HorseImage3", description: "This hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."),
         Hike(name: "Dalstien", filters: [.asphalt, .gravel], rating: 3, isFavorite: false, imageName: "HorseImage", description: "A difficult trail with beautiful views of the valley. It is best to go in the summer when the weather is good.")
     ]
-
+    
     private var filteredHikes: [Hike] {
-            let filtered = selectedFilter == .heart ? hikes.filter { $0.isFavorite } : hikes
-            return searchText.isEmpty ? filtered : filtered.filter { $0.name.lowercased().contains(searchText.lowercased()) }
-        }
+        let filtered = selectedFilter == .heart ? hikes.filter { $0.isFavorite } : hikes
+        return searchText.isEmpty ? filtered : filtered.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+    }
     
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .top) { // Use a ZStack to layer the views
+        VStack(spacing: 0) {
+            // Place filterBar and searchBar at the top with no extra spacing between them
+            filterBar
+            searchBar
+        }
+        .frame(maxWidth: .infinity)
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+        ZStack {
+            // Main content wrapped in NavigationView
+            NavigationView {
+                // Scrollable content, adjusting padding and top space
                 ScrollView {
                     VStack(spacing: 10) {
                         ForEach(filteredHikes, id: \.id) { hike in
@@ -78,30 +87,14 @@ struct Hikes: View {
                         }
                         .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
-                    .padding(.top, 140) // Increase padding to make space for both bars
                 }
-                
-                VStack(spacing: 0) {
-                    filterBar
-                        .zIndex(1) // Ensure the filter bar stays on top
-                    
-                    searchBar
-                        .zIndex(1) // Ensure the search bar stays on top of content
-                        
-                }
-                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                .frame(maxWidth: .infinity) // Ensure it spans the whole width
-                .padding(.top, 0) // Remove unnecessary top padding here, it’s managed by the ZStack
-                
+                .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
             }
-            .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-            .navigationBarHidden(true) // Hide the navigation bar
-            .ignoresSafeArea(.all, edges: .top) // To fix the extra space at the top
         }
+        .navigationBarHidden(true)
     }
-
-
-
+    
+    
     
     private func binding(for hike: Hike) -> Binding<Hike> {
         guard let index = hikes.firstIndex(where: { $0.id == hike.id }) else {
@@ -119,23 +112,23 @@ struct Hikes: View {
             }
             .pickerStyle(SegmentedPickerStyle())
         }
+        .frame(height: 30)
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
-
+    
     // MARK: - Search bar
     private var searchBar: some View {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                TextField("Search hikes...", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .padding(8)
-                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
-            }
-            .padding(.horizontal)
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+            TextField("Search hikes...", text: $searchText)
+                .textFieldStyle(PlainTextFieldStyle())
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
         }
+        .padding(.horizontal)
+    }
 }
-
 
 
 // MARK: - Hike Card
@@ -146,7 +139,7 @@ struct HikeCard: View {
     var body: some View {
         NavigationLink(destination: HikesDetails(hike: hike)) {
             VStack {
-                ZStack(alignment: .topLeading) {
+                ZStack(alignment: .top) {
                     Image(hike.imageName)
                         .resizable()
                         .scaledToFill()

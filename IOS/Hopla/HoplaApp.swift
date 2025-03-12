@@ -7,6 +7,7 @@
 
 import SwiftUI
 import GoogleMaps
+import CoreLocation
 
 @main
 struct HoplaApp: App {
@@ -16,6 +17,7 @@ struct HoplaApp: App {
     @Environment(\.colorScheme) var colorScheme
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    @StateObject private var locationManager = LocationManager()
 
     var body: some Scene {
         WindowGroup {
@@ -25,19 +27,19 @@ struct HoplaApp: App {
                     .ignoresSafeArea(edges: .all)
                 
                 VStack(spacing: 0) {
-                    // Logo at the Top
-                    VStack {
-                        Image("LogoUtenBakgrunn")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 40)
-                            .padding(.top, 10)
-                            .padding(.bottom, 5)
+                    // Only show the logo and green background if the user is logged in
+                    if isLoggedIn {
+                        VStack {
+                            Image("LogoUtenBakgrunn")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 40)
+                                .padding(.bottom, 5)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                     }
-                    .frame(maxWidth: .infinity)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    
-                    
+
                     // Main App Content
                     if isLoggedIn {
                         MainTabView()
@@ -46,10 +48,17 @@ struct HoplaApp: App {
                         Login()
                     }
                 }
+
             }
             .onAppear {
                 setupNavigationBar(for: colorScheme)
                 setupTabBarAppearance(for: colorScheme)
+                
+                if let lat = locationManager.latitude, let lon = locationManager.longitude {
+                    print("Current Location - Latitude: \(lat), Longitude: \(lon)")
+                } else {
+                    print("Waiting for location...")
+                }
             }
             .onChange(of: colorScheme) { newColorScheme in
                 setupNavigationBar(for: newColorScheme)
