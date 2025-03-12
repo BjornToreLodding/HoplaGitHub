@@ -107,13 +107,22 @@ public class UserController : ControllerBase
 
         return Ok("E-post bekreftet! Du kan nå gå tilbake til appen og logge inn med epost og passord.");
     }
-        
-    [HttpPut("users/update")]
+    [Authorize]    
+    [HttpPut("update")]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
+        Console.WriteLine("users/update åpnet");
+        Console.WriteLine(request.Id);
+        Console.WriteLine(request.Name);
+        Console.WriteLine(request.Alias);
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
         if (user == null)
             return NotFound("Bruker ikke funnet.");
+        Console.WriteLine("users/update checkpoint bruker ikke funnet");
+
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Alias))
+            return BadRequest("Name or Alias cannot be empty");
+        Console.WriteLine("users/update checkpoint Name or alias cannot be empty");
 
         // Oppdater informasjon
         if (!string.IsNullOrWhiteSpace(request.Name))
@@ -122,11 +131,13 @@ public class UserController : ControllerBase
         if (!string.IsNullOrWhiteSpace(request.Alias))
             user.Alias = request.Alias;
 
+        Console.WriteLine("users/update checkpoint før save og return ok");
+
+
         await _context.SaveChangesAsync();
 
         return Ok("Brukerinformasjon oppdatert.");
     }
-
 
 /*    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -221,8 +232,10 @@ public class UserController : ControllerBase
         {
             token,
             userId = user.Id,
-            email = user.Email,
+            //email = user.Email,
+            name = user.Name,
             alias = user.Alias,
+            telephone = user.Telephone,
             description = user.Description,
             pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? user.PictureUrl + "?w=200&h=200&fit=crop" : "",
             redirect = loginRedirect
