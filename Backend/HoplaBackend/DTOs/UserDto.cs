@@ -24,7 +24,15 @@ public class ChangePasswordRequest
     public string OldPassword { get; set; }
     public string NewPassword { get; set; }
 }
-
+public class RequestPasswordReset
+{
+    public string Email { get; set; }
+}
+public class ResetPasswordRequest
+{
+    public string Token { get; set; }
+    public string NewPassword { get; set; }
+}
 
 public class UserDto
 {

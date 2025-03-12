@@ -26,9 +26,8 @@ public class UserController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
-     private readonly EmailService _emailService;
+    private readonly EmailService _emailService;
     private readonly IConfiguration _configuration;
-
     private readonly UserRelationService _userRelationService;
     private readonly UserHikeService _userHikeService;
     public UserController(Authentication authentication, AppDbContext context, EmailService emailService, IConfiguration configuration, UserRelationService userRelationService, UserHikeService userHikeService)
@@ -74,7 +73,7 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
 
         // Send e-post
-        var confirmationLink = $"{_configuration["FrontendUrl"]}/users/confirm-email?token={Uri.EscapeDataString(token)}";
+        var confirmationLink = $"{_configuration["ConfirmEmailUrl"]}/users/confirm-email?token={Uri.EscapeDataString(token)}";
         await _emailService.SendEmailAsync(request.Email, "Bekreft registrering",
             $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>");
 
@@ -579,7 +578,58 @@ public class UserController : ControllerBase
 
         return Ok(new { message = "Passordet er endret!" });
     }
+    // 📌 2.1: Be om passordtilbakestilling
+    [HttpPost("reset-password-request")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordReset request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null)
+            return BadRequest("E-postadressen finnes ikke.");
 
+        // Generer engangs-token for passordtilbakestilling
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+        var passwordReset = new PasswordReset
+        {
+            Email = request.Email,
+            Token = token,
+            ExpiryDate = DateTime.UtcNow.AddMinutes(15)
+        };
+
+        _context.PasswordResets.Add(passwordReset); //Rød strek under PasswordResets
+        await _context.SaveChangesAsync();
+
+        // Lag lenke til nettsiden for tilbakestilling
+        var resetLink = $"{_configuration["PasswordResetUrl"]}/resetpassword.html?token={Uri.EscapeDataString(token)}";
+        await _emailService.SendEmailAsync(request.Email, "Tilbakestill passord",
+            $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a>");
+
+        return Ok("E-post sendt. Sjekk innboksen din.");
+    }
+
+    // 📌 2.2: Endepunkt for å sette nytt passord
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var passwordReset = await _context.PasswordResets
+            .FirstOrDefaultAsync(pr => pr.Token == request.Token && !pr.IsUsed && pr.ExpiryDate > DateTime.UtcNow);
+
+        if (passwordReset == null)
+            return BadRequest("Ugyldig eller utløpt token.");
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == passwordReset.Email);
+        if (user == null)
+            return NotFound("Bruker ikke funnet.");
+
+        // Oppdater passordet
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        passwordReset.IsUsed = true;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Passordet er endret. Du kan nå logge inn med ditt nye passord." });
+
+    }
 /*
     [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
     public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)

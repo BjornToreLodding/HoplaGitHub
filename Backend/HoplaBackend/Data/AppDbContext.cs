@@ -25,6 +25,7 @@ public class AppDbContext : DbContext
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<EmailVerification> EmailVerifications { get; set; }
+    public DbSet<PasswordReset> PasswordResets { get; set; }
     public DbSet<UserSetting> UserSettings { get; set; }
     public DbSet<UserRelation> UserRelations { get; set; } // Endret fra Friendrequest til FriendRequest
     public DbSet<Message> Messages { get; set; }
