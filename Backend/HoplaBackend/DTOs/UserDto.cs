@@ -43,8 +43,6 @@ public class CreateUserDto
 
 public class UpdateUserDto
 {
-    [Key] //Denne er unødvendig tror jeg, fordi Id blir automatisk som PK hvis ikke man bruker [key] et annet sted.
-    public Guid Id { get; set; } 
     //public guid Id { get; set; } //Bruker kanskje denne senere
     public string? Name { get; set; }
     public string? Alias { get; set; }
