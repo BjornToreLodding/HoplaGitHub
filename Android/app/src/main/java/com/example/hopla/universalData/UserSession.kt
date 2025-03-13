@@ -1,4 +1,4 @@
-package com.example.hopla
+package com.example.hopla.universalData
 
 object UserSession {
     var token: String = ""

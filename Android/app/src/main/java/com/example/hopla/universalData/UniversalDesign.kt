@@ -1,4 +1,4 @@
-package com.example.hopla
+package com.example.hopla.universalData
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.hopla.R
 import com.example.hopla.ui.theme.PrimaryGray
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -303,7 +304,9 @@ fun MessageBox(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = if (message.username == UserSession.alias) stringResource(R.string.me) else message.username, // Change username to "me"
+                                    text = if (message.username == UserSession.alias) stringResource(
+                                        R.string.me
+                                    ) else message.username, // Change username to "me"
                                     fontSize = 10.sp,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )

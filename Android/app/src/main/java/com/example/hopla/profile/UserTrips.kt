@@ -45,11 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.hopla.Hike
+import com.example.hopla.universalData.Hike
 import com.example.hopla.R
-import com.example.hopla.ScreenHeader
-import com.example.hopla.Trip
-import com.example.hopla.UserSession
+import com.example.hopla.universalData.ScreenHeader
+import com.example.hopla.universalData.Trip
+import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchUserHikes
 import com.example.hopla.ui.theme.PrimaryWhite
 import kotlinx.coroutines.launch

@@ -79,6 +79,14 @@ import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
+import com.example.hopla.universalData.ContentBoxInfo
+import com.example.hopla.universalData.Difficulty
+import com.example.hopla.universalData.Filters
+import com.example.hopla.universalData.MapScreen
+import com.example.hopla.universalData.Message
+import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.Trail
+import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date

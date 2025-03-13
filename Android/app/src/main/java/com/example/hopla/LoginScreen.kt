@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import com.example.hopla.apiService.handleLogin
 import com.example.hopla.ui.theme.PrimaryGray
+import com.example.hopla.universalData.ImagePicker
 
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {

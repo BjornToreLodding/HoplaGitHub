@@ -2,12 +2,12 @@ package com.example.hopla.apiService
 
 import android.content.Context
 import android.util.Log
-import com.example.hopla.ErrorResponse
-import com.example.hopla.LoginRequest
+import com.example.hopla.universalData.ErrorResponse
+import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.R
-import com.example.hopla.User
-import com.example.hopla.UserSession
-import com.example.hopla.apiUrl
+import com.example.hopla.universalData.User
+import com.example.hopla.universalData.UserSession
+import com.example.hopla.universalData.apiUrl
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

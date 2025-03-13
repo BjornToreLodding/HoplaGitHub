@@ -47,10 +47,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
-import com.example.hopla.ImagePicker
-import com.example.hopla.OtherUsers
+import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.R
-import com.example.hopla.UserSession
+import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.ui.theme.PrimaryGray
 
@@ -439,7 +439,7 @@ fun AddNewType(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    com.example.hopla.SearchBar(
+                    com.example.hopla.universalData.SearchBar(
                         searchQuery = searchQuery,
                         onSearchQueryChange = { searchQuery = it }
                     )

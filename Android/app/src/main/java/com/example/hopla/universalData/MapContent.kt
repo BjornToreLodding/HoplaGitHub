@@ -1,4 +1,4 @@
-package com.example.hopla
+package com.example.hopla.universalData
 
 import android.content.Context
 import android.content.pm.PackageManager

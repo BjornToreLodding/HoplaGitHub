@@ -58,6 +58,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.hopla.apiService.fetchMessages
+import com.example.hopla.universalData.AddButton
+import com.example.hopla.universalData.Community
+import com.example.hopla.universalData.CommunityMemberStatus
+import com.example.hopla.universalData.CommunityStatus
+import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.Message
+import com.example.hopla.universalData.MessageBox
+import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.ScreenHeader
+import com.example.hopla.universalData.SearchBar
 
 // Define the communities list
 val communities = listOf(

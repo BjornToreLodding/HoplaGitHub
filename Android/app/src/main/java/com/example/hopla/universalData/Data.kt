@@ -1,4 +1,4 @@
-package com.example.hopla
+package com.example.hopla.universalData
 
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable

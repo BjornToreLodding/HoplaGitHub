@@ -59,6 +59,8 @@ import com.example.hopla.profile.ProfileScreen
 import com.example.hopla.profile.SettingsScreen
 import com.example.hopla.profile.UserHorsesScreen
 import com.example.hopla.profile.UsersProfileScreen
+import com.example.hopla.universalData.MapScreen
+import com.example.hopla.universalData.UserSession
 
 
 class MainActivity : ComponentActivity() {

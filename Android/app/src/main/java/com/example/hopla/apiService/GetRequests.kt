@@ -1,16 +1,16 @@
 package com.example.hopla.apiService
 
 import android.util.Log
-import com.example.hopla.Following
-import com.example.hopla.Friend
-import com.example.hopla.FriendProfile
-import com.example.hopla.Hike
-import com.example.hopla.Horse
-import com.example.hopla.HorseDetail
-import com.example.hopla.Message
-import com.example.hopla.OtherUsers
-import com.example.hopla.TrailsResponse
-import com.example.hopla.apiUrl
+import com.example.hopla.universalData.Following
+import com.example.hopla.universalData.Friend
+import com.example.hopla.universalData.FriendProfile
+import com.example.hopla.universalData.Hike
+import com.example.hopla.universalData.Horse
+import com.example.hopla.universalData.HorseDetail
+import com.example.hopla.universalData.Message
+import com.example.hopla.universalData.OtherUsers
+import com.example.hopla.universalData.TrailsResponse
+import com.example.hopla.universalData.apiUrl
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

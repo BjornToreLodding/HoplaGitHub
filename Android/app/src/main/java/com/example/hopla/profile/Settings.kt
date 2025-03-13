@@ -43,8 +43,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.R
-import com.example.hopla.ReportDialog
-import com.example.hopla.ScreenHeader
+import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.UserViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
 import java.util.Locale
