@@ -91,6 +91,7 @@ struct Hikes: View {
                 .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
             }
         }
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
         .navigationBarHidden(true)
     }
     

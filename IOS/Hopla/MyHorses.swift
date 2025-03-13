@@ -5,95 +5,6 @@
 //  Created by Ane Marie Johnsen on 27/02/2025.
 //
 
-/**
- import SwiftUI
- 
- // MARK: - Horse Model
- struct Horse: Identifiable {
- let id = UUID()
- let name: String
- let imageName: String
- }
- 
- struct MyHorses: View {
- 
- 
- 
- @Environment(\.colorScheme) var colorScheme
- 
- @State private var horses: [Horse] = [
- Horse(name: "Horse1", imageName: "HorseImage"),
- Horse(name: "Horse2", imageName: "HorseImage2"),
- Horse(name: "Horse3", imageName: "HorseImage3"),
- Horse(name: "Horse4", imageName: "HorseImage"),
- Horse(name: "Horse5", imageName: "HorseImage2"),
- Horse(name: "Horse6", imageName: "HorseImage3")
- ]
- 
- var body: some View {
- VStack {
- NavigationView {
- VStack {
- ScrollView {
- VStack(spacing: 10) {
- ForEach($horses) { $horse in
- HorseCard(horse: $horse)
- }
- }
- .padding(.horizontal)
- }
- }
- .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
- 
- }
- }
- }
- 
- private func horseBinding(for horse: Horse) -> Binding<Horse>? {
- guard let index = horses.firstIndex(where: { $0.id == horse.id }) else {
- return nil
- }
- return $horses[index]
- }
- 
- 
- }
- 
- // MARK: - Horse Card
- 
- struct HorseCard: View {
- @Environment(\.colorScheme) var colorScheme
- @Binding var horse: Horse
- 
- var body: some View {
- NavigationLink(destination: HorseDetails(horse: horse)) {
- VStack {
- ZStack(alignment: .leading) {
- 
- Rectangle()
- .fill(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
- .frame(width: 380, height: 120)
- 
- HStack {
- Image(horse.imageName)
- .resizable()
- .scaledToFill()
- .frame(width: 100, height: 100)
- .clipShape(Circle())
- 
- Text(horse.name)
- .padding(.leading, 10)
- .foregroundStyle(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
- }
- }
- }
- .shadow(radius: 3)
- }
- .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
- }
- }
- */
-
 import SwiftUI
 
 // MARK: - Horse ViewModel
@@ -124,98 +35,98 @@ struct MyHorses: View {
     @State private var showAddHorseSheet = false
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
-
+    
     var body: some View {
-        VStack {
-            /*
-            Text("")
-                .frame(maxWidth: .infinity)
-                .frame(height: 0)
-                .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-            */
-            NavigationView {
-                ZStack {
-                    // Set the background color for the whole screen based on color scheme
-                    AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
-                        .color(for: colorScheme)
-                        .edgesIgnoringSafeArea(.all) // Ensure the background fills the screen
-
-                    ScrollView {
-                        VStack {
-                            ForEach(vm.horses) { horse in
-                                NavigationLink(destination: HorseDetails(horse: horse)) {
-                                    HStack {
-                                        if let image = horse.image {
-                                            Image(uiImage: image)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 80, height: 80)
-                                                .clipShape(Circle())
+        ZStack {
+            VStack(spacing: 0) {
+                Text("My horses")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right
+                    .frame(height: 40)
+                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .foregroundColor(.white)
+                NavigationView {
+                    ZStack {
+                        // Set the background color for the whole screen based on color scheme
+                        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                            .color(for: colorScheme)
+                            .edgesIgnoringSafeArea(.all) // Ensure the background fills the screen
+                        
+                        ScrollView {
+                            VStack(spacing: 10) {
+                                ForEach(vm.horses) { horse in
+                                    NavigationLink(destination: HorseDetails(horse: horse)) {
+                                        HStack {
+                                            if let image = horse.image {
+                                                Image(uiImage: image)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 80, height: 80)
+                                                    .clipShape(Circle())
+                                            }
+                                            Text(horse.name)
+                                                .font(.headline)
+                                                .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
                                         }
-                                        Text(horse.name)
-                                            .font(.headline)
-                                            .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
+                                        .frame(width: 380, height: 120)
+                                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                                        .padding(5)
                                     }
-                                    .frame(width: 380, height: 120)
-                                    .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                                    .padding(5)
+                                    .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
                                 }
-                                .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
                             }
                         }
                     }
+                    .edgesIgnoringSafeArea(.top) // Ensures it can be placed above navigation elements
                     
-                    // Custom Back Button
-                    VStack {
-                        HStack {
-                            Button(action: {
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Image(systemName: "arrow.left")
+                    .toolbar {
+                        ToolbarItem(placement: .bottomBar) {
+                            Button(action: { showAddHorseSheet = true }) {
+                                Image(systemName: "plus")
                                     .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 30, height: 30)
+                                    .scaledToFill() // Ensures the image fills
+                                    .frame(width: 30, height: 30) // Adjust the icon size
                                     .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                                    .padding(20) // Ensures touch target is bigger
+                                    .background(
+                                        Circle()
+                                            .fill(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                                            .frame(width: 60, height: 60) // Adjusts the button size
+                                            .shadow(radius: 3)
+                                    )
                             }
-                            .padding(.bottom, 150) // Adjust the vertical position
-                            .padding(.leading, 20) // Adjust the horizontal position
-                            Spacer()
+                            .padding(.leading, 320)
+                            .padding(.bottom, 30)
                         }
-                        Spacer()
+                    }
+                    .sheet(isPresented: $showAddHorseSheet) {
+                        AddHorseView(vm: vm)
                     }
                 }
                 .navigationBarBackButtonHidden(true) // Hides the default back button
-                .toolbar {
-                    ToolbarItem(placement: .bottomBar) {
-                        Button(action: { showAddHorseSheet = true }) {
-                            Image(systemName: "plus")
-                                .resizable()
-                                .scaledToFill() // Ensures the image fills
-                                .frame(width: 30, height: 30) // Adjust the icon size
-                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
-                                .padding(20) // Ensures touch target is bigger
-                                .background(
-                                    Circle()
-                                        .fill(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                                        .frame(width: 60, height: 60) // Adjusts the button size
-                                        .shadow(radius: 3)
-                                )
-                        }
-                        .padding(.leading, 320)
-                        .padding(.bottom, 30)
+            }
+            // MARK: - Custom Back Button
+            VStack {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image(systemName: "arrow.left")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                     }
+                    .position(x: 25, y: 20) // Adjust for exact placement
+                    
+                    Spacer()
                 }
-                .sheet(isPresented: $showAddHorseSheet) {
-                    AddHorseView(vm: vm)
-                }
+                Spacer()
             }
         }
     }
-
 }
-
-
-
 
 
 // MARK: - Add Horse View

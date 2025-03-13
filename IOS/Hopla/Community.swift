@@ -56,7 +56,6 @@ struct Community: View {
         .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
         ZStack {
             NavigationView {
-                
                 ScrollView {
                     VStack(spacing: 10) {
                         ForEach(filteredGroups, id: \ .id) { group in
@@ -67,10 +66,12 @@ struct Community: View {
                     .padding(.horizontal)
                 }
                 .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
+                
             }
+            .navigationBarBackButtonHidden(true) // Hides the default back button
         }
-        .navigationBarHidden(true)
-        
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+        .edgesIgnoringSafeArea(.top) // Ensures it can be placed above navigation elements
     }
     
     private func binding(for group: Group) -> Binding<Group> {

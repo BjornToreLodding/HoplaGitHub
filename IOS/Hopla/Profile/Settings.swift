@@ -8,6 +8,7 @@ import SwiftUI
 
 struct Settings: View {
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.presentationMode) var presentationMode
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login status
     @AppStorage("isEnglishSelected") private var isEnglishSelected = false
@@ -26,84 +27,111 @@ struct Settings: View {
             // Ensure the whole background is green
             AdaptiveColor.background.color(for: colorScheme)
                 .ignoresSafeArea(edges: .all)
-            
-            NavigationView {
-                Form {
-                    Section(header: Text(LocalizedStringKey("Display"))) {
-                        Toggle(isOn: $isDarkMode) {
-                            Text(LocalizedStringKey("Dark Mode"))
+            VStack(spacing: 0) {
+                Text("Settings")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right
+                    .frame(height: 40)
+                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .foregroundColor(.white)
+                
+                NavigationView {
+                    Form {
+                        Section(header: Text(LocalizedStringKey("Display"))) {
+                            Toggle(isOn: $isDarkMode) {
+                                Text(LocalizedStringKey("Dark Mode"))
+                            }
                         }
-                    }
-                    
-                    Section(header: Text(LocalizedStringKey("The app must reload to apply language change"))) {
-                        Toggle(isOn: $isEnglishSelected) {
-                            Text("English")
-                        }
-                        .onChange(of: isEnglishSelected) { _ in
-                            changeLanguage()
-                        }
-                    }
-                    
-                    // Send a Report Button
-                    Button(action: {
-                        showReportSheet = true
-                    }) {
-                        Text("Report an Issue")
-                    }
-                    .sheet(isPresented: $showReportSheet) {
-                        ReportIssueView(showReportSheet: $showReportSheet)
-                    }
-                    
-                    // Log out button
-                    Button(action: {
-                        // Show the logout confirmation alert
-                        showLogoutAlert = true
-                    }) {
-                        Text("Log Out")
-                            .foregroundColor(.red)
-                    }
-                    .alert(isPresented: $showLogoutAlert) {
-                        Alert(
-                            title: Text("Are you sure you want to log out?"),
-                            message: Text("You will be logged out of your account."),
-                            primaryButton: .destructive(Text("Log Out")) {
-                                // Log Out Section
-                                NavigationLink(destination: Login()) {
-                                    Text("Log Out")
-                                        .foregroundColor(.red)
-                                }
-                                isLoggedIn = false
-                            },
-                            secondaryButton: .cancel()
-                        )
-                    }
-                    
-                    // Delete User Button
-                    Button(action: {
-                        showDeleteUserAlert = true
-                    }) {
-                        Text("Delete User")
-                            .foregroundColor(.red)
-                    }
-                    .alert("Are you sure you want to delete your user?", isPresented: $showDeleteUserAlert) {
-                        Button("Cancel", role: .cancel) {}
                         
-                        Button("Continue", role: .destructive) {
-                            showPasswordConfirmation = true
+                        Section(header: Text(LocalizedStringKey("The app must reload to apply language change"))) {
+                            Toggle(isOn: $isEnglishSelected) {
+                                Text("English")
+                            }
+                            .onChange(of: isEnglishSelected) { _ in
+                                changeLanguage()
+                            }
                         }
-                    } message: {
-                        Text("This action cannot be undone.")
+                        
+                        // Send a Report Button
+                        Button(action: {
+                            showReportSheet = true
+                        }) {
+                            Text("Report an Issue")
+                        }
+                        .sheet(isPresented: $showReportSheet) {
+                            ReportIssueView(showReportSheet: $showReportSheet)
+                        }
+                        
+                        // Log out button
+                        Button(action: {
+                            // Show the logout confirmation alert
+                            showLogoutAlert = true
+                        }) {
+                            Text("Log Out")
+                                .foregroundColor(.red)
+                        }
+                        .alert(isPresented: $showLogoutAlert) {
+                            Alert(
+                                title: Text("Are you sure you want to log out?"),
+                                message: Text("You will be logged out of your account."),
+                                primaryButton: .destructive(Text("Log Out")) {
+                                    // Log Out Section
+                                    NavigationLink(destination: Login()) {
+                                        Text("Log Out")
+                                            .foregroundColor(.red)
+                                    }
+                                    isLoggedIn = false
+                                },
+                                secondaryButton: .cancel()
+                            )
+                        }
+                        
+                        // Delete User Button
+                        Button(action: {
+                            showDeleteUserAlert = true
+                        }) {
+                            Text("Delete User")
+                                .foregroundColor(.red)
+                        }
+                        .alert("Are you sure you want to delete your user?", isPresented: $showDeleteUserAlert) {
+                            Button("Cancel", role: .cancel) {}
+                            
+                            Button("Continue", role: .destructive) {
+                                showPasswordConfirmation = true
+                            }
+                        } message: {
+                            Text("This action cannot be undone.")
+                        }
+                    }
+                    .background(AdaptiveColor.background.color(for: colorScheme)) // Set Form background
+                    .scrollContentBackground(.hidden) // Hide default Form background
+                    .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
+                    .sheet(isPresented: $showPasswordConfirmation) {
+                        PasswordConfirmationView(password: $password, isLoggedIn: $isLoggedIn, showPasswordConfirmation: $showPasswordConfirmation)
                     }
                 }
-                .background(AdaptiveColor.background.color(for: colorScheme)) // Set Form background
-                .scrollContentBackground(.hidden) // Hide default Form background
-                .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
-                .sheet(isPresented: $showPasswordConfirmation) {
-                    PasswordConfirmationView(password: $password, isLoggedIn: $isLoggedIn, showPasswordConfirmation: $showPasswordConfirmation)
-                }
+                .navigationBarBackButtonHidden(true) // Hides the default back button
+                .preferredColorScheme(isDarkMode ? .dark : .light)
             }
-            
-            .preferredColorScheme(isDarkMode ? .dark : .light)
+            // MARK: - Custom Back Button
+            VStack {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image(systemName: "arrow.left")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                    }
+                    .position(x: 25, y: 20) // Adjust for exact placement
+                    
+                    Spacer()
+                }
+                Spacer()
+            }
         }
         .onAppear {
             setupNavigationBar(for: colorScheme)
