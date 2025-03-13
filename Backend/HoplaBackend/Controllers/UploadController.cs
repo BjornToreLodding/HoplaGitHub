@@ -91,6 +91,7 @@ public class UploadController : ControllerBase
 
             using (var sftpClient = new SftpClient(_sftpHost, _sftpPort, _sftpUsername, _sftpPassword))
             {
+                /*
                 // Sjekk om en kjent SSH-nøkkel er satt
                 if (!string.IsNullOrEmpty(_knownHostKey))
                 {
@@ -109,6 +110,7 @@ public class UploadController : ControllerBase
                 }
                 else
                 {
+                    */
                     // Hvis ingen kjent nøkkel er satt, godta serverens nøkkel automatisk
                     Console.WriteLine("⚠️ Ingen SSH-nøkkel sjekkes (lokal utvikling).");
                     sftpClient.HostKeyReceived += (sender, e) =>
@@ -117,7 +119,7 @@ public class UploadController : ControllerBase
                         Console.WriteLine("✅ Serverens fingeravtrykk godkjent.");
                         e.CanTrust = true;
                     };
-                }
+                //}
 
                 sftpClient.Connect();
                 Console.WriteLine("✅ Tilkoblet til SFTP-serveren!");
