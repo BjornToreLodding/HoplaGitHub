@@ -55,7 +55,6 @@ import com.example.hopla.profile.HorseDetailScreen
 import com.example.hopla.profile.LanguageViewModel
 import com.example.hopla.profile.MyHorsesScreen
 import com.example.hopla.profile.MyTripsScreen
-import com.example.hopla.profile.PersonDetailScreen
 import com.example.hopla.profile.ProfileScreen
 import com.example.hopla.profile.SettingsScreen
 import com.example.hopla.profile.UserHorsesScreen
@@ -146,20 +145,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             composable("update_screen") { UpdateScreen(navController) }
-                            composable(
-                                "person_detail/{personName}/{personImageResource}/{personStatus}",
-                                arguments = listOf(
-                                    navArgument("personName") { type = NavType.StringType },
-                                    navArgument("personImageResource") { type = NavType.IntType },
-                                    navArgument("personStatus") { type = NavType.StringType }
-                                )
-                            ) { backStackEntry ->
-                                val personName = backStackEntry.arguments?.getString("personName") ?: ""
-                                val personImageResource = backStackEntry.arguments?.getInt("personImageResource") ?: 0
-                                val personStatus = backStackEntry.arguments?.getString("personStatus") ?: "NONE"
-                                val person = Person(name = personName, imageResource = personImageResource, status = PersonStatus.valueOf(personStatus))
-                                PersonDetailScreen(navController, person)
-                            }
                             composable(
                                 "friend_profile/{userId}",
                                 arguments = listOf(navArgument("userId") { type = NavType.StringType })

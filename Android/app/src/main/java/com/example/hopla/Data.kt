@@ -19,7 +19,7 @@ data class Trip(
 
 // Different status relationship between users can be
 enum class PersonStatus {
-    FRIEND,
+    FRIENDS,
     FOLLOWING,
     NONE,
     PENDING

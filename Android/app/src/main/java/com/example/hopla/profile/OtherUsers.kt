@@ -23,12 +23,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -62,13 +58,11 @@ import com.example.hopla.Friend
 import com.example.hopla.FriendProfile
 import com.example.hopla.Hike
 import com.example.hopla.OtherUsers
-import com.example.hopla.Person
 import com.example.hopla.PersonStatus
 import com.example.hopla.R
 import com.example.hopla.ReportDialog
 import com.example.hopla.ScreenHeader
 import com.example.hopla.SearchBar
-import com.example.hopla.Trip
 import com.example.hopla.UserItem
 import com.example.hopla.UserSession
 import com.example.hopla.fetchFollowing
@@ -177,20 +171,22 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 Column {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(text = profile.name, style = MaterialTheme.typography.bodySmall)
-                    Text(
-                        text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
-                        style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                        modifier = Modifier.clickable {
-                            navController.navigate("friends_list/${profile.id}")
-                        }
-                    )
-                    Text(
-                        text = stringResource(R.string.horses) + ": ${profile.horseCount}",
-                        style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                        modifier = Modifier.clickable {
-                            navController.navigate("user_horses/$userId")
-                        }
-                    )
+                    if (profile.relationStatus == PersonStatus.FRIENDS.name) {
+                        Text(
+                            text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
+                            style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                            modifier = Modifier.clickable {
+                                navController.navigate("friends_list/${profile.id}")
+                            }
+                        )
+                        Text(
+                            text = stringResource(R.string.horses) + ": ${profile.horseCount}",
+                            style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                            modifier = Modifier.clickable {
+                                navController.navigate("user_horses/$userId")
+                            }
+                        )
+                    }
                     Text(
                         text = stringResource(R.string.relation_status) + ": ${profile.relationStatus}",
                         style = MaterialTheme.typography.bodySmall
@@ -207,8 +203,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             ) {
                 Column {
                     Text(
-                        text = if (showFullDescription) profile.description
-                            ?: "" else profile.description?.take(100)?.plus("...") ?: "",
+                        text = if (profile.description.isNullOrEmpty()) "N/A" else if (showFullDescription) profile.description else profile.description.take(100).plus("..."),
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = if (showFullDescription) Int.MAX_VALUE else 1,
                         overflow = TextOverflow.Ellipsis
@@ -231,19 +226,21 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             profile.userHikes.forEach { hike ->
                 HikeItem(hike)
             }
-            Box(
-                modifier = Modifier
-                    .height(50.dp)
-                    .width(100.dp)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .clickable { loadMoreHikes() },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Load More",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = PrimaryBlack
-                )
+            if (userHikes.isNotEmpty() || profile.userHikes.isNotEmpty())  {
+                Box(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .width(100.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable { loadMoreHikes() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.load_more),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = PrimaryBlack
+                    )
+                }
             }
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -302,185 +299,6 @@ fun FriendsListScreen(navController: NavController, userId: String) {
                     items(friends) { friend ->
                         UserItemComposable(friend, navController)
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PersonDetailScreen(navController: NavController, person: Person) {
-    var showConfirmationDialogFriend by remember { mutableStateOf(false) }
-    var showConfirmationDialogFollowing by remember { mutableStateOf(false) }
-    var showConfirmationDialogPending by remember { mutableStateOf(false) }
-    val trips = listOf(
-        Trip("Trip to the mountains", "2023-10-01", "10", "2", R.drawable.stockimg1),
-        Trip("City walk", "2023-09-15", "5", "1", R.drawable.stockimg2),
-        Trip("Beach run", "2023-08-20", "8", "1.5", R.drawable.stockimg2)
-    )
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        IconButton(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.back)
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = person.imageResource),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape)
-                        .border(5.dp, PrimaryWhite, CircleShape)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(text = person.name, style = MaterialTheme.typography.headlineLarge)
-                    Text(
-                        text = stringResource(R.string.friends) + " : 5",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = stringResource(R.string.trips_added) + " : 3",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = person.status.toString(),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    // If the user is a friend
-                    if (person.status == PersonStatus.FRIEND) {
-                        Text(
-                            text = stringResource(R.string.remove_friend),
-                            modifier = Modifier.clickable {
-                                showConfirmationDialogFriend = true
-                            },
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.Red,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        )
-                    }
-                    // If the user is following that person
-                    if (person.status == PersonStatus.FOLLOWING) {
-                        Text(
-                            text = stringResource(R.string.unfollow),
-                            modifier = Modifier.clickable {
-                                showConfirmationDialogFollowing = true
-                            },
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.Red,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        )
-                    }
-                    // If the user has a pending friend request
-                    if (person.status == PersonStatus.PENDING) {
-                        Text(
-                            text = stringResource(R.string.friendrequest_pending),
-                            modifier = Modifier.clickable {
-                                showConfirmationDialogPending = true
-                            },
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.Red,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        )
-                    }
-                    // If the user has no relation to that user
-                    if (person.status == PersonStatus.NONE) {
-                        Button(onClick = { /* Handle follow logic here */ }) {
-                            Text(text = stringResource(R.string.follow))
-                        }
-                        Button(onClick = { /* Handle follow logic here */ }) {
-                            Text(text = stringResource(R.string.add_friend))
-                        }
-                    }
-                    if (showConfirmationDialogFriend) {
-                        AlertDialog(
-                            onDismissRequest = { showConfirmationDialogFriend = false },
-                            title = { Text(text = stringResource(R.string.remove_friend)) },
-                            text = { Text(text = stringResource(R.string.delete_friend_dialogue)) },
-                            confirmButton = {
-                                Button(onClick = {
-                                    // Handle confirmation action here
-                                    showConfirmationDialogFriend = false
-                                }) {
-                                    Text(text = stringResource(R.string.confirm))
-                                }
-                            },
-                            dismissButton = {
-                                Button(onClick = { showConfirmationDialogFriend = false }) {
-                                    Text(text = stringResource(R.string.cancel))
-                                }
-                            }
-                        )
-                    }
-                    if (showConfirmationDialogFollowing) {
-                        AlertDialog(
-                            onDismissRequest = { showConfirmationDialogFollowing = false },
-                            title = { Text(text = stringResource(R.string.unfollow)) },
-                            text = { Text(text = stringResource(R.string.unfollow_dialogue)) },
-                            confirmButton = {
-                                Button(onClick = {
-                                    // Handle confirmation action here
-                                    showConfirmationDialogFollowing = false
-                                }) {
-                                    Text(text = stringResource(R.string.confirm))
-                                }
-                            },
-                            dismissButton = {
-                                Button(onClick = { showConfirmationDialogFollowing = false }) {
-                                    Text(text = stringResource(R.string.cancel))
-                                }
-                            }
-                        )
-                    }
-                    if (showConfirmationDialogPending) {
-                        AlertDialog(
-                            onDismissRequest = { showConfirmationDialogPending = false },
-                            title = { Text(text = stringResource(R.string.friendrequest_pending)) },
-                            text = { Text(text = stringResource(R.string.remove_request_dialogue)) },
-                            confirmButton = {
-                                Button(onClick = {
-                                    // Handle confirmation action here
-                                    showConfirmationDialogPending = false
-                                }) {
-                                    Text(text = stringResource(R.string.confirm))
-                                }
-                            },
-                            dismissButton = {
-                                Button(onClick = { showConfirmationDialogPending = false }) {
-                                    Text(text = stringResource(R.string.cancel))
-                                }
-                            }
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(trips) { trip ->
-                    TripItem(trip)
                 }
             }
         }
