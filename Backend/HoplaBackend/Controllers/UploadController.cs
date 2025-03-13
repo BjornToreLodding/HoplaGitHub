@@ -1,8 +1,9 @@
+using DotNetEnv;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -14,9 +15,6 @@ using System.Threading.Tasks;
 [ApiController]
 public class UploadController : ControllerBase
 {
-    private readonly string _ftpServer = "sftp.domeneshop.no";
-    private readonly string _ftpUsername = "hopla";
-    private readonly string _ftpPassword = "Reell-300-hr-lam-Gjess";
     
     [HttpPost]
     public async Task<IActionResult> UploadImage([FromForm] IFormFile image, [FromForm] string table)
@@ -56,7 +54,7 @@ public class UploadController : ControllerBase
             //string ftpPath = _ftpServer + fileName;
             //UploadToFtp(tempPath, ftpPath);
 
-            string sftpPath = $"/{fileName}"; // Endre path etter behov
+            string sftpPath = $"{fileName}"; // Endre path etter behov
             Console.WriteLine(sftpPath);
             UploadToSftp(tempPath, sftpPath);
 
@@ -93,23 +91,49 @@ public class UploadController : ControllerBase
 
     private void UploadToSftp(string localFile, string remoteFileName)
     {
-        string sftpHost = "sftp.domeneshop.no";
-        int sftpPort = 22; // Standard SFTP-port
-        string sftpUsername = "hopla";
-        string sftpPassword = "Reell-300-hr-lam-Gjess";
-        string remoteDirectory = "/upload";
+        // Hent miljøvariabler (fra Render eller lokalt)
+        Env.Load(); // Laster .env hvis den finnes (kun lokalt)
+        
+        string sftpHost = Environment.GetEnvironmentVariable("SFTP_HOST");
+        int sftpPort = int.TryParse(Environment.GetEnvironmentVariable("SFTP_PORT"), out var port) ? port : 22;
+        string sftpUsername = Environment.GetEnvironmentVariable("SFTP_USER");
+        string sftpPassword = Environment.GetEnvironmentVariable("SFTP_PASS");
+        string remoteDirectory = Environment.GetEnvironmentVariable("SFTP_REMOTE_PATH");
+        string knownHostKey = Environment.GetEnvironmentVariable("SFTP_KNOWN_HOSTS"); // Tom lokalt
 
         try
         {
             Console.WriteLine("🚀 Starter SFTP-opplasting...");
-            Console.WriteLine($"➡️  Kobler til {sftpHost} på port {sftpPort} med brukernavn {sftpUsername}");
+            Console.WriteLine($"➡️ Kobler til {sftpHost} på port {sftpPort} med brukernavn {sftpUsername}");
 
             using (var sftpClient = new SftpClient(sftpHost, sftpPort, sftpUsername, sftpPassword))
             {
+                // Kun sjekk SSH-nøkkel hvis den er satt (Render.com)
+                if (!string.IsNullOrEmpty(knownHostKey))
+                {
+                    sftpClient.HostKeyReceived += (sender, e) =>
+                    {
+                        string receivedKey = Convert.ToBase64String(e.HostKey);
+                        
+                        if (!knownHostKey.Contains(receivedKey))
+                        {
+                            Console.WriteLine("❌ Feil SSH-nøkkel! Tilkobling avvist.");
+                            e.CanTrust = false;
+                            return;
+                        }
+
+                        Console.WriteLine("✅ SSH-nøkkel verifisert. Tilkobling godkjent.");
+                        e.CanTrust = true;
+                    };
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ Ingen SSH-nøkkel sjekkes (lokal utvikling).");
+                }
+
                 sftpClient.Connect();
                 Console.WriteLine("✅ Tilkoblet til SFTP-serveren!");
 
-                // Sjekk om mappen eksisterer
                 if (!sftpClient.Exists(remoteDirectory))
                 {
                     Console.WriteLine($"📁 Mappen '{remoteDirectory}' finnes ikke, oppretter den...");
@@ -123,14 +147,13 @@ public class UploadController : ControllerBase
 
                 string remoteFilePath = remoteDirectory + remoteFileName;
                 Console.WriteLine($"📝 Filbane på server: {remoteFilePath}");
-
-                // Sjekk at filen eksisterer lokalt før opplasting
-                /*if (!File.Exists(localFile)) //rød strek under File
+                //if (!File.Exists(localFile)) // Rød strek under File erstattet med linje under pga konflikt med ASP.NET Core Controllerbase.
+                if (!System.IO.File.Exists(localFile)) 
                 {
                     Console.WriteLine($"❌ Lokal fil ikke funnet: {localFile}");
                     return;
                 }
-                */
+
                 using (var fileStream = new FileStream(localFile, FileMode.Open))
                 {
                     Console.WriteLine("📤 Laster opp filen...");
@@ -148,6 +171,7 @@ public class UploadController : ControllerBase
             Console.WriteLine(ex.StackTrace);
         }
     }
+
 
 /*
     private void UploadToSftp(string localFile, string remoteFileName)
@@ -178,13 +202,13 @@ public class UploadController : ControllerBase
         }            sftpClient.Disconnect();
         }
     }
-*/
+
     private void UploadToFtp(string localFile, string ftpPath)
     {
         using WebClient client = new WebClient { Credentials = new NetworkCredential(_ftpUsername, _ftpPassword) };
         client.UploadFile(ftpPath, WebRequestMethods.Ftp.UploadFile, localFile);
     }
-
+*/
     private void SaveToDatabase(string table, string filePath)
     {
         Console.WriteLine("");
