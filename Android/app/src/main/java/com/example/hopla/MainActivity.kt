@@ -47,6 +47,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.hopla.profile.AddNewType
+import com.example.hopla.profile.FollowingScreen
+import com.example.hopla.profile.FriendsListScreen
+import com.example.hopla.profile.FriendsScreen
+import com.example.hopla.profile.HorseDetailScreen
+import com.example.hopla.profile.LanguageViewModel
+import com.example.hopla.profile.MyHorsesScreen
+import com.example.hopla.profile.MyTripsScreen
+import com.example.hopla.profile.PersonDetailScreen
+import com.example.hopla.profile.ProfileScreen
+import com.example.hopla.profile.SettingsScreen
+import com.example.hopla.profile.UserHorsesScreen
+import com.example.hopla.profile.UsersProfileScreen
 
 
 class MainActivity : ComponentActivity() {
