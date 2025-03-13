@@ -301,7 +301,7 @@ fun TrailsScreen(navController: NavController) {
             }
         } else {
             val routesToDisplay = if (showOnlyFavorites) {
-                trails.filter { it.heartClicked == true }
+                trails.filter { it.isFavorite == true }
             } else {
                 trails
             }
@@ -317,7 +317,7 @@ fun TrailsScreen(navController: NavController) {
                             imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                 R.drawable.stockimg1
                             ),
-                            isHeartClicked = trail.heartClicked ?: false,
+                            isFavorite = trail.isFavorite ?: false,
                             starRating = trail.averageRating,
                             filters = Filters(
                                 trail.filters?.toSet() ?: emptySet(),
@@ -326,9 +326,9 @@ fun TrailsScreen(navController: NavController) {
                             description = "This is a description of the trail"
                         ),
                         onHeartClick = {
-                            val newState = !(trail.heartClicked ?: false)
+                            val newState = !(trail.isFavorite ?: false)
                             trails = trails.toMutableList().apply {
-                                this[index] = trail.copy(heartClicked = newState)
+                                this[index] = trail.copy(isFavorite = newState)
                             }
                         },
                         onBoxClick = {
@@ -337,7 +337,7 @@ fun TrailsScreen(navController: NavController) {
                                 imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                     R.drawable.stockimg1
                                 ),
-                                isHeartClicked = trail.heartClicked ?: false,
+                                isFavorite = trail.isFavorite ?: false,
                                 starRating = trail.averageRating,
                                 filters = Filters(
                                     trail.filters?.toSet() ?: emptySet(),
@@ -430,9 +430,9 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     // Heart Icon
                     IconButton(onClick = onHeartClick) {
                         Icon(
-                            imageVector = if (info.isHeartClicked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                            imageVector = if (info.isFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = null,
-                            tint = if (info.isHeartClicked) HeartColor else PrimaryWhite
+                            tint = if (info.isFavorite) HeartColor else PrimaryWhite
                         )
                     }
                     Spacer(modifier = Modifier.width(0.1.dp))

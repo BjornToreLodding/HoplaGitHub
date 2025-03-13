@@ -7,6 +7,10 @@ object UserSession {
     var name: String = ""
     var alias: String = ""
     var profilePictureURL: String = ""
+    var telephone: Int? = null
+    var description: String = ""
+    var dob: String = ""
+    var redirect: String = ""
 
     fun clear() {
         token = ""
@@ -15,5 +19,9 @@ object UserSession {
         name = ""
         alias = ""
         profilePictureURL = ""
+        telephone = null
+        description = ""
+        dob = ""
+        redirect = ""
     }
 }

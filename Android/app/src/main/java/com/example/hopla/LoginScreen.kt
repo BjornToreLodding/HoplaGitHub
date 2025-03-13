@@ -108,10 +108,14 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                             val loginResponse = response.body<User>()
                             UserSession.token = loginResponse.token
                             UserSession.userId = loginResponse.userId
-                            UserSession.email = loginResponse.email
+                            UserSession.email = trimmedUsername
                             UserSession.name = loginResponse.name
                             UserSession.alias = loginResponse.alias
                             UserSession.profilePictureURL = loginResponse.pictureUrl
+                            UserSession.telephone = loginResponse.telephone
+                            UserSession.description = loginResponse.description
+                            UserSession.dob = loginResponse.dob
+                            UserSession.redirect = loginResponse.redirect
                             onLogin()
                         }
                         HttpStatusCode.Unauthorized -> {

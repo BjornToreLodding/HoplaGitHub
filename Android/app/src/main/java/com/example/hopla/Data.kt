@@ -56,10 +56,14 @@ data class User(
     val token: String,
     val userId: String,
     val name: String,
-    val email: String,
     val alias: String,
-    val pictureUrl: String
+    val pictureUrl: String,
+    val telephone: Int? = null,
+    val description: String,
+    val dob: String,
+    val redirect: String
 )
+
 
 @Serializable
 data class OtherUsers(
@@ -163,7 +167,7 @@ data class Filters(
 data class ContentBoxInfo(
     val title: String,
     val imageResource: List<Any>,
-    val isHeartClicked: Boolean,
+    val isFavorite: Boolean,
     val starRating: Int,
     val filters: Filters = Filters(),
     val description: String
@@ -218,8 +222,8 @@ data class Trail(
     val pictureUrl: String?,
     val averageRating: Int,
     val difficulty: String? = "EASY",
-    val heartClicked: Boolean? = false,
-    val filters: List<String>? = listOf("gravel", "sand", "asphalt", "dirt")
+    val isFavorite: Boolean? = false,
+    val filters: List<String>? = listOf("gravel", "sand", "asphalt", "dirt"),
 )
 
 @Serializable
