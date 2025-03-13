@@ -91,7 +91,7 @@ public class UploadController : ControllerBase
 
             using (var sftpClient = new SftpClient(_sftpHost, _sftpPort, _sftpUsername, _sftpPassword))
             {
-                // Sjekk SSH-nøkkel hvis miljøvariabel er satt
+                // Sjekk om en kjent SSH-nøkkel er satt
                 if (!string.IsNullOrEmpty(_knownHostKey))
                 {
                     sftpClient.HostKeyReceived += (sender, e) =>
@@ -109,12 +109,20 @@ public class UploadController : ControllerBase
                 }
                 else
                 {
+                    // Hvis ingen kjent nøkkel er satt, godta serverens nøkkel automatisk
                     Console.WriteLine("⚠️ Ingen SSH-nøkkel sjekkes (lokal utvikling).");
+                    sftpClient.HostKeyReceived += (sender, e) =>
+                    {
+                        // Aksepterer serverens nøkkel automatisk
+                        Console.WriteLine("✅ Serverens fingeravtrykk godkjent.");
+                        e.CanTrust = true;
+                    };
                 }
-                
+
                 sftpClient.Connect();
                 Console.WriteLine("✅ Tilkoblet til SFTP-serveren!");
 
+                // Sjekk om mappen finnes, og opprett den om nødvendig
                 if (!sftpClient.Exists(_remoteDirectory))
                 {
                     Console.WriteLine($"📁 Mappen '{_remoteDirectory}' finnes ikke, oppretter den...");
@@ -126,15 +134,18 @@ public class UploadController : ControllerBase
                     Console.WriteLine("📂 Mappe eksisterer allerede.");
                 }
 
+                // Filbane på serveren
                 string remoteFilePath = _remoteDirectory + remoteFileName;
                 Console.WriteLine($"📝 Filbane på server: {remoteFilePath}");
 
+                // Sjekk at den lokale filen finnes
                 if (!System.IO.File.Exists(localFile))
                 {
                     Console.WriteLine($"❌ Lokal fil ikke funnet: {localFile}");
                     return;
                 }
 
+                // Laste opp filen
                 using (var fileStream = new FileStream(localFile, FileMode.Open))
                 {
                     Console.WriteLine("📤 Laster opp filen...");
@@ -142,6 +153,7 @@ public class UploadController : ControllerBase
                     Console.WriteLine("✅ Fil opplastet!");
                 }
 
+                // Frakobling etter opplasting
                 sftpClient.Disconnect();
                 Console.WriteLine("🚪 Frakoblet fra SFTP-serveren.");
             }
@@ -152,6 +164,7 @@ public class UploadController : ControllerBase
             Console.WriteLine(ex.StackTrace);
         }
     }
+
 }
 
 /*using DotNetEnv;
