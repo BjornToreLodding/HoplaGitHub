@@ -137,5 +137,7 @@
     <string name="no_matches">Ingen treff</string>
     <string name="block_user">Blokker bruker</string>
     <string name="report_user">Rapporter bruker</string>
+    <string name="pending">Venter</string>
+    <string name="add">Legg til</string>
 
 </resources>

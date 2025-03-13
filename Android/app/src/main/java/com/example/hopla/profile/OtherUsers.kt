@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.AddButton
+import com.example.hopla.CustomButton
 import com.example.hopla.Friend
 import com.example.hopla.FriendProfile
 import com.example.hopla.Hike
@@ -186,6 +187,26 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                                 navController.navigate("user_horses/$userId")
                             }
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CustomButton(text = stringResource(R.string.friends)) { /*Handle button click*/ }
+                    }
+                    if (profile.relationStatus == PersonStatus.PENDING.name)  {
+                        CustomButton(text = stringResource(R.string.pending)) { /*Handle button click*/ }
+                    }
+                    if (profile.relationStatus == PersonStatus.FOLLOWING.name) {
+                        CustomButton(text = stringResource(R.string.following)) { /*Handle button click*/ }
+                    }
+                    if (profile.relationStatus == PersonStatus.NONE.name) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CustomButton(text = stringResource(R.string.add)) {
+                                // Handle add button click
+                            }
+                            CustomButton(text = stringResource(R.string.follow)) {
+                                // Handle follow button click
+                            }
+                        }
                     }
                     Text(
                         text = stringResource(R.string.relation_status) + ": ${profile.relationStatus}",

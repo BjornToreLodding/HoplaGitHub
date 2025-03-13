@@ -137,5 +137,7 @@
     <string name="no_matches">No matches</string>
     <string name="block_user">Block user</string>
     <string name="report_user">Report user</string>
+    <string name="pending">Pending</string>
+    <string name="add">Add</string>
 
 </resources>
