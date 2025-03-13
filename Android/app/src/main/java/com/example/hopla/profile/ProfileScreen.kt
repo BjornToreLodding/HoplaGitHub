@@ -51,7 +51,7 @@ import com.example.hopla.ImagePicker
 import com.example.hopla.OtherUsers
 import com.example.hopla.R
 import com.example.hopla.UserSession
-import com.example.hopla.fetchAllUsers
+import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.ui.theme.PrimaryGray
 
 // Main profile function

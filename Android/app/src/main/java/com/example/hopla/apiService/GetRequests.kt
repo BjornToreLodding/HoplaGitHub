@@ -1,6 +1,16 @@
-package com.example.hopla
+package com.example.hopla.apiService
 
 import android.util.Log
+import com.example.hopla.Following
+import com.example.hopla.Friend
+import com.example.hopla.FriendProfile
+import com.example.hopla.Hike
+import com.example.hopla.Horse
+import com.example.hopla.HorseDetail
+import com.example.hopla.Message
+import com.example.hopla.OtherUsers
+import com.example.hopla.TrailsResponse
+import com.example.hopla.apiUrl
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -54,7 +64,7 @@ suspend fun fetchHorseDetails(horseId: String, token: String): HorseDetail {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"horses/$horseId") {
+        val response: HttpResponse = client.get(apiUrl +"horses/$horseId") {
             headers {
                 append("Authorization", "Bearer $token")
             }
@@ -70,7 +80,7 @@ suspend fun fetchFriends(token: String): List<Friend> {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"userrelations/friends") {
+        val response: HttpResponse = client.get(apiUrl +"userrelations/friends") {
             headers {
                 append("Authorization", "Bearer $token")
             }
@@ -127,7 +137,7 @@ suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"userhikes/user?pageNumber=$pageNumber") {
+        val response: HttpResponse = client.get(apiUrl +"userhikes/user?pageNumber=$pageNumber") {
             headers {
                 append("Authorization", "Bearer $token")
             }

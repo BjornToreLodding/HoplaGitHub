@@ -50,7 +50,7 @@ import com.example.hopla.R
 import com.example.hopla.ScreenHeader
 import com.example.hopla.Trip
 import com.example.hopla.UserSession
-import com.example.hopla.fetchUserHikes
+import com.example.hopla.apiService.fetchUserHikes
 import com.example.hopla.ui.theme.PrimaryWhite
 import kotlinx.coroutines.launch
 

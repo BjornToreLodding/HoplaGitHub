@@ -66,10 +66,10 @@ import com.example.hopla.ScreenHeader
 import com.example.hopla.SearchBar
 import com.example.hopla.UserItem
 import com.example.hopla.UserSession
-import com.example.hopla.fetchFollowing
-import com.example.hopla.fetchFriendProfile
-import com.example.hopla.fetchFriends
-import com.example.hopla.fetchUserFriends
+import com.example.hopla.apiService.fetchFollowing
+import com.example.hopla.apiService.fetchFriendProfile
+import com.example.hopla.apiService.fetchFriends
+import com.example.hopla.apiService.fetchUserFriends
 import com.example.hopla.formatDate
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite

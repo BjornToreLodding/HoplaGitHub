@@ -36,21 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import kotlinx.coroutines.launch
-import android.util.Log
 import androidx.compose.material3.CircularProgressIndicator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.statement.bodyAsText
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import android.graphics.Bitmap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Spacer
@@ -64,9 +50,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import com.example.hopla.apiService.handleLogin
 import com.example.hopla.ui.theme.PrimaryGray
 
-// Main function for the login screen
 @Composable
 fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var username by remember { mutableStateOf("") }
@@ -78,68 +64,6 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var isLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    fun handleLogin() {
-        val trimmedUsername = username.trim()
-        val trimmedPassword = password.trim()
-
-        if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
-            errorMessage = context.getString(R.string.input_fields_cannot_be_empty)
-            showErrorDialog = true
-        } else {
-            isLoading = true
-            coroutineScope.launch {
-                val client = HttpClient {
-                    install(ContentNegotiation) {
-                        json(Json {
-                            ignoreUnknownKeys = true
-                            isLenient = true
-                            encodeDefaults = true
-                        })
-                    }
-                }
-                try {
-                    val response: HttpResponse = client.post(apiUrl + "users/login/") {
-                        contentType(ContentType.Application.Json)
-                        setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
-                    }
-                    when (response.status) {
-                        HttpStatusCode.OK -> {
-                            val loginResponse = response.body<User>()
-                            UserSession.token = loginResponse.token
-                            UserSession.userId = loginResponse.userId
-                            UserSession.email = trimmedUsername
-                            UserSession.name = loginResponse.name
-                            UserSession.alias = loginResponse.alias
-                            UserSession.profilePictureURL = loginResponse.pictureUrl
-                            UserSession.telephone = loginResponse.telephone
-                            UserSession.description = loginResponse.description
-                            UserSession.dob = loginResponse.dob
-                            UserSession.redirect = loginResponse.redirect
-                            onLogin()
-                        }
-                        HttpStatusCode.Unauthorized -> {
-                            val errorResponse = response.body<ErrorResponse>()
-                            errorMessage = errorResponse.message
-                            showErrorDialog = true
-                        }
-                        else -> {
-                            Log.e("LoginError", "Status: ${response.status}, Body: ${response.bodyAsText()}")
-                            errorMessage = context.getString(R.string.not_available_right_now)
-                            showErrorDialog = true
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("LoginError", "Exception: ${e.message}")
-                    errorMessage = context.getString(R.string.not_available_right_now)
-                    showErrorDialog = true
-                } finally {
-                    client.close()
-                    isLoading = false
-                }
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -153,7 +77,16 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
             onClick = {
                 username = "test@test.no"
                 password = "Hopla2025!"
-                handleLogin()
+                handleLogin(
+                    username = username,
+                    password = password,
+                    context = context,
+                    coroutineScope = coroutineScope,
+                    onLogin = onLogin,
+                    setErrorMessage = { errorMessage = it },
+                    setShowErrorDialog = { showErrorDialog = it },
+                    setIsLoading = { isLoading = it }
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -210,7 +143,18 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
             CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         } else {
             Button(
-                onClick = { handleLogin() },
+                onClick = {
+                    handleLogin(
+                        username = username,
+                        password = password,
+                        context = context,
+                        coroutineScope = coroutineScope,
+                        onLogin = onLogin,
+                        setErrorMessage = { errorMessage = it },
+                        setShowErrorDialog = { showErrorDialog = it },
+                        setIsLoading = { isLoading = it }
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 8.dp)
