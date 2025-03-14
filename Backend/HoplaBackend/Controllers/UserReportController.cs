@@ -31,6 +31,7 @@ public class UserReportsController : ControllerBase
             Id = Guid.NewGuid(),
             UserId = request.UserId,
             EntityId = request.EntityId,
+            
             EntityName = request.EntityName,
             Message = request.Message,
             CreatedAt = DateTime.UtcNow

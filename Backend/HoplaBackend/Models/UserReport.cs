@@ -11,7 +11,8 @@ public class UserReport
     public Guid UserId { get; set; }  // Brukeren som rapporterer
 
     public Guid EntityId { get; set; }
-
+    public string Category { get; set; } = "Annet";
+    public string Status { get; set; } = "New"; // (behandles, lukket)
     public string EntityName { get; set; }
 
     public string Message { get; set; }  // Rapportens innhold
@@ -20,4 +21,3 @@ public class UserReport
 
     public virtual User User { get; set; }
 }
-
