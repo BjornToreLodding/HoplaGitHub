@@ -98,6 +98,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import com.example.hopla.apiService.fetchFavoriteTrails
 
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -171,6 +172,19 @@ fun TrailsScreen(navController: NavController) {
                                 isFiltersClicked = false
                                 isDropdownExpanded = false
                                 showOnlyFavorites = false
+
+                                coroutineScope.launch {
+                                    isLoading = true
+                                    try {
+                                        val trailsResponse = fetchTrails(token, 1, "")
+                                        trails = trailsResponse.trails
+                                        noResults = trails.isEmpty()
+                                    } catch (e: Exception) {
+                                        Log.e("TrailsScreen", "Error fetching all trails", e)
+                                    } finally {
+                                        isLoading = false
+                                    }
+                                }
                             }
                         },
                         modifier = Modifier
@@ -241,17 +255,33 @@ fun TrailsScreen(navController: NavController) {
 
                     IconButton(
                         onClick = {
-                            showOnlyFavorites = !showOnlyFavorites
-                            if (showOnlyFavorites) {
+                            isFavoriteClicked = !isFavoriteClicked
+                            if (isFavoriteClicked) {
                                 isMapClicked = false
                                 isCloseByClicked = false
-                                isFavoriteClicked = false
                                 isFollowingClicked = false
+
+                                coroutineScope.launch {
+                                    isLoading = true
+                                    try {
+                                        val trailsResponse = fetchFavoriteTrails(token)
+                                        trails = trailsResponse.trails
+                                        noResults = trails.isEmpty()
+                                    } catch (e: Exception) {
+                                        Log.e("TrailsScreen", "Error fetching favorite trails", e)
+                                    } finally {
+                                        isLoading = false
+                                    }
+                                }
+                            } else {
+                                // Reset trails to an empty list or fetch all trails again if needed
+                                trails = emptyList()
+                                noResults = false
                             }
                         },
                         modifier = Modifier
                             .background(
-                                if (showOnlyFavorites) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                if (isFavoriteClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
                                 shape = RoundedCornerShape(8.dp)
                             )
                     ) {
@@ -260,6 +290,7 @@ fun TrailsScreen(navController: NavController) {
                             contentDescription = null
                         )
                     }
+
                     IconButton(
                         onClick = {
                             isFollowingClicked = !isFollowingClicked
@@ -356,7 +387,7 @@ fun TrailsScreen(navController: NavController) {
                         onSearchQueryChange = { searchQuery = it }
                     )
                 }
-                if (noResults) {
+                if (noResults && pageNumber == 1) {
                     item {
                         Box(
                             modifier = Modifier
@@ -962,7 +993,7 @@ fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
 // Function to display the update screen where user can add their own update about the route
 @Composable
 fun UpdateScreen(navController: NavController) {
-    var location by remember { mutableStateOf("Boredalstien") }
+    val location by remember { mutableStateOf("Boredalstien") }
     var comment by remember { mutableStateOf("") }
 
     Column(

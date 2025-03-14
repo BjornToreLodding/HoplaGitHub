@@ -208,6 +208,27 @@ suspend fun fetchTrailsByLocation(token: String, latitude: Double, longitude: Do
     }
 }
 
+// Favorite trails
+suspend fun fetchFavoriteTrails(token: String): TrailsResponse {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "trails/favorites") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchFavoriteTrails", "Response: $responseBody")
+        response.body()
+    }
+}
+
 suspend fun fetchAllUsers(token: String): List<OtherUsers> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
