@@ -31,7 +31,8 @@ public class UserReportsController : ControllerBase
             Id = Guid.NewGuid(),
             UserId = request.UserId,
             EntityId = request.EntityId,
-            
+            Status = request.Status,
+            Category = request.Category,
             EntityName = request.EntityName,
             Message = request.Message,
             CreatedAt = DateTime.UtcNow
@@ -53,6 +54,8 @@ public class UserReportsController : ControllerBase
                 tabell = r.EntityName,
                 message = r.Message,
                 created = r.CreatedAt
+
+            // trenger mere her.. Hestenavn eller Trailnavn osv?
             })
             .ToListAsync();
 

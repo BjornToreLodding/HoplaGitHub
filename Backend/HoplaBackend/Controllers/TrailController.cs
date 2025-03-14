@@ -248,7 +248,7 @@ public class TrailController : ControllerBase
                 t.Id,
                 t.Name,
                 t.Distance,
-                favorite = favoriteTrailIds.Contains(t.Id),
+                isFavorite = favoriteTrailIds.Contains(t.Id),
                 t.AverageRating,
                 t.PictureUrl
             }),
@@ -313,7 +313,7 @@ public class TrailController : ControllerBase
             {
                 t.Id,
                 t.Name,
-                favorite = favoriteTrailIds.Contains(t.Id),
+                isFavorite = favoriteTrailIds.Contains(t.Id),
                 t.AverageRating,
                 t.PictureUrl
             }),
