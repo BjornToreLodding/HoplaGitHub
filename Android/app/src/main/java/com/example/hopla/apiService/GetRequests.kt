@@ -166,7 +166,8 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
         response.body()
     }
 }
-
+//---------------------------------Trails---------------------------------
+// All trails
 suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): TrailsResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -183,6 +184,26 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): Tr
         }
         val responseBody: String = response.bodyAsText()
         Log.d("fetchTrails", "Response: $responseBody")
+        response.body()
+    }
+}
+// Trails by position
+suspend fun fetchTrailsByLocation(token: String, latitude: Double, longitude: Double, pageNumber: Int): TrailsResponse {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "trails/list?latitude=$latitude&longitude=$longitude&pageNumber=$pageNumber") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchTrailsDistance", "Response: $responseBody")
         response.body()
     }
 }

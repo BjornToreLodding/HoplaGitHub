@@ -1,5 +1,7 @@
 package com.example.hopla
 
+import android.content.pm.PackageManager
+import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,15 +67,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.fetchTrails
+import com.example.hopla.apiService.fetchTrailsByLocation
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryWhite
@@ -87,10 +92,12 @@ import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.Trail
 import com.example.hopla.universalData.UserSession
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.Manifest
 
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -111,6 +118,9 @@ fun TrailsScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var noResults by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
 
     LaunchedEffect(searchQuery) {
         pageNumber = 1
@@ -176,16 +186,45 @@ fun TrailsScreen(navController: NavController) {
                             contentDescription = null
                         )
                     }
+
                     IconButton(
                         onClick = {
                             isCloseByClicked = !isCloseByClicked
                             if (isCloseByClicked) {
-                                isMapClicked = false
-                                isFavoriteClicked = false
-                                isFollowingClicked = false
-                                isFiltersClicked = false
-                                isDropdownExpanded = false
-                                showOnlyFavorites = false
+                                coroutineScope.launch {
+                                    isLoading = true
+                                    val hasFineLocationPermission = ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.ACCESS_FINE_LOCATION
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                    val hasCoarseLocationPermission = ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.ACCESS_COARSE_LOCATION
+                                    ) == PackageManager.PERMISSION_GRANTED
+
+                                    if (hasFineLocationPermission || hasCoarseLocationPermission) {
+                                        fusedLocationClient.lastLocation
+                                            .addOnSuccessListener { location: Location? ->
+                                                location?.let {
+                                                    val latitude = it.latitude
+                                                    val longitude = it.longitude
+                                                    Log.d("TrailsScreen", "Latitude: $latitude, Longitude: $longitude")
+                                                    coroutineScope.launch {
+                                                        try {
+                                                            val trailsResponse = fetchTrailsByLocation(token, latitude, longitude, pageNumber)
+                                                            trails = trailsResponse.trails
+                                                            noResults = trails.isEmpty()
+                                                        } catch (e: Exception) {
+                                                            Log.e("TrailsScreen", "Error fetching trails by location", e)
+                                                        } finally {
+                                                            isLoading = false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                    } else {
+                                        Log.e("TrailsScreen", "Location permissions are not granted")
+                                        isLoading = false
+                                    }
+                                }
                             }
                         },
                         modifier = Modifier
@@ -199,6 +238,7 @@ fun TrailsScreen(navController: NavController) {
                             contentDescription = null
                         )
                     }
+
                     IconButton(
                         onClick = {
                             showOnlyFavorites = !showOnlyFavorites
