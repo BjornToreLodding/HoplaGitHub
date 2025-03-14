@@ -104,8 +104,8 @@ function updateUserUI() {
         console.warn("⚠️ Mangler navn eller alias for bruker.");
     }
 
-    if (userAvatar && user.profilePictureURL) {
-        userAvatar.src = user.profilePictureURL;
+    if (userAvatar && user.pictureUrl) {
+        userAvatar.src = user.pictureUrl;
         userAvatar.classList.remove("hidden");
     } else {
         console.warn("⚠️ Mangler profilbilde.");
@@ -157,7 +157,7 @@ function loadSideMenu(section) {
     switch (section) {
         case "admin":
             menuItems = [
-                { name: "SystemSettings2", action: "loadContent('admin', 'systemsettings')" },
+                { name: "SystemSettings", action: "loadContent('admin', 'systemsettings')" },
                 { name: "Rapporter", action: "loadContent('admin', 'reports')" },
                 { name: "Statistikker", action: "loadContent('admin', 'statistikker')" }
             ];

@@ -205,6 +205,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<EntityReaction>()
             .HasIndex(e => new { e.UserId, e.EntityId, e.EntityName })
             .IsUnique();  // Hindrer at samme bruker kan like samme ting flere ganger
+        
+        modelBuilder.Entity<UserReport>()
+            .HasOne(report => report.User)
+            .WithMany()  // Hvis User kan ha mange UserReports
+            .HasForeignKey(report => report.UserId);
 
     }
 

@@ -7,3 +7,4 @@ Backend/HoplaBackend/appsettings.Development.json
 Backend/HoplaBackend/appsettings.Local.json
 Backend/HoplaBackend/secrets.json
 Backend/*/.env
+Web/*/.env

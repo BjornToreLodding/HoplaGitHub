@@ -52,6 +52,7 @@ public class UploadController : ControllerBase
             
             UploadToSftp(tempPath, fileName);
             
+            SaveToDatabase(table, fileName);
             return Ok(new { filePath = _remoteDirectory + fileName });
         }
         catch (Exception ex)
@@ -165,6 +166,26 @@ public class UploadController : ControllerBase
             Console.WriteLine($"🔥 FEIL under SFTP-opplasting: {ex.Message}");
             Console.WriteLine(ex.StackTrace);
         }
+    }
+    private void SaveToDatabase(string table, string filePath)
+    {
+        Console.WriteLine("");
+        Console.WriteLine(table);
+        Console.WriteLine(filePath);
+        
+        /*
+        using var db = new YourDbContext();
+        
+        switch (table)
+        {
+            case "Users": db.Users.Add(new User { ProfileImage = filePath }); break;
+            case "MyHikes": db.MyHikes.Add(new MyHike { ImageUrl = filePath }); break;
+            case "Trails": db.Trails.Add(new Trail { ImageUrl = filePath }); break;
+            case "Horses": db.Horses.Add(new Horse { ImageUrl = filePath }); break;
+        }
+        
+        db.SaveChanges();
+        */
     }
 
 }
