@@ -1,4 +1,5 @@
-import apiURL from '../../index.js';
+import apiURL from '../../utils/config.js';
+
 export async function render(container) {
     container.innerHTML = "<h2>User Reports</h2><div id='reports-container'></div>";
 
@@ -6,7 +7,7 @@ export async function render(container) {
 
     try {
         console.log("Fetching reports from API...");
-        const response = await fetch('${apiURL}/userreports/all', {
+        const response = await fetch(`${apiURL}/userreports/all`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

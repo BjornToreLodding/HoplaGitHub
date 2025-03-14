@@ -1,4 +1,4 @@
-const apiURL = process.env.API_URL || 'https://localhost:7128';
+
 // Kjør ved siden lasting for å sjekke om bruker er innlogget
 document.addEventListener("DOMContentLoaded", () => {
     updateUserUI();      // Oppdater brukergrensesnittet basert på om bruker er logget inn

@@ -1,3 +1,5 @@
+import apiURL from '../../utils/config.js';
+
 export async function render(container) {
     container.innerHTML = "<h2>System Settings</h2><div id='settings-container'></div>";
 
@@ -5,7 +7,7 @@ export async function render(container) {
 
     try {
         console.log("Fetching settings from API...");
-        const response = await fetch('https://localhost:7128/admin/settings/all', {
+        const response = await fetch(`${apiURL}/admin/settings/all`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
