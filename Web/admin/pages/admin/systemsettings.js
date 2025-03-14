@@ -9,7 +9,7 @@ export async function render(container) {
 
     try {
         console.log("Fetching settings from API...");
-        const response = await fetch(`${apiURL}/admin/settings/all`, {
+        const response = await fetch(`${apiUrl}/admin/settings/all`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
