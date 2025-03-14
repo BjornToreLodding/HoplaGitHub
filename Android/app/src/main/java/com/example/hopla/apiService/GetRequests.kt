@@ -19,7 +19,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import retrofit2.http.Query
 
 fun fetchMessages(messageName: String): List<Message> {
     val currentTime = System.currentTimeMillis()
@@ -228,6 +227,29 @@ suspend fun fetchFavoriteTrails(token: String): TrailsResponse {
         response.body()
     }
 }
+
+// Friends and followers trails
+suspend fun fetchTrailsRelations(token: String, pageNumber: Int): TrailsResponse {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "trails/relations?friends=true&following=true&pagenumber=$pageNumber") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchTrailsRelations", "Response: $responseBody")
+        response.body()
+    }
+}
+
+//-----------------------------------------------------------------------------------------------
 
 suspend fun fetchAllUsers(token: String): List<OtherUsers> {
     val httpClient = HttpClient {

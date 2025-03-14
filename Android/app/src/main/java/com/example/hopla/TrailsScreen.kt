@@ -99,6 +99,7 @@ import java.util.Date
 import java.util.Locale
 import android.Manifest
 import com.example.hopla.apiService.fetchFavoriteTrails
+import com.example.hopla.apiService.fetchTrailsRelations
 
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -124,7 +125,7 @@ fun TrailsScreen(navController: NavController) {
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
 
     LaunchedEffect(searchQuery) {
-        pageNumber = 1
+        pageNumber = 0
         if (searchQuery.isEmpty()) {
             trails = emptyList()
             noResults = false
@@ -203,8 +204,12 @@ fun TrailsScreen(navController: NavController) {
 
                     IconButton(
                         onClick = {
+                            pageNumber = 1
                             isCloseByClicked = !isCloseByClicked
                             if (isCloseByClicked) {
+                                isFavoriteClicked = false
+                                isFollowingClicked = false
+                                isMapClicked = false
                                 coroutineScope.launch {
                                     isLoading = true
                                     val hasFineLocationPermission = ContextCompat.checkSelfPermission(
@@ -255,6 +260,7 @@ fun TrailsScreen(navController: NavController) {
 
                     IconButton(
                         onClick = {
+                            pageNumber = 1
                             isFavoriteClicked = !isFavoriteClicked
                             if (isFavoriteClicked) {
                                 isMapClicked = false
@@ -293,6 +299,7 @@ fun TrailsScreen(navController: NavController) {
 
                     IconButton(
                         onClick = {
+                            pageNumber = 1
                             isFollowingClicked = !isFollowingClicked
                             if (isFollowingClicked) {
                                 isMapClicked = false
@@ -301,6 +308,19 @@ fun TrailsScreen(navController: NavController) {
                                 isFiltersClicked = false
                                 isDropdownExpanded = false
                                 showOnlyFavorites = false
+
+                                coroutineScope.launch {
+                                    isLoading = true
+                                    try {
+                                        val trailsResponse = fetchTrailsRelations(token, pageNumber)
+                                        trails = trailsResponse.trails
+                                        noResults = trails.isEmpty()
+                                    } catch (e: Exception) {
+                                        Log.e("TrailsScreen", "Error fetching trails relations", e)
+                                    } finally {
+                                        isLoading = false
+                                    }
+                                }
                             }
                         },
                         modifier = Modifier
@@ -314,6 +334,7 @@ fun TrailsScreen(navController: NavController) {
                             contentDescription = null
                         )
                     }
+
                     Column {
                         Box {
                             IconButton(
