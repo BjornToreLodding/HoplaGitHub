@@ -232,20 +232,3 @@ data class TrailsResponse(
     val pageNumber: Int,
     val pageSize: Int
 )
-
-@Serializable
-data class TrailDistance(
-    val id: String,
-    val name: String,
-    val distance: Double,
-    val favorite: Boolean,
-    val averageRating: Int,
-    val pictureUrl: String
-)
-
-@Serializable
-data class TrailsResponseDistance(
-    val trails: List<Trail>,
-    val pageNumber: Int,
-    val pageSize: Int
-)
