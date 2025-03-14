@@ -1,4 +1,6 @@
-import apiURL from '../../utils/config.js';
+const apiUrl = window.appConfig.API_URL || "https://localhost:7128"; // Fallback hvis miljøvariabelen ikke er satt
+console.log("API URL:", apiUrl);
+
 
 export async function render(container) {
     container.innerHTML = "<h2>User Reports</h2><div id='reports-container'></div>";
