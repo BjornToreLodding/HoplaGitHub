@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import android.Manifest
 import android.location.LocationManager
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -23,12 +24,17 @@ import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import androidx.compose.runtime.MutableState
 import android.widget.Toast
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 
 @Composable
 fun MapScreen() {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
     val polyline: MutableState<Polyline?> = remember { mutableStateOf(null) }
+    val zoomLevel = remember { mutableFloatStateOf(10f) } // Initial zoom level
+    val latitude = remember { mutableDoubleStateOf(0.0) }
+    val longitude = remember { mutableDoubleStateOf(0.0) }
 
     AndroidView({ mapView }) {
         mapView.getMapAsync { googleMap ->
@@ -43,8 +49,16 @@ fun MapScreen() {
                 val lastKnownLocation = locationManager.getLastKnownLocation(locationProvider)
                 lastKnownLocation?.let {
                     val userLocation = LatLng(it.latitude, it.longitude)
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10f))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoomLevel.floatValue))
                 }
+            }
+
+            // Update zoom level and center coordinates when the camera changes
+            googleMap.setOnCameraIdleListener {
+                zoomLevel.floatValue = googleMap.cameraPosition.zoom
+                latitude.doubleValue = googleMap.cameraPosition.target.latitude
+                longitude.doubleValue = googleMap.cameraPosition.target.longitude
+                Log.d("MapScreen", "Zoom level: ${zoomLevel.floatValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
             }
 
             // List of test coordinates in and around Gjøvik, Norway with individual names and trip coordinates
