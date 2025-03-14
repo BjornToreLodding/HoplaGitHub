@@ -1,12 +1,14 @@
 package com.example.hopla.apiService
 
 import android.util.Log
+import com.example.hopla.universalData.ErrorResponse2
 import com.example.hopla.universalData.Following
 import com.example.hopla.universalData.Friend
 import com.example.hopla.universalData.FriendProfile
 import com.example.hopla.universalData.Hike
 import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.HorseDetail
+import com.example.hopla.universalData.MapTrail
 import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.TrailsResponse
@@ -16,6 +18,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -246,6 +249,33 @@ suspend fun fetchTrailsRelations(token: String, pageNumber: Int): TrailsResponse
         val responseBody: String = response.bodyAsText()
         Log.d("fetchTrailsRelations", "Response: $responseBody")
         response.body()
+    }
+}
+
+// Trail on the map
+suspend fun fetchTrailsOnMap(token: String, latitude: Double, longitude: Double, zoomLevel: Int): List<MapTrail> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "trails/map?latitude=$latitude&longitude=$longitude&zoomlevel=$zoomLevel") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        if (response.status == HttpStatusCode.OK) {
+            val responseBody: String = response.bodyAsText()
+            Log.d("fetchTrailsOnMap", "Response: $responseBody")
+            response.body()
+        } else {
+            val errorResponse: ErrorResponse2 = response.body()
+            Log.e("fetchTrailsOnMap", "Error: ${errorResponse.title}, Details: ${errorResponse.errors}")
+            emptyList()
+        }
     }
 }
 

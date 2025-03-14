@@ -20,21 +20,22 @@ import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
-import androidx.compose.runtime.MutableState
-import android.widget.Toast
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.hopla.apiService.fetchTrailsOnMap
+import kotlinx.coroutines.launch
 
 @Composable
 fun MapScreen() {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
-    val polyline: MutableState<Polyline?> = remember { mutableStateOf(null) }
-    val zoomLevel = remember { mutableFloatStateOf(10f) } // Initial zoom level
+    val zoomLevel = remember { mutableIntStateOf(10) }
     val latitude = remember { mutableDoubleStateOf(0.0) }
     val longitude = remember { mutableDoubleStateOf(0.0) }
+    val trails = remember { mutableStateOf(emptyList<MapTrail>()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
     AndroidView({ mapView }) {
         mapView.getMapAsync { googleMap ->
@@ -49,64 +50,29 @@ fun MapScreen() {
                 val lastKnownLocation = locationManager.getLastKnownLocation(locationProvider)
                 lastKnownLocation?.let {
                     val userLocation = LatLng(it.latitude, it.longitude)
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoomLevel.floatValue))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoomLevel.intValue.toFloat()))
                 }
             }
 
             // Update zoom level and center coordinates when the camera changes
             googleMap.setOnCameraIdleListener {
-                zoomLevel.floatValue = googleMap.cameraPosition.zoom
+                zoomLevel.intValue = googleMap.cameraPosition.zoom.toInt()
                 latitude.doubleValue = googleMap.cameraPosition.target.latitude
                 longitude.doubleValue = googleMap.cameraPosition.target.longitude
-                Log.d("MapScreen", "Zoom level: ${zoomLevel.floatValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
-            }
+                Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
 
-            // List of test coordinates in and around Gjøvik, Norway with individual names and trip coordinates
-            val testLocations = listOf(
-                TestLocation(
-                    mainCoordinate = LatLng(60.7950, 10.6915),
-                    name = "Gjøvikløypa",
-                    tripCoordinates = listOf(
-                        LatLng(60.7960, 10.6920),
-                        LatLng(60.7970, 10.6930)
-                    )
-                ),
-                TestLocation(
-                    mainCoordinate = LatLng(60.8000, 10.7000),
-                    name = "Vannstien",
-                    tripCoordinates = listOf(
-                        LatLng(60.8010, 10.7010),
-                        LatLng(60.8020, 10.7020)
-                    )
-                ),
-            )
-
-            // Add markers for each test location and its trip coordinates
-            testLocations.forEach { location ->
-                val marker = googleMap.addMarker(MarkerOptions().position(location.mainCoordinate).title(location.name))
-                marker?.tag = location
-
-                googleMap.setOnMarkerClickListener { clickedMarker ->
-                    val clickedLocation = clickedMarker.tag as? TestLocation
-                    clickedLocation?.let {
-                        // Show the name of the testLocation
-                        Toast.makeText(context, it.name, Toast.LENGTH_SHORT).show()
-
-                        if (polyline.value != null) {
-                            // Remove existing polyline if any
-                            polyline.value?.remove()
-                            polyline.value = null
-                        } else {
-                            // Create a new polyline with the mainCoordinate and tripCoordinates
-                            val polylineOptions = PolylineOptions().add(it.mainCoordinate).apply {
-                                it.tripCoordinates.forEach { tripCoordinate ->
-                                    add(tripCoordinate)
-                                }
-                            }
-                            polyline.value = googleMap.addPolyline(polylineOptions)
+                // Fetch trails and update markers
+                coroutineScope.launch {
+                    try {
+                        val response = fetchTrailsOnMap(token, latitude.doubleValue, longitude.doubleValue, zoomLevel.intValue)
+                        trails.value = response
+                        googleMap.clear()
+                        trails.value.forEach { trail ->
+                            googleMap.addMarker(MarkerOptions().position(LatLng(trail.latMean, trail.longMean)).title(trail.name))
                         }
+                    } catch (e: Exception) {
+                        Log.e("MapScreen", "Error fetching trails", e)
                     }
-                    true
                 }
             }
         }

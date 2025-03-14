@@ -1,6 +1,5 @@
 package com.example.hopla.universalData
 
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -24,13 +23,6 @@ enum class PersonStatus {
     NONE,
     PENDING
 }
-
-// Class for the data of a person a user is following/friends
-data class Person(
-    val name: String,
-    val imageResource: Int,
-    val status: PersonStatus
-)
 
 // Class for details about a specific horse
 @Serializable
@@ -173,12 +165,6 @@ data class ContentBoxInfo(
     val description: String
 )
 
-data class TestLocation(
-    val mainCoordinate: LatLng,
-    val name: String,
-    val tripCoordinates: List<LatLng>
-)
-
 @Serializable
 data class FriendProfile(
     val id: String,
@@ -231,4 +217,21 @@ data class TrailsResponse(
     val trails: List<Trail>,
     val pageNumber: Int,
     val pageSize: Int
+)
+
+@Serializable
+data class MapTrail(
+    val id: String,
+    val name: String,
+    val latMean: Double,
+    val longMean: Double,
+    val trailAllCoordinates: List<String>?
+)
+
+@Serializable
+data class ErrorResponse2(
+    val type: String,
+    val title: String,
+    val traceId: String,
+    val errors: Map<String, List<String>>
 )
