@@ -35,7 +35,6 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -85,6 +84,7 @@ import com.example.hopla.universalData.Filters
 import com.example.hopla.universalData.MapScreen
 import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.Trail
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
@@ -109,17 +109,26 @@ fun TrailsScreen(navController: NavController) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    var noResults by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                val trailsResponse = fetchTrails(token, pageNumber)
-                trails = trails + trailsResponse.trails
-            } catch (e: Exception) {
-                Log.e("TrailsScreen", "Error fetching trails", e)
-            } finally {
-                isLoading = false
+    LaunchedEffect(searchQuery) {
+        pageNumber = 1
+        if (searchQuery.isEmpty()) {
+            trails = emptyList()
+            noResults = false
+        } else {
+            coroutineScope.launch {
+                try {
+                    isLoading = true
+                    val trailsResponse = fetchTrails(token, pageNumber, searchQuery)
+                    trails = trailsResponse.trails
+                    noResults = trails.isEmpty()
+                } catch (e: Exception) {
+                    Log.e("TrailsScreen", "Error fetching trails", e)
+                } finally {
+                    isLoading = false
+                }
             }
         }
     }
@@ -258,32 +267,15 @@ fun TrailsScreen(navController: NavController) {
                                     val isSelected = selectedItems.value.contains(item)
                                     DropdownMenuItem(
                                         text = {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                if (isSelected) {
-                                                    Icon(
-                                                        imageVector = Icons.Outlined.Check,
-                                                        contentDescription = null,
-                                                        tint = Color.Black,
-                                                        modifier = Modifier.size(16.dp)
-                                                    )
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                }
-                                                Text(
-                                                    text = item,
-                                                    color = if (isSelected) Color.Black else Color.DarkGray
-                                                )
-                                            }
+                                            Text(text = item)
                                         },
                                         onClick = {
-                                            val newSet = selectedItems.value.toMutableSet()
-                                            if (newSet.contains(item)) {
-                                                newSet.remove(item)
+                                            if (isSelected) {
+                                                selectedItems.value -= item
                                             } else {
-                                                newSet.add(item)
+                                                selectedItems.value += item
                                             }
-                                            selectedItems.value = newSet
+                                            isDropdownExpanded = false
                                         }
                                     )
                                 }
@@ -318,30 +310,28 @@ fun TrailsScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(routesToDisplay.size) { index ->
-                    val trail = routesToDisplay[index]
-                    ContentBox(
-                        info = ContentBoxInfo(
-                            title = trail.name,
-                            imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
-                                R.drawable.stockimg1
-                            ),
-                            isFavorite = trail.isFavorite ?: false,
-                            starRating = trail.averageRating,
-                            filters = Filters(
-                                trail.filters?.toSet() ?: emptySet(),
-                                Difficulty.valueOf(trail.difficulty ?: "EASY")
-                            ),
-                            description = "This is a description of the trail"
-                        ),
-                        onHeartClick = {
-                            val newState = !(trail.isFavorite ?: false)
-                            trails = trails.toMutableList().apply {
-                                this[index] = trail.copy(isFavorite = newState)
-                            }
-                        },
-                        onBoxClick = {
-                            selectedContentBoxInfo = ContentBoxInfo(
+                item {
+                    SearchBar(
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = { searchQuery = it }
+                    )
+                }
+                if (noResults) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = stringResource(R.string.no_trails_found))
+                        }
+                    }
+                } else {
+                    items(routesToDisplay.size) { index ->
+                        val trail = routesToDisplay[index]
+                        ContentBox(
+                            info = ContentBoxInfo(
                                 title = trail.name,
                                 imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                     R.drawable.stockimg1
@@ -353,33 +343,58 @@ fun TrailsScreen(navController: NavController) {
                                     Difficulty.valueOf(trail.difficulty ?: "EASY")
                                 ),
                                 description = "This is a description of the trail"
-                            )
-                            isRouteClicked = true
-                        }
-                    )
-                }
-                item {
-                    if (isLoading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    } else {
-                        LaunchedEffect(Unit) {
-                            coroutineScope.launch {
-                                pageNumber++
-                                isLoading = true
-                                try {
-                                    val trailsResponse = fetchTrails(token, pageNumber)
-                                    trails = trails + trailsResponse.trails
-                                } catch (e: Exception) {
-                                    Log.e("TrailsScreen", "Error fetching trails", e)
-                                } finally {
-                                    isLoading = false
+                            ),
+                            onHeartClick = {
+                                val newState = !(trail.isFavorite ?: false)
+                                trails = trails.toMutableList().apply {
+                                    this[index] = trail.copy(isFavorite = newState)
+                                }
+                            },
+                            onBoxClick = {
+                                selectedContentBoxInfo = ContentBoxInfo(
+                                    title = trail.name,
+                                    imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
+                                        R.drawable.stockimg1
+                                    ),
+                                    isFavorite = trail.isFavorite ?: false,
+                                    starRating = trail.averageRating,
+                                    filters = Filters(
+                                        trail.filters?.toSet() ?: emptySet(),
+                                        Difficulty.valueOf(trail.difficulty ?: "EASY")
+                                    ),
+                                    description = "This is a description of the trail"
+                                )
+                                isRouteClicked = true
+                            }
+                        )
+                    }
+                    item {
+                        if (isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        } else {
+                            LaunchedEffect(Unit) {
+                                coroutineScope.launch {
+                                    pageNumber++
+                                    isLoading = true
+                                    try {
+                                        val trailsResponse = fetchTrails(token, pageNumber, searchQuery)
+                                        if (trailsResponse.trails.isNotEmpty()) {
+                                            trails = trails + trailsResponse.trails
+                                        } else {
+                                            noResults = true
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("TrailsScreen", "Error fetching trails", e)
+                                    } finally {
+                                        isLoading = false
+                                    }
                                 }
                             }
                         }

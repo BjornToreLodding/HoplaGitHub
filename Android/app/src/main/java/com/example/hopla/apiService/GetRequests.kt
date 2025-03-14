@@ -19,6 +19,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import retrofit2.http.Query
 
 fun fetchMessages(messageName: String): List<Message> {
     val currentTime = System.currentTimeMillis()
@@ -166,7 +167,7 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
     }
 }
 
-suspend fun fetchTrails(token: String, pageNumber: Int): TrailsResponse {
+suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): TrailsResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -175,11 +176,13 @@ suspend fun fetchTrails(token: String, pageNumber: Int): TrailsResponse {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get("https://hopla.onrender.com/trails/all?pageNumber=$pageNumber") {
+        val response: HttpResponse = client.get(apiUrl+"trails/all?search=$searchQuery&pageNumber=$pageNumber") {
             headers {
                 append("Authorization", "Bearer $token")
             }
         }
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchTrails", "Response: $responseBody")
         response.body()
     }
 }
