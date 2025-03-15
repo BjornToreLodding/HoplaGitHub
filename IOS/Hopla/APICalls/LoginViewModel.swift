@@ -7,15 +7,13 @@
 
 import Foundation
 import SwiftUI
-import KeychainSwift
 import KeychainAccess
 
 class LoginViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isLoggedIn: Bool = false
-    @Published var userProfile: UserProfile? // Store user profile data
-    
-    private let keychain = KeychainSwift()
+    @Published var userProfile: UserProfile?
+
     private let apiUrl = "https://hopla.onrender.com/users/login/"
     
     struct LoginRequest: Codable {
@@ -35,19 +33,16 @@ class LoginViewModel: ObservableObject {
         let redirect: String?
     }
 
-
-    
     struct UserProfile: Codable {
         let alias: String
         let name: String
         let email: String
         let pictureUrl: String?
-        let telephone: String? // Add these new fields
+        let telephone: String?
         let description: String?
         let dob: String?
     }
 
-    
     func login(email: String, password: String) {
         guard let url = URL(string: apiUrl) else {
             DispatchQueue.main.async { self.errorMessage = "Invalid URL" }
@@ -80,27 +75,17 @@ class LoginViewModel: ObservableObject {
             
             if httpResponse.statusCode == 200 {
                 do {
-                    print("Raw Response:", String(data: data, encoding: .utf8) ?? "Invalid Data")
-
                     let decoder = JSONDecoder()
-                    decoder.dateDecodingStrategy = .iso8601 // Ensure date decoding
+                    decoder.dateDecodingStrategy = .iso8601
 
                     let loginResponse = try decoder.decode(LoginResponse.self, from: data)
-                    
                     DispatchQueue.main.async {
-                        self.saveToken(loginResponse.token)
+                        TokenManager.shared.saveToken(loginResponse.token) // Use the TokenManager
                         
-                        // Verify token storage
-                        if let savedToken = self.getToken() {
-                            print("Token saved successfully: \(savedToken)")
-                        } else {
-                            print("Failed to save token")
-                        }
-
                         self.isLoggedIn = true
                         UserDefaults.standard.set(true, forKey: "isLoggedIn")
                         UserDefaults.standard.set(loginResponse.userId, forKey: "userId")
-
+                        
                         self.fetchUserProfile()
                     }
                 } catch {
@@ -108,11 +93,7 @@ class LoginViewModel: ObservableObject {
                         self.errorMessage = "Failed to decode response: \(error.localizedDescription)"
                     }
                 }
-            }
-
-
-
-            else if httpResponse.statusCode == 401 {
+            } else if httpResponse.statusCode == 401 {
                 DispatchQueue.main.async { self.errorMessage = "Invalid email or password" }
             } else {
                 DispatchQueue.main.async { self.errorMessage = "Unexpected server error" }
@@ -120,24 +101,16 @@ class LoginViewModel: ObservableObject {
         }.resume()
     }
     
-    private func saveToken(_ token: String) {
-        keychain.set(token, forKey: "authToken")
-    }
-    
-    func getToken() -> String? {
-        return keychain.get("authToken")
-    }
-    
     func logout() {
-        keychain.delete("authToken")
+        TokenManager.shared.deleteToken() // Use the TokenManager
         DispatchQueue.main.async {
             self.isLoggedIn = false
-            self.userProfile = nil // Clear profile data on logout
+            self.userProfile = nil
         }
     }
     
     func fetchUserProfile() {
-        guard let token = getToken() else {
+        guard let token = TokenManager.shared.getToken() else { // Use the TokenManager
             print("No token found")
             return
         }
@@ -173,4 +146,3 @@ class LoginViewModel: ObservableObject {
         }.resume()
     }
 }
-

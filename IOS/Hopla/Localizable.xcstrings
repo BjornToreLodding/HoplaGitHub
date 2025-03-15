@@ -11,13 +11,14 @@
         }
       }
     },
-    "Add" : {
-
-    },
     "Add a Horse" : {
 
     },
+    "Add Horse" : {
+
+    },
     "Antall" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -390,6 +391,9 @@
     "Horse Details" : {
 
     },
+    "Image Selection" : {
+
+    },
     "Join now" : {
       "localizations" : {
         "nb" : {
@@ -528,9 +532,6 @@
           }
         }
       }
-    },
-    "Pil tilbake" : {
-
     },
     "Posts" : {
       "extractionState" : "stale",

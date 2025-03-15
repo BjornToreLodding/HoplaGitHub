@@ -14,20 +14,21 @@ struct HoplaApp: App {
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isDarkMode") private var isDarkMode = false
     @StateObject private var vm = ViewModel()
+    @StateObject private var loginViewModel = LoginViewModel() // Create an instance
     @Environment(\.colorScheme) var colorScheme
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    @State private var navigationPath = NavigationPath()
     @StateObject private var locationManager = LocationManager()
-
+    
+    
     var body: some Scene {
         WindowGroup {
             ZStack {
-                // Background Color
                 AdaptiveColor.background.color(for: colorScheme)
                     .ignoresSafeArea(edges: .all)
                 
                 VStack(spacing: 0) {
-                    // Only show the logo and green background if the user is logged in
                     if isLoggedIn {
                         VStack {
                             Image("LogoUtenBakgrunn")
@@ -39,16 +40,14 @@ struct HoplaApp: App {
                         .frame(maxWidth: .infinity)
                         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                     }
-
-                    // Main App Content
+                    
                     if isLoggedIn {
-                        MainTabView()
+                        MainTabView(navigationPath: $navigationPath)
                             .environmentObject(vm)
                     } else {
-                        Login()
+                        Login(viewModel: LoginViewModel(), loginViewModel: loginViewModel) // Pass viewModel here
                     }
                 }
-
             }
             .onAppear {
                 setupNavigationBar(for: colorScheme)
@@ -69,9 +68,13 @@ struct HoplaApp: App {
     }
 }
 
+
 struct MainTabView: View {
     @Environment(\.colorScheme) var colorScheme
-
+    @Binding var navigationPath: NavigationPath
+    @EnvironmentObject var vm: ViewModel
+    @StateObject private var loginViewModel = LoginViewModel()
+    
     var body: some View {
         TabView {
             NavigationStack { Home() }
@@ -98,13 +101,20 @@ struct MainTabView: View {
                     Text("Community")
                 }
             
-            NavigationStack { Profile(loginViewModel: LoginViewModel()) }
-                .tabItem {
-                    Image(systemName: "person")
-                    Text("Profile")
-                }
+            NavigationStack {
+                Profile(
+                    loginViewModel: LoginViewModel(),
+                    viewModel: loginViewModel,
+                    navigationPath: $navigationPath
+                )
+            }
+            .tabItem {
+                Image(systemName: "person")
+                Text("Profile")
+            }
         }
         .tint(colorScheme == .dark ? .white : .black)
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
 }
+

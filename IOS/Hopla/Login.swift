@@ -23,7 +23,10 @@ struct Login: View {
     
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
     
-    @StateObject private var viewModel = LoginViewModel()
+    //@StateObject private var viewModel = LoginViewModel()
+    @ObservedObject var viewModel: LoginViewModel
+    @ObservedObject var loginViewModel: LoginViewModel
+
     
     var body: some View {
         NavigationStack {
@@ -232,14 +235,17 @@ struct Login: View {
                         }
                 }
                 .onAppear {
-                    if let token = viewModel.getToken(), !token.isEmpty {
-                        viewModel.isLoggedIn = true
+                    DispatchQueue.main.async {
+                        if let token = TokenManager.shared.getToken(), !token.isEmpty {
+                            viewModel.isLoggedIn = true
+                        }
                     }
                 }
+
                 .frame(maxWidth: .infinity, alignment: .center) // Ensure content is centered
                 .frame(maxHeight: .infinity) // Limit height to prevent overflow
                 //  }
-                .padding(.bottom, 100)
+                //.padding(.bottom, 100)
             }
             .navigationBarHidden(true) // Hide navigation bar on the login screen
         }

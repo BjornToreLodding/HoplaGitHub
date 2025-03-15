@@ -14,6 +14,8 @@ struct Profile: View {
     @EnvironmentObject var vm: ViewModel
     
     @ObservedObject var loginViewModel: LoginViewModel
+    @ObservedObject var viewModel: LoginViewModel
+
     
     // Holds the information about the photo selected from the photo picker
     @State private var selectedItem: PhotosPickerItem? = nil
@@ -22,7 +24,9 @@ struct Profile: View {
     @State private var isShowingCamera = false // Camera
     @State private var username: String = "" // Username
     @State private var email: String = "" // Email
-    @State private var navigationPath = NavigationPath()
+    //@State private var navigationPath = NavigationPath()
+    @Binding var navigationPath: NavigationPath
+
     
     var body: some View {
         ZStack {
@@ -169,7 +173,7 @@ struct Profile: View {
             // Settings button in the top-right corner
             HStack {
                 Spacer()
-                NavigationLink(destination: Settings(navigationPath: $navigationPath)) {
+                NavigationLink(destination: Settings(navigationPath: $navigationPath, viewModel: viewModel)) {
                     Image(systemName: "gearshape")
                         .font(.system(size: 24))
                         .padding()

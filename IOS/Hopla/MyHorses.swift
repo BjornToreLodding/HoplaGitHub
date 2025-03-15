@@ -6,28 +6,73 @@
 //
 
 import SwiftUI
+import Combine
+import KeychainAccess
+import KeychainSwift
+import Foundation
+
 
 // MARK: - Horse ViewModel
 class HorseViewModel: ObservableObject {
-    @Published var horses: [Horse] = [
-        Horse(name: "Horse1", image: UIImage(named: "HorseImage")),
-        Horse(name: "Horse2", image: UIImage(named: "HorseImage2")),
-        Horse(name: "Horse3", image: UIImage(named: "HorseImage3"))
-    ]
+    @Published var horses: [Horse] = []
+    private var cancellables = Set<AnyCancellable>()
+    
+    func fetchHorses() {
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+        
+        let url = URL(string: "https://hopla.onrender.com/horses/userhorses/")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse, let data = data else {
+                print("Invalid response")
+                return
+            }
+            
+            if httpResponse.statusCode == 200 {
+                do {
+                    let horses = try JSONDecoder().decode([Horse].self, from: data)
+                    DispatchQueue.main.async {
+                        self.horses = horses
+                    }
+                } catch {
+                    print("Error decoding horses:", error.localizedDescription)
+                }
+            } else {
+                print("Failed to retrieve horses. Status Code:", httpResponse.statusCode)
+            }
+        }.resume()
+    }
+    
     
     func addHorse(name: String, image: UIImage?) {
-        let newHorse = Horse(name: name, image: image)
-        horses.append(newHorse)
-        horses.sort { $0.name < $1.name }  // Sort alphabetically
+        let newHorse = Horse(
+            id: UUID().uuidString, // Generate a unique ID
+            name: name,
+            horsePictureUrl: nil // For now, we're not uploading the image to a server
+        )
+        horses.append(newHorse) // Add the new horse to the list
     }
 }
 
+
 // MARK: - Horse Model
-struct Horse: Identifiable {
-    let id = UUID()
+struct Horse: Identifiable, Decodable {
+    let id: String
     let name: String
-    let image: UIImage?
+    let horsePictureUrl: String?
 }
+
 
 // MARK: - My Horses View
 struct MyHorses: View {
@@ -35,6 +80,7 @@ struct MyHorses: View {
     @State private var showAddHorseSheet = false
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
+    
     
     var body: some View {
         ZStack {
@@ -58,20 +104,30 @@ struct MyHorses: View {
                                 ForEach(vm.horses) { horse in
                                     NavigationLink(destination: HorseDetails(horse: horse)) {
                                         HStack {
-                                            if let image = horse.image {
-                                                Image(uiImage: image)
-                                                    .resizable()
-                                                    .scaledToFit()
+                                            if let urlString = horse.horsePictureUrl, let url = URL(string: urlString) {
+                                                AsyncImage(url: url) { image in
+                                                    image.resizable()
+                                                        .scaledToFill() // Ensures all images fill the same frame
+                                                        .frame(width: 80, height: 80) // Uniform size for all images
+                                                        .clipShape(Circle())
+                                                } placeholder: {
+                                                    ProgressView()
+                                                        .frame(width: 80, height: 80) // Ensures placeholder also has the same size
+                                                }
+                                            } else {
+                                                // Placeholder if no image URL is available
+                                                Circle()
+                                                    .fill(Color.gray.opacity(0.5))
                                                     .frame(width: 80, height: 80)
-                                                    .clipShape(Circle())
                                             }
+                                            
                                             Text(horse.name)
                                                 .font(.headline)
-                                                .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
                                         }
-                                        .frame(width: 380, height: 120)
+                                        .padding()
+                                        .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading) // Ensures a consistent row height
                                         .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
-                                        .padding(5)
+                                        
                                     }
                                     .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
                                 }
@@ -106,6 +162,10 @@ struct MyHorses: View {
                 }
                 .navigationBarBackButtonHidden(true) // Hides the default back button
             }
+            .onAppear {
+                vm.fetchHorses()
+            }
+            
             // MARK: - Custom Back Button
             VStack {
                 HStack {
@@ -118,7 +178,7 @@ struct MyHorses: View {
                             .frame(width: 30, height: 30)
                             .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                     }
-                    .position(x: 25, y: 20) // Adjust for exact placement
+                    .position(x: 25, y: 20)
                     
                     Spacer()
                 }
@@ -134,17 +194,25 @@ struct AddHorseView: View {
     @ObservedObject var vm: HorseViewModel
     @State private var horseName = ""
     @State private var selectedImage: UIImage?
+    @State private var horseBreed = ""
+    @State private var horseAge = ""
     @State private var showImagePicker = false
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         NavigationView {
             Form {
+                // Section for horse details
                 Section(header: Text("Horse Details")) {
                     TextField("Enter horse name", text: $horseName)
-                    
-                    Button("Select Image") {
+                }
+                
+                // Section for image selection
+                Section(header: Text("Image Selection")) {
+                    Button(action: {
                         showImagePicker = true
+                    }) {
+                        Text("Select Image")
                     }
                     
                     if let image = selectedImage {
@@ -154,14 +222,21 @@ struct AddHorseView: View {
                             .frame(height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
-                    
-                    Button("Add") {
-                        vm.addHorse(name: horseName, image: selectedImage)
-                        horseName = ""
+                }
+                
+                // Section for adding the horse
+                Section {
+                    Button(action: {
+                        vm.addHorse(name: horseName, image: selectedImage) // Calls the ViewModel's addHorse method
+                        horseName = "" // Reset the input fields
                         selectedImage = nil
+                        presentationMode.wrappedValue.dismiss() // Close the sheet
+                    }) {
+                        Text("Add Horse")
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .disabled(horseName.isEmpty || selectedImage == nil)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .disabled(horseName.isEmpty || selectedImage == nil) // Ensure name and image are provided
+                    
                 }
             }
             .navigationTitle("Add a Horse")
@@ -176,7 +251,6 @@ struct AddHorseView: View {
                 ImagePicker(sourceType: .photoLibrary, selectedImage: $selectedImage)
             }
         }
-        
-        
     }
 }
+
