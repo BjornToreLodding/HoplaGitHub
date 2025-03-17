@@ -213,78 +213,83 @@ public class AppDbContext : DbContext
 
     }
 
-    
-
-        /* Dette er nok ikke nødvendig mer etter omstruktureringen
-        modelBuilder.Entity<EntityImage>()
-            .HasOne(ei => ei.Image)
-            .WithMany(i => i.EntityImages)
-            .HasForeignKey(ei => ei.ImageId)
-            .OnDelete(DeleteBehavior.Cascade); // Hvis et bilde slettes, slett koblingen
-
-        */
-        // Usikker på om denne trengs, da disse er slettet eller om indexeringen kan gjøres på en annen måte.
-        //modelBuilder.Entity<EntityImage>()
-        //    .HasIndex(ei => new { ei.EntityId, ei.EntityType }); // Raskere søk på koblinger
-
-        // Spatial Index (hvis databasen støtter det)
-        // Indeksering for raskere søk i databasen spesielt ved tunge data i tabellen.
-        //Fluent API?
-        /*
-        modelBuilder.Entity<Ride>()
-            .HasIndex(r => new { r.LatMean, r.LongMean }) // Vanlig indeks
-            .HasDatabaseName("idx_rides_geo");
-
-        modelBuilder.Entity<Trail>()
-            .HasIndex(t => new { t.LatMean, t.LongMean }) // Vanlig indeks
-            .HasDatabaseName("idx_trails_geo");
-
-        modelBuilder.Entity<Ride>()
-            .HasIndex(r => r.GeoCoordinates) // Spatial felt
-            .HasDatabaseName("idx_rides_geo_spatial");
-        */
-
-       // modelBuilder.Entity<StableUser>().HasKey(su => su.Id);  //Tvinger EF til å bruke Id som primærnøkkel
+    internal object CreateDbContext()
+    {
+        throw new NotImplementedException();
+    }
 
 
-        //Definere Hver eneste relasjon i hele databasen. 
-        //Det er ikke nødvendig for at det skal virke, men blir kanskje mer robust og stabilt?
-        //Stable-Users
-        //Stable-messages
-        //osv.
 
-        /*
-        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+    /* Dette er nok ikke nødvendig mer etter omstruktureringen
+    modelBuilder.Entity<EntityImage>()
+        .HasOne(ei => ei.Image)
+        .WithMany(i => i.EntityImages)
+        .HasForeignKey(ei => ei.ImageId)
+        .OnDelete(DeleteBehavior.Cascade); // Hvis et bilde slettes, slett koblingen
+
+    */
+    // Usikker på om denne trengs, da disse er slettet eller om indexeringen kan gjøres på en annen måte.
+    //modelBuilder.Entity<EntityImage>()
+    //    .HasIndex(ei => new { ei.EntityId, ei.EntityType }); // Raskere søk på koblinger
+
+    // Spatial Index (hvis databasen støtter det)
+    // Indeksering for raskere søk i databasen spesielt ved tunge data i tabellen.
+    //Fluent API?
+    /*
+    modelBuilder.Entity<Ride>()
+        .HasIndex(r => new { r.LatMean, r.LongMean }) // Vanlig indeks
+        .HasDatabaseName("idx_rides_geo");
+
+    modelBuilder.Entity<Trail>()
+        .HasIndex(t => new { t.LatMean, t.LongMean }) // Vanlig indeks
+        .HasDatabaseName("idx_trails_geo");
+
+    modelBuilder.Entity<Ride>()
+        .HasIndex(r => r.GeoCoordinates) // Spatial felt
+        .HasDatabaseName("idx_rides_geo_spatial");
+    */
+
+    // modelBuilder.Entity<StableUser>().HasKey(su => su.Id);  //Tvinger EF til å bruke Id som primærnøkkel
+
+
+    //Definere Hver eneste relasjon i hele databasen. 
+    //Det er ikke nødvendig for at det skal virke, men blir kanskje mer robust og stabilt?
+    //Stable-Users
+    //Stable-messages
+    //osv.
+
+    /*
+    foreach (var entity in modelBuilder.Model.GetEntityTypes())
+    {
+        entity.SetTableName(ToSnakeCase(entity.GetTableName()));
+
+        foreach (var property in entity.GetProperties())
         {
-            entity.SetTableName(ToSnakeCase(entity.GetTableName()));
+            property.SetColumnName(ToSnakeCase(property.GetColumnName()));
 
-            foreach (var property in entity.GetProperties())
+            if (property.Name.EndsWith("Id"))
             {
-                property.SetColumnName(ToSnakeCase(property.GetColumnName()));
-
-                if (property.Name.EndsWith("Id"))
-                {
-                    property.SetColumnName(ToSnakeCase(property.Name));
-                }
+                property.SetColumnName(ToSnakeCase(property.Name));
             }
         }
-        // Mapper `FriendRequest` til riktig tabell i PostgreSQL
-        modelBuilder.Entity<Friendrequest>().ToTable("friendrequest");
-
-        // Definer primærnøkkel for FriendRequest-tabellen
-        modelBuilder.Entity<Users>()
-            .Property(u => u.Id)
-            .HasColumnName("user_id");
-        
-        modelBuilder.Entity<Friendrequest>().HasKey(fr => fr.RequestId);
-
-        base.OnModelCreating(modelBuilder);
     }
-    private static string ToSnakeCase(string input)
-    {
-        if (string.IsNullOrEmpty(input)) return input;
-        return Regex.Replace(input, "([a-z0-9])([A-Z])", "$1_$2").ToLower();
-    */
+    // Mapper `FriendRequest` til riktig tabell i PostgreSQL
+    modelBuilder.Entity<Friendrequest>().ToTable("friendrequest");
+
+    // Definer primærnøkkel for FriendRequest-tabellen
+    modelBuilder.Entity<Users>()
+        .Property(u => u.Id)
+        .HasColumnName("user_id");
+
+    modelBuilder.Entity<Friendrequest>().HasKey(fr => fr.RequestId);
+
+    base.OnModelCreating(modelBuilder);
+}
+private static string ToSnakeCase(string input)
+{
+    if (string.IsNullOrEmpty(input)) return input;
+    return Regex.Replace(input, "([a-z0-9])([A-Z])", "$1_$2").ToLower();
+*/
 }
     
 

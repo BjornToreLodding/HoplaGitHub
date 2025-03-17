@@ -144,22 +144,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 // Konfigurer Entity Framework med riktig connection-string
-
+/*
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+*/
 
-/*
 // Bruk DbContextFactory i stedet for pooled variant
 // Registrer DbContextFactory som Scoped, slik at den ikke skaper konflikt
 //builder.Services.AddScoped<IDbContextFactory<AppDbContext>, DbContextFactory<AppDbContext>>();
 
 // Registrer DbContextFactory som Scoped, slik at det ikke skaper konflikt
-builder.Services.AddScoped<IDbContextFactory<AppDbContext>>(sp =>
+/*builder.Services.AddScoped<IDbContextFactory<AppDbContext>>(sp =>
 {
     var options = sp.GetRequiredService<DbContextOptions<AppDbContext>>();
     return new PooledDbContextFactory<AppDbContext>(options);
 });
-
+*/
 // 1️⃣ Registrer AppDbContext som Scoped
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -173,12 +173,11 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 // 4️⃣ Registrer EntityService som Scoped
 //builder.Services.AddScoped<EntityService>();
-*/
+
 builder.Services.AddControllers();//options =>
 //{
 //    options.Filters.Add<PutLog.LogEnricherFilter>(); // Bruk full namespace
 //});
-//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IUserService, UserService>();  // 🔹 Registrer UserService
 builder.Services.AddScoped<Authentication>();
 builder.Services.AddScoped<SystemSettingService>();
@@ -209,7 +208,7 @@ builder.Services.AddCors(options =>
 });
 
 //17.03.2025 fjernet denne da det ligger en annen addMediateR et tidligere i koden.
-builder.Services.AddMediatR(typeof(Program));
+//builder.Services.AddMediatR(typeof(Program));
 
 var app = builder.Build();
 app.UseHttpsRedirection();
