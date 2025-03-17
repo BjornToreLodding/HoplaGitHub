@@ -139,5 +139,6 @@
     <string name="pending">Venter</string>
     <string name="add">Legg til</string>
     <string name="no_trails_found">Ingen løyper funnet</string>
+    <string name="choose_position">Velg posisjon</string>
 
 </resources>

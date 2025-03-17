@@ -140,5 +140,6 @@
     <string name="pending">Pending</string>
     <string name="add">Add</string>
     <string name="no_trails_found">No trails found</string>
+    <string name="choose_position">Choose position</string>
 
 </resources>

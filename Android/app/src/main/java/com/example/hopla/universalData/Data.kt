@@ -71,7 +71,9 @@ data class Community(
     val imageResource: Int,
     val description: String,
     val communityMemberStatus: CommunityMemberStatus,
-    val communityStatus: CommunityStatus
+    val communityStatus: CommunityStatus,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 enum class CommunityMemberStatus{

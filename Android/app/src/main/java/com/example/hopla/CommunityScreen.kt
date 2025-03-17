@@ -68,6 +68,8 @@ import com.example.hopla.universalData.MessageBox
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
+import com.example.hopla.universalData.SimpleMapScreen
+import com.google.android.gms.maps.model.LatLng
 
 // Define the communities list
 val communities = listOf(
@@ -414,105 +416,120 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
     var description by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var selectedOption by remember { mutableStateOf<String?>(null) }
+    var showMap by remember { mutableStateOf(false) }
+    var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
 
-    // Column for the add community screen
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Header of the screen
-        ScreenHeader(navController = navController, headerText = stringResource(R.string.add_new_community))
+        item {
+            ScreenHeader(navController = navController, headerText = stringResource(R.string.add_new_community))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Input fields for the name and description of the community group
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text(text = stringResource(R.string.name)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text(text = stringResource(R.string.description)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(text = stringResource(R.string.name)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text(text = stringResource(R.string.description)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // Image picker to select an image for the community group
-        if (imageBitmap != null) {
+            if (imageBitmap != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        bitmap = imageBitmap!!.asImageBitmap(),
+                        contentDescription = "Selected Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    IconButton(onClick = { imageBitmap = null }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Remove Image"
+                        )
+                    }
+                }
+            }
+            ImagePicker(
+                onImageSelected = { bitmap -> imageBitmap = bitmap },
+                text = if (imageBitmap == null) stringResource(R.string.add_image) else stringResource(R.string.change_image)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                listOf(stringResource(R.string.private_string), stringResource(R.string.public_string)).forEach { option ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
+                            .clickable { selectedOption = option }
+                            .background(
+                                if (selectedOption == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = option,
+                            color = if (selectedOption == option) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { showMap = !showMap },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    bitmap = imageBitmap!!.asImageBitmap(),
-                    contentDescription = "Selected Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(64.dp)
-                )
-                IconButton(onClick = { imageBitmap = null }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Remove Image"
-                    )
+                Text(text = stringResource(R.string.choose_position))
+            }
+
+            if (showMap) {
+                SimpleMapScreen { position ->
+                    selectedPosition = position
                 }
             }
-        }
-        ImagePicker(
-            onImageSelected = { bitmap -> imageBitmap = bitmap },
-            text = if (imageBitmap == null) stringResource(R.string.add_image) else stringResource(R.string.change_image)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Clickable boxes for Private, Public, and Friends
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            listOf(stringResource(R.string.private_string), stringResource(R.string.public_string)).forEach { option ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                        .clickable { selectedOption = option }
-                        .background(
-                            if (selectedOption == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(8.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if (selectedOption != null && selectedPosition != null) {
+                        val newCommunity = Community(
+                            name, imageResource, description,
+                            communityMemberStatus = CommunityMemberStatus.ADMIN,
+                            communityStatus = CommunityStatus.PRIVATE,
+                            latitude = selectedPosition!!.latitude,
+                            longitude = selectedPosition!!.longitude
                         )
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = option,
-                        color = if (selectedOption == option) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                        onAdd(newCommunity)
+                        navController.popBackStack()
+                    } else {
+                        // Show a message to select an option and position
+                    }
+                },
+                enabled = name.isNotBlank() && description.isNotBlank() && selectedOption != null && selectedPosition != null
+            ) {
+                Text(text = stringResource(R.string.add_new_community))
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Button to add the new community group, that makes sure the input fields are filled
-        Button(
-            onClick = {
-                if (selectedOption != null) {
-                    val newCommunity = Community(
-                        name, imageResource, description,
-                        communityMemberStatus = CommunityMemberStatus.ADMIN,
-                        communityStatus = CommunityStatus.PRIVATE
-                    )
-                    onAdd(newCommunity)
-                    navController.popBackStack()
-                } else {
-                    // Show a message to select an option
-                }
-            },
-            enabled = name.isNotBlank() && description.isNotBlank() && selectedOption != null
-        ) {
-            Text(text = stringResource(R.string.add_new_community))
         }
     }
 }

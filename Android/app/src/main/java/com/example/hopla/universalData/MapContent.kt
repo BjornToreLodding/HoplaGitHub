@@ -16,6 +16,8 @@ import com.google.android.gms.maps.MapView
 import android.Manifest
 import android.location.LocationManager
 import android.util.Log
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -23,9 +25,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.hopla.apiService.fetchTrailsOnMap
 import kotlinx.coroutines.launch
 
+// Map screen for displaying trails on a map
 @Composable
 fun MapScreen() {
     val mapView = rememberMapViewWithLifecycle()
@@ -115,4 +120,34 @@ fun rememberMapViewWithLifecycle(): MapView {
     }
 
     return mapView
+}
+
+@Composable
+fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
+    val mapView = rememberMapViewWithLifecycle()
+    val context = LocalContext.current
+    val selectedPosition = remember { mutableStateOf<LatLng?>(null) }
+
+    AndroidView(
+        factory = { mapView },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(400.dp)
+    ) {
+        mapView.getMapAsync { googleMap ->
+            googleMap.uiSettings.isZoomControlsEnabled = true
+            enableMyLocation(googleMap, context)
+
+            googleMap.setOnMapClickListener { latLng ->
+                selectedPosition.value = latLng
+                googleMap.clear()
+                googleMap.addMarker(MarkerOptions().position(latLng).title("Selected Position"))
+                onPositionSelected(latLng)
+            }
+
+            selectedPosition.value?.let {
+                googleMap.addMarker(MarkerOptions().position(it).title("Selected Position"))
+            }
+        }
+    }
 }
