@@ -1,4 +1,12 @@
 export function render(container) {
+    const token = localStorage.getItem("authToken");
+        
+        if (!token) {
+            alert("Du må være innlogget for å se favorittløyper.");
+            loadContent('users', 'login'); // Send brukeren til login
+            return;
+        }
+    
     console.log("list.js lastet inn!");
 
     if (typeof L === "undefined") {
@@ -34,7 +42,10 @@ export function render(container) {
         try {
             const response = await fetch(`https://localhost:7128/trails/list?latitude=${latitude}&longitude=${longitude}`, {
                 method: "GET",
-                headers: { "Accept": "application/json" }
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                 }
             });
 
             if (!response.ok) {
@@ -44,7 +55,7 @@ export function render(container) {
             const trails = await response.json();
             console.log("Mottatte turer:", trails);
 
-            displayTrails(trails);
+            displayTrails(trails.trails);
         } catch (error) {
             console.error("Feil ved henting av turer:", error);
             alert("Kunne ikke laste turer.");
@@ -52,20 +63,21 @@ export function render(container) {
     });
 }
 
-function displayTrails(trails) {
+function displayTrails(trailsList) {
     const listContainer = document.getElementById("trails-list");
     listContainer.innerHTML = "";
 
-    trails.forEach(trail => {
-        const formattedDistance = trail.distance.toFixed(2);
+    trailsList.forEach(trail => {
+        const formattedDistance = trail.distance ? trail.distance.toFixed(2) : "N/A";
 
         const listItem = document.createElement("li");
         listItem.className = "list-item";
-        listItem.dataset.trailId = trail.id;
-        listItem.innerHTML = `<strong>${trail.name}</strong> - ${formattedDistance} km`;
+        listItem.dataset.trailId = trail.id || "Ukjent ID";
+        listItem.innerHTML = `<strong>${trail.name || "Ukjent navn"}</strong> - ${formattedDistance} km`;
 
         listContainer.appendChild(listItem);
     });
 
     console.log("Turer lagt til i liste.");
 }
+

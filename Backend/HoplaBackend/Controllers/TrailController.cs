@@ -155,7 +155,7 @@ public class TrailController : ControllerBase
 
     
 
-    //[Authorize]
+    [Authorize]
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 
@@ -166,7 +166,7 @@ public class TrailController : ControllerBase
         [FromQuery] double? lengthMin = null,
         [FromQuery] double? lengthMax = null) 
     {
-        
+        Console.WriteLine("list åpnet");
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
@@ -175,7 +175,7 @@ public class TrailController : ControllerBase
         }
 
         var query = _context.Trails.AsQueryable();
-         
+        Console.WriteLine(parsedUserId);
         // Hent JSON-filtre fra querystring
         if (!string.IsNullOrEmpty(filters))
         {
@@ -225,7 +225,8 @@ public class TrailController : ControllerBase
             t.Distance
         })
         .ToListAsync(); // 🚀 Flytter dataene til minnet
-
+        Console.WriteLine("Traillist");
+                Console.WriteLine(trailList);
         // 🚀 Nå kan vi bruke `DistanceCalc.SimplePytagoras()` i minnet
         var sortedTrails = trailList
         .Select(t => new
@@ -255,7 +256,7 @@ public class TrailController : ControllerBase
             PageNumber = pageNumber,
             PageSize = pageSize
         };
-
+                Console.WriteLine(response);
         return Ok(response);
 
     }
@@ -320,7 +321,7 @@ public class TrailController : ControllerBase
             PageNumber = pageNumber,
             PageSize = pageSize
         };
-
+        Console.WriteLine(response);
         return Ok(response);
 
     }
