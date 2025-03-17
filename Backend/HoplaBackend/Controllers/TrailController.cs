@@ -155,7 +155,7 @@ public class TrailController : ControllerBase
 
     
 
-    [Authorize]
+    //[Authorize]
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 

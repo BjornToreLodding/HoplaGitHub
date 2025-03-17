@@ -23,6 +23,7 @@ public class StableMessageController : ControllerBase
         Guid stableId,
         [FromQuery] Guid? userid) // id er optional, men hvis spesifisert så returneres alle meldinger som user har sendt til stableId
     {
+       /*
         // Hvis id er spesifisert: Hent alle meldinger mellom userId og stableId
         if (userid.HasValue)
         {
@@ -45,7 +46,7 @@ public class StableMessageController : ControllerBase
 
             return Ok(userstablemessages);
         }
-
+*/
         // Hvis userid IKKE er spesifisert: Hent alle meldinger fra stallid
         var stablemessages = await _context.StableMessages
             .Where(s => s.StableId == stableId ) // Finn meldinger til/fra bruker
@@ -57,30 +58,11 @@ public class StableMessageController : ControllerBase
                 Content = s.MessageText,
                 Timestamp = s.SentAt,
                 SenderId = s.UserId,
-                SenderName = s.User.Name,
-                StableId = s.StableId,
-                StableName = s.Stable.Name
+                SenderAlias = s.User.Alias,
+                
             })
-
             .ToListAsync(); // Hent resultatet før vi inkluderer brukere
 
-        // Nå kan vi hente avsender- og mottakerinfo via en ny query
-        /*var messagesWithUsers = await _context.Messages
-            .Where(m => lastMessages.Select(lm => lm.Id).Contains(m.Id)) // Finn meldingene vi akkurat fant
-            .Include(m => m.Sender) // Henter brukerinfo
-            .Include(m => m.Receiver)
-            .OrderByDescending(m => m.SentAt)
-            .Select(m => new
-            {
-                Content = m.MessageText,
-                Timestamp = m.SentAt,
-                SenderId = m.SUserId,
-                SenderName = m.Sender.Name,
-                ReceiverId = m.RUserId,
-                ReceiverName = m.Receiver.Name
-            })
-            .ToListAsync();
-        */
         return Ok(stablemessages);
     }
     //Sletting av meldinger i stall. Kan kun gjøres hvis userID den som forsøker å slette er admin/moderator for stallen.
