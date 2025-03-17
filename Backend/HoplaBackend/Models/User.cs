@@ -21,6 +21,8 @@ public class User
     public string? Description { get ; set; }
     public int LikesCount { get ; set ; } = 0 ;
     public int CommentsCount { get ; set ; } = 0;
+    public int FriendsCount { get; set; } = 0;
+    public int HorseCount { get; set; } = 0;
 
     public bool IsRegistrationCompleted => !string.IsNullOrWhiteSpace(Name) 
                                            && !string.IsNullOrWhiteSpace(Alias); 

@@ -357,8 +357,8 @@ public class UserController : ControllerBase
                     dob = user.Dob,
                     created_at = user.CreatedAt,
                     //Må migrere og oppdatere databasen før jeg kan legge til disse
-                    friendsCount = 1,
-                    horseCount = 1,
+                    friendsCount = user.FriendsCount,
+                    horseCount = user.HorseCount,
                     relationStatus,
                     userHikes,
                     page = 1,
