@@ -995,12 +995,14 @@ POST /userreports/create
 Body:
 ```json
 { 
-    "EntityId": "12345678-0000-0000-0006-123456780001",
-    "EntityName": "Stables",
-    "Category": "Drama",
+    "EntityId": "12345678-0000-0000-0006-123456780001", //EntityId = innleggId, løypeId, profilId, StableId etc.
+    "EntityName": "Stables", //EntityName = Trails, Users, Stables eller hva det er.
+    "Category": "Drama", //Optional. HVis ikke oppgitt, blir den satt til Annet.
     "Message": "Hesten til Ester er løs"
 }
 ```
+
+UserId registreres automatisk fra Token
 
 Response:
 ```json
@@ -1012,6 +1014,7 @@ Response:
 Profil -\> Innstillinger -\> Slett bruker
 
 Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backend) så slette brukeren om det stemmer eller feilmelding hvis ikke
+
 </td>
 </tr>
 <tr>

@@ -23,6 +23,7 @@ public class User
     public int CommentsCount { get ; set ; } = 0;
     public int FriendsCount { get; set; } = 0;
     public int HorseCount { get; set; } = 0;
+    public bool IsDeleted { get; set; } = false;
 
     public bool IsRegistrationCompleted => !string.IsNullOrWhiteSpace(Name) 
                                            && !string.IsNullOrWhiteSpace(Alias); 

@@ -678,7 +678,7 @@ public class UserController : ControllerBase
     */
 
     [Authorize]
-    [HttpDelete("delete")]
+    [HttpPatch("delete")]
     public async Task<IActionResult> DeleteUser([FromBody] DeleteRequest password)
     {
         foreach (var claim in User.Claims)
@@ -701,13 +701,16 @@ public class UserController : ControllerBase
         {
             return NotFound(new { message = "User not found." });
         }
-        // Slett brukeren
+
+        // Deaktiver brukeren
         //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (!Authentication.VerifyPassword(password.Password, userId.PasswordHash))
         {
             return Unauthorized(new { message = "Feil passord" });
         }
-        _context.Users.Remove(userId);
+
+        userId.IsDeleted = true;
+        
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "User removed successfully." });
