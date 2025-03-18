@@ -403,9 +403,7 @@ public class UserController : ControllerBase
             {
                 u.Id,
                 u.Name,
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl)
-                    ? $"{u.PictureUrl}?h={pictureHeight}&w={pictureWidth}&fit=crop"
-                    : "",
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : "",
                 u.Alias
             })
             .OrderBy(u => u.Id) // Sorterer etter Guid
@@ -468,9 +466,7 @@ public class UserController : ControllerBase
                 u.Name,
                 u.Email,
                 //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl)
-                    ? $"{u.PictureUrl}?h=200&w=200&fit=crop"
-                    : ""
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : "",
             })
             .FirstOrDefaultAsync();
 
