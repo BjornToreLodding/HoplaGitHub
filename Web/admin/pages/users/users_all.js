@@ -67,7 +67,7 @@ export async function render(container) {
                 try {
                     console.log(`➡️  Prøver å logge inn som: ${user.name} (ID: ${user.id})`);
 
-                    const loginResponse = await fetch("https://localhost:7128/users/login/test", {
+                    const loginResponse = await fetch("https://hopla.onrender.com/users/login/test", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ id: user.id })
