@@ -52,11 +52,14 @@ import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.R
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchAllUsers
+import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.PrimaryGray
+import org.json.JSONObject
 
 // Main profile function
 @Composable
 fun ProfileScreen(navController: NavController) {
+    Log.d("ProfilePicture", "Profile Screen entry: ${UserSession.profilePictureURL}")
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -94,6 +97,7 @@ fun ProfileScreen(navController: NavController) {
 @Composable
 fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -126,7 +130,20 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
         }
     }
     ImagePicker(
-        onImageSelected = { bitmap -> imageBitmap = bitmap },
+        onImageSelected = { bitmap ->
+            imageBitmap = bitmap
+            coroutineScope.launch {
+                try {
+                    val response = uploadProfilePicture(UserSession.token, UserSession.userId, bitmap!!)
+                    val filePath = JSONObject(response).getString("filePath").replace("/uploads", "")
+                    val fullUrl = "https://files.hopla.no$filePath"
+                    UserSession.profilePictureURL = fullUrl
+                    Log.d("ProfilePicture", "New profile picture URL: ${UserSession.profilePictureURL}")
+                } catch (e: Exception) {
+                    Log.e("ProfilePicture", "Error uploading profile picture", e)
+                }
+            }
+        },
         text = stringResource(R.string.change_profile_picture)
     )
 }

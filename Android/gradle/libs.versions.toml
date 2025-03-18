@@ -13,6 +13,7 @@ playServicesMaps = "19.0.0"
 uiTestAndroid = "1.7.2"
 playServicesLocation = "21.3.0"
 generativeai = "0.9.0"
+transportRuntime = "4.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +35,7 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
+transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
