@@ -4,6 +4,8 @@ using HoplaBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 namespace HoplaBackend.Controllers;
@@ -22,9 +24,18 @@ public class UserReportsController : ControllerBase
     }
 
     // POST api/userreports/create
+    [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> CreateReport([FromBody] CreateUserReportRequest request)
     {
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
         if (request == null || string.IsNullOrEmpty(request.Message))
         {
             return BadRequest("Message cannot be empty.");
@@ -33,13 +44,11 @@ public class UserReportsController : ControllerBase
         var report = new UserReport
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
+            UserId = parsedUserId,
             EntityId = request.EntityId,
-            Status = request.Status,
             Category = request.Category,
             EntityName = request.EntityName,
-            Message = request.Message,
-            CreatedAt = DateTime.UtcNow
+            Message = request.Message
         };
 
         _context.UserReports.Add(report);

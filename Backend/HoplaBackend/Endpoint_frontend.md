@@ -1,4 +1,5 @@
 
+
 # Kort informasjon
 
 Android: :green_apple: Lagt inn :warning: Delvis lagt inn :x: Ikke lagt inn
@@ -988,6 +989,25 @@ Hvis løyper: løypeid
 Hvis profiler: profilid
 
 Hvis community: communityid.
+
+POST /userreports/create
+
+Body:
+```json
+{ 
+    "EntityId": "12345678-0000-0000-0006-123456780001",
+    "EntityName": "Stables",
+    "Category": "Drama",
+    "Message": "Hesten til Ester er løs"
+}
+```
+
+Response:
+```json
+{
+    "message": "Report created successfully."
+}
+```
 
 Profil -\> Innstillinger -\> Slett bruker
 
