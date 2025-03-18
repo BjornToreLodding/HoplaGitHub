@@ -8,7 +8,8 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using DotNetEnv;
-using HoplaBackend.Data; // For miljøvariabler
+using HoplaBackend.Data;
+using Microsoft.AspNetCore.Authorization; // For miljøvariabler
 
 [Route("upload")]
 [ApiController]
@@ -34,9 +35,9 @@ public class UploadController : ControllerBase
         _remoteDirectory = Environment.GetEnvironmentVariable("SFTP_REMOTE_PATH");
         _knownHostKey = Environment.GetEnvironmentVariable("SFTP_KNOWN_HOSTS");
     }
-        
+    [Authorize]        
     [HttpPut]
-    public async Task<IActionResult> UploadImage([FromForm] IFormFile image, [FromForm] string table, [FromForm] string entityId)
+    public async Task<IActionResult> UploadImage([FromForm] IFormFile image, [FromForm] string table, [FromForm] string? entityId)
     {
         Console.WriteLine($"📌 Mottatt entityId (string): {entityId}");
 

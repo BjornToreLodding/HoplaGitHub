@@ -1,5 +1,28 @@
 
-# Profil
+# Kort informasjon
+
+Android: :green_apple: Lagt inn :warning: Delvis lagt inn :x: Ikke lagt inn
+
+Hva som mangler endpoints i listen:
+
+* Profil
+  * Bytte passord
+  * Bytte epost, brukernavn (alias)
+  * Bytte profilbilde
+* Communities
+  * Liste
+  * Medlem
+  * Legge til nytt
+* Hjem skjerm
+* Sende inn rapport etter hvor den sendes inn fra
+  * fra innstillinger (generell)
+  * for løyper
+  * for bruker
+  * etc. (mer i selve tabellen)
+* For filter
+* Slette bruker
+
+# Liste
 
 <table>
 <tr>
@@ -9,16 +32,17 @@
 
 `Android: Nå mulig å logge inn`
 
-`NB. Har fått en annen response.` 
+`NB. Har fått en annen response.`
 
-`Hvis redirect = profile, så sendes brukeren til profilsiden.` 
+`Hvis redirect = profile, så sendes brukeren til profilsiden.`
 
 `Hvis redirect = update, må brukeren oppdatere brukerinformasjonen sin`
 
 `Det for profil-siden er det nok noe overflødig informasjon, men dette kan bare ignoreres. Det er nødvendig for "update"`
-
 </td>
 <td>
+
+## :warning:
 
 Logg inn
 
@@ -53,9 +77,11 @@ JSON-Response hvis bruker ikke har registrert name eller alias (f.eks akuratt be
     "redirect": "update"
 }
 ```
+
 **For update, se lengere ned i dokumenter om registrering**
 
 JSON-Response for brukere som har registrert navn og alias
+
 ```json
     "token": "123xyz...XYZ",
     "userId": "2b46f82a-2e38-47b6-a08e-cc62d10f4503",
@@ -67,8 +93,6 @@ JSON-Response for brukere som har registrert navn og alias
     "pictureUrl": "",
     "redirect": "profile"
 ```
-
-
 </td>
 </tr>
 <tr>
@@ -79,6 +103,8 @@ JSON-Response for brukere som har registrert navn og alias
 `Android: Bruker lagret informasjon fra login for øyeblikket for å displaye informasjon`
 </td>
 <td>
+
+## :green_apple:
 
 Main profil side
 
@@ -113,6 +139,8 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
+## :green_apple:
+
 **Profil -\> Mine hester**
 
 * `Get` request på å hente brukeren som er logget inn sine hester
@@ -121,7 +149,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
   * \*\*GET GET \*\***https://hopla.onrender.com/horses/userhorses/**
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
-* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003  -\> Hester tilhørende brukerid
+* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003 -\> Hester tilhørende brukerid
 
 **Eksempel på response body JSON**
 
@@ -158,6 +186,8 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
+## :green_apple:
+
 **Profil -\> Mine hester -\> Velge en spesifikk hest**
 
 * Get request ut ifra hestens id for å hente: navn, bilde, rase og alder/fødselsdato
@@ -193,6 +223,8 @@ BT: Denne skal virke nå
 `Android: Lagt til venner liste side & venners venner`
 </td>
 <td>
+
+## :green_apple:
 
 **Profil -\> Venner**
 
@@ -263,6 +295,8 @@ BT: Denne skal virke nå
 </td>
 <td>
 
+## :green_apple:
+
 **Profil -\> Følger**
 
 * Get request for å hente brukeren som er logget inn personer som den følger. På denne siden er det alle profiler som er følger
@@ -314,6 +348,8 @@ Har ikke bilde for øyeblikket, profil -\> Venner -\> Trykke på spesifikk venn
 `Android: Lagt til må bare fikse det bedre i frontend`
 </td>
 <td>
+
+## :green_apple:
 
 GET request
 
@@ -468,6 +504,8 @@ Har ikke bilde for øyeblikket, profil -\> Følger -\> Trykke på spesifikk pers
 </td>
 <td>
 
+## :green_apple:
+
 GET request
 
 Profil -\> Følger -\> "navn"
@@ -487,6 +525,8 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(bare off
 `Android: Lagt til med pagenumber øker når knappen last mer trykkes på`
 </td>
 <td>
+
+## :green_apple:
 
 Profil -\> Mine turer
 
@@ -563,11 +603,52 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 </td>
 <td>
 
+## :x:
+
 Profil -\> Endre profilbilde
 
-Skal frontend sende et bilde
 
-Trenger iallfall endpoint for å bytte profilbilde her
+upload.html
+```html
+
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+            formData.append("table", tableSelect);
+            formData.append("entityId", guidInput); // Riktig parameter-navn
+
+            try {
+                const response = await fetch("https://hopla.onrender.com/upload", {
+                    method: "PUT",
+                    body: formData
+                });
+            }
+```
+
+OBS!! Authorization er aktivert, så dette må også med i Requesten.
+
+Lagrer opplastet fil som {Guid}.jpg, f.eks bilde.jpg vil bli omdøpt til 4e66b1a6-2f18-4e35-8e89-eee6c3886a1b.jpg og lagret i databasen på riktig id.
+
+Kan testes med dette i postman:
+```PostMan_formdata
+
+Key         Value
+image       bilde.jpg
+table       Users
+entityId    12345678-0000-0000-0001-123456780001
+```
+
+Response:
+```json
+{
+    "filePath": "/uploads/99e06dfe-2999-4d90-a5bf-087ba1e0df99.jpg"
+}
+```
+
+Profil -\> Bytte brukernavn
+
+Profil -\> Bytte epost
+
+Profil -\> bytte passord
 </td>
 </tr>
 <tr>
@@ -579,6 +660,8 @@ Trenger iallfall endpoint for å bytte profilbilde her
 </td>
 <td>
 
+## :green_apple:
+
 (Alle disse sidene skal displaye lister på samme måte)
 
 * Get request for: id, navn, bilde, stjerner (0-5)
@@ -587,7 +670,7 @@ Trenger iallfall endpoint for å bytte profilbilde her
 * Sorteres etter nyeste øverst
 * Tenke på: offentlig, privat, kun venner?
 
-**Løyper -\> Første side**
+:green_apple: **Løyper -\> Første side**
 
 https://hopla.onrender.com/trails/all
 
@@ -598,7 +681,7 @@ https://hopla.onrender.com/trails/all
 * pageNumber Optional. Hvis ikke oppgitt, settes den til 1
 * pageSize Optional. Hvis ikke oppgitt settes den til 10
 
-**eks**
+:green_apple: **eks**
 
 https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
@@ -629,7 +712,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 * Vise alle løyper som brukere har lagt inn i appen. Flest stjerner øverst (hvis likt antall stjerner, nyeste av de øverst. Runde opp så det er f.eks 5 istede for 4.6 så sortere). Løypene må være offentlig eller fra venner
 
-**Løyper -\> Icon 2 fra venstre**
+:green_apple: **Løyper -\> Icon 2 fra venstre**
 
 * Vise løyper nærmest brukerens posisjon
 
@@ -678,7 +761,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 }
 ```
 
-**Løyper -\> Hjerte ikon**
+:green_apple: **Løyper -\> Hjerte ikon**
 
 * Kun løyper som brukeren har trykket liker på
 
@@ -716,7 +799,7 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 }
 ```
 
-**Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
+:green_apple: **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
 
 * Løyper til brukere brukeren følger og venner med
 
@@ -764,6 +847,8 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
 </td>
 <td>
 
+## :x:
+
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
 Brukere skal kunne gi dem "likes". Skal stå hvor mange likes innlegget har fått (symbol skal prøve å være logoen)
@@ -799,18 +884,23 @@ Brukere skal kunne gi dem "likes". Skal stå hvor mange likes innlegget har fåt
 <td>
 
 ![image.png](/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"}
+
+Spørsmål: finnes det en epost jeg kan teste glemt passord på? Eller er det "nok" at jeg for nå tester at jeg sjekker at jeg får riktig respons?
 </td>
 <td>
 
+## :x:
+
 Startsiden:
 
-Glemt passord: sender med en epost i requesten, som den da må sjekke at den finnes i databasen for så å på en måte sende en mail der brukeren kan bytte passordet sitt?
+:x: Glemt passord: sender med en epost i requesten, som den da må sjekke at den finnes i databasen for så å på en måte sende en mail der brukeren kan bytte passordet sitt?
 
-Opprett bruker:
+:x: Opprett bruker:
 
 **Trinn 1:** Registrer epost, passord
 
 POST https://hopla.onrender.com/users/register
+
 ```json
 {
     "Email": "betjent-epost@domene.com",
@@ -819,12 +909,15 @@ POST https://hopla.onrender.com/users/register
 ```
 
 **response:**
+
 ```message
 E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost.
 ```
+
 **Trinn 2:** Bekreft epostadressen
 
 **Mail innboks/søppelpost:**
+
 ```email
 FROM: Ikke svar (noreply@hopla.no)
 Klikk på lenken for å fullføre registreringen: Bekreft e-post
@@ -835,25 +928,26 @@ Klikk på lenken for å fullføre registreringen: Bekreft e-post
 GET https://hopla.onrender.com/users/confirm-email?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
 
 **eksempel på response:**
+
 ```http_message
 E-post bekreftet! Du kan nå gå tilbake til appen og logge inn med epost og passord.
 ```
 
-**Trinn 3:** Logg inn for videre registrering
-**logger inn med endpoint for login:**
+**Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
 
-Når man logger inn her får man: 
+Når man logger inn her får man:
+
 * Token
-* redirect = "update"
-(hvis registreringen er fullført, dvs name og alias er registrert, vil man få redirect = "profile" )
+* redirect = "update" (hvis registreringen er fullført, dvs name og alias er registrert, vil man få redirect = "profile" )
 
-*Se nærmere info om login på enpoint først i dokumentet.*
+_Se nærmere info om login på enpoint først i dokumentet._
 
 **Trinn 4** Oppdatere profilinfo: alias, navn, beskrivelse (optional), fødselsdato, tlf (optional), bilde (optional)
 
 PUT https://lhopla.onrender.com/users/update
 
 Body:
+
 ```json
 {
     "id": "2b46f82a-2e38-47b6-a08e-cc62d10f4503",
@@ -866,10 +960,10 @@ Body:
 ```
 
 **eksempel på response**
+
 ```postman_message
 Brukerinformasjon oppdatert.
 ```
-
 </td>
 </tr>
 <tr>
@@ -878,6 +972,8 @@ Brukerinformasjon oppdatert.
 ![Screenshot_20250303_153409_com.example.hopla\[1\].jpg](uploads/48f1f5a098d2503eeea4aa1b65124930/Screenshot_20250303_153409_com.example.hopla_1_.jpg)
 </td>
 <td>
+
+## :x:
 
 Profil -\> Innstillinger -\> Send en rapport (skal også legges inn: innlegg(hjem), løyper, profiler, community)
 
@@ -905,6 +1001,8 @@ Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backen
 </td>
 <td>
 
+## :x:
+
 Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene.
 
 Nå har jeg det satt opp slik (ikke lagt til "riktig" filter):
@@ -916,8 +1014,12 @@ Nå har jeg det satt opp slik (ikke lagt til "riktig" filter):
 <td>
 
 ![Screenshot_20250303_153900_com.example.hopla\[1\].jpg](uploads/f2a20e8cf7fed8f256f7ddf95b2f2190/Screenshot_20250303_153900_com.example.hopla_1_.jpg)
+
+`Android: Lagt til longitude, latitude og zoomlevel som viser ikoner på kartutsnittet`
 </td>
 <td>
+
+## :green_apple:
 
 Løyper -\> Kart
 
@@ -962,23 +1064,11 @@ https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlev
 <tr>
 <td>
 
-![Screenshot_20250303_154024_com.example.hopla\[1\].jpg](uploads/43f5349ec9d480b13b70e8304a4bb46f/Screenshot_20250303_154024_com.example.hopla_1_.jpg)
-</td>
-<td>
-
-Løyper -\> Kart -\> Trykke på en spesifikk løype
-
-Da tegnes en strek mellom alle koordinatene som tilhører løypa fra start-koordinatet
-
-BT oppdaterer
-</td>
-</tr>
-<tr>
-<td>
-
 ![Screenshot_20250303_154741_com.example.hopla\[1\].jpg](uploads/dda7d3a7724bd06b1087879b2f05aa12/Screenshot_20250303_154741_com.example.hopla_1_.jpg)
 </td>
 <td>
+
+## :x:
 
 Community/Fellesskap/Grupper
 
@@ -993,7 +1083,128 @@ Hente: navn, bilde, id, medlemstatus sorteres etter nærmest brukeren
 Hvis man henter eks. 10 og 10 grupper etter som brukeren blar nedover.
 
 hvordan gjøres det med muligheten til å søke gjennom grupper (sende med hver og hver bokstav etterhvert som man skriver som da viser de 10 øverste som passer hvis man ikke blar nedover)
+
+Roller i en gruppe: admin, medlem eller ikke medlem
+
+Muligheter for medlemskap i gruppe: ikke-medlem/medlem/request(hvis private)
+
+En gruppe kan være: public eller private
+</td>
+</tr>
+<tr>
+<td>
+
+![Screenshot_20250317_130457_com.example.hopla\[1\].jpg](/vakvaer/hopla/-/wikis/uploads/515ed0b7ac115e1ecfc2399bb7939b3c/Screenshot_20250317_130457_com.example.hopla_1_.jpg){width="200" height="400"}![Screenshot_20250317_144901_com.example.hopla\[1\].jpg](uploads/80267b25c43c34dde9ee60ddb8977a9e/Screenshot_20250317_144901_com.example.hopla_1_.jpg)
+</td>
+<td>
+
+## :x:
+
+Legg til nytt fellesskap:
+
+Bruker som som oppretter blir automatisk admin.
+
+Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og posisjon (long, lat)
+</td>
+</tr>
+<tr>
+<td>
+
+![Screenshot_20250317_145832_com.example.hopla\[1\].jpg](uploads/42f821da9e20a7c5a20bf7780712d314/Screenshot_20250317_145832_com.example.hopla_1_.jpg)
+</td>
+<td>
+
+## :x: 
+
+Community details
+
+Når man klikker inn på enkelte communities. Kommer man inn på postene der.
+
+Hver enkelt post trenger: dato, tid, alias og selve meldingen. Den grønne meldingen er også innlogget bruker sine egne meldinger. Så må kanskje derfor også ha med brukerid for å sjekke om det er egen melding eller ikke?
+
+Ellers trengs: id, bilde, beskrivelse, gruppenavn, medlemsstatus (for å sjekke om innlogget bruker er medlem/admin/ikke-medlem).
+
+Skal også legges til: mulighet for å rapportere community og "gå ut av gruppen"
+
+Admin skal kunne: slette community (?)
 </td>
 </tr>
 </table>
 
+# Android bilder
+
+Sist oppdatert: 17.03
+
+#### Profil
+
+![Screenshot_20250317_124010_com.example.hopla\[1\].jpg](uploads/f8190e21008789c6e3e58247da22c021/Screenshot_20250317_124010_com.example.hopla_1_.jpg){width="162" height="324"}![Screenshot_20250317_124013_com.example.hopla\[1\].jpg](uploads/552463dd776087f1eb5f473dd34c8f60/Screenshot_20250317_124013_com.example.hopla_1_.jpg){width="163" height="326"}
+
+#### Innstillinger
+
+#### ![Screenshot_20250317_124017_com.example.hopla\[1\].jpg](uploads/36fb2c9be1d8808d86b4bcd2966ba39f/Screenshot_20250317_124017_com.example.hopla_1_.jpg){width="173" height="346"}![Screenshot_20250317_124019_com.example.hopla\[1\].jpg](uploads/a7169e8e79125cbdb133a84416b55b23/Screenshot_20250317_124019_com.example.hopla_1_.jpg){width="172" height="344"}
+
+#### Mine turer
+
+![Screenshot_20250317_124334_com.example.hopla\[1\].jpg](uploads/f06cc71ef8673c8afe7519b9495f5249/Screenshot_20250317_124334_com.example.hopla_1_.jpg){width="170" height="340"}
+
+#### Mine hester Detaljer hester
+
+![Screenshot_20250317_124339_com.example.hopla\[1\].jpg](uploads/99c3c75e8ca782c180eea4ae4e5f3c14/Screenshot_20250317_124339_com.example.hopla_1_.jpg){width="180" height="360"}![Screenshot_20250317_124343_com.example.hopla\[1\].jpg](uploads/8c112519d0d5552045e638f050d645b6/Screenshot_20250317_124343_com.example.hopla_1_.jpg){width="181" height="362"}
+
+#### Venner
+
+Brukers venner--------------Venns detaljer--------------Venners hester------------Venners venner
+
+![Screenshot_20250317_124723_com.example.hopla\[1\].jpg](uploads/efbe8d4623b04f7f3843ec43a602a165/Screenshot_20250317_124723_com.example.hopla_1_.jpg){width="175" height="350"} ![Screenshot_20250317_124736_com.example.hopla\[1\].jpg](uploads/1b2f2b35581588d950eb7bb382dbbb7f/Screenshot_20250317_124736_com.example.hopla_1_.jpg){width="175" height="350"}![Screenshot_20250317_124739_com.example.hopla\[1\].jpg](uploads/885be5e7017df675cfe7a1802e7bff97/Screenshot_20250317_124739_com.example.hopla_1_.jpg){width="175" height="350"}![Screenshot_20250317_124744_com.example.hopla\[1\].jpg](uploads/6367179be9512955e12b66e10bfb6621/Screenshot_20250317_124744_com.example.hopla_1_.jpg){width="175" height="350"}
+
+Venners profil lengre ned----Venners blokker/rapporter
+
+![Screenshot_20250317_125226_com.example.hopla\[1\].jpg](uploads/0631ad3c215f5cf58125ca1ebe2dee1a/Screenshot_20250317_125226_com.example.hopla_1_.jpg){width="167" height="334"}![Screenshot_20250317_124751_com.example.hopla\[1\].jpg](/vakvaer/hopla/-/wikis/uploads/64369284df67c6bffbf52c7cf99ad8f4/Screenshot_20250317_124751_com.example.hopla_1_.jpg){width="168" height="336"}
+
+#### Følger
+
+Bruker følger----------------Følger detaljer-----------Følger "valg"
+
+![Screenshot_20250317_130004_com.example.hopla\[1\].jpg](uploads/c788a2cf85ae88661f4544fc17db72f9/Screenshot_20250317_130004_com.example.hopla_1_.jpg){width="167" height="334"}![Screenshot_20250317_130008_com.example.hopla\[1\].jpg](uploads/a6eff64ea0f0c6f526416b473e6b3f9f/Screenshot_20250317_130008_com.example.hopla_1_.jpg){width="168" height="336"}![Screenshot_20250317_130012_com.example.hopla\[1\].jpg](uploads/9138d3f3908741745c585ee3e872b3b3/Screenshot_20250317_130012_com.example.hopla_1_.jpg){width="167" height="334"}
+
+#### Alle brukere
+
+Alle brukere-------------------Relation=None-------------Relation=Pending
+
+![Screenshot_20250317_130021_com.example.hopla\[1\].jpg](uploads/0587ebbfcce70acbbf2846fec2871771/Screenshot_20250317_130021_com.example.hopla_1_.jpg){width="180" height="360"}![Screenshot_20250317_130207_com.example.hopla\[1\].jpg](uploads/78c1f253c2416a1e6d2722779a534eb4/Screenshot_20250317_130207_com.example.hopla_1_.jpg){width="180" height="360"}![Screenshot_20250317_130258_com.example.hopla\[1\].jpg](uploads/0e7e86915a87a1bb496a3bf4c793a62d/Screenshot_20250317_130258_com.example.hopla_1_.jpg){width="180" height="360"}
+
+#### Fellesskap
+
+Fellesskap første side(posisjon)----Likte fellesskap---------------Legge til nytt fellesskap-------Legge til posisjon nytt fellesskap
+
+`OBS OBS!!! `Se detaljer i listen over hvordan disse sidene skal endres
+
+![Screenshot_20250317_130448_com.example.hopla\[1\].jpg](uploads/31857f6cdf35d1c99add55fb1dc755b2/Screenshot_20250317_130448_com.example.hopla_1_.jpg){width="201" height="402"}![Screenshot_20250317_130454_com.example.hopla\[1\].jpg](uploads/ef5e329f36c653c84261a1cd99a72a09/Screenshot_20250317_130454_com.example.hopla_1_.jpg){width="201" height="402"}![Screenshot_20250317_130457_com.example.hopla\[1\].jpg](uploads/515ed0b7ac115e1ecfc2399bb7939b3c/Screenshot_20250317_130457_com.example.hopla_1_.jpg){width="200" height="400"}![Screenshot_20250317_144901_com.example.hopla\[1\].jpg](uploads/fdd7aacc85f2074567744417322013be/Screenshot_20250317_144901_com.example.hopla_1_.jpg){width="201" height="402"}
+
+Community skjerm ------------- Beskrivelse av community (når man trykker på i icon)
+
+![Screenshot_20250317_145505_com.example.hopla\[1\].jpg](uploads/967fafb066d5d0615535d399235241d5/Screenshot_20250317_145505_com.example.hopla_1_.jpg){width="194" height="388"}![Screenshot_20250317_145508_com.example.hopla\[1\].jpg](uploads/9d0123cae0afe57f3d95ea37944d0267/Screenshot_20250317_145508_com.example.hopla_1_.jpg){width="196" height="392"}
+
+#### Ny tur (skal nok endres litt)
+
+Start på ny tur-----------------Når ny tur er ferdig
+
+![Screenshot_20250317_130846_com.example.hopla\[1\].jpg](uploads/b02689a03b7be70d2222649f1782de2e/Screenshot_20250317_130846_com.example.hopla_1_.jpg){width="177" height="354"}![Screenshot_20250317_130854_com.example.hopla\[1\].jpg](uploads/06fde64999c226b8a16adfa913341360/Screenshot_20250317_130854_com.example.hopla_1_.jpg){width="178" height="356"}
+
+#### Løyper
+
+(Ja jeg vet jeg har "ødelagt" kvaliteten på bildene litt, fiks kommer :laughing: )
+
+Første side---------------------Nær bruker-----------------Likte løyper-------------Venner og følger
+
+![Screenshot_20250317_131317_com.example.hopla\[1\].jpg](uploads/9820fada4a00b2b31186886b7c81cd35/Screenshot_20250317_131317_com.example.hopla_1_.jpg){width="179" height="358"}![Screenshot_20250317_131321_com.example.hopla\[1\].jpg](uploads/14b2a266703f867ec7725c444f2bdd2a/Screenshot_20250317_131321_com.example.hopla_1_.jpg){width="179" height="358"}![Screenshot_20250317_131325_com.example.hopla\[1\].jpg](uploads/e21464de32a27d0b3ac75c35d28b2175/Screenshot_20250317_131325_com.example.hopla_1_.jpg){width="179" height="358"}![Screenshot_20250317_131330_com.example.hopla\[1\].jpg](uploads/b2d1f71e1203233ed0a3a99c7e406687/Screenshot_20250317_131330_com.example.hopla_1_.jpg){width="179" height="358"}
+
+Filter liste
+
+![Screenshot_20250317_131335_com.example.hopla\[1\].jpg](uploads/f2b34108e4a09755dee7f313047a304e/Screenshot_20250317_131335_com.example.hopla_1_.jpg){width="189" height="378"}
+
+#### Hjem
+
+Mer detaljer om denne siden i listen over, men foreløpig design
+
+![Screenshot_20250317_131734_com.example.hopla\[1\].jpg](uploads/ba7873a84dd59fba092f29812c914512/Screenshot_20250317_131734_com.example.hopla_1_.jpg){width="187" height="374"}![Screenshot_20250317_131738_com.example.hopla\[1\].jpg](uploads/8a7357e0e7d17c961b860ea6b753cd62/Screenshot_20250317_131738_com.example.hopla_1_.jpg){width="188" height="376"}
