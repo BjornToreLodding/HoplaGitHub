@@ -7,12 +7,14 @@ using Renci.SshNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using DotNetEnv; // For miljøvariabler
+using DotNetEnv;
+using HoplaBackend.Data; // For miljøvariabler
 
 [Route("upload")]
 [ApiController]
 public class UploadController : ControllerBase
 {
+    private readonly AppDbContext _context;
     private readonly string _sftpHost;
     private readonly int _sftpPort;
     private readonly string _sftpUsername;
@@ -20,8 +22,10 @@ public class UploadController : ControllerBase
     private readonly string _remoteDirectory;
     private readonly string _knownHostKey;
     
-    public UploadController()
+    public UploadController(AppDbContext context)
     {
+        _context = context;
+
         Env.Load(); // Laster .env hvis den finnes
         _sftpHost = Environment.GetEnvironmentVariable("SFTP_HOST");
         _sftpPort = int.TryParse(Environment.GetEnvironmentVariable("SFTP_PORT"), out var port) ? port : 22;
@@ -30,13 +34,22 @@ public class UploadController : ControllerBase
         _remoteDirectory = Environment.GetEnvironmentVariable("SFTP_REMOTE_PATH");
         _knownHostKey = Environment.GetEnvironmentVariable("SFTP_KNOWN_HOSTS");
     }
-    
-    [HttpPost]
-    public async Task<IActionResult> UploadImage([FromForm] IFormFile image, [FromForm] string table)
+        
+    [HttpPut]
+    public async Task<IActionResult> UploadImage([FromForm] IFormFile image, [FromForm] string table, [FromForm] string entityId)
     {
+        Console.WriteLine($"📌 Mottatt entityId (string): {entityId}");
+
+        if (!Guid.TryParse(entityId, out Guid parsedEntityId) || parsedEntityId == Guid.Empty)
+        {
+            return BadRequest(new { error = "Invalid or missing entityId" });
+        }
+
+        Console.WriteLine($"✅ Parsed entityId: {parsedEntityId}");
+
         if (image == null || image.Length == 0)
             return BadRequest(new { error = "No file uploaded." });
-        
+
         try
         {
             Console.WriteLine("🚀 Starter SFTP-opplasting...");
@@ -45,14 +58,18 @@ public class UploadController : ControllerBase
             using var stream = new MemoryStream();
             await image.CopyToAsync(stream);
             byte[] resizedImage = ResizeImage(stream.ToArray(), 1000);
-            
-            string fileName = $"{Guid.NewGuid()}.jpg";
+
+            string fileName = $"{Guid.NewGuid()}.jpg"; // Nytt bilde
             string tempPath = Path.Combine(Path.GetTempPath(), fileName);
             await System.IO.File.WriteAllBytesAsync(tempPath, resizedImage);
-            
+
             UploadToSftp(tempPath, fileName);
-            
-            SaveToDatabase(table, fileName);
+
+            bool updated = SaveToDatabase(table, parsedEntityId, fileName);
+
+            if (!updated)
+                return NotFound(new { error = "Entity not found." });
+
             return Ok(new { filePath = _remoteDirectory + fileName });
         }
         catch (Exception ex)
@@ -62,6 +79,7 @@ public class UploadController : ControllerBase
             return StatusCode(500, new { error = ex.Message });
         }
     }
+
 
     private byte[] ResizeImage(byte[] imageBytes, int maxWidth)
     {
@@ -167,26 +185,58 @@ public class UploadController : ControllerBase
             Console.WriteLine(ex.StackTrace);
         }
     }
-    private void SaveToDatabase(string table, string filePath)
+private bool SaveToDatabase(string table, Guid entityId, string filePath)
+{
+    var entityUpdated = false;
+    Console.WriteLine(table);
+    Console.WriteLine(entityId);
+    switch (table)
     {
-        Console.WriteLine("");
-        Console.WriteLine(table);
-        Console.WriteLine(filePath);
-        
-        /*
-        using var db = new YourDbContext();
-        
-        switch (table)
-        {
-            case "Users": db.Users.Add(new User { ProfileImage = filePath }); break;
-            case "MyHikes": db.MyHikes.Add(new MyHike { ImageUrl = filePath }); break;
-            case "Trails": db.Trails.Add(new Trail { ImageUrl = filePath }); break;
-            case "Horses": db.Horses.Add(new Horse { ImageUrl = filePath }); break;
-        }
-        
-        db.SaveChanges();
-        */
+        case "Users":
+            var user = _context.Users.FirstOrDefault(u => u.Id == entityId);
+            if (user != null)
+            {
+                user.PictureUrl = filePath;
+                entityUpdated = true;
+            }
+            break;
+
+        case "MyHikes":
+            var myHike = _context.UserHikes.FirstOrDefault(h => h.Id == entityId);
+            if (myHike != null)
+            {
+                myHike.PictureUrl = filePath;
+                entityUpdated = true;
+            }
+            break;
+
+        case "Trails":
+            var trail = _context.Trails.FirstOrDefault(t => t.Id == entityId);
+            if (trail != null)
+            {
+                trail.PictureUrl = filePath;
+                entityUpdated = true;
+            }
+            break;
+
+        case "Horses":
+            var horse = _context.Horses.FirstOrDefault(h => h.Id == entityId);
+            if (horse != null)
+            {
+                horse.PictureUrl = filePath;
+                entityUpdated = true;
+            }
+            break;
     }
+
+    if (entityUpdated)
+    {
+        _context.SaveChanges(); // Lagrer endringene i databasen
+    }
+
+    return entityUpdated; // Returnerer `true` hvis en oppdatering ble gjort
+}
+
 
 }
 

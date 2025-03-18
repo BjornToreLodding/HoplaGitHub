@@ -15,6 +15,11 @@
             margin: auto;
             text-align: left;
         }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
         input {
             width: 100%;
             padding: 10px;
@@ -72,10 +77,11 @@
 <body>
     <div class="container">
         <h2>Tilbakestill passord</h2>
-        <p>Velg et nytt passord.</p>
 
+        <label for="newPassword">Nytt passord</label>
         <input type="password" id="newPassword" placeholder="Nytt passord" oninput="validatePassword()" />
 
+        <label for="confirmPassword">Bekreft passord</label>
         <div class="confirm-wrapper">
             <input type="password" id="confirmPassword" placeholder="Bekreft passord" oninput="checkPasswordsMatch()" />
             <span id="match" class="error">✖</span>
@@ -97,12 +103,23 @@
     <script>
         function validatePassword() {
             const password = document.getElementById("newPassword").value;
-            document.getElementById("length").className = password.length >= 9 ? "valid" : "error";
-            document.getElementById("uppercase").className = /[A-Z]/.test(password) ? "valid" : "error";
-            document.getElementById("lowercase").className = /[a-z]/.test(password) ? "valid" : "error";
-            document.getElementById("number").className = /\d/.test(password) ? "valid" : "error";
-            document.getElementById("special").className = /[!@#$%^&*]/.test(password) ? "valid" : "error";
+            updateRule("length", password.length >= 9);
+            updateRule("uppercase", /[A-Z]/.test(password));
+            updateRule("lowercase", /[a-z]/.test(password));
+            updateRule("number", /\d/.test(password));
+            updateRule("special", /[!@#$%^&*]/.test(password));
             checkPasswordsMatch();
+        }
+
+        function updateRule(elementId, isValid) {
+            const element = document.getElementById(elementId);
+            if (isValid) {
+                element.className = "valid";
+                element.innerHTML = "✔ " + element.textContent.slice(2);
+            } else {
+                element.className = "error";
+                element.innerHTML = "✖ " + element.textContent.slice(2);
+            }
         }
 
         function checkPasswordsMatch() {

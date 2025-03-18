@@ -246,7 +246,7 @@ public class UserController : ControllerBase
             telephone = user.Telephone,
             description = user.Description,
             dob = user.Dob,
-            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? user.PictureUrl + "?w=200&h=200&fit=crop" : "",
+            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl + "?w=200&h=200&fit=crop" : "https://files.hopla.no/" + user.PictureUrl) : "",
             redirect = loginRedirect
         });
         /*
@@ -318,9 +318,7 @@ public class UserController : ControllerBase
                     u.Name,
                     u.Email,
                     //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
-                    PictureUrl = !string.IsNullOrEmpty(u.PictureUrl)
-                        ? $"{u.PictureUrl}?h=200&w=200&fit=crop"
-                        : ""
+                    PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : ""
                 })
                 .FirstOrDefaultAsync();
             if (user == null)
@@ -351,7 +349,7 @@ public class UserController : ControllerBase
                 {
                     id = user.Id,
                     name = user.Name,
-                    PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop",
+                    PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
                     alias = user.Alias,
                     description = user.Description,
                     dob = user.Dob,
@@ -371,7 +369,7 @@ public class UserController : ControllerBase
                 {
                     id = user.Id,
                     name = user.Name,
-                    PictureUrl = user.PictureUrl + "?w=200&h=200&fit=crop",
+                    PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
                     alias = user.Alias,
                     description = user.Description,
                     created_at = user.CreatedAt,
