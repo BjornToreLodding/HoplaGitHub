@@ -246,7 +246,7 @@ public class UserController : ControllerBase
             telephone = user.Telephone,
             description = user.Description,
             dob = user.Dob,
-            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl + "?w=200&h=200&fit=crop" : "https://files.hopla.no/" + user.PictureUrl) : "",
+            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl  : "https://files.hopla.no/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
             redirect = loginRedirect
         });
         /*
@@ -403,7 +403,7 @@ public class UserController : ControllerBase
             {
                 u.Id,
                 u.Name,
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : "",
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=64&h=64&fit=crop" : "",
                 u.Alias
             })
             .OrderBy(u => u.Id) // Sorterer etter Guid
