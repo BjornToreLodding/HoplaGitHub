@@ -42,7 +42,7 @@ Hva som mangler endpoints i listen:
 </td>
 <td>
 
-## :warning:
+## :warning: POST /users/login
 
 Logg inn
 
@@ -104,7 +104,7 @@ JSON-Response for brukere som har registrert navn og alias
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /users/profile
 
 Main profil side
 
@@ -139,7 +139,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /horses/userhorses
 
 **Profil -\> Mine hester**
 
@@ -186,7 +186,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /horses/{horseId}
 
 **Profil -\> Mine hester -\> Velge en spesifikk hest**
 
@@ -224,7 +224,7 @@ BT: Denne skal virke nå
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /userrelations/friends
 
 **Profil -\> Venner**
 
@@ -295,7 +295,7 @@ BT: Denne skal virke nå
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /userrelations/following
 
 **Profil -\> Følger**
 
@@ -349,7 +349,7 @@ Har ikke bilde for øyeblikket, profil -\> Venner -\> Trykke på spesifikk venn
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /users/profile?userid=
 
 GET request
 
@@ -374,13 +374,13 @@ Vilde bruker: https://hopla.onrender.com/users/profile?userId=12345678-0000-0000
 | :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
 | :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
 
-#### :mag_right: Query:
+:mag_right: Query:
 
 * `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
 * `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
 * `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
-#### :floppy_disk: Syntax:
+:floppy_disk: Syntax:
 
 ```bash
 curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
@@ -504,7 +504,7 @@ Har ikke bilde for øyeblikket, profil -\> Følger -\> Trykke på spesifikk pers
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /userrelations/following?userid=
 
 GET request
 
@@ -526,7 +526,7 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(bare off
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /userhikes/user
 
 Profil -\> Mine turer
 
@@ -536,7 +536,7 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 
 **BT: Har laget dette endpointet:**
 
-### GET /usershikes/user
+**### **GET /usershikes/user**
 
 :pushpin: **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
 
@@ -549,13 +549,13 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 | :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
 | :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
 
-#### :mag_right: Query:
+**#### **:mag_right: Query:**
 
 * `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
 * `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
 * `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
-#### :floppy_disk: Syntax:
+**:floppy_disk: Syntax:**
 
 ```bash
 curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
@@ -603,7 +603,7 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 </td>
 <td>
 
-## :x:
+## :x: PUT /upload
 
 Profil -\> Endre profilbilde
 
@@ -660,7 +660,7 @@ Profil -\> bytte passord
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /trails/all
 
 (Alle disse sidene skal displaye lister på samme måte)
 
@@ -847,7 +847,7 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
 </td>
 <td>
 
-## :x:
+## :x: Get /home?
 
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
@@ -889,7 +889,7 @@ Spørsmål: finnes det en epost jeg kan teste glemt passord på? Eller er det "n
 </td>
 <td>
 
-## :x:
+## :x: POST /users/register
 
 Startsiden:
 
@@ -973,7 +973,7 @@ Brukerinformasjon oppdatert.
 </td>
 <td>
 
-## :x:
+## :x: POST /userreports/create
 
 Profil -\> Innstillinger -\> Send en rapport (skal også legges inn: innlegg(hjem), løyper, profiler, community)
 
@@ -1001,7 +1001,7 @@ Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backen
 </td>
 <td>
 
-## :x:
+## :x: GET /filters?
 
 Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene.
 
@@ -1019,7 +1019,7 @@ Nå har jeg det satt opp slik (ikke lagt til "riktig" filter):
 </td>
 <td>
 
-## :green_apple:
+## :green_apple: GET /trails/map
 
 Løyper -\> Kart
 
@@ -1068,7 +1068,7 @@ https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlev
 </td>
 <td>
 
-## :x:
+## :x: GET /stables/all
 
 Community/Fellesskap/Grupper
 
@@ -1098,7 +1098,7 @@ En gruppe kan være: public eller private
 </td>
 <td>
 
-## :x:
+## :x: POST /stables/create
 
 Legg til nytt fellesskap:
 
@@ -1114,7 +1114,7 @@ Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og 
 </td>
 <td>
 
-## :x: 
+## :x: GET /stables/{stableId}
 
 Community details
 

@@ -5,7 +5,7 @@ export async function render(container) {
 
     try {
         console.log("Fetching users from API...");
-        const response = await fetch("https://localhost:7128/users/all", {
+        const response = await fetch("https://hopla.onrender.com/users/all", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
