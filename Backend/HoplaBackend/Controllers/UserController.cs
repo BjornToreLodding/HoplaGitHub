@@ -603,7 +603,7 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
 
         // Lag lenke til nettsiden for tilbakestilling
-        var resetLink = $"{_configuration["PasswordResetUrl"]}/resetpassword.html?token={Uri.EscapeDataString(token)}";
+        var resetLink = $"{_configuration["PasswordResetUrl"]}/index.html?token={Uri.EscapeDataString(token)}";
         await _emailService.SendEmailAsync(request.Email, "Tilbakestill passord",
             $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a>");
 

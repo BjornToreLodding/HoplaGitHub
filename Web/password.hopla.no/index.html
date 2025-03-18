@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tilbakestill passord</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 50px; 
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .password-rules {
+            margin-top: 10px;
+            padding-left: 10px;
+            list-style-type: none;
+        }
+        .password-rules li {
+            margin-bottom: 5px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .valid {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        .confirm-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .confirm-wrapper span {
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tilbakestill passord</h2>
+        <p>Velg et nytt passord.</p>
+
+        <input type="password" id="newPassword" placeholder="Nytt passord" oninput="validatePassword()" />
+
+        <div class="confirm-wrapper">
+            <input type="password" id="confirmPassword" placeholder="Bekreft passord" oninput="checkPasswordsMatch()" />
+            <span id="match" class="error">✖</span>
+        </div>
+
+        <ul class="password-rules">
+            <li id="length" class="error">✖ Minst 9 tegn</li>
+            <li id="uppercase" class="error">✖ Minst 1 stor bokstav</li>
+            <li id="lowercase" class="error">✖ Minst 1 liten bokstav</li>
+            <li id="number" class="error">✖ Minst 1 tall</li>
+            <li id="special" class="error">✖ Minst 1 spesialtegn (!@#$%^&*)</li>
+        </ul>
+
+        <button onclick="resetPassword()">Tilbakestill passord</button>
+
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function validatePassword() {
+            const password = document.getElementById("newPassword").value;
+            document.getElementById("length").className = password.length >= 9 ? "valid" : "error";
+            document.getElementById("uppercase").className = /[A-Z]/.test(password) ? "valid" : "error";
+            document.getElementById("lowercase").className = /[a-z]/.test(password) ? "valid" : "error";
+            document.getElementById("number").className = /\d/.test(password) ? "valid" : "error";
+            document.getElementById("special").className = /[!@#$%^&*]/.test(password) ? "valid" : "error";
+            checkPasswordsMatch();
+        }
+
+        function checkPasswordsMatch() {
+            const password = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const matchIndicator = document.getElementById("match");
+
+            if (password === confirmPassword && password.length > 0) {
+                matchIndicator.className = "valid";
+                matchIndicator.innerHTML = "✔";
+            } else {
+                matchIndicator.className = "error";
+                matchIndicator.innerHTML = "✖";
+            }
+        }
+
+        async function resetPassword() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get("token");
+            const password = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (!token) {
+                document.getElementById("message").innerText = "Feil: Token mangler!";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById("message").innerText = "Passordene er ikke like!";
+                return;
+            }
+
+            if (document.querySelectorAll(".error").length > 0) {
+                document.getElementById("message").innerText = "Passordet oppfyller ikke kravene!";
+                return;
+            }
+
+            try {
+                const response = await fetch("https://hopla.onrender.com/users/reset-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token, newPassword: password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = "password-reset-success.html";
+                } else {
+                    document.getElementById("message").innerText = data.message || "Feil ved tilbakestilling av passord.";
+                }
+            } catch (error) {
+                console.error("Feil:", error);
+                document.getElementById("message").innerText = "Noe gikk galt. Prøv igjen.";
+            }
+        }
+    </script>
+</body>
+</html>
