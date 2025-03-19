@@ -9,6 +9,7 @@ public class EmailVerification
 
     [Required, EmailAddress]
     public string Email { get; set; }
+    public string? OldEmail { get; set; } // når epost skal byttes.
     public string PasswordHash { get; set; }
     //Password  and Email will be transfered Users-table when registration is completed.
 

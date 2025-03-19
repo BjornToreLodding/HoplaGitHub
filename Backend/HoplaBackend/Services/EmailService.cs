@@ -31,12 +31,16 @@ public class EmailService
         {
             smtp.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
             smtp.EnableSsl = true;
+            
+            string timestamp = DateTime.UtcNow.ToString("HH:mm:ss dd-MM-yyyy");
 
+            string footer = $"<br><br><hr><p>Denne e-posten ble sendt: {timestamp}. Denne eposten kan ikke besvares.</p>";
+ 
             var mailMessage = new MailMessage
             {
                 From = new MailAddress("postmaster@hopla.no", "Hopla NoReply"),
                 Subject = subject,
-                Body = htmlMessage,
+                Body = htmlMessage + footer,
                 IsBodyHtml = true
             };
             mailMessage.To.Add(to);
