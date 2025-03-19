@@ -420,10 +420,11 @@ fun TrailsScreen(navController: NavController) {
                         }
                     }
                 } else {
-                    items(routesToDisplay.size) { index ->
-                        val trail = routesToDisplay[index]
+                    items(trails.size) { index ->
+                        val trail = trails[index]
                         ContentBox(
                             info = ContentBoxInfo(
+                                id = trail.id,
                                 title = trail.name,
                                 imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                     R.drawable.stockimg1
@@ -444,6 +445,7 @@ fun TrailsScreen(navController: NavController) {
                             },
                             onBoxClick = {
                                 selectedContentBoxInfo = ContentBoxInfo(
+                                    id = trail.id,
                                     title = trail.name,
                                     imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                         R.drawable.stockimg1
@@ -646,7 +648,12 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
     }
 
     if (showReportDialog) {
-        ReportDialog(onDismiss = { showReportDialog = false })
+        ReportDialog(
+            entityId = info.id,
+            entityName = "Trails",
+            token = UserSession.token,
+            onDismiss = { showReportDialog = false }
+        )
     }
 }
 

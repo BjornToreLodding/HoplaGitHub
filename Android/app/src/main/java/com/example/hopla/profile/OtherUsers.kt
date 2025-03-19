@@ -281,7 +281,12 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
         }
     }
     if (showReportDialog) {
-        ReportDialog(onDismiss = { showReportDialog = false })
+        ReportDialog(
+            entityId = userId,
+            entityName = "Users",
+            token = UserSession.token,
+            onDismiss = { showReportDialog = false }
+        )
     }
 }
 

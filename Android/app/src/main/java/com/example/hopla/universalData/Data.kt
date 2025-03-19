@@ -159,6 +159,7 @@ data class Filters(
 
 // Data class to hold the information for each ContentBox
 data class ContentBoxInfo(
+    val id: String,
     val title: String,
     val imageResource: List<Any>,
     val isFavorite: Boolean,
@@ -236,4 +237,18 @@ data class ErrorResponse2(
     val title: String,
     val traceId: String,
     val errors: Map<String, List<String>>
+)
+
+//-------- Data classes for user reports -------------
+@Serializable
+data class UserReportRequest(
+    val EntityId: String,
+    val EntityName: String,
+    val Category: String? = "Annet",
+    val Message: String
+)
+
+@Serializable
+data class UserReportResponse(
+    val message: String
 )

@@ -47,6 +47,7 @@ import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.UserViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
+import com.example.hopla.universalData.UserSession
 import java.util.Locale
 
 @Composable
@@ -115,7 +116,12 @@ fun SettingsScreen(
     }
 
     if (showReportDialog) {
-        ReportDialog(onDismiss = { showReportDialog = false })
+        ReportDialog(
+            entityId = UserSession.userId,
+            entityName = "Users",
+            token = UserSession.token,
+            onDismiss = { showReportDialog = false }
+        )
     }
     if (showLogOutDialog) {
         ConfirmDialog(

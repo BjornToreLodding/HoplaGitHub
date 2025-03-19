@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -63,7 +64,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.hopla.R
+import com.example.hopla.apiService.createUserReport
 import com.example.hopla.ui.theme.PrimaryGray
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -399,9 +402,15 @@ fun CustomTextField(
 
 // Report dialog
 @Composable
-fun ReportDialog(onDismiss: () -> Unit) {
+fun ReportDialog(
+    entityId: String,
+    entityName: String,
+    token: String,
+    onDismiss: () -> Unit
+) {
     var reportTitle by remember { mutableStateOf("") }
     var reportText by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -438,7 +447,18 @@ fun ReportDialog(onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            Button(onClick = onDismiss) {
+            Button(onClick = {
+                coroutineScope.launch {
+                    val reportRequest = UserReportRequest(
+                        EntityId = entityId,
+                        EntityName = entityName,
+                        Category = reportTitle,
+                        Message = reportText
+                    )
+                    createUserReport(token, reportRequest)
+                    onDismiss()
+                }
+            }) {
                 Text(text = stringResource(R.string.send))
             }
         },

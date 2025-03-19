@@ -6,11 +6,14 @@ import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.R
 import com.example.hopla.universalData.User
+import com.example.hopla.universalData.UserReportRequest
+import com.example.hopla.universalData.UserReportResponse
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -95,4 +98,28 @@ fun handleLogin(
             }
         }
     }
+}
+
+//---------- Post requests for creating a user report ---------------
+suspend fun createUserReport(token: String, reportRequest: UserReportRequest): UserReportResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.post(apiUrl+"userreports/create") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(reportRequest)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("createUserReport", "Response: $responseBody")
+    client.close()
+    return Json.decodeFromString(UserReportResponse.serializer(), responseBody)
 }

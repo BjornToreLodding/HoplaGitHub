@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.UserSession
 
 @Composable
 fun HomeScreen() {
@@ -188,8 +189,13 @@ fun PostItem(imageRes: Int, text: String) {
             }
         }
     }
-
+    // !!!!!! Change to correct entity id and entity name
     if (showReportDialog) {
-        ReportDialog(onDismiss = { showReportDialog = false })
+        ReportDialog(
+            entityId = UserSession.userId,
+            entityName = "Home",
+            token = UserSession.token,
+            onDismiss = { showReportDialog = false }
+        )
     }
 }

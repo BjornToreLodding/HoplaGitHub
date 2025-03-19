@@ -69,6 +69,7 @@ import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.SimpleMapScreen
+import com.example.hopla.universalData.UserSession
 import com.google.android.gms.maps.model.LatLng
 
 // Define the communities list
@@ -395,9 +396,14 @@ fun CommunityDetailScreen(navController: NavController, community: Community) {
             }
         )
     }
-
+    // !!!! Change entityID to communityid
     if (showReportDialog) {
-        ReportDialog(onDismiss = { showReportDialog = false })
+        ReportDialog(
+            entityId = UserSession.userId,
+            entityName = "Community",
+            token = UserSession.token,
+            onDismiss = { showReportDialog = false }
+        )
     }
 }
 
