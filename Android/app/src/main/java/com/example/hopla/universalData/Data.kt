@@ -217,9 +217,9 @@ data class Trail(
 
 @Serializable
 data class TrailsResponse(
-    val trails: List<Trail>,
-    val pageNumber: Int,
-    val pageSize: Int
+    val trails: List<Trail> = emptyList(),
+    val pageNumber: Int = 0,
+    val pageSize: Int = 0
 )
 
 @Serializable
@@ -228,7 +228,7 @@ data class MapTrail(
     val name: String,
     val latMean: Double,
     val longMean: Double,
-    val trailAllCoordinates: List<String>?
+    val trailAllCoordinates: String? = null
 )
 
 @Serializable

@@ -248,7 +248,12 @@ suspend fun fetchTrailsRelations(token: String, pageNumber: Int): TrailsResponse
         }
         val responseBody: String = response.bodyAsText()
         Log.d("fetchTrailsRelations", "Response: $responseBody")
-        response.body()
+
+        if (response.status == HttpStatusCode.OK) {
+            response.body()
+        } else {
+            throw Exception("Client request (${response.request.url}) failed: ${response.status}.")
+        }
     }
 }
 
