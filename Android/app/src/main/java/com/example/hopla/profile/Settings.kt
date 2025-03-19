@@ -136,10 +136,11 @@ fun SettingsScreen(
     }
     if (showDeleteDialog) {
         PasswordConfirmDialog(
+            token = UserSession.token,
             password = password,
             onPasswordChange = { password = it },
-            onConfirm = {
-                userViewModel.deleteUser()
+            onConfirm = { password ->
+                userViewModel.deleteUser(UserSession.token, password)
                 showDeleteDialog = false
             },
             onDismiss = { showDeleteDialog = false }
@@ -212,7 +213,13 @@ fun ConfirmDialog(title: String, message: String, onConfirm: () -> Unit, onDismi
 
 // Password Confirmation Dialog
 @Composable
-fun PasswordConfirmDialog(password: String, onPasswordChange: (String) -> Unit, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun PasswordConfirmDialog(
+    token: String,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.delete_user)) },
@@ -227,13 +234,13 @@ fun PasswordConfirmDialog(password: String, onPasswordChange: (String) -> Unit, 
             }
         },
         confirmButton = {
-            Button(onClick = onConfirm) {
+            Button(onClick = { onConfirm(password) }) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(text = stringResource(R.string.cancel))
             }
         }
     )

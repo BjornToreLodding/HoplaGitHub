@@ -3,6 +3,7 @@ package com.example.hopla
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -45,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.hopla.profile.AddNewType
@@ -61,6 +63,24 @@ import com.example.hopla.profile.UserHorsesScreen
 import com.example.hopla.profile.UsersProfileScreen
 import com.example.hopla.universalData.MapScreen
 import com.example.hopla.universalData.UserSession
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
+import com.example.hopla.universalData.DeleteUserRequest
+import com.example.hopla.universalData.DeleteUserResponse
+import io.ktor.client.call.body
+import io.ktor.client.request.header
+import io.ktor.client.request.patch
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 
 class MainActivity : ComponentActivity() {
@@ -280,9 +300,39 @@ class UserViewModel : ViewModel() {
         _isLoggedIn.value = false
         UserSession.clear()
     }
-    fun deleteUser() {
-        _isLoggedIn.value = false
-        UserSession.clear()
+
+    fun deleteUser(token: String, password: String) {
+        viewModelScope.launch {
+            try {
+                val client = HttpClient {
+                    install(ContentNegotiation) {
+                        json(Json {
+                            ignoreUnknownKeys = true
+                            isLenient = true
+                            encodeDefaults = true
+                        })
+                    }
+                }
+
+                val response = client.patch("https://hopla.onrender.com/users/delete") {
+                    header("Authorization", "Bearer $token")
+                    contentType(ContentType.Application.Json)
+                    setBody(DeleteUserRequest(Password = password))
+                }
+
+                val responseBody: String = response.bodyAsText()
+                Log.d("deleteUser", "Response: $responseBody")
+                client.close()
+
+                val deleteUserResponse = Json.decodeFromString(DeleteUserResponse.serializer(), responseBody)
+                Log.d("deleteUser", "Message: ${deleteUserResponse.message}")
+
+                _isLoggedIn.value = false
+                UserSession.clear()
+            } catch (e: Exception) {
+                Log.e("deleteUser", "Error deleting user", e)
+            }
+        }
     }
 }
 

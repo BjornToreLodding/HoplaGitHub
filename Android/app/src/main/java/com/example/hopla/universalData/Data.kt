@@ -252,3 +252,10 @@ data class UserReportRequest(
 data class UserReportResponse(
     val message: String
 )
+
+//-------- Data classes for deleting a user -------------
+@Serializable
+data class DeleteUserRequest(val Password: String)
+
+@Serializable
+data class DeleteUserResponse(val message: String)
