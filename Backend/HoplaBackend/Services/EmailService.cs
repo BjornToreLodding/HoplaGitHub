@@ -1,4 +1,53 @@
-using MailKit.Net.Smtp;
+using System;
+using System.Net;
+using System.Net.Mail;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+
+public class EmailService
+{
+    private readonly IConfiguration _configuration;
+    
+    public EmailService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    public async Task SendEmailAsync(string to, string subject, string htmlMessage)
+    {
+        Console.WriteLine($"SMTP Server: {_configuration["EmailSettings:SmtpServer"]}");
+        Console.WriteLine($"SMTP Username: {_configuration["EmailSettings:SmtpUsername"]}");
+        Console.WriteLine($"SMTP Password: {(string.IsNullOrEmpty(_configuration["EmailSettings:SmtpPassword"]) ? "IKKE SATT!" : "SATT ✔")}");
+        var smtpServer = _configuration["EmailSettings:SmtpServer"];
+        var smtpUsername = _configuration["EmailSettings:SmtpUsername"];
+        var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+
+        if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword))
+        {
+            throw new Exception("❌ Miljøvariabler for SMTP mangler!");
+        }
+
+        using (var smtp = new SmtpClient(smtpServer, 587))
+        {
+            smtp.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+            smtp.EnableSsl = true;
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress("postmaster@hopla.no", "Hopla NoReply"),
+                Subject = subject,
+                Body = htmlMessage,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(to);
+
+            await smtp.SendMailAsync(mailMessage);
+        }
+    }
+}
+
+
+/*using MailKit.Net.Smtp;
 using MimeKit;
 using System.Threading.Tasks;
 
@@ -32,7 +81,7 @@ public class EmailService
             Console.WriteLine("Sending email...");
             await client.SendAsync(emailMessage);
             await client.DisconnectAsync(true);
-               /*
+               
             //await client.ConnectAsync("smtp.domeneshop.no", 587, MailKit.Security.SecureSocketOptions.StartTls);
             Console.WriteLine($"Connecting to {_configuration["EmailSettings:SmtpServer"]}");
             await client.ConnectAsync("email-smtp.eu-west-1.amazonaws.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
@@ -41,9 +90,10 @@ public class EmailService
             Console.WriteLine("Sending email...");
             await client.SendAsync(emailMessage);
             await client.DisconnectAsync(true);
-            */
+            
         }
         
 
     }
 }
+*/

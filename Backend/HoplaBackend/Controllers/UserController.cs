@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 
 using RestSharp; // RestSharp v112.1.0
 using RestSharp.Authenticators;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace HoplaBackend.Controllers;
@@ -95,9 +96,9 @@ public class UserController : ControllerBase
 
         var existingUser = await _context.Users.AnyAsync(u => u.Email == request.Email);
         if (existingUser)
-            return BadRequest("E-postadressen er allerede registrert.");
+            return BadRequest("E-postadressen er allerede registrert."); //Endres til noe annet for å ikke avsløre at epostadressen finnes.
 
-        var existingVerification = await _context.EmailVerifications.AnyAsync(ev => ev.Email == request.Email && !ev.IsUsed);
+        var existingVerification = await _context.EmailVerifications.AnyAsync(ev => ev.Email == request.Email && !ev.IsUsed && ev.ExpiryDate < DateTime.UtcNow);
         if (existingVerification)
             return BadRequest("En verifikasjonsprosess er allerede i gang. Sjekk e-posten din og evt søppelpost.");
 
@@ -125,9 +126,9 @@ public class UserController : ControllerBase
 
         var confirmationLink = $"{_configuration["ConfirmEmailUrl"]}?token={Uri.EscapeDataString(token)}";
         await _emailService.SendEmailAsync(request.Email, "Bekreft registrering",
-            $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>");
+            $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>. Dette må gjøres innen 24 timer fra da du opprettet brukernavnet.");
 
-        return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost.");
+        return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer");
     }
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
@@ -642,7 +643,7 @@ public class UserController : ControllerBase
         {
             Email = request.Email,
             Token = token,
-            ExpiryDate = DateTime.UtcNow.AddMinutes(15)
+            ExpiryDate = DateTime.UtcNow.AddMinutes(240)
         };
 
         _context.PasswordResets.Add(passwordReset); //Rød strek under PasswordResets
@@ -651,7 +652,7 @@ public class UserController : ControllerBase
         // Lag lenke til nettsiden for tilbakestilling
         var resetLink = $"{_configuration["PasswordResetUrl"]}/index.html?token={Uri.EscapeDataString(token)}";
         await _emailService.SendEmailAsync(request.Email, "Tilbakestill passord",
-            $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a>");
+            $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a> Dette må gjøres innen 4 timer fra da du tilbakestilte passordet");
 
         return Ok("E-post sendt. Sjekk innboksen din.");
     }
