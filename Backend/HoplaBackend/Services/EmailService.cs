@@ -53,7 +53,7 @@ public class EmailService
     }
 }
 
-
+//Gammel epost-tjeneste, men den er ment for å sende store vedlegg, så den fyller opp minnet svært fort.
 /*using MailKit.Net.Smtp;
 using MimeKit;
 using System.Threading.Tasks;

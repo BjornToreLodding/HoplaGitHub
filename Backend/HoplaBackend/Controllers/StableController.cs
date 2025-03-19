@@ -5,6 +5,7 @@ using HoplaBackend.Data;
 using HoplaBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using HoplaBackend.Helpers;
 
 namespace HoplaBackend.Controllers;
 
@@ -69,6 +70,36 @@ public class StableController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Stable created successfully.", StableId = stable.Id });
+    }
+    [Authorize]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetStables([FromQuery] string search, double latMean, double longMean, int pageSize = 10, int pageNumber = 1)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var query = _context.Stables
+            .Where(s => string.IsNullOrEmpty(search) || s.Name.Contains(search))
+            .AsQueryable();
+
+        var stablesWithDistance = await query
+            .Select(s => new
+            {
+                StableId = s.Id,
+                StableName = s.Name,
+                Distance = DistanceCalc.SimplePytagoras(latMean, longMean, s.Latitude, s.Longitude),
+                Member = _context.StableUsers.Any(su => su.StableId == s.Id && su.UserId == parsedUserId),
+                PictureUrl = s.PictureUrl
+            })
+            .OrderBy(s => s.Distance)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return Ok(stablesWithDistance);
     }
 
 }

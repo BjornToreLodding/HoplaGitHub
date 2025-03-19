@@ -1,27 +1,19 @@
 
+# OBS
+
+trails/all mangler: beskrivelse av løypen
+
+Skal trails/map få liste med koordinater når zoomlevel er under et vist nivå? Gjerne få lagt inn dette så jeg får testet
 
 # Kort informasjon
 
-Android: :green_apple: Lagt inn :warning: Delvis lagt inn :x: Ikke lagt inn
+Backend: :green_book: Lagd :yellow_circle: Delvis laget :red_circle: Ikke lagd
 
-Hva som mangler endpoints i listen:
+Android: :alien: Lagt inn :grimacing: Delvis lagt inn :smiling_imp: Ikke lagt inn
 
-* Profil
-  * Bytte passord
-  * Bytte epost, brukernavn (alias)
-  * Bytte profilbilde
-* Communities
-  * Liste
-  * Medlem
-  * Legge til nytt
-* Hjem skjerm
-* Sende inn rapport etter hvor den sendes inn fra
-  * fra innstillinger (generell)
-  * for løyper
-  * for bruker
-  * etc. (mer i selve tabellen)
-* For filter
-* Slette bruker
+iOs:  :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
+
+
 
 # Liste
 
@@ -43,7 +35,7 @@ Hva som mangler endpoints i listen:
 </td>
 <td>
 
-## :warning: POST /users/login
+## :green_book: :grimacing: :banana: POST /users/login
 
 Logg inn
 
@@ -105,7 +97,7 @@ JSON-Response for brukere som har registrert navn og alias
 </td>
 <td>
 
-## :green_apple: GET /users/profile
+## :green_book: :alien: :apple: GET /users/profile
 
 Main profil side
 
@@ -140,7 +132,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_apple: GET /horses/userhorses
+## :green_book: :alien: :apple: GET /horses/userhorses
 
 **Profil -\> Mine hester**
 
@@ -187,7 +179,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_apple: GET /horses/{horseId}
+## :green_book: :alien: :apple: GET /horses/{horseId}
 
 **Profil -\> Mine hester -\> Velge en spesifikk hest**
 
@@ -225,7 +217,7 @@ BT: Denne skal virke nå
 </td>
 <td>
 
-## :green_apple: GET /userrelations/friends
+## :green_book: :alien: :apple: GET /userrelations/friends
 
 **Profil -\> Venner**
 
@@ -296,7 +288,7 @@ BT: Denne skal virke nå
 </td>
 <td>
 
-## :green_apple: GET /userrelations/following
+## :green_book: :alien: :apple: GET /userrelations/following
 
 **Profil -\> Følger**
 
@@ -350,7 +342,7 @@ Har ikke bilde for øyeblikket, profil -\> Venner -\> Trykke på spesifikk venn
 </td>
 <td>
 
-## :green_apple: GET /users/profile?userid=
+## :green_book: :alien: :apple: GET /users/profile?userid=
 
 GET request
 
@@ -505,7 +497,7 @@ Har ikke bilde for øyeblikket, profil -\> Følger -\> Trykke på spesifikk pers
 </td>
 <td>
 
-## :green_apple: GET /userrelations/following?userid=
+## :green_book: :alien: :apple: GET /userrelations/following?userid=
 
 GET request
 
@@ -527,7 +519,7 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(bare off
 </td>
 <td>
 
-## :green_apple: GET /userhikes/user
+## :green_book: :alien: :apple: GET /userhikes/user
 
 Profil -\> Mine turer
 
@@ -537,7 +529,7 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 
 **BT: Har laget dette endpointet:**
 
-**### **GET /usershikes/user**
+\*\*### **GET /usershikes/user**
 
 :pushpin: **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
 
@@ -550,7 +542,7 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 | :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
 | :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
 
-**#### **:mag_right: Query:**
+\*\*#### **:mag_right: Query:**
 
 * `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
 * `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
@@ -604,12 +596,12 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 </td>
 <td>
 
-## :x: PUT /upload
+## :green_book: :warning: :apple: PUT /upload
 
-Profil -\> Endre profilbilde
-
+:alien: :apple: Profil -\> Endre profilbilde
 
 upload.html
+
 ```html
 
             const formData = new FormData();
@@ -630,6 +622,7 @@ OBS!! Authorization er aktivert, så dette må også med i Requesten.
 Lagrer opplastet fil som {Guid}.jpg, f.eks bilde.jpg vil bli omdøpt til 4e66b1a6-2f18-4e35-8e89-eee6c3886a1b.jpg og lagret i databasen på riktig id.
 
 Kan testes med dette i postman:
+
 ```PostMan_formdata
 
 Key         Value
@@ -639,6 +632,7 @@ entityId    12345678-0000-0000-0001-123456780001
 ```
 
 Response:
+
 ```json
 {
     "filePath": "/uploads/99e06dfe-2999-4d90-a5bf-087ba1e0df99.jpg"
@@ -661,7 +655,7 @@ Profil -\> bytte passord
 </td>
 <td>
 
-## :green_apple: GET /trails/all
+## :green_book: :alien: :apple: GET /trails/all
 
 (Alle disse sidene skal displaye lister på samme måte)
 
@@ -671,7 +665,7 @@ Profil -\> bytte passord
 * Sorteres etter nyeste øverst
 * Tenke på: offentlig, privat, kun venner?
 
-:green_apple: **Løyper -\> Første side**
+:alien: :apple: **Løyper -\> Første side**
 
 https://hopla.onrender.com/trails/all
 
@@ -682,7 +676,7 @@ https://hopla.onrender.com/trails/all
 * pageNumber Optional. Hvis ikke oppgitt, settes den til 1
 * pageSize Optional. Hvis ikke oppgitt settes den til 10
 
-:green_apple: **eks**
+:alien: :apple: **eks**
 
 https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
@@ -713,7 +707,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 * Vise alle løyper som brukere har lagt inn i appen. Flest stjerner øverst (hvis likt antall stjerner, nyeste av de øverst. Runde opp så det er f.eks 5 istede for 4.6 så sortere). Løypene må være offentlig eller fra venner
 
-:green_apple: **Løyper -\> Icon 2 fra venstre**
+:alien: :apple: **Løyper -\> Icon 2 fra venstre**
 
 * Vise løyper nærmest brukerens posisjon
 
@@ -762,7 +756,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 }
 ```
 
-:green_apple: **Løyper -\> Hjerte ikon**
+:alien: :apple: **Løyper -\> Hjerte ikon**
 
 * Kun løyper som brukeren har trykket liker på
 
@@ -800,7 +794,7 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 }
 ```
 
-:green_apple: **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
+:alien: :apple: **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
 
 * Løyper til brukere brukeren følger og venner med
 
@@ -848,7 +842,7 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
 </td>
 <td>
 
-## :x: Get /home?
+## :red_circle: :smiling_imp: :apple: Get /home?
 
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
@@ -890,13 +884,13 @@ Spørsmål: finnes det en epost jeg kan teste glemt passord på? Eller er det "n
 </td>
 <td>
 
-## :x: POST /users/register
+## :green_book: :smiling_imp: :apple: POST /users/register
 
 Startsiden:
 
-:x: Glemt passord: sender med en epost i requesten, som den da må sjekke at den finnes i databasen for så å på en måte sende en mail der brukeren kan bytte passordet sitt?
+:smiling_imp: :apple: Glemt passord: sender med en epost i requesten, som den da må sjekke at den finnes i databasen for så å på en måte sende en mail der brukeren kan bytte passordet sitt?
 
-:x: Opprett bruker:
+:smiling_imp: :apple: Opprett bruker:
 
 **Trinn 1:** Registrer epost, passord
 
@@ -974,7 +968,7 @@ Brukerinformasjon oppdatert.
 </td>
 <td>
 
-## :x: POST /userreports/create
+## :green_book: :alien: :apple: POST /userreports/create
 
 Profil -\> Innstillinger -\> Send en rapport (skal også legges inn: innlegg(hjem), løyper, profiler, community)
 
@@ -993,6 +987,7 @@ Hvis community: communityid.
 POST /userreports/create
 
 Body:
+
 ```json
 { 
     "EntityId": "12345678-0000-0000-0006-123456780001", //EntityId = innleggId, løypeId, profilId, StableId etc.
@@ -1005,13 +1000,14 @@ Body:
 UserId registreres automatisk fra Token
 
 Response:
+
 ```json
 {
     "message": "Report created successfully."
 }
 ```
 
-## :x: PATCH /users/delete
+## :green_book: :alien: :apple: PATCH /users/delete
 
 Profil -\> Innstillinger -\> Slett bruker
 
@@ -1020,6 +1016,7 @@ Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backen
 PATCH https://hopla.onrender.com/users/delete
 
 Request Body:
+
 ```json
 {
     "Password": "Hopla2025!"
@@ -1027,6 +1024,7 @@ Request Body:
 ```
 
 Responce Body:
+
 ```json
 {
     "message": "Bruker deaktivert."
@@ -1034,7 +1032,6 @@ Responce Body:
 ```
 
 **BRUKEREN BLIR IKKE SLETTET!! men deaktivert. Dette for å bevare databaseintegritet da brukeren kan ha opprettet løper som andre brukere kan ha laget turer med osv.**
-
 </td>
 </tr>
 <tr>
@@ -1044,7 +1041,7 @@ Responce Body:
 </td>
 <td>
 
-## :x: GET /filters?
+## :red_circle: :smiling_imp: :apple: GET /filters?
 
 Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene.
 
@@ -1062,7 +1059,7 @@ Nå har jeg det satt opp slik (ikke lagt til "riktig" filter):
 </td>
 <td>
 
-## :green_apple: GET /trails/map
+## :green_book: :alien: :apple: GET /trails/map
 
 Løyper -\> Kart
 
@@ -1111,7 +1108,7 @@ https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlev
 </td>
 <td>
 
-## :x: GET /stables/all
+## :yellow_circle: :smiling_imp: :apple: GET /stables/all
 
 Community/Fellesskap/Grupper
 
@@ -1132,6 +1129,41 @@ Roller i en gruppe: admin, medlem eller ikke medlem
 Muligheter for medlemskap i gruppe: ikke-medlem/medlem/request(hvis private)
 
 En gruppe kan være: public eller private
+
+**BT**
+
+Denne er laget, men har ikke testdata for å teste hvordan den fungerer.
+
+GET /stables/all
+
+**Query**
+* search= tekst som skal matche med stallnavnet
+* lat = latitude til bruker
+* long = longitude til bruker
+* page? = (Optional) side nummer. Hvis ikke oppgitt, settes den til 1
+* pageSize? = (Optional) antall treff pr side. Hvis ikke oppgitt, så settes den til 10.
+
+Responce
+```json
+{
+    "Stable":
+    {
+        "StableId": 12345678-0000-0000-0006-123456780001,
+        "StableName": "GjøvikStallen",
+        "Distance": 5.01,
+        "Member": true,
+        "PictureUrl": "https://...jpg?h=140&w330&crop"
+    },
+    "stable2":
+    {
+        "blablabla"
+    }
+}
+```
+
+sånn cirka
+
+
 </td>
 </tr>
 <tr>
@@ -1141,13 +1173,39 @@ En gruppe kan være: public eller private
 </td>
 <td>
 
-## :x: POST /stables/create
+## :green_book: :smiling_imp: :apple: POST /stables/create
 
 Legg til nytt fellesskap:
 
 Bruker som som oppretter blir automatisk admin.
 
 Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og posisjon (long, lat)
+
+**POST https://hopla.onrender.com/stable/create**
+
+Body:
+```json
+{
+    "Name": "Stallione",
+    "Description": "Flott Stall",
+    "PictureUrl": "asdfjkl.jpg", //skal det lastes opp her, eller skal man kunne oppdatere det senere?
+    "Latitude": 60.01223,
+    "Longitude": 10.5433,
+    "PrivateGroup": false
+}
+```
+
+Responce:
+```json
+{
+    "message": "Stable created successfully.",
+    "stableId": "14cfddd6-688a-4700-9408-dc7e6a0b957b"
+}
+```
+
+Denne lager ny stall i Stables OG bruker som lager stallen blir satt som admin i StableUsers
+
+
 </td>
 </tr>
 <tr>
@@ -1157,7 +1215,7 @@ Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og 
 </td>
 <td>
 
-## :x: GET /stables/{stableId}
+## :red_circle: :smiling_imp: :apple: GET /stables/{stableId}
 
 Community details
 
@@ -1170,6 +1228,93 @@ Ellers trengs: id, bilde, beskrivelse, gruppenavn, medlemsstatus (for å sjekke 
 Skal også legges til: mulighet for å rapportere community og "gå ut av gruppen"
 
 Admin skal kunne: slette community (?)
+</td>
+</tr>
+<tr>
+<td>
+
+![Screenshot_20250319_131751_com.example.hopla\[1\].jpg](uploads/fd03859cf3b73b0879c1f72cd10fab49/Screenshot_20250319_131751_com.example.hopla_1_.jpg)
+</td>
+<td>
+
+## :red_circle: :smiling_imp: :apple: POST newHorse
+
+Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
+</td>
+</tr>
+<tr>
+<td>
+
+</td>
+<td>
+
+## :red_circle: :smiling_imp: :apple: POST friendrequest
+
+Trenger endpoints for å endre på venneforhold:
+
+Hvis knapp legg til venn trykket: endre forhold fra NONE/Følger til request
+
+Hvis knapp følg er trykket på: endre follow fra NONE til følger
+
+Hvis knapp fjern venn er trykker: endre forhold til NONE
+
+Hvis knapp blokker er trykket på: endre til blocked
+</td>
+</tr>
+<tr>
+<td>
+
+</td>
+<td>
+
+## :red_circle: :smiling_imp: :apple: GET friendrequests
+
+Endpoint som henter alle venneforespørseler innlogget bruker har. Trenger også her et POST endpoint der bruker kan godkjenne eller slette forespørseler. Endre fra request til enten NONE eller FRIENDS
+</td>
+</tr>
+<tr>
+<td>
+
+</td>
+<td>
+
+## :red_circle: :smiling_imp: :apple: POST ny tur (ny tur knapp)
+
+Denne generer en liste koordinater, sammen med tid og distanse fra bruker trykker på start til stopp. Da kan brukeren velge å bare trykke lagre eller fylle inn mer informasjon (navn på tur, beskrivelse, antall stjerner (?), filtere, bilde, privat/public (?). Hvis public så gjøres denne om til en løype også.
+
+## :red_circle: :smiling_imp: :apple: PUT (?) redigere informasjon om en tur
+
+Endpoint der informasjonen over skal kunne redigeres i ettertid. Hvis public her også må det lages en løype av den.
+</td>
+</tr>
+<tr>
+<td>
+
+![Screenshot_20250319_133243_com.example.hopla\[1\].jpg](uploads/19defbdeb9b709df22f7eac59809b9e5/Screenshot_20250319_133243_com.example.hopla_1_.jpg)
+</td>
+<td>
+
+## :red_circle: :smiling_imp: :apple: POST ny oppdatering om løype
+
+Når brukeren poster en ny oppdatering om løypen (trykker på ny oppdatering): informasjon post requesten trenger: brukerens id, løypens id, oppdateringen, optional bilde, tidspunkt (tid og dato)
+
+## :red_circle: :smiling_imp: :apple: GET nye oppdateringer om løypen
+
+Når brukeren trykker på nyeste oppdatering om løypen skal de få: selve oppdateringen, tid den ble lagt ut, evt bilde, bruker som har lagt ut
+
+## :red_circle: :smiling_imp: :apple: POST vurdering av løype
+
+Endpoint som henter hvor mange stjerner brukeren har trykket på og legger de til i totale vurderinger.
+
+## :red_circle: :smiling_imp: :apple: GET start tur
+
+Henter opp alle koordinater til løypen og tegner de opp på kartet, samt tid, og distanse (id for å lagre det som en tur etterpå.
+
+## :red_circle: :smiling_imp: :apple: POST ny tur
+
+Etter turen er ferdig (brukeren er på sluttkoordinatet eller trykker på stopp.
+
+Turen lagres som en ny tur koblet til brukeren
 </td>
 </tr>
 </table>

@@ -12,6 +12,7 @@ public class UserSetting
     //public guid Id { get; set; } //Bruker kanskje denne senere
     
     public bool DarkMode { get; set; } = false;
+    public string Language { get; set; } = "NOR";
 
     // privacy settings
     public bool HideFeedFriendNewFriends { get; set; } = false;

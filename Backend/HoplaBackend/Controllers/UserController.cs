@@ -44,50 +44,8 @@ public class UserController : ControllerBase
         _userRelationService = userRelationService;
         _userHikeService = userHikeService;
     }
-    [HttpGet("send-email")]
-    public async Task<IActionResult> SendEmail()
-    {
-        var response = await Send();
-        
-        if (response.IsSuccessful)
-        {
-            return Ok(new { message = "Email sent successfully!", response.Content });
-        }
-        else
-        {
-            Console.WriteLine(response);
-            return StatusCode((int)response.StatusCode, new { message = "Failed to send email", error = response.ErrorMessage });
-        }
-    }
 
-    private static async Task<RestResponse> Send()
-    {
-        var options = new RestClientOptions("https://api.eu.mailgun.net/v3")
-        {
-            //3d4b3a2a-f95d980c
-            //977c08266df432c863b622f54a4afd66-3d4b3a2a-6af5299f
-            Authenticator = new HttpBasicAuthenticator("api", "977c08266df432c863b622f54a4afd66-3d4b3a2a-6af5299f" ?? "977c08266df432c863b622f54a4afd66-3d4b3a2a-6af5299f")
-            //Authenticator = new HttpBasicAuthenticator("api", Environment.GetEnvironmentVariable("1e9427de167d9efbb0e87b1d354e9fdc-3d4b3a2a-f95d980c") ?? "1e9427de167d9efbb0e87b1d354e9fdc-3d4b3a2a-f95d980c")
-        };
-        /*
-        var client = new RestClient(options);
-        var request = new RestRequest("/sandboxa636ea1ffabc48db8d8ea16a9cc2c578.mailgun.org/messages", Method.Post);
-        request.AlwaysMultipartFormData = true;
-        request.AddParameter("from", "Mailgun Sandbox <postmaster@sandboxa636ea1ffabc48db8d8ea16a9cc2c578.mailgun.org>");
-        request.AddParameter("to", "Bjorn Tore Lodding <bjorn_tore_lodding@hotmail.com>");
-        request.AddParameter("subject", "Hello Bjorn Tore Lodding");
-        request.AddParameter("text", "Congratulations Bjorn Tore Lodding, you just sent an email with Mailgun! You are truly awesome!");
-        return await client.ExecuteAsync(request);
-        */
-        var client = new RestClient(options);
-        var request = new RestRequest("/hopla.no/messages", Method.Post);
-        request.AlwaysMultipartFormData = true;
-        request.AddParameter("from", "Mailgun Sandbox <postmaster@hopla.no>");
-        request.AddParameter("to", "Bjorn Tore Lodding <bjorn_tore_lodding@hotmail.com>");
-        request.AddParameter("subject", "Hello Bjorn Tore Lodding");
-        request.AddParameter("text", "Congratulations Bjorn Tore Lodding, you just sent an email with Mailgun! You are truly awesome!");
-        return await client.ExecuteAsync(request);
-    }
+    // 0.1 Registrer. Skriv inn epost og passord. 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -111,7 +69,7 @@ public class UserController : ControllerBase
         var verification = new EmailVerification
         {
             Email = request.Email,
-            PasswordHash = passwordHash,  // 📌 Lagres her til e-posten er bekreftet
+            PasswordHash = passwordHash,  // Lagres her til e-posten er bekreftet
             Token = token,
             ExpiryDate = DateTime.UtcNow.AddHours(24),
             //IsUsed = true
@@ -130,6 +88,8 @@ public class UserController : ControllerBase
 
         return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer");
     }
+
+    // 0.2 Endpoint for fullføring av registrering.
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
     {
@@ -157,6 +117,149 @@ public class UserController : ControllerBase
 
         return Ok("E-post bekreftet! Du kan nå gå tilbake til appen og logge inn med epost og passord.");
     }
+
+    // 1.1 login med epost og passord. Mottar token slik at brukeren kan bruke programmet.
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null || !Authentication.VerifyPassword(request.Password, user.PasswordHash))
+        {
+            return Unauthorized(new { message = "Ugyldig e-post eller passord" });
+        }
+        Console.WriteLine(request.Email);
+        Console.WriteLine(user.Email);
+        Console.WriteLine(request.Password);
+        Console.WriteLine(user.PasswordHash);
+        Console.WriteLine(user.IsDeleted);
+        Console.WriteLine(Authentication.VerifyPassword(request.Password, user.PasswordHash));
+        
+        if (user.IsDeleted) 
+        {
+            return Unauthorized("Kontoen er deaktivert. For å reaktivere kontoen må du gå til https://activate.hopla.no");
+        }
+        Console.WriteLine($"Mottatt forespørsel for ID: {request.Email}");
+        Console.WriteLine(user);
+        Console.WriteLine(user.Id);
+
+        var token = _authentication.GenerateJwtToken(user);
+        Console.WriteLine(token);        //return Ok(new { token });
+        string loginRedirect = user.IsRegistrationCompleted ? "profile" : "update";
+        
+        return Ok(new
+        {
+            token,
+            userId = user.Id,
+            //email = user.Email,
+            name = user.Name,
+            alias = user.Alias,
+            telephone = user.Telephone,
+            description = user.Description,
+            dob = user.Dob,
+            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl  : "https://files.hopla.no/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
+            redirect = loginRedirect
+        });
+    }
+
+    //1.2.a Blir redirectet hit hvis brukeren har registrert Navn og Alias. 
+    // Denne funksjonen brukes også til å sjekke andre brukeres profiler hvis query userId er spesifisert.
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetUserProfile([FromQuery] Guid? userId)
+    {
+        Console.WriteLine(userId);
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+        if (!userId.HasValue) 
+        {
+            // Hvis Query parameter ikke spesifisert. Returner egen bruker
+            var user = await _context.Users
+                .Where(u => u.Id == parsedUserId)
+                .Select(u => new
+                {
+                    u.Alias,
+                    u.Name,
+                    u.Email,
+                    //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
+                    PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : ""
+                })
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Bruker ikke funnet" });
+            }
+            return Ok(user);
+        }
+        else
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
+            }
+            Console.WriteLine(_userRelationService.RelationStatus(parsedUserId, userId.Value));
+            Console.WriteLine(_userRelationService.RelationStatus(userId.Value, parsedUserId));
+
+            string relationStatus = _userRelationService.RelationStatus(parsedUserId, userId.Value);
+            var userHikes = await _userHikeService.GetUserHikes(userId.Value, 1,3);
+            Console.WriteLine("---");
+            Console.WriteLine(userHikes);
+            Console.WriteLine("---");
+                
+            if (relationStatus.ToLower() == "friend" || relationStatus.ToLower() == "friends")
+            {
+                // Når man er venner med vedkommende gis man litt mer informasjon
+                return Ok(new
+                {
+                    id = user.Id,
+                    name = user.Name,
+                    PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
+                    alias = user.Alias,
+                    description = user.Description,
+                    dob = user.Dob,
+                    created_at = user.CreatedAt,
+                    //Må migrere og oppdatere databasen før jeg kan legge til disse
+                    friendsCount = user.FriendsCount,
+                    horseCount = user.HorseCount,
+                    relationStatus,
+                    userHikes,
+                    page = 1,
+                    size = 3
+                });
+            } else 
+            {
+                
+                // For alle andre tilfeller enn venner
+                return Ok(new
+                {
+                    id = user.Id,
+                    name = user.Name,
+                    PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
+                    alias = user.Alias,
+                    description = user.Description,
+                    created_at = user.CreatedAt,
+                    relationStatus,
+                    userHikes,
+                    page = 1,
+                    size = 3
+                });
+            }
+        }
+    }
+    // 1.2.b Blir redirectet hit for videre oppdatering av brukerprofilen hvis bool IsRegistrationCompleted == false.
+    // Her kan alt bortsett fra email, passord og profilbilde. Endres. 
     [Authorize]    
     [HttpPut("update")]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
@@ -194,6 +297,322 @@ public class UserController : ControllerBase
 
         return Ok("Brukerinformasjon oppdatert.");
     }
+
+    // update email
+    // 1.2.c1 change-email
+    [Authorize]
+    [HttpPost("change-email")]
+    public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequest request)
+    {
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.NewEmail) || string.IsNullOrWhiteSpace(request.Password))
+            return BadRequest("E-post og passord er påkrevd.");
+
+        // Sjekk om den nye e-postadressen allerede er registrert
+        var existingUser = await _context.Users.AnyAsync(u => u.Email == request.NewEmail);
+        if (existingUser)
+            return BadRequest("E-postadressen er allerede registrert."); // Unngå å avsløre om e-posten finnes.
+
+        // Sjekk om det allerede finnes en verifikasjon for denne e-posten
+        var existingVerification = await _context.EmailVerifications
+            .AnyAsync(ev => ev.Email == request.NewEmail && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
+        if (existingVerification)
+            return BadRequest("En verifikasjonsprosess er allerede i gang. Sjekk e-posten din og evt. søppelpost.");
+
+        // Hent brukerens nåværende e-post basert på ID-en fra tokenet
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == parsedUserId);
+        if (user == null)
+            return Unauthorized("Brukeren finnes ikke.");
+
+        // Hash passordet
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        // Generer token til epost
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+        var verification = new EmailVerification
+        {
+            Email = request.NewEmail,
+            OldEmail = user.Email, // ✅ Nå henter vi riktig gammel e-postadresse
+            PasswordHash = passwordHash,  // Lagres her, men ikke nødvendig.
+            Token = token,
+            ExpiryDate = DateTime.UtcNow.AddHours(24),
+        };
+        _context.EmailVerifications.Add(verification);
+        await _context.SaveChangesAsync();
+
+        // Send e-post
+        var confirmNewEmailUrl = _configuration["ConfirmEmailUrl"];
+        Console.WriteLine(confirmNewEmailUrl);
+
+        var confirmationLink = $"{_configuration["ConfirmNewEmailUrl"]}?token={Uri.EscapeDataString(token)}";
+        await _emailService.SendEmailAsync(request.NewEmail, "Bekreft registrering",
+            $"Klikk på lenken for å fullføre registreringen: <a href='{confirmationLink}'>Bekreft e-post</a>. Dette må gjøres innen 24 timer fra da du opprettet brukernavnet.");
+
+        return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer");
+    }
+
+    // 1.2.c2 Trinn to av bytte epostadresse. Burde egentlig vært Put, men litt vanskelig når det er via epostlink.
+    [HttpGet("confirm-new-email")]
+    public async Task<IActionResult> ConfirmNewEmail([FromQuery] string token)
+    {
+        var verification = await _context.EmailVerifications
+            .FirstOrDefaultAsync(ev => ev.Token == token && !ev.IsUsed && ev.ExpiryDate > DateTime.UtcNow);
+
+        if (verification == null)
+            return BadRequest("Ugyldig eller utløpt token.");
+
+        // Hent brukeren basert på den gamle e-posten
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.OldEmail);
+        if (existingUser == null)
+            return BadRequest("Brukeren ble ikke funnet.");
+
+        // Sjekk om den nye e-posten allerede finnes hos en annen bruker
+        var emailTaken = await _context.Users.AnyAsync(u => u.Email == verification.Email);
+        if (emailTaken)
+            return BadRequest("E-posten er allerede registrert hos en annen bruker.");
+
+        // Oppdater brukerens e-postadresse
+        existingUser.Email = verification.Email;
+
+        // Marker tokenet som brukt
+        verification.IsUsed = true;
+
+        // Lagre endringene i databasen
+        await _context.SaveChangesAsync();
+
+        return Ok("E-post bekreftet! Du kan nå logge inn med din nye e-postadresse.");
+    }
+    // 1.2.d change-password
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet ved å bruke `ClaimTypes.NameIdentifier`
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+        }
+
+        if (!Authentication.VerifyPassword(request.OldPassword, user.PasswordHash))
+        {
+            return Unauthorized(new { message = "Feil passord" });
+        }
+
+        user.PasswordHash = Authentication.HashPassword(request.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Passordet er endret!" });
+    }
+
+
+    // 2.1: Be om passordtilbakestilling
+    [HttpPost("reset-password-request")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordReset request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null)
+            return BadRequest("E-postadressen finnes ikke.");
+
+        // Generer engangs-token for passordtilbakestilling
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+        var passwordReset = new PasswordReset
+        {
+            Email = request.Email,
+            Token = token,
+            ExpiryDate = DateTime.UtcNow.AddMinutes(240)
+        };
+
+        _context.PasswordResets.Add(passwordReset); //Rød strek under PasswordResets
+        await _context.SaveChangesAsync();
+
+        // Lag lenke til nettsiden for tilbakestilling
+        var resetLink = $"{_configuration["PasswordResetUrl"]}/index.html?token={Uri.EscapeDataString(token)}";
+        await _emailService.SendEmailAsync(request.Email, "Tilbakestill passord",
+            $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a> Dette må gjøres innen 4 timer fra da du tilbakestilte passordet");
+
+        return Ok("E-post sendt. Sjekk innboksen din.");
+    }
+
+    // Denne kan kun gjøres på web! https://password.hopla.no
+    // 2.2: Endepunkt for å sette nytt passord
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var passwordReset = await _context.PasswordResets
+            .FirstOrDefaultAsync(pr => pr.Token == request.Token && !pr.IsUsed && pr.ExpiryDate > DateTime.UtcNow);
+
+        if (passwordReset == null)
+            return BadRequest("Ugyldig eller utløpt token.");
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == passwordReset.Email);
+        if (user == null)
+            return NotFound("Bruker ikke funnet.");
+
+        // Oppdater passordet
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        passwordReset.IsUsed = true;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Passordet er endret. Du kan nå logge inn med ditt nye passord." });
+
+    }
+
+
+    [Authorize]
+    [HttpPatch("delete")]
+    public async Task<IActionResult> DeleteUser([FromBody] DeleteRequest request)
+    {
+        // Debugging: Logg alle claims for å sjekke hva tokenet inneholder
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        // Hent brukeren fra databasen
+        var user = await _context.Users.FindAsync(parsedUserId);
+
+        // Sjekk om brukeren finnes
+        if (user == null)
+        {
+            return NotFound(new { message = "Bruker ikke funnet." });
+        }
+
+        // Sjekk passord
+        if (!Authentication.VerifyPassword(request.Password, user.PasswordHash))
+        {
+            return Unauthorized(new { message = "Feil passord." });
+        }
+
+        // Merk brukeren som slettet
+        user.IsDeleted = true;
+
+        // Oppdater entiteten eksplisitt for at EF skal fange opp endringen
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Bruker deaktivert." });
+    }
+
+    // Klasse for å motta passord fra forespørselen
+    public class DeleteRequest
+    {
+        public string Password { get; set; }
+    }
+    //Admin funksjon eller bygges om evt utvides til søkefunksjon
+    //[Authorize]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var settingsDict = await _context.SystemSettings
+            .Where(s => s.Key == "UserProfilePictureList-height" || s.Key == "UserProfilePictureList-width")
+            .ToDictionaryAsync(s => s.Key, s => s.Value);
+
+        settingsDict.TryGetValue("UserProfilePictureList-height", out var heightValue);
+        settingsDict.TryGetValue("UserProfilePictureList-width", out var widthValue);
+
+        // Konverter til int med fallback-verdi
+        var pictureHeight = int.TryParse(heightValue, out var height) ? height : 200;
+        var pictureWidth = int.TryParse(widthValue, out var width) ? width : 200;
+
+        var users = await _context.Users
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=64&h=64&fit=crop" : "",
+                u.Alias
+            })
+            .OrderBy(u => u.Id) // Sorterer etter Guid
+            .ToListAsync();
+
+        if (!users.Any())
+        {
+            Log.Warning("⚠️ Ingen brukere funnet!");
+            return NotFound(new { message = "No users found." });
+        }
+
+        Log.Information("📢 GetAllUsers() ble kalt! Antall brukere: {UserCount}", users.Count);
+
+        return Ok(users);
+    }
+
+    // Denne kan fjernes når profile brukes av både android og iOs
+    [Authorize]
+    [HttpGet("myprofile")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        Console.WriteLine("Token claims:");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+
+        // Hent brukerens ID fra tokenet
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var user = await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => new
+            {
+                u.Alias,
+                u.Name,
+                u.Email,
+                //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
+                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : "",
+            })
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+        }
+
+        return Ok(user);
+    }
+ 
+
 
 /*    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -262,58 +681,10 @@ public class UserController : ControllerBase
         return Ok("Bruker registrert.");
     }
 */
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
-    {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (user == null || !Authentication.VerifyPassword(request.Password, user.PasswordHash))
-        {
-            return Unauthorized(new { message = "Ugyldig e-post eller passord" });
-        }
-        Console.WriteLine(request.Email);
-        Console.WriteLine(user.Email);
-        Console.WriteLine(request.Password);
-        Console.WriteLine(user.PasswordHash);
-        Console.WriteLine(user.IsDeleted);
-        Console.WriteLine(Authentication.VerifyPassword(request.Password, user.PasswordHash));
-        
-        if (user.IsDeleted) 
-        {
-            return Unauthorized("Kontoen er deaktivert. For å reaktivere kontoen må du gå til https://activate.hopla.no");
-        }
-        Console.WriteLine($"Mottatt forespørsel for ID: {request.Email}");
-        Console.WriteLine(user);
-        Console.WriteLine(user.Id);
-
-        var token = _authentication.GenerateJwtToken(user);
-        Console.WriteLine(token);        //return Ok(new { token });
-        string loginRedirect = user.IsRegistrationCompleted ? "profile" : "update";
-        
-        return Ok(new
-        {
-            token,
-            userId = user.Id,
-            //email = user.Email,
-            name = user.Name,
-            alias = user.Alias,
-            telephone = user.Telephone,
-            description = user.Description,
-            dob = user.Dob,
-            pictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl  : "https://files.hopla.no/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
-            redirect = loginRedirect
-        });
-        /*
-        return Ok(new
-        {
-            token,
-            userId = user.Id,
-            email = user.Email,
-            name = user.Name,
-            alias = user.Alias,
-            PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? user.PictureUrl + "?w=200&h=200&fit=crop" : ""
-        });
-        */
-    }
+   //
+    // Disse brukes kanskje på websiden fra gammelt av. Skal fjernes!!
+    //
+    // Denne brukes av nettside for backendtesting for enklere innlogging. Skal fjernes til lansering
     [HttpPost("login/test")]
     public async Task<IActionResult> Logintest([FromBody] LoginTest request)
     {
@@ -342,136 +713,6 @@ public class UserController : ControllerBase
         });
     }
 
-    [Authorize]
-    [HttpGet("profile")]
-    public async Task<IActionResult> GetUserProfile([FromQuery] Guid? userId)
-    {
-        Console.WriteLine(userId);
-        Console.WriteLine("Token claims:");
-        foreach (var claim in User.Claims)
-        {
-            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-        }
-
-        // Hent brukerens ID fra tokenet
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-        if (!userId.HasValue) // Query parameter ikke spesifisert. Returner egen bruker
-        {
-            var user = await _context.Users
-                .Where(u => u.Id == parsedUserId)
-                .Select(u => new
-                {
-                    u.Alias,
-                    u.Name,
-                    u.Email,
-                    //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
-                    PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : ""
-                })
-                .FirstOrDefaultAsync();
-            if (user == null)
-            {
-                return Unauthorized(new { message = "Bruker ikke funnet" });
-            }
-            return Ok(user);
-        }
-        else
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound(); // Returnerer 404 hvis brukeren ikke finnes
-            }
-            Console.WriteLine(_userRelationService.RelationStatus(parsedUserId, userId.Value));
-            Console.WriteLine(_userRelationService.RelationStatus(userId.Value, parsedUserId));
-
-            string relationStatus = _userRelationService.RelationStatus(parsedUserId, userId.Value);
-            var userHikes = await _userHikeService.GetUserHikes(userId.Value, 1,3);
-            Console.WriteLine("---");
-            Console.WriteLine(userHikes);
-            Console.WriteLine("---");
-                
-            if (relationStatus.ToLower() == "friend" || relationStatus.ToLower() == "friends")
-            {
-                return Ok(new
-                {
-                    id = user.Id,
-                    name = user.Name,
-                    PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
-                    alias = user.Alias,
-                    description = user.Description,
-                    dob = user.Dob,
-                    created_at = user.CreatedAt,
-                    //Må migrere og oppdatere databasen før jeg kan legge til disse
-                    friendsCount = user.FriendsCount,
-                    horseCount = user.HorseCount,
-                    relationStatus,
-                    userHikes,
-                    page = 1,
-                    size = 3
-                });
-            } else 
-            {
-                
-                return Ok(new
-                {
-                    id = user.Id,
-                    name = user.Name,
-                    PictureUrl = !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "",
-                    alias = user.Alias,
-                    description = user.Description,
-                    created_at = user.CreatedAt,
-                    relationStatus,
-                    userHikes,
-                    page = 1,
-                    size = 3
-                });
-            }
-        }
-    }
-
-    //Admin funksjon eller bygges om evt utvides til søkefunksjon
-    //[Authorize]
-    [HttpGet("all")]
-    public async Task<IActionResult> GetUsers()
-    {
-        var settingsDict = await _context.SystemSettings
-            .Where(s => s.Key == "UserProfilePictureList-height" || s.Key == "UserProfilePictureList-width")
-            .ToDictionaryAsync(s => s.Key, s => s.Value);
-
-        settingsDict.TryGetValue("UserProfilePictureList-height", out var heightValue);
-        settingsDict.TryGetValue("UserProfilePictureList-width", out var widthValue);
-
-        // Konverter til int med fallback-verdi
-        var pictureHeight = int.TryParse(heightValue, out var height) ? height : 200;
-        var pictureWidth = int.TryParse(widthValue, out var width) ? width : 200;
-
-        var users = await _context.Users
-            .Select(u => new
-            {
-                u.Id,
-                u.Name,
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=64&h=64&fit=crop" : "",
-                u.Alias
-            })
-            .OrderBy(u => u.Id) // Sorterer etter Guid
-            .ToListAsync();
-
-        if (!users.Any())
-        {
-            Log.Warning("⚠️ Ingen brukere funnet!");
-            return NotFound(new { message = "No users found." });
-        }
-
-        Log.Information("📢 GetAllUsers() ble kalt! Antall brukere: {UserCount}", users.Count);
-
-        return Ok(users);
-    }
     //[Authorize]
     [HttpGet("int/{userId}")]
     public async Task<IActionResult> GetIntUser(int userId)
@@ -492,46 +733,6 @@ public class UserController : ControllerBase
 
         return await GetUser(newGuid, false);
     }
-    [Authorize]
-    [HttpGet("myprofile")]
-    public async Task<IActionResult> GetMyProfile()
-    {
-        Console.WriteLine("Token claims:");
-        foreach (var claim in User.Claims)
-        {
-            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-        }
-
-        // Hent brukerens ID fra tokenet
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-
-        var user = await _context.Users
-            .Where(u => u.Id == userId)
-            .Select(u => new
-            {
-                u.Alias,
-                u.Name,
-                u.Email,
-                //u.PictureUrl + "?h={pictureHeight}&w={pictureWidth}&fit=crop" //Denne implementeres senere
-                PictureUrl = !string.IsNullOrEmpty(u.PictureUrl) ? (u.PictureUrl.Contains("http") ? u.PictureUrl : "https://hopla.imgix.net/" + u.PictureUrl) + "?w=200&h=200&fit=crop" : "",
-            })
-            .FirstOrDefaultAsync();
-
-        if (user == null)
-        {
-            return Unauthorized(new { message = "Bruker ikke funnet" });
-        }
-
-        return Ok(user);
-    }
-
-
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetUser(
         Guid userId,
@@ -553,230 +754,5 @@ public class UserController : ControllerBase
             password_hash = user.PasswordHash,
             created_at = user.CreatedAt
         });
-    }
-
-
-    //[Authorize]
-    [HttpPost("new")]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto requestDto)
-    {
-        /*
-        if (requestDto.FromUserId == requestDto.ToUserId)
-        {
-            return BadRequest(new { message = "You cannot send a friend request to yourself." });
-        }
-
-        // Sjekk om relasjonen allerede eksisterer
-        var existingRelation = await _context.UserRelations
-            .FirstOrDefaultAsync(ur => 
-                (ur.FromUserId == requestDto.FromUserId && ur.ToUserId == requestDto.ToUserId) ||
-                (ur.FromUserId == requestDto.ToUserId && ur.ToUserId == requestDto.FromUserId));
-
-        if (existingRelation != null)
-        {
-            return Conflict(new { message = "A relation already exists between these users." });
-        }
-        */
-        // Opprett venneforespørsel
-        var userData = new User
-        {
-            Id = Guid.NewGuid(),
-            Name = requestDto.Name,
-            Alias = requestDto.Alias,
-            Email = requestDto.Email,
-            PasswordHash = requestDto.PasswordHash
-        };
-
-        _context.Users.Add(userData);
-        await _context.SaveChangesAsync();
-        return Ok(userData);
-    }
-
-    [Authorize]
-    [HttpPut("change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
-    {
-        Console.WriteLine("Token claims:");
-        foreach (var claim in User.Claims)
-        {
-            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-        }
-
-        // Hent brukerens ID fra tokenet ved å bruke `ClaimTypes.NameIdentifier`
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-
-        if (user == null)
-        {
-            return Unauthorized(new { message = "Bruker ikke funnet" });
-        }
-
-        if (!Authentication.VerifyPassword(request.OldPassword, user.PasswordHash))
-        {
-            return Unauthorized(new { message = "Feil passord" });
-        }
-
-        user.PasswordHash = Authentication.HashPassword(request.NewPassword);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Passordet er endret!" });
-    }
-    // 📌 2.1: Be om passordtilbakestilling
-    [HttpPost("reset-password-request")]
-    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordReset request)
-    {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (user == null)
-            return BadRequest("E-postadressen finnes ikke.");
-
-        // Generer engangs-token for passordtilbakestilling
-        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
-
-        var passwordReset = new PasswordReset
-        {
-            Email = request.Email,
-            Token = token,
-            ExpiryDate = DateTime.UtcNow.AddMinutes(240)
-        };
-
-        _context.PasswordResets.Add(passwordReset); //Rød strek under PasswordResets
-        await _context.SaveChangesAsync();
-
-        // Lag lenke til nettsiden for tilbakestilling
-        var resetLink = $"{_configuration["PasswordResetUrl"]}/index.html?token={Uri.EscapeDataString(token)}";
-        await _emailService.SendEmailAsync(request.Email, "Tilbakestill passord",
-            $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a> Dette må gjøres innen 4 timer fra da du tilbakestilte passordet");
-
-        return Ok("E-post sendt. Sjekk innboksen din.");
-    }
-
-    // 📌 2.2: Endepunkt for å sette nytt passord
-    [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-    {
-        var passwordReset = await _context.PasswordResets
-            .FirstOrDefaultAsync(pr => pr.Token == request.Token && !pr.IsUsed && pr.ExpiryDate > DateTime.UtcNow);
-
-        if (passwordReset == null)
-            return BadRequest("Ugyldig eller utløpt token.");
-
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == passwordReset.Email);
-        if (user == null)
-            return NotFound("Bruker ikke funnet.");
-
-        // Oppdater passordet
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-        passwordReset.IsUsed = true;
-
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Passordet er endret. Du kan nå logge inn med ditt nye passord." });
-
-    }
-/*
-    [HttpPut("{userId}")] //Denne håndterer alle statusendringene.
-    public async Task<IActionResult> UpdateFriendRequestStatus(Guid userId, [FromBody] UpdateUserDto requestDto)
-    {
-        var userData = await _context.Users.FindAsync(userId);
-        Console.ForegroundColor = ConsoleColor.Red;
-        if (userData == null)
-        {
-            return NotFound(new { message = "User is doesn't exist" });
-        }
-        var newUserData = requestDto;
-        if (newUserData.Name != userData.Name && newUserData.Name != "" && newUserData.Name != null)
-        {
-            Console.WriteLine("different Name");
-            userData.Name = newUserData.Name;
-        }
-        if (newUserData.Alias != userData.Alias && newUserData.Alias != "" && newUserData.Alias != null)
-        {
-            Console.WriteLine("different Alias");
-            userData.Alias = newUserData.Alias;
-        }
-        if (newUserData.Email != userData.Email && newUserData.Email != "" && newUserData.Email != null)
-        {
-            Console.WriteLine("different Email");
-            userData.Email = newUserData.Email;
-        }
-        if (newUserData.PasswordHash != userData.PasswordHash && newUserData.PasswordHash != "" && newUserData.PasswordHash != null)
-        {
-            Console.WriteLine("different PW");
-            //Sjekk om diverse betingelser for passord er oppfylt kommer evt senere.
-            userData.PasswordHash = newUserData.PasswordHash;
-        }
-        Console.ResetColor();
-        // Oppdater informasjonen om brukeren.
-        // Name
-        // Alias
-        // Email
-        // PasswordHash 
-        // PictureUrl 
-        // Admin = false
-        // Premium = false
-        // VerifiedTrail = false
-
-        _context.Users.Update(userData);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = $"User userId was updated", userData });
-    }
-    */
-
-    [Authorize]
-    [HttpPatch("delete")]
-    public async Task<IActionResult> DeleteUser([FromBody] DeleteRequest request)
-    {
-        // Debugging: Logg alle claims for å sjekke hva tokenet inneholder
-        foreach (var claim in User.Claims)
-        {
-            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-        }
-
-        // Hent brukerens ID fra tokenet
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-
-        // Hent brukeren fra databasen
-        var user = await _context.Users.FindAsync(parsedUserId);
-
-        // Sjekk om brukeren finnes
-        if (user == null)
-        {
-            return NotFound(new { message = "Bruker ikke funnet." });
-        }
-
-        // Sjekk passord
-        if (!Authentication.VerifyPassword(request.Password, user.PasswordHash))
-        {
-            return Unauthorized(new { message = "Feil passord." });
-        }
-
-        // Merk brukeren som slettet
-        user.IsDeleted = true;
-
-        // Oppdater entiteten eksplisitt for at EF skal fange opp endringen
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Bruker deaktivert." });
-    }
-
-    // Klasse for å motta passord fra forespørselen
-    public class DeleteRequest
-    {
-        public string Password { get; set; }
     }
 }
