@@ -32,10 +32,13 @@ public class EmailService
             smtp.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
             smtp.EnableSsl = true;
             
-            string timestamp = DateTime.UtcNow.ToString("HH:mm:ss dd-MM-yyyy");
+            TimeZoneInfo norwayTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+            DateTime norwegianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, norwayTimeZone);
+            string timestamp = norwegianTime.ToString("HH:mm:ss dd-MM-yyyy");
 
-            string footer = $"<br><br><hr><p>Denne e-posten ble sendt: {timestamp}. Denne eposten kan ikke besvares.</p>";
- 
+            // 📨 Legg til tidsstempel med linjeskift
+            string footer = $"<br><br><hr><p>Denne e-posten ble sendt: {timestamp} (Norsk tid).  Denne eposten kan ikke besvares.</p>";
+
             var mailMessage = new MailMessage
             {
                 From = new MailAddress("postmaster@hopla.no", "Hopla NoReply"),
