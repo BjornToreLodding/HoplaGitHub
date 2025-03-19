@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
+using RestSharp; // RestSharp v112.1.0
+using RestSharp.Authenticators;
+
 
 namespace HoplaBackend.Controllers;
 
@@ -40,7 +43,50 @@ public class UserController : ControllerBase
         _userRelationService = userRelationService;
         _userHikeService = userHikeService;
     }
+    [HttpGet("send-email")]
+    public async Task<IActionResult> SendEmail()
+    {
+        var response = await Send();
+        
+        if (response.IsSuccessful)
+        {
+            return Ok(new { message = "Email sent successfully!", response.Content });
+        }
+        else
+        {
+            Console.WriteLine(response);
+            return StatusCode((int)response.StatusCode, new { message = "Failed to send email", error = response.ErrorMessage });
+        }
+    }
 
+    private static async Task<RestResponse> Send()
+    {
+        var options = new RestClientOptions("https://api.eu.mailgun.net/v3")
+        {
+            //3d4b3a2a-f95d980c
+            //977c08266df432c863b622f54a4afd66-3d4b3a2a-6af5299f
+            Authenticator = new HttpBasicAuthenticator("api", "977c08266df432c863b622f54a4afd66-3d4b3a2a-6af5299f" ?? "977c08266df432c863b622f54a4afd66-3d4b3a2a-6af5299f")
+            //Authenticator = new HttpBasicAuthenticator("api", Environment.GetEnvironmentVariable("1e9427de167d9efbb0e87b1d354e9fdc-3d4b3a2a-f95d980c") ?? "1e9427de167d9efbb0e87b1d354e9fdc-3d4b3a2a-f95d980c")
+        };
+        /*
+        var client = new RestClient(options);
+        var request = new RestRequest("/sandboxa636ea1ffabc48db8d8ea16a9cc2c578.mailgun.org/messages", Method.Post);
+        request.AlwaysMultipartFormData = true;
+        request.AddParameter("from", "Mailgun Sandbox <postmaster@sandboxa636ea1ffabc48db8d8ea16a9cc2c578.mailgun.org>");
+        request.AddParameter("to", "Bjorn Tore Lodding <bjorn_tore_lodding@hotmail.com>");
+        request.AddParameter("subject", "Hello Bjorn Tore Lodding");
+        request.AddParameter("text", "Congratulations Bjorn Tore Lodding, you just sent an email with Mailgun! You are truly awesome!");
+        return await client.ExecuteAsync(request);
+        */
+        var client = new RestClient(options);
+        var request = new RestRequest("/hopla.no/messages", Method.Post);
+        request.AlwaysMultipartFormData = true;
+        request.AddParameter("from", "Mailgun Sandbox <postmaster@hopla.no>");
+        request.AddParameter("to", "Bjorn Tore Lodding <bjorn_tore_lodding@hotmail.com>");
+        request.AddParameter("subject", "Hello Bjorn Tore Lodding");
+        request.AddParameter("text", "Congratulations Bjorn Tore Lodding, you just sent an email with Mailgun! You are truly awesome!");
+        return await client.ExecuteAsync(request);
+    }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -66,7 +112,8 @@ public class UserController : ControllerBase
             Email = request.Email,
             PasswordHash = passwordHash,  // 📌 Lagres her til e-posten er bekreftet
             Token = token,
-            ExpiryDate = DateTime.UtcNow.AddHours(24)
+            ExpiryDate = DateTime.UtcNow.AddHours(24),
+            //IsUsed = true
         };
 
         _context.EmailVerifications.Add(verification);

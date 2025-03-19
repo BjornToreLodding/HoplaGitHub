@@ -21,10 +21,10 @@ public class EmailService
 
         var bodyBuilder = new BodyBuilder { HtmlBody = htmlMessage };
         emailMessage.Body = bodyBuilder.ToMessageBody();
-
+        
         using (var client = new SmtpClient())
         {
-            //
+            /*
             //await client.ConnectAsync("smtp.domeneshop.no", 587, MailKit.Security.SecureSocketOptions.StartTls);
             Console.WriteLine($"Connecting to {_configuration["EmailSettings:SmtpServer"]}");
             await client.ConnectAsync("email-smtp.eu-west-1.amazonaws.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
@@ -33,6 +33,17 @@ public class EmailService
             Console.WriteLine("Sending email...");
             await client.SendAsync(emailMessage);
             await client.DisconnectAsync(true);
+            */
+            Console.WriteLine($"Connecting to {_configuration["EmailSettings:SmtpServer"]}");
+            await client.ConnectAsync("smtp.eu.mailgun.org", 587, MailKit.Security.SecureSocketOptions.StartTls);
+            Console.WriteLine("Authenticating...");
+            await client.AuthenticateAsync("postmaster@hopla.no", "61fd6fe64521e2430ac55b63db0e24c7-3d4b3a2a-9290d169");
+            Console.WriteLine("Sending email...");
+            await client.SendAsync(emailMessage);
+            await client.DisconnectAsync(true);
+            
         }
+        
+
     }
 }
