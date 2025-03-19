@@ -997,7 +997,7 @@ Body:
 { 
     "EntityId": "12345678-0000-0000-0006-123456780001", //EntityId = innleggId, løypeId, profilId, StableId etc.
     "EntityName": "Stables", //EntityName = Trails, Users, Stables eller hva det er.
-    "Category": "Drama", //Optional. HVis ikke oppgitt, blir den satt til Annet.
+    "Category": "Drama", //Optional. Hvis ikke oppgitt, blir den satt til "Annet".
     "Message": "Hesten til Ester er løs"
 }
 ```
@@ -1011,9 +1011,29 @@ Response:
 }
 ```
 
+## :x: PATCH /users/delete
+
 Profil -\> Innstillinger -\> Slett bruker
 
 Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backend) så slette brukeren om det stemmer eller feilmelding hvis ikke
+
+PATCH https://hopla.onrender.com/users/delete
+
+Request Body:
+```json
+{
+    "Password": "Hopla2025!"
+}
+```
+
+Responce Body:
+```json
+{
+    "message": "Bruker deaktivert."
+}
+```
+
+**BRUKEREN BLIR IKKE SLETTET!! men deaktivert. Dette for å bevare databaseintegritet da brukeren kan ha opprettet løper som andre brukere kan ha laget turer med osv.**
 
 </td>
 </tr>

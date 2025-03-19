@@ -218,15 +218,20 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null || !Authentication.VerifyPassword(request.Password, user.PasswordHash))
+        {
+            return Unauthorized(new { message = "Ugyldig e-post eller passord" });
+        }
         Console.WriteLine(request.Email);
         Console.WriteLine(user.Email);
         Console.WriteLine(request.Password);
         Console.WriteLine(user.PasswordHash);
+        Console.WriteLine(user.IsDeleted);
         Console.WriteLine(Authentication.VerifyPassword(request.Password, user.PasswordHash));
-
-        if (user == null || !Authentication.VerifyPassword(request.Password, user.PasswordHash))
+        
+        if (user.IsDeleted) 
         {
-            return Unauthorized(new { message = "Ugyldig e-post eller passord" });
+            return Unauthorized("Kontoen er deaktivert. For å reaktivere kontoen må du gå til https://activate.hopla.no");
         }
         Console.WriteLine($"Mottatt forespørsel for ID: {request.Email}");
         Console.WriteLine(user);
@@ -679,8 +684,9 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpPatch("delete")]
-    public async Task<IActionResult> DeleteUser([FromBody] DeleteRequest password)
+    public async Task<IActionResult> DeleteUser([FromBody] DeleteRequest request)
     {
+        // Debugging: Logg alle claims for å sjekke hva tokenet inneholder
         foreach (var claim in User.Claims)
         {
             Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
@@ -694,53 +700,35 @@ public class UserController : ControllerBase
         {
             return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
         }
-        var userId = await _context.Users.FindAsync(parsedUserId);
+
+        // Hent brukeren fra databasen
+        var user = await _context.Users.FindAsync(parsedUserId);
 
         // Sjekk om brukeren finnes
-        if (userId == null)
+        if (user == null)
         {
-            return NotFound(new { message = "User not found." });
+            return NotFound(new { message = "Bruker ikke funnet." });
         }
 
-        // Deaktiver brukeren
-        //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (!Authentication.VerifyPassword(password.Password, userId.PasswordHash))
+        // Sjekk passord
+        if (!Authentication.VerifyPassword(request.Password, user.PasswordHash))
         {
-            return Unauthorized(new { message = "Feil passord" });
+            return Unauthorized(new { message = "Feil passord." });
         }
 
-        userId.IsDeleted = true;
-        
+        // Merk brukeren som slettet
+        user.IsDeleted = true;
+
+        // Oppdater entiteten eksplisitt for at EF skal fange opp endringen
+        _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "User removed successfully." });
+        return Ok(new { message = "Bruker deaktivert." });
+    }
+
+    // Klasse for å motta passord fra forespørselen
+    public class DeleteRequest
+    {
+        public string Password { get; set; }
     }
 }
-
-/*
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-    {
-        // 🔹 Sjekk om e-posten allerede finnes
-        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (existingUser != null)
-        {
-            return BadRequest(new { message = "E-post er allerede i bruk" });
-        }
-
-        // 🔹 Hashe passordet før vi lagrer det
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-        var newUser = new User
-        {
-            Email = request.Email,
-            PasswordHash = hashedPassword // Lagre det hash'ede passordet
-        };
-
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Bruker registrert!" });
-    }
-
-*/
