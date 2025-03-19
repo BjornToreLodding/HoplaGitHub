@@ -280,7 +280,6 @@ suspend fun fetchTrailsOnMap(token: String, latitude: Double, longitude: Double,
 }
 
 //-----------------------------------------------------------------------------------------------
-
 suspend fun fetchAllUsers(token: String): List<OtherUsers> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {

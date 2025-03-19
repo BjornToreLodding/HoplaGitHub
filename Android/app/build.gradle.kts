@@ -97,4 +97,6 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.0")
     testImplementation("io.ktor:ktor-client-mock:2.0.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
 }
