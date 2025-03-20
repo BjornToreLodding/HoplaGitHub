@@ -470,21 +470,6 @@ fun ReportDialog(
     )
 }
 
-@Composable
-fun DetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Text(text = value, style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
 // FRIENDS, REQUEST button in users profile
 @Composable
 fun CustomButton(text: String, onClick: () -> Unit) {

@@ -40,13 +40,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.universalData.AddButton
-import com.example.hopla.universalData.DetailRow
 import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.HorseDetail
 import com.example.hopla.R
@@ -55,6 +52,10 @@ import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchHorseDetails
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryWhite
+import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleBold
+import com.example.hopla.ui.theme.headerTextStyle
+import com.example.hopla.ui.theme.underheaderTextStyle
 import kotlinx.coroutines.launch
 
 @Composable
@@ -154,9 +155,7 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                 // Name
                 Text(
                     text = horse.name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    style = headerTextStyle
                 )
 
                 // Image with Border & Shadow
@@ -240,6 +239,20 @@ fun HorseItem(horse: Horse, navController: NavController) {
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = horse.name, style = MaterialTheme.typography.bodyLarge)
+        Text(text = horse.name, style = underheaderTextStyle)
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = generalTextStyleBold
+        )
+        Text(text = value, style = generalTextStyle)
     }
 }

@@ -377,8 +377,8 @@ fun AddNewType(
     }
 
     val filteredUsers = users.filter {
-        it.name.contains(searchQuery, ignoreCase = true) ||
-                it.alias.contains(searchQuery, ignoreCase = true)
+        (it.name?.contains(searchQuery, ignoreCase = true) ?: false) ||
+                (it.alias?.contains(searchQuery, ignoreCase = true) ?: false)
     }
 
     Column(

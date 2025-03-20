@@ -34,6 +34,14 @@ val headerTextStyle = TextStyle(
     fontWeight = FontWeight.Bold
 )
 
+val headerTextStyleSmall = TextStyle(
+    fontFamily = customFontFamilyHeader,
+    fontSize = 32.sp,
+    color = PrimaryBlack,
+    fontStyle = FontStyle.Italic,
+    fontWeight = FontWeight.Bold
+)
+
 //---------------Custom font for "under headers"------------------
 val customFontFamilyUnderHeader = FontFamily(
     Font(R.font.underheaders, FontWeight.Normal)
@@ -56,7 +64,7 @@ val generalTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 12.sp,
     fontWeight = FontWeight.Normal,
-    color = PrimaryWhite
+    color = PrimaryBlack
 )
 
 val generalTextStyleRed = TextStyle(
@@ -66,6 +74,13 @@ val generalTextStyleRed = TextStyle(
     color = HeartColor
 )
 
+val generalTextStyleBold = TextStyle(
+    fontFamily = customFontFamilyText,
+    fontSize = 12.sp,
+    fontWeight = FontWeight.Bold,
+    color = PrimaryBlack
+)
+
 // Custom text style for buttons
 val buttonTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
@@ -73,8 +88,6 @@ val buttonTextStyle = TextStyle(
     fontWeight = FontWeight.Normal,
     color = PrimaryWhite
 )
-
-
 
 // Custom text style for TextField labels
 val textFieldLabelTextStyle = TextStyle(
@@ -100,4 +113,12 @@ val underlinedTextStyleBig = TextStyle(
     fontWeight = FontWeight.Normal,
     color = PrimaryBlack,
     textDecoration = TextDecoration.Underline
+)
+
+// Custom text style for buttons
+val dropdownMenuTextStyle = TextStyle(
+    fontFamily = customFontFamilyText,
+    fontSize = 12.sp,
+    fontWeight = FontWeight.ExtraBold,
+    color = PrimaryBlack
 )
