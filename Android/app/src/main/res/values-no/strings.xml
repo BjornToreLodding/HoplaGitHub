@@ -44,7 +44,7 @@
 
     <string name="send_a_report">Send en rapport</string>
     <string name="report">Rapport</string>
-    <string name="title">TIttel</string>
+    <string name="title">Tittel</string>
     <string name="send">Send</string>
     <string name="confirm">Bekreft</string>
 
@@ -141,5 +141,6 @@
     <string name="add">Legg til</string>
     <string name="no_trails_found">Ingen løyper funnet</string>
     <string name="choose_position">Velg posisjon</string>
+    <string name="duration">Tid</string>
 
 </resources>

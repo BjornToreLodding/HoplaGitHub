@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -51,21 +50,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.hopla.R
 import com.example.hopla.apiService.createUserReport
-import com.example.hopla.ui.theme.PrimaryGray
+import com.example.hopla.ui.theme.buttonTextStyle
+import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.textFieldLabelTextStyle
+import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -83,7 +81,7 @@ fun SearchBar(
     TextField(
         value = searchQuery,
         onValueChange = onSearchQueryChange,
-        label = { Text(text = stringResource(R.string.search)) },
+        label = { Text(text = stringResource(R.string.search), style = textFieldLabelTextStyle) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -146,9 +144,7 @@ fun ScreenHeader(navController: NavController, headerText: String) {
         ) {
             Text(
                 text = headerText,
-                fontSize = 24.sp,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
+                style = headerTextStyleSmall
             )
         }
     }
@@ -216,15 +212,15 @@ fun ImagePicker(
         modifier = Modifier
             .padding(top = 8.dp)
             .clickable { showDialog.value = true },
-        style = TextStyle(textDecoration = TextDecoration.Underline)
+        style = underlinedTextStyleSmall
     )
 
     // Dialog to confirm taking a picture
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(text = stringResource(R.string.change_profile_picture)) },
-            text = { Text(text = stringResource(R.string.profile_pic_description)) },
+            title = { Text(text = stringResource(R.string.change_profile_picture), style = underheaderTextStyle) },
+            text = { Text(text = stringResource(R.string.profile_pic_description), style = generalTextStyle) },
             confirmButton = {
                 Column {
                     Button(onClick = {
@@ -233,20 +229,20 @@ fun ImagePicker(
                         }
                         showDialog.value = false
                     }) {
-                        Text(text = stringResource(R.string.take_a_picture))
+                        Text(text = stringResource(R.string.take_a_picture), style = buttonTextStyle)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = {
                         contentPickerLauncher.launch("image/*")
                         showDialog.value = false
                     }) {
-                        Text(text = stringResource(R.string.choose_from_library))
+                        Text(text = stringResource(R.string.choose_from_library), style = buttonTextStyle)
                     }
                 }
             },
             dismissButton = {
                 Button(onClick = { showDialog.value = false }) {
-                    Text(text = stringResource(R.string.cancel))
+                    Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
                 }
             }
         )
@@ -283,7 +279,7 @@ fun MessageBox(
                         ) {
                             Text(
                                 text = date,
-                                fontSize = 12.sp
+                                style = generalTextStyle
                             )
                         }
                     }
@@ -302,7 +298,7 @@ fun MessageBox(
                             ) {
                                 Text(
                                     text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(message.timestamp)),
-                                    fontSize = 10.sp,
+                                    style = generalTextStyle,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -310,7 +306,7 @@ fun MessageBox(
                                     text = if (message.username == UserSession.alias) stringResource(
                                         R.string.me
                                     ) else message.username, // Change username to "me"
-                                    fontSize = 10.sp,
+                                    style = generalTextStyle,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                             }
@@ -327,6 +323,7 @@ fun MessageBox(
                             ) {
                                 Text(
                                     text = message.content,
+                                    style = generalTextStyle,
                                     modifier = Modifier.padding(8.dp)
                                 )
                             }
@@ -342,7 +339,7 @@ fun MessageBox(
                     value = newMessage,
                     onValueChange = onMessageChange,
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text(text = stringResource(R.string.enter_you_message)) }
+                    placeholder = { Text(text = stringResource(R.string.enter_you_message), style = textFieldLabelTextStyle) }
                 )
                 Button(
                     onClick = {
@@ -359,43 +356,9 @@ fun MessageBox(
                     },
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
-                    Text(text = stringResource(R.string.publish))
+                    Text(text = stringResource(R.string.publish), style = buttonTextStyle)
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun CustomTextField(
-    modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: String = ""
-) {
-    Column(modifier = modifier) {
-        label?.invoke()
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.LightGray)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(text = placeholder, color = PrimaryGray, fontSize = 16.sp)
-                    }
-                    innerTextField()
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }
@@ -414,7 +377,7 @@ fun ReportDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.send_a_report)) },
+        title = { Text(stringResource(R.string.send_a_report), style = underheaderTextStyle) },
         text = {
             Box(
                 modifier = Modifier
@@ -429,14 +392,14 @@ fun ReportDialog(
                             androidx.compose.material.TextField(
                                 value = reportTitle,
                                 onValueChange = { reportTitle = it },
-                                label = { Text(text = stringResource(R.string.title)) },
+                                label = { Text(text = stringResource(R.string.title), style = textFieldLabelTextStyle) },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             androidx.compose.material.TextField(
                                 value = reportText,
                                 onValueChange = { reportText = it },
-                                label = { Text(text = stringResource(R.string.report)) },
+                                label = { Text(text = stringResource(R.string.report), style = textFieldLabelTextStyle) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp) // Set a fixed height for the text field
@@ -459,12 +422,12 @@ fun ReportDialog(
                     onDismiss()
                 }
             }) {
-                Text(text = stringResource(R.string.send))
+                Text(text = stringResource(R.string.send), style = buttonTextStyle)
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
             }
         }
     )
@@ -480,7 +443,7 @@ fun CustomButton(text: String, onClick: () -> Unit) {
             .width(100.dp),
         shape = RectangleShape
     ) {
-        Text(text = text)
+        Text(text = text, style = buttonTextStyle)
         Icon(
             imageVector = Icons.Default.KeyboardArrowDown,
             contentDescription = null,

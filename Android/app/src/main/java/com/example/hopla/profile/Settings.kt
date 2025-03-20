@@ -24,7 +24,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +46,11 @@ import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.UserViewModel
 import com.example.hopla.ui.theme.ThemeViewModel
+import com.example.hopla.ui.theme.buttonTextStyle
+import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleBold
+import com.example.hopla.ui.theme.textFieldLabelTextStyle
+import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.UserSession
 import java.util.Locale
 
@@ -156,8 +160,7 @@ fun SettingsCategory(title: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.primary
+        style = generalTextStyleBold
     )
 }
 
@@ -171,7 +174,7 @@ fun SettingsItem(icon: ImageVector, title: String, trailingContent: @Composable 
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
-        Text(text = title, modifier = Modifier.weight(1f).padding(start = 16.dp))
+        Text(text = title, style = generalTextStyle, modifier = Modifier.weight(1f).padding(start = 16.dp))
         trailingContent()
     }
 }
@@ -187,7 +190,7 @@ fun SettingsClickableItem(icon: ImageVector, title: String, onClick: () -> Unit)
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
-        Text(text = title, modifier = Modifier.weight(1f).padding(start = 16.dp))
+        Text(text = title, style = generalTextStyle, modifier = Modifier.weight(1f).padding(start = 16.dp))
     }
 }
 
@@ -200,12 +203,12 @@ fun ConfirmDialog(title: String, message: String, onConfirm: () -> Unit, onDismi
         text = { Text(message) },
         confirmButton = {
             Button(onClick = onConfirm) {
-                Text(text = stringResource(R.string.confirm))
+                Text(text = stringResource(R.string.confirm), style = buttonTextStyle)
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
             }
         }
     )
@@ -222,25 +225,25 @@ fun PasswordConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.delete_user)) },
+        title = { Text(stringResource(R.string.delete_user), style = underheaderTextStyle) },
         text = {
             Column {
                 TextField(
                     value = password,
                     onValueChange = onPasswordChange,
-                    label = { Text(stringResource(R.string.confirm_password)) },
+                    label = { Text(stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
         confirmButton = {
             Button(onClick = { onConfirm(password) }) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.confirm), style = buttonTextStyle)
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
             }
         }
     )
@@ -279,12 +282,14 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
         Column {
             Text(
                 text = "Norsk",
+                style = generalTextStyle,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("Norwegian") }
             )
             Text(
                 text = "English",
+                style = generalTextStyle,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("English") }
@@ -302,12 +307,14 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
         Column {
             Text(
                 text = stringResource(R.string.light),
+                style = generalTextStyle,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { themeViewModel.setDarkTheme(false) }
             )
             Text(
                 text = stringResource(R.string.dark),
+                style = generalTextStyle,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { themeViewModel.setDarkTheme(true) }
