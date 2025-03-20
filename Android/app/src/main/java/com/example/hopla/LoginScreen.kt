@@ -53,6 +53,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
 import com.example.hopla.apiService.handleLogin
 import com.example.hopla.ui.theme.PrimaryGray
+import com.example.hopla.ui.theme.customFontFamilyHeader
+import com.example.hopla.ui.theme.customFontFamilyText
+import com.example.hopla.ui.theme.customFontFamilyUnderHeader
 import com.example.hopla.universalData.ImagePicker
 
 @Composable
@@ -97,7 +100,15 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 8.dp)
         ) {
-            Text(text = "Auto-Fill and Login", color = PrimaryWhite)
+            Text(
+                text = "Auto-Fill and Login",
+                style = TextStyle(
+                    fontFamily = customFontFamilyText,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = PrimaryWhite
+                )
+            )
         }
 
         Image(
@@ -109,6 +120,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         Text(
             text = "Hopla",
             style = TextStyle(
+                fontFamily = customFontFamilyHeader,
                 fontSize = 48.sp,
                 color = MaterialTheme.colorScheme.secondary,
                 fontStyle = FontStyle.Italic,
@@ -338,7 +350,12 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
             ) {
                 Text(
                     text = stringResource(R.string.create_user),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = TextStyle(
+                        fontFamily = customFontFamilyUnderHeader,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
