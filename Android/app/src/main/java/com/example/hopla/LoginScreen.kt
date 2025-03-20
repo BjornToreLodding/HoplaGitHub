@@ -1,16 +1,27 @@
 package com.example.hopla
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,39 +34,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import com.example.hopla.ui.theme.PrimaryBlack
-import com.example.hopla.ui.theme.PrimaryWhite
-import androidx.compose.material3.CircularProgressIndicator
-import android.graphics.Bitmap
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.hopla.apiService.handleLogin
 import com.example.hopla.ui.theme.PrimaryGray
-import com.example.hopla.ui.theme.customFontFamilyHeader
-import com.example.hopla.ui.theme.customFontFamilyText
-import com.example.hopla.ui.theme.customFontFamilyUnderHeader
+import com.example.hopla.ui.theme.buttonTextStyle
+import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleRed
+import com.example.hopla.ui.theme.headerTextStyle
+import com.example.hopla.ui.theme.textFieldLabelTextStyle
+import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.ui.theme.underlinedTextStyleBig
+import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.ImagePicker
 
 @Composable
@@ -102,12 +100,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         ) {
             Text(
                 text = "Auto-Fill and Login",
-                style = TextStyle(
-                    fontFamily = customFontFamilyText,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = PrimaryWhite
-                )
+                style = buttonTextStyle
             )
         }
 
@@ -119,18 +112,12 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         )
         Text(
             text = "Hopla",
-            style = TextStyle(
-                fontFamily = customFontFamilyHeader,
-                fontSize = 48.sp,
-                color = MaterialTheme.colorScheme.secondary,
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold
-            )
+            style = headerTextStyle
         )
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text(text = stringResource(R.string.email)) },
+            label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,7 +126,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(text = stringResource(R.string.password))},
+            label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             modifier = Modifier
@@ -148,12 +135,10 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         )
         Text(
             text = stringResource(R.string.forgot_password),
-            color = PrimaryBlack,
-            textDecoration = TextDecoration.Underline,
-            fontSize = 12.sp,
+            style = underlinedTextStyleSmall,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .clickable { showForgottenPasswordDialog = true },
+                .clickable { showForgottenPasswordDialog = true }
         )
 
         if (isLoading) {
@@ -179,14 +164,16 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 8.dp)
             ) {
-                Text(text = stringResource(R.string.log_in), color = PrimaryWhite)
+                Text(
+                    text = stringResource(R.string.log_in),
+                    style = buttonTextStyle
+                )
             }
         }
 
         Text(
             text = stringResource(R.string.create_user),
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline,
+            style = underlinedTextStyleBig,
             modifier = Modifier
                 .padding(top = 16.dp)
                 .clickable { showCreateUserDialogue = true }
@@ -227,15 +214,15 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
             ) {
                 Text(
                     text = stringResource(R.string.error),
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style = underheaderTextStyle,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Text(text = errorMessage)
                 Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
-                    Text(text = stringResource(R.string.ok))
+                    Text(
+                        text = stringResource(R.string.ok),
+                        style = buttonTextStyle
+                    )
                 }
             }
         }
@@ -266,10 +253,7 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                 ) {
                     Text(
                         text = stringResource(R.string.forgot_password),
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
+                        style = underheaderTextStyle,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                     Text(text = stringResource(R.string.forgotten_password_description))
@@ -285,12 +269,18 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(onClick = onDismiss) {
-                            Text(text = stringResource(R.string.cancel))
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                style = buttonTextStyle
+                            )
                         }
                         Button(onClick = {
                             showInfoDialog = true
                         }) {
-                            Text(text = stringResource(R.string.send))
+                            Text(
+                                text = stringResource(R.string.send),
+                                style = buttonTextStyle
+                            )
                         }
                     }
                 }
@@ -314,11 +304,14 @@ fun InfoDialog(onDismiss: () -> Unit) {
             ) {
                 Text(
                     text = stringResource(R.string.verification_explanation),
-                    style = TextStyle(fontSize = 16.sp),
+                    style = generalTextStyle,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Button(onClick = onDismiss) {
-                    Text(text = "Close")
+                    Text(
+                        text = stringResource(R.string.close),
+                        style = buttonTextStyle
+                    )
                 }
             }
         }
@@ -350,26 +343,20 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
             ) {
                 Text(
                     text = stringResource(R.string.create_user),
-                    style = TextStyle(
-                        fontFamily = customFontFamilyUnderHeader,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
+                    style = underheaderTextStyle,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text(text = stringResource(R.string.email)) },
-                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },                    singleLine = true,
                     isError = showError && email.isEmpty(),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
                 TextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = stringResource(R.string.password)) },
+                    label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     isError = showError && password.isEmpty(),
@@ -378,8 +365,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                 TextField(
                     value = confirmedPassword,
                     onValueChange = { confirmedPassword = it },
-                    label = { Text(text = stringResource(R.string.confirm_password)) },
-                    visualTransformation = PasswordVisualTransformation(),
+                    label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },                    visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     isError = showError && (confirmedPassword.isEmpty() || password != confirmedPassword),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -396,7 +382,10 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(onClick = onDismiss) {
-                        Text(text = stringResource(R.string.cancel))
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = buttonTextStyle
+                        )
                     }
                     Button(onClick = {
                         if (email.isEmpty() || password.isEmpty() || confirmedPassword.isEmpty()) {
@@ -410,7 +399,10 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                             showAdditionalUserInfoDialog = true
                         }
                     }) {
-                        Text(text = stringResource(R.string.create_user))
+                        Text(
+                            text = stringResource(R.string.create_user),
+                            style = buttonTextStyle
+                        )
                     }
                 }
             }
@@ -453,21 +445,20 @@ fun AdditionalUserInfoDialog(
             ) {
                 Text(
                     text = stringResource(R.string.additional_user_info),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = underheaderTextStyle,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
                     value = alias,
                     onValueChange = { alias = it },
-                    label = { Text(text = stringResource(R.string.alias)) },
-                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.alias), style = textFieldLabelTextStyle) },                    singleLine = true,
                     isError = showError && alias.isEmpty(),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
                 TextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(text = stringResource(R.string.name)) },
+                    label = { Text(text = stringResource(R.string.name), style = textFieldLabelTextStyle) },
                     singleLine = true,
                     isError = showError && name.isEmpty(),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -475,23 +466,20 @@ fun AdditionalUserInfoDialog(
                 TextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(text = stringResource(R.string.description)) },
-                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.description), style = textFieldLabelTextStyle) },                    singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
                 TextField(
                     value = birthDate,
                     onValueChange = { birthDate = it },
-                    label = { Text(text = stringResource(R.string.birth_date)) },
-                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.birth_date), style = textFieldLabelTextStyle) },                    singleLine = true,
                     isError = showError && birthDate.isEmpty(),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
                 TextField(
                     value = phone,
                     onValueChange = { phone = it },
-                    label = { Text(text = stringResource(R.string.phone)) },
-                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.phone), style = textFieldLabelTextStyle) },                    singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
 
@@ -525,7 +513,7 @@ fun AdditionalUserInfoDialog(
                 if (showError) {
                     Text(
                         text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
+                        style = generalTextStyleRed,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
@@ -535,7 +523,10 @@ fun AdditionalUserInfoDialog(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(onClick = onDismiss) {
-                        Text(text = stringResource(R.string.cancel))
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = buttonTextStyle
+                        )
                     }
                     Button(onClick = {
                         if (alias.isEmpty() || name.isEmpty() || birthDate.isEmpty()) {
@@ -546,7 +537,10 @@ fun AdditionalUserInfoDialog(
                             onDismiss()
                         }
                     }) {
-                        Text(text = stringResource(R.string.confirm))
+                        Text(
+                            text = stringResource(R.string.confirm),
+                            style = buttonTextStyle
+                        )
                     }
                 }
             }
