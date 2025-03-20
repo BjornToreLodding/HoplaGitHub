@@ -279,17 +279,31 @@ public class UserController : ControllerBase
             return NotFound("Bruker ikke funnet.");
         Console.WriteLine("users/update checkpoint bruker ikke funnet");
 
+        //Alias og Navn er påkrevd. 
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Alias))
             return BadRequest("Name or Alias cannot be empty");
         Console.WriteLine("users/update checkpoint Name or alias cannot be empty");
 
         // Oppdater informasjon
-        if (!string.IsNullOrWhiteSpace(request.Name))
+        /*if (!string.IsNullOrWhiteSpace(request.Name))
             user.Name = request.Name;
 
         if (!string.IsNullOrWhiteSpace(request.Alias))
             user.Alias = request.Alias;
+        if (!string.IsNullOrWhiteSpace(request.Description))
+            user.Description = request.Description;
+        if (!string.IsNullOrWhiteSpace(request.Telephone))
+            user.Telephone = request.Telephone;
+        if (request.Dob.HasValue)
+            user.Dob = request.Dob;
+        */
+        if (request.Name != null) user.Name = request.Name;
+        if (request.Alias != null) user.Alias = request.Alias;
+        if (request.Description != null) user.Description = request.Description;
+        if (request.Telephone != null) user.Telephone = request.Telephone;
 
+        // Hvis Dob er eksplisitt satt til null, fjern datoen
+        user.Dob = request.Dob;
         Console.WriteLine("users/update checkpoint før save og return ok");
 
 
@@ -422,7 +436,16 @@ public class UserController : ControllerBase
         {
             return Unauthorized(new { message = "Feil passord" });
         }
-
+        bool isValid = PasswordValidator.IsValidPassword(request.NewPassword);
+        
+        if (!isValid)
+        {
+            return Unauthorized(new { message = "Passordet er avvist fordi det er for kort eller ikke inneholder minst en liten bokstav, en stor bokstav, tall eller spesialtegn "});
+        }
+        if (request.NewPassword != request.ConfirmPassword) 
+        {
+            return Unauthorized(new { message = "New password doesn't match with comfirmed password." });
+        }
         user.PasswordHash = Authentication.HashPassword(request.NewPassword);
         await _context.SaveChangesAsync();
 

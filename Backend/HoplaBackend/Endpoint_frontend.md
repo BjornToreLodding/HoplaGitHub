@@ -11,9 +11,7 @@ Backend: :green_book: Lagd :yellow_circle: Delvis laget :red_circle: Ikke lagd
 
 Android: :alien: Lagt inn :grimacing: Delvis lagt inn :smiling_imp: Ikke lagt inn
 
-iOs:  :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
-
-
+iOs: :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
 
 # Liste
 
@@ -35,7 +33,7 @@ iOs:  :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
 </td>
 <td>
 
-## :green_book: :grimacing: :banana: POST /users/login
+## :green_book: :alien: :banana: POST /users/login
 
 Logg inn
 
@@ -363,15 +361,15 @@ Vilde bruker: https://hopla.onrender.com/users/profile?userId=12345678-0000-0000
 | Parameter | Name | Type | Påkrevd | Beskrivelse |
 |-----------|------|------|---------|-------------|
 | :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
-| :mag_right: Query | `userId` | Guid | 🟡 Nei | ID-en til brukeren |
-| :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
-| :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
+| :mag_right: Query | `userId` | Guid | :yellow_circle: Nei | ID-en til brukeren |
+| :mag_right: Query | `pageNumber` | int | :yellow_circle: Nei | Side nummer |
+| :mag_right: Query | `pageSize` | int | :yellow_circle: Nei | Antall resultater pr side |
 
 :mag_right: Query:
 
-* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
-* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - :yellow_circle: Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - :yellow_circle: Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
+* `?pageSize=[int]` - :yellow_circle: Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 :floppy_disk: Syntax:
 
@@ -538,15 +536,15 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 | Parameter | Name | Type | Påkrevd | Beskrivelse |
 |-----------|------|------|---------|-------------|
 | :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
-| :mag_right: Query | `userId` | Guid | 🟡 Nei | ID-en til brukeren |
-| :mag_right: Query | `pageNumber` | int | 🟡 Nei | Side nummer |
-| :mag_right: Query | `pageSize` | int | 🟡 Nei | Antall resultater pr side |
+| :mag_right: Query | `userId` | Guid | :yellow_circle: Nei | ID-en til brukeren |
+| :mag_right: Query | `pageNumber` | int | :yellow_circle: Nei | Side nummer |
+| :mag_right: Query | `pageSize` | int | :yellow_circle: Nei | Antall resultater pr side |
 
 \*\*#### **:mag_right: Query:**
 
-* `?userId=[Guid]` - 🟡 Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-* `?pageNumber=[int]` - 🟡 Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
-* `?pageSize=[int]` - 🟡 Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - :yellow_circle: Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - :yellow_circle: Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
+* `?pageSize=[int]` - :yellow_circle: Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
 **:floppy_disk: Syntax:**
 
@@ -641,9 +639,67 @@ Response:
 
 Profil -\> Bytte brukernavn
 
+## :green_book: :smiling_imp: :apple: PUT /users/update
+
+Body:
+```json
+{
+    "Name": "",
+    "Alias": "",
+    "Telephone": "",
+    "Description": "",
+    "Dob": "Date"
+}
+```
+
+Response:
+```json
+{
+    "message": "Brukerinformasjon oppdatert."
+}
+```
 Profil -\> Bytte epost
 
+## :green_book: :smiling_imp: :apple: POST /users/change-email
+
+body:
+```json
+{
+    "NewEmail": "test@test.no",
+    "Password": "Hopla2025!"
+}
+´´´
+
+Mottar epost med beskjed om å bekrefte epostadressen ved å trykke på en lenke.. 
+
+Response trinn1:
+```json
+{
+    "message": "E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer"
+}
+```
+
+Åpne epost og trykk på aktiveringslenke. I noen tilfeller har det tatt opptil 30 minutter før eposten har kommet frem.
+
+
 Profil -\> bytte passord
+
+## :green_book: :smiling_imp: :apple: PUT /users/change-password
+
+body:
+```json
+{
+    "OldPassword": "GammeltPass0rd!",
+    "NewPassword": "Hopla2025!",
+    "ConfirmPassword": "Hopla2025!"
+}
+
+response:
+```json
+{
+    "message": "Passordet er endret"
+}
+```
 </td>
 </tr>
 <tr>
@@ -1137,6 +1193,7 @@ Denne er laget, men har ikke testdata for å teste hvordan den fungerer.
 GET /stables/all
 
 **Query**
+
 * search= tekst som skal matche med stallnavnet
 * lat = latitude til bruker
 * long = longitude til bruker
@@ -1144,6 +1201,7 @@ GET /stables/all
 * pageSize? = (Optional) antall treff pr side. Hvis ikke oppgitt, så settes den til 10.
 
 Responce
+
 ```json
 {
     "Stable":
@@ -1162,8 +1220,6 @@ Responce
 ```
 
 sånn cirka
-
-
 </td>
 </tr>
 <tr>
@@ -1181,9 +1237,10 @@ Bruker som som oppretter blir automatisk admin.
 
 Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og posisjon (long, lat)
 
-**POST https://hopla.onrender.com/stable/create**
+**POST ****https://hopla.onrender.com/stable/create**
 
 Body:
+
 ```json
 {
     "Name": "Stallione",
@@ -1196,6 +1253,7 @@ Body:
 ```
 
 Responce:
+
 ```json
 {
     "message": "Stable created successfully.",
@@ -1204,8 +1262,6 @@ Responce:
 ```
 
 Denne lager ny stall i Stables OG bruker som lager stallen blir satt som admin i StableUsers
-
-
 </td>
 </tr>
 <tr>
@@ -1243,9 +1299,7 @@ Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
 </td>
 </tr>
 <tr>
-<td>
-
-</td>
+<td></td>
 <td>
 
 ## :red_circle: :smiling_imp: :apple: POST friendrequest
@@ -1262,9 +1316,7 @@ Hvis knapp blokker er trykket på: endre til blocked
 </td>
 </tr>
 <tr>
-<td>
-
-</td>
+<td></td>
 <td>
 
 ## :red_circle: :smiling_imp: :apple: GET friendrequests
@@ -1273,9 +1325,7 @@ Endpoint som henter alle venneforespørseler innlogget bruker har. Trenger også
 </td>
 </tr>
 <tr>
-<td>
-
-</td>
+<td></td>
 <td>
 
 ## :red_circle: :smiling_imp: :apple: POST ny tur (ny tur knapp)
