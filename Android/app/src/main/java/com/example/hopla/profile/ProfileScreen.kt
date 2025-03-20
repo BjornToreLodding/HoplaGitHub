@@ -227,7 +227,7 @@ fun ProfileButtons(navController: NavController) {
 @Composable
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
-    var username by remember { mutableStateOf(UserSession.name) }
+    var username by remember { mutableStateOf(UserSession.alias) }
     var showDialog by remember { mutableStateOf(false) }
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
@@ -259,16 +259,16 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     value = username,
                     onValueChange = { username = it },
                     singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = stringResource(R.string.username),
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .clickable {
-                            // Handle username update logic here
-                        }
+                    modifier = Modifier.weight(1f),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = stringResource(R.string.username),
+                            modifier = Modifier.clickable {
+                                // Handle username update logic here
+                            }
+                        )
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -283,16 +283,16 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     value = email,
                     onValueChange = { email = it },
                     singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = stringResource(R.string.email),
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .clickable {
-                            // Handle email update logic here
-                        }
+                    modifier = Modifier.weight(1f),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = stringResource(R.string.email),
+                            modifier = Modifier.clickable {
+                                // Handle email update logic here
+                            }
+                        )
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
