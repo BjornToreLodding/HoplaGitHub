@@ -50,12 +50,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavController
 import com.example.hopla.apiService.handleLogin
 import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.universalData.ImagePicker
 
 @Composable
-fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
+fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showCreateUserDialogue by remember { mutableStateOf(false) }
@@ -83,7 +84,10 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                     password = password,
                     context = context,
                     coroutineScope = coroutineScope,
-                    onLogin = onLogin,
+                    onLogin = {
+                        onLogin()
+                        navController.navigate("profile")
+                    },
                     setErrorMessage = { errorMessage = it },
                     setShowErrorDialog = { showErrorDialog = it },
                     setIsLoading = { isLoading = it }
@@ -150,7 +154,10 @@ fun LoginScreen(onLogin: () -> Unit, onCreateUser: () -> Unit) {
                         password = password,
                         context = context,
                         coroutineScope = coroutineScope,
-                        onLogin = onLogin,
+                        onLogin = {
+                            onLogin()
+                            navController.navigate("profile")
+                        },
                         setErrorMessage = { errorMessage = it },
                         setShowErrorDialog = { showErrorDialog = it },
                         setIsLoading = { isLoading = it }
