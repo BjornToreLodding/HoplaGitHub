@@ -45,15 +45,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.R
+import com.example.hopla.apiService.changePassword
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.PrimaryGray
+import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import org.json.JSONObject
 
 // Main profile function
@@ -229,6 +232,9 @@ fun UserChanges(modifier: Modifier = Modifier) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var responseMessage by remember { mutableStateOf("") }
+    var showResponseDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = modifier
@@ -310,17 +316,26 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     TextField(
                         value = currentPassword,
                         onValueChange = { currentPassword = it },
-                        label = { Text(text = stringResource(R.string.current_password)) }
+                        label = { Text(text = stringResource(R.string.current_password), style = textFieldLabelTextStyle) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     TextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
-                        label = { Text(text = stringResource(R.string.new_password)) }
+                        label = { Text(text = stringResource(R.string.new_password), style = textFieldLabelTextStyle) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     TextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
-                        label = { Text(text = stringResource(R.string.confirm_password)) }
+                        label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     if (newPassword != confirmPassword) {
                         Text(
@@ -334,8 +349,19 @@ fun UserChanges(modifier: Modifier = Modifier) {
             confirmButton = {
                 Button(
                     onClick = {
-                        // Handle password change logic here
-                        showDialog = false
+                        if (newPassword == confirmPassword) {
+                            coroutineScope.launch {
+                                val trimmedCurrentPassword = currentPassword.trim()
+                                val trimmedNewPassword = newPassword.trim()
+                                val trimmedConfirmPassword = confirmPassword.trim()
+                                val (statusCode, message) = changePassword(UserSession.token, trimmedCurrentPassword, trimmedNewPassword, trimmedConfirmPassword)
+                                responseMessage = message
+                                showResponseDialog = true
+                                if (statusCode == 200) {
+                                    showDialog = false
+                                }
+                            }
+                        }
                     },
                     enabled = newPassword == confirmPassword
                 ) {
@@ -345,6 +371,18 @@ fun UserChanges(modifier: Modifier = Modifier) {
             dismissButton = {
                 Button(onClick = { showDialog = false }) {
                     Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showResponseDialog) {
+        AlertDialog(
+            onDismissRequest = { showResponseDialog = false },
+            text = { Text(text = responseMessage) },
+            confirmButton = {
+                Button(onClick = { showResponseDialog = false }) {
+                    Text(text = stringResource(R.string.close))
                 }
             }
         )

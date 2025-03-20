@@ -142,5 +142,6 @@
     <string name="no_trails_found">No trails found</string>
     <string name="choose_position">Choose position</string>
     <string name="duration">Duration</string>
+    <string name="password_changed">Password is changed</string>
 
 </resources>

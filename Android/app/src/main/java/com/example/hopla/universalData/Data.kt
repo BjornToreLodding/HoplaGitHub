@@ -259,3 +259,7 @@ data class DeleteUserRequest(val Password: String)
 
 @Serializable
 data class DeleteUserResponse(val message: String)
+
+//-------------Data classes for updating user information----------------
+@Serializable
+data class ChangePasswordResponse(val message: String)
