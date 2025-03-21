@@ -9,7 +9,7 @@ object UserSession {
     var profilePictureURL: String = ""
     var telephone: Int? = null
     var description: String = ""
-    var dob: String = ""
+    var dob: String? = ""
     var redirect: String = ""
 
     fun clear() {

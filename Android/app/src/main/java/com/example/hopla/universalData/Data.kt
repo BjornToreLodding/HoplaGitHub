@@ -52,7 +52,7 @@ data class User(
     val pictureUrl: String,
     val telephone: Int? = null,
     val description: String,
-    val dob: String,
+    val dob: String? = null,
     val redirect: String
 )
 
