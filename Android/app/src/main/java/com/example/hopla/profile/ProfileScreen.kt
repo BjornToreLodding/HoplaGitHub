@@ -228,10 +228,10 @@ fun ProfileButtons(navController: NavController) {
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
     var username by remember { mutableStateOf(UserSession.alias) }
-    var showDialog by remember { mutableStateOf(false) }
-    var currentPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf(UserSession.telephone?.toString() ?: "") }
+    var name by remember { mutableStateOf(UserSession.name) }
+    var description by remember { mutableStateOf(UserSession.description) }
+    var dob by remember { mutableStateOf(UserSession.dob) }
     var responseMessage by remember { mutableStateOf("") }
     var showResponseDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -250,132 +250,84 @@ fun UserChanges(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(R.string.username))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = stringResource(R.string.username),
-                            modifier = Modifier.clickable {
-                                // Handle username update logic here
-                            }
-                        )
-                    }
-                )
+
+            // Reusable TextField with Save Icon
+            @Composable
+            fun EditableTextField(label: String, value: String, onValueChange: (String) -> Unit, onSave: () -> Unit) {
+                Column {
+                    Text(text = label)
+                    TextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = stringResource(R.string.save),
+                                modifier = Modifier.clickable { onSave() }
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(R.string.email))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = stringResource(R.string.email),
-                            modifier = Modifier.clickable {
-                                // Handle email update logic here
-                            }
-                        )
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.change_password),
-                modifier = Modifier.clickable { showDialog = true },
-                style = TextStyle(textDecoration = TextDecoration.Underline)
+
+            // Username
+            EditableTextField(
+                label = stringResource(R.string.username),
+                value = username,
+                onValueChange = { username = it },
+                onSave = { UserSession.alias = username }
             )
+
+            // Email
+            EditableTextField(
+                label = stringResource(R.string.email),
+                value = email,
+                onValueChange = { email = it },
+                onSave = { UserSession.email = email }
+            )
+
+            // Phone (Handled as a nullable integer)
+            EditableTextField(
+                label = stringResource(R.string.phone),
+                value = phone,
+                onValueChange = { phone = it },
+                onSave = { UserSession.telephone = phone.toIntOrNull() }
+            )
+
+            // Name
+            EditableTextField(
+                label = stringResource(R.string.name),
+                value = name,
+                onValueChange = { name = it },
+                onSave = { UserSession.name = name }
+            )
+
+            // Description
+            EditableTextField(
+                label = stringResource(R.string.description),
+                value = description,
+                onValueChange = { description = it },
+                onSave = { UserSession.description = description }
+            )
+
+            // Date of Birth
+            EditableTextField(
+                label = stringResource(R.string.date_of_birth),
+                value = dob,
+                onValueChange = { dob = it },
+                onSave = { UserSession.dob = dob }
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = stringResource(R.string.change_password)) },
-            text = {
-                Column {
-                    TextField(
-                        value = currentPassword,
-                        onValueChange = { currentPassword = it },
-                        label = { Text(text = stringResource(R.string.current_password), style = textFieldLabelTextStyle) },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextField(
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        label = { Text(text = stringResource(R.string.new_password), style = textFieldLabelTextStyle) },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (newPassword != confirmPassword) {
-                        Text(
-                            text = stringResource(R.string.passwords_do_not_match),
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (newPassword == confirmPassword) {
-                            coroutineScope.launch {
-                                val trimmedCurrentPassword = currentPassword.trim()
-                                val trimmedNewPassword = newPassword.trim()
-                                val trimmedConfirmPassword = confirmPassword.trim()
-                                val (statusCode, message) = changePassword(UserSession.token, trimmedCurrentPassword, trimmedNewPassword, trimmedConfirmPassword)
-                                responseMessage = message
-                                showResponseDialog = true
-                                if (statusCode == 200) {
-                                    showDialog = false
-                                }
-                            }
-                        }
-                    },
-                    enabled = newPassword == confirmPassword
-                ) {
-                    Text(text = stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-
+    // Response Dialog
     if (showResponseDialog) {
         AlertDialog(
             onDismissRequest = { showResponseDialog = false },
@@ -388,6 +340,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
         )
     }
 }
+
 
 @Composable
 fun AddNewType(
