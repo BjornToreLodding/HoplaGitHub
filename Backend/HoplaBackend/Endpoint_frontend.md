@@ -1379,9 +1379,25 @@ Response:
 </td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: POST newHorse
+## :green_book: :smiling_imp: :apple: POST /horses/create
 
 Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
+
+eks: https://hopla.onrender.com/horses/create
+
+Body:
+```json
+{
+    "Name": "KongDurek",
+    "Age": 5
+}
+```
+
+Response:
+```json
+Horse Created
+```
+
 </td>
 </tr>
 <tr>
