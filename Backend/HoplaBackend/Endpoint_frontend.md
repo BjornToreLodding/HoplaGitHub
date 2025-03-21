@@ -1316,7 +1316,12 @@ Response:
 
 Videre må man hente meldinger med neste endpoint
 
-## :red_circle: :smiling_imp: :apple: GET /stablemessages/{stableId}
+## :green_book: :smiling_imp: :apple: GET /stablemessages/{stableId}
+
+**Query**
+* page? = (Optional) side nummer. Hvis ikke oppgitt, settes den til 1
+* pageSize? = (Optional) antall treff pr side. Hvis ikke oppgitt, så settes den til 10.
+* Annet som burde være med?
 
 eks:
 ```postman
