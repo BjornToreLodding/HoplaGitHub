@@ -24,7 +24,13 @@ public static class DistanceCalc
 
     public static double SimplePytagoras(double lat1, double long1, double lat2, double long2) 
     {
-
+        /*
+        Console.WriteLine("Called:");
+        Console.WriteLine(lat1);
+        Console.WriteLine(long1);
+        Console.WriteLine(lat2);
+        Console.WriteLine(long2);
+        */
         // Enkel Pythagoras (Biri-Gjøvik 18.6780 km) Regner enkelt ut
         double degreeDist = 40008 / 360.0;    // lengde mellom hver lengdegrad, Jordens.gjsn_omkrets / lengdegrader.Antall
         double sideX_simple = Math.Cos((lat1 + lat2) * Math.PI / 360) * Math.Abs(long1 - long2) * degreeDist;

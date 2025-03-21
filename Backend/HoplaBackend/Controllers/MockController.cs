@@ -9,6 +9,7 @@ using HoplaBackend.Data;
 using HoplaBackend.Helpers;
 using MediatR;
 using HoplaBackend.Events;
+using System.Diagnostics;
 
 namespace HoplaBackend.Models;
 
@@ -169,6 +170,26 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", stables });
 
     }
+    [HttpPost("clearstableusers")]
+    public async Task<IActionResult> ClearStableUsers()
+    {
+        _context.StableUsers.RemoveRange(_context.StableUsers);
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
+        return Ok("StableUsers table content cleared and IDs reset.");    
+    }
+    [HttpPost("createstableusers")]
+    public async Task<IActionResult> CreateStableUsers()
+    {
+        if (_context.StableUsers.Any()) { return NoContent(); }
+        var stableUsers = StableUserMock.CreateStableUsersMock();
+        _context.StableUsers.AddRange(stableUsers);
+        await _context.SaveChangesAsync();
+
+        //return Created();
+        return Created("", new { message = "opprettet!", stableUsers });
+
+    }
 
     [HttpPost("clearstablemessages")]
     public async Task<IActionResult> ClearStableMessages()
@@ -320,27 +341,70 @@ public class MockController : ControllerBase
     [HttpPost("createdatabase")]
     public async Task<IActionResult> CreateDataBase() //kanskje misvisende navn. Lager innholdet
     {
-        //await ClearDatabase();
-        await CreateUsers();
-        await CreateHorses();
-        await CreateUserRelations();
-        await CreateMessages();
-        await CreateStables();
-        //await CreateStableUSers();
-        await CreateStableMessages();
+    var stopwatch = new Stopwatch();
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating Users");
+    await CreateUsers();
+    Console.WriteLine($"Users created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating Horses");
+    await CreateHorses();
+    Console.WriteLine($"Horses created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating UserRelations");
+    await CreateUserRelations();
+    Console.WriteLine($"UserRelations created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating Messages");
+    await CreateMessages();
+    Console.WriteLine($"Messages created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating Stables");
+    await CreateStables();
+    Console.WriteLine($"Stables created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating StableUsers");
+    await CreateStableUsers();
+    Console.WriteLine($"StableUsers created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating StableMessages");
+    await CreateStableMessages();
+    Console.WriteLine($"StableMessages created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating Trails");
+    await CreateTrails();
+    Console.WriteLine($"Trails created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
         //await CreateRides();
         //await CreateRideDetails();
         //await CreateRideReviews();
         //await CreateRideDetailsDatas();
-        await CreateTrails();
-        await CreateUserHikes();
+    stopwatch.Restart();
+    Console.WriteLine("Creating UserHikes");
+    await CreateUserHikes();
+    Console.WriteLine($"UserHikes created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
         //await CreateTrailDetails();
         //await CreateTrailReviews();
         //await CreateTrailFilters;
-        await CreateSystemSettings();
-        await CreateTrailFavorites();
+    stopwatch.Restart();
+    Console.WriteLine("Creating SystemSettings");
+    await CreateSystemSettings();
+    Console.WriteLine($"SystemSettings created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
 
-        //return Created();
+    stopwatch.Restart();
+    Console.WriteLine("Creating TrailFavorites");
+    await CreateTrailFavorites();
+    Console.WriteLine($"TrailFavorites created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
         return Created("", new { message = "opprettet!"});
 
     }

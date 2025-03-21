@@ -12,13 +12,12 @@ public class StableUser
     public Guid UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public required User User { get; set; }
+    public User User { get; set; }
 
     public Guid StableId { get; set; }
 
     [ForeignKey("StableId")]
-    public required Stable Stable { get; set; }
-
+    public Stable Stable { get; set; }
     public int LikesCount { get ; set ; } = 0 ;
     public int CommentsCount { get ; set ; } = 0;
 

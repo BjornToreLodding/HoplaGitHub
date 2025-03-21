@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 //using HoplaBackend.Models;
 
 namespace HoplaBackend.Models;
@@ -11,6 +12,7 @@ public class TrailDetail
 {
     [Key, ForeignKey("Trail")]
     public Guid Id { get; set; } // Samme som Trail.Id
+    [JsonIgnore]
     public Trail Trail { get; set; } = null!;
     public string? Description { get; set; } 
 

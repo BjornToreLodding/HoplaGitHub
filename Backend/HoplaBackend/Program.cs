@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using Microsoft.Extensions.Configuration;
@@ -145,8 +146,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 // Konfigurer Entity Framework med riktig connection-string
 
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder
+        .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning) // 👈 demper SQL
+        .AddConsole();
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options
+        .UseNpgsql(connectionString)
+        .UseLoggerFactory(loggerFactory));
+        //.EnableSensitiveDataLogging(false) // (valgfritt)
+        //.EnableDetailedErrors(false)       // (valgfritt)
+        //.LogTo(Console.WriteLine, LogLevel.Warning)); //
 
 /*
 // Bruk DbContextFactory i stedet for pooled variant
