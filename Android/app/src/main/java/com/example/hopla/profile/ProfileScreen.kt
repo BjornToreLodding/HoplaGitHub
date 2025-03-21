@@ -51,15 +51,19 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.R
+import com.example.hopla.apiService.changePassword
 import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.apiService.uploadProfilePicture
+import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.PrimaryWhite
+import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.UserSession
@@ -242,6 +246,10 @@ fun UserChanges(modifier: Modifier = Modifier) {
     var responseMessage by remember { mutableStateOf("") }
     var showResponseDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -331,7 +339,82 @@ fun UserChanges(modifier: Modifier = Modifier) {
             )
 
             Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.change_password),
+                modifier = Modifier.clickable { showDialog = true },
+                style = underlinedTextStyleSmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = stringResource(R.string.change_password)) },
+            text = {
+                Column {
+                    TextField(
+                        value = currentPassword,
+                        onValueChange = { currentPassword = it },
+                        label = { Text(text = stringResource(R.string.current_password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text(text = stringResource(R.string.new_password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text(text = stringResource(R.string.confirm_password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (newPassword != confirmPassword) {
+                        Text(
+                            text = stringResource(R.string.passwords_do_not_match),
+                            color = HeartColor,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (newPassword == confirmPassword) {
+                            coroutineScope.launch {
+                                val trimmedCurrentPassword = currentPassword.trim()
+                                val trimmedNewPassword = newPassword.trim()
+                                val trimmedConfirmPassword = confirmPassword.trim()
+                                val (statusCode, message) = changePassword(UserSession.token, trimmedCurrentPassword, trimmedNewPassword, trimmedConfirmPassword)
+                                responseMessage = message
+                                showResponseDialog = true
+                                if (statusCode == 200) {
+                                    showDialog = false
+                                }
+                            }
+                        }
+                    },
+                    enabled = newPassword == confirmPassword
+                ) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     // Response Dialog
