@@ -6,70 +6,113 @@
 //
 
 import SwiftUI
+import Combine
+import KeychainAccess
+import KeychainSwift
+
+
+class HorseDetailsViewModel: ObservableObject {
+    @Published var horse: Horse?
+
+    func fetchHorseDetails(horseId: String) {
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+        
+        let urlString = "https://hopla.onrender.com/horses/\(horseId)"
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, let data = data else {
+                print("Invalid response")
+                return
+            }
+
+            if httpResponse.statusCode == 200 {
+                print("Received data: \(String(data: data, encoding: .utf8) ?? "No data")") // Log the raw response
+                do {
+                    let horse = try JSONDecoder().decode(Horse.self, from: data)
+                    DispatchQueue.main.async {
+                        self.horse = horse
+                        self.horse?.id = horseId
+                    }
+                } catch let DecodingError.dataCorrupted(context) {
+                    print("Data corrupted:", context)
+                } catch let DecodingError.keyNotFound(key, context) {
+                    print("Key '\(key)' not found:", context.debugDescription)
+                    print("Coding path:", context.codingPath)
+                } catch let DecodingError.valueNotFound(value, context) {
+                    print("Value '\(value)' not found:", context.debugDescription)
+                    print("Coding path:", context.codingPath)
+                } catch let DecodingError.typeMismatch(type, context) {
+                    print("Type '\(type)' mismatch:", context.debugDescription)
+                    print("Coding path:", context.codingPath)
+                } catch {
+                    print("Error decoding horse details:", error.localizedDescription)
+                }
+            } else {
+                print("Failed to retrieve horse details. Status Code:", httpResponse.statusCode)
+            }
+        }.resume()
+    }
+
+
+}
+
+
 
 struct HorseDetails: View {
-    @Environment(\.colorScheme) var colorScheme
-    @Environment(\.presentationMode) var presentationMode
-    
-    let horse: Horse
-    
+    @ObservedObject var vm = HorseDetailsViewModel()
+    var horseId: String
+
     var body: some View {
-        ZStack {      
-            VStack(spacing: 0) {
+        VStack(spacing: 20) {
+            if let horse = vm.horse {
                 Text(horse.name)
-                    .font(.title)
+                    .font(.largeTitle)
                     .fontWeight(.bold)
-                    .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right
-                    .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    .foregroundColor(.white)
-                NavigationView {
-                    VStack {
-                        if let urlString = horse.horsePictureUrl, let url = URL(string: urlString) {
-                            AsyncImage(url: url) { image in
-                                image.resizable()
-                                    .scaledToFill()
-                                    .frame(width: 200, height: 200)
-                                    .clipShape(Circle())
-                                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                                    .shadow(radius: 5)
-                                    .padding(.top, 20)
-                            } placeholder: {
-                                ProgressView()
-                                    .frame(width: 200, height: 200)
-                            }
-                        } else {
-                            Circle()
-                                .fill(Color.gray)
-                                .frame(width: 200, height: 200)
-                                .padding(.top, 20)
-                        }
-                        
-                        Spacer()
-                    }
-                    .edgesIgnoringSafeArea(.top) // Ensures it can be placed above navigation elements
+
+                if let breed = horse.breed {
+                    Text("Breed: \(breed)")
+                        .font(.title2)
                 }
-                .navigationBarBackButtonHidden(true) // Hides the default back button
-            }
-            
-            // MARK: - Custom Back Button
-            VStack {
-                HStack {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Image(systemName: "arrow.left")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
-                    }
-                    .position(x: 25, y: 20) // Adjust for exact placement
-                    
-                    Spacer()
+
+                if let age = horse.age {
+                    Text("Age: \(age) years old")
+                        .font(.title2)
                 }
-                Spacer()
+
+                if let urlString = horse.horsePictureUrl, let url = URL(string: urlString) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                            .scaledToFill()
+                            .frame(width: 150, height: 150)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        ProgressView()
+                            .frame(width: 150, height: 150)
+                    }
+                }
+            } else {
+                ProgressView()
             }
+        }
+        .onAppear {
+            vm.fetchHorseDetails(horseId: horseId)
         }
     }
 }
+

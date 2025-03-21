@@ -12,18 +12,31 @@
       }
     },
     "Add a Horse" : {
-
-    },
-    "Add Horse" : {
-
-    },
-    "Antall" : {
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Antall"
+            "value" : "Legg til en hest"
+          }
+        }
+      }
+    },
+    "Add Horse" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legg til hest"
+          }
+        }
+      }
+    },
+    "Age: %lld years old" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alder: %lld år gammel"
           }
         }
       }
@@ -54,6 +67,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gjennomsnitt: "
+          }
+        }
+      }
+    },
+    "Breed: %@" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rase: %@"
           }
         }
       }
@@ -180,10 +203,24 @@
       }
     },
     "Distance" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distanse"
+          }
+        }
+      }
     },
     "Done" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ferdig"
+          }
+        }
+      }
     },
     "Email" : {
       "localizations" : {
@@ -215,6 +252,26 @@
         }
       }
     },
+    "Enter age" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn alder"
+          }
+        }
+      }
+    },
+    "Enter breed" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn rase"
+          }
+        }
+      }
+    },
     "Enter email address" : {
       "localizations" : {
         "nb" : {
@@ -236,7 +293,14 @@
       }
     },
     "Enter horse name" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn hestens navn"
+          }
+        }
+      }
     },
     "Enter new password" : {
       "localizations" : {
@@ -405,7 +469,14 @@
       }
     },
     "Loading profile..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laster profil…"
+          }
+        }
+      }
     },
     "Log In" : {
       "localizations" : {
@@ -428,7 +499,14 @@
       }
     },
     "Login Failed" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login feilet"
+          }
+        }
+      }
     },
     "My hikes" : {
       "localizations" : {
@@ -511,7 +589,14 @@
       }
     },
     "OK" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "Password" : {
       "localizations" : {
@@ -589,7 +674,14 @@
       }
     },
     "Select Image" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg bilde"
+          }
+        }
+      }
     },
     "Send" : {
       "localizations" : {
@@ -622,7 +714,14 @@
       }
     },
     "Start" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
     },
     "Start hike" : {
       "localizations" : {
@@ -665,7 +764,14 @@
       }
     },
     "Time" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tid"
+          }
+        }
+      }
     },
     "Type a message..." : {
       "localizations" : {
