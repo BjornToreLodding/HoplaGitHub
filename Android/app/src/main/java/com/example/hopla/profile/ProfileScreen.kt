@@ -58,6 +58,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.R
 import com.example.hopla.apiService.changePassword
 import com.example.hopla.apiService.fetchAllUsers
+import com.example.hopla.apiService.updateUserInfo
 import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
@@ -236,6 +237,40 @@ fun ProfileButtons(navController: NavController) {
 }
 
 @Composable
+fun EditableTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSave: suspend () -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    Column {
+        Text(text = label)
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = stringResource(R.string.save),
+                    modifier = Modifier.clickable {
+                        coroutineScope.launch {
+                            onSave()
+                        }
+                    }
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
     var username by remember { mutableStateOf(UserSession.alias) }
@@ -266,36 +301,19 @@ fun UserChanges(modifier: Modifier = Modifier) {
             HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Reusable TextField with Save Icon
-            @Composable
-            fun EditableTextField(label: String, value: String, onValueChange: (String) -> Unit, onSave: () -> Unit) {
-                Column {
-                    Text(text = label)
-                    TextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = stringResource(R.string.save),
-                                modifier = Modifier.clickable { onSave() }
-                            )
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-
             // Username
             EditableTextField(
                 label = stringResource(R.string.username),
                 value = username,
                 onValueChange = { username = it },
-                onSave = { UserSession.alias = username }
+                onSave = {
+                    val (statusCode, message) = updateUserInfo(UserSession.token, username, UserSession.name)
+                    if (statusCode == 200) {
+                        UserSession.alias = username
+                    }
+                    responseMessage = message
+                    showResponseDialog = true
+                }
             )
 
             // Email
@@ -319,7 +337,14 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 label = stringResource(R.string.name),
                 value = name,
                 onValueChange = { name = it },
-                onSave = { UserSession.name = name }
+                onSave = {
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias, name)
+                    if (statusCode == 200) {
+                        UserSession.name = name
+                    }
+                    responseMessage = message
+                    showResponseDialog = true
+                }
             )
 
             // Description

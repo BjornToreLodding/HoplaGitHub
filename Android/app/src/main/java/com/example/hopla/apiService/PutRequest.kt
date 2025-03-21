@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.hopla.universalData.ChangePasswordResponse
+import com.example.hopla.universalData.apiUrl
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 
@@ -84,4 +85,33 @@ suspend fun changePassword(
     val message = Json.decodeFromString<ChangePasswordResponse>(responseBody).message
     Log.d("changePassword", "Response: $message")
     return response.status.value to message
+}
+
+suspend fun updateUserInfo(token: String, alias: String, name: String): Pair<Int, String> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.put(apiUrl+"users/update") {
+            header("Authorization", "Bearer $token")
+            contentType(ContentType.Application.Json)
+            setBody(
+                mapOf(
+                    "Alias" to alias,
+                    "Name" to name
+                )
+            )
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("updateUserInfo", "Response: $responseBody")
+    return response.status.value to responseBody
 }
