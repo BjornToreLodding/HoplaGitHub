@@ -33,7 +33,7 @@ iOs: :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
 </td>
 <td>
 
-## :green_book: :alien: :banana: POST /users/login
+## :green_book: :alien: :green_apple: POST /users/login
 
 Logg inn
 
@@ -95,7 +95,7 @@ JSON-Response for brukere som har registrert navn og alias
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /users/profile
+## :green_book: :alien: :green_apple: GET /users/profile
 
 Main profil side
 
@@ -130,7 +130,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /horses/userhorses
+## :green_book: :alien: :green_apple:  GET /horses/userhorses
 
 **Profil -\> Mine hester**
 
@@ -177,7 +177,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /horses/{horseId}
+## :green_book: :alien: :green_apple: GET /horses/{horseId}
 
 **Profil -\> Mine hester -\> Velge en spesifikk hest**
 
@@ -594,9 +594,9 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 </td>
 <td>
 
-## :green_book: :warning: :apple: PUT /upload
+## :green_book: :alien: :apple: PUT /upload
 
-:alien: :apple: Profil -\> Endre profilbilde
+Profil -\> Endre profilbilde
 
 upload.html
 
@@ -642,6 +642,7 @@ Profil -\> Bytte brukernavn
 ## :green_book: :smiling_imp: :apple: PUT /users/update
 
 Body:
+
 ```json
 {
     "Name": "",
@@ -653,17 +654,20 @@ Body:
 ```
 
 Response:
+
 ```json
 {
     "message": "Brukerinformasjon oppdatert."
 }
 ```
+
 Profil -\> Bytte epost
 
 ## :green_book: :smiling_imp: :apple: POST /users/change-email
 
 body:
-```json
+
+````json
 {
     "NewEmail": "test@test.no",
     "Password": "Hopla2025!"
@@ -677,17 +681,17 @@ Response trinn1:
 {
     "message": "E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer"
 }
-```
+````
 
 Åpne epost og trykk på aktiveringslenke. I noen tilfeller har det tatt opptil 30 minutter før eposten har kommet frem.
 
-
 Profil -\> bytte passord
 
-## :green_book: :smiling_imp: :apple: PUT /users/change-password
+## :green_book: :alien: :apple: PUT /users/change-password
 
 body:
-```json
+
+````json
 {
     "OldPassword": "GammeltPass0rd!",
     "NewPassword": "Hopla2025!",
@@ -699,7 +703,7 @@ response:
 {
     "message": "Passordet er endret"
 }
-```
+````
 </td>
 </tr>
 <tr>
@@ -1164,7 +1168,7 @@ https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlev
 </td>
 <td>
 
-## :yellow_circle: :smiling_imp: :apple: GET /stables/all
+## :green_book: :smiling_imp: :apple: GET /stables/all
 
 Community/Fellesskap/Grupper
 
@@ -1188,36 +1192,43 @@ En gruppe kan være: public eller private
 
 **BT**
 
-Denne er laget, men har ikke testdata for å teste hvordan den fungerer.
-
-GET /stables/all
+Den sorterer nå på distanse
 
 **Query**
 
-* search= tekst som skal matche med stallnavnet
-* lat = latitude til bruker
-* long = longitude til bruker
+* search= (optioanal) tekst som skal matche med stallnavnet
+* latitude = latitude til bruker
+* longitude = longitude til bruker
 * page? = (Optional) side nummer. Hvis ikke oppgitt, settes den til 1
 * pageSize? = (Optional) antall treff pr side. Hvis ikke oppgitt, så settes den til 10.
 
-Responce
+**eks**
+```postman
+https://localhost:7128/stables/all?search=byen&latitude=60.8&longitude=10.7&pagesize=50&pagenumber=1
+```
+
+Response
 
 ```json
 {
-    "Stable":
     {
-        "StableId": 12345678-0000-0000-0006-123456780001,
-        "StableName": "GjøvikStallen",
-        "Distance": 5.01,
-        "Member": true,
-        "PictureUrl": "https://...jpg?h=140&w330&crop"
+        "stableId": "12345678-0000-0000-0031-123456780029",
+        "stableName": "Nesbyen Rideklubb",
+        "distance": 90.539,
+        "member": false,
+        "pictureUrl": "https://hopla.imgix.net/12345678-0000-0000-0031-123456780029.jpg?h=140&w394&crop"
     },
-    "stable2":
     {
-        "blablabla"
+        "stableId": "12345678-0000-0000-0031-123456780158",
+        "stableName": "Nesbyen og Omegn Rideklubb",
+        "distance": 90.539, 
+        "member": false,
+        "pictureUrl": "https://hopla.imgix.net/12345678-0000-0000-0031-123456780158.jpg?h=140&w394&crop"
     }
 }
 ```
+
+**Avrunding? på Distanse kan evt frontend gjøre :-) **
 
 sånn cirka
 </td>
@@ -1237,7 +1248,7 @@ Bruker som som oppretter blir automatisk admin.
 
 Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og posisjon (long, lat)
 
-**POST ****https://hopla.onrender.com/stable/create**
+\*\*POST \*\***https://hopla.onrender.com/stable/create**
 
 Body:
 
@@ -1271,7 +1282,7 @@ Denne lager ny stall i Stables OG bruker som lager stallen blir satt som admin i
 </td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: GET /stables/{stableId}
+## :green_book: :smiling_imp: :apple: GET /stables/{stableId}
 
 Community details
 
@@ -1284,6 +1295,76 @@ Ellers trengs: id, bilde, beskrivelse, gruppenavn, medlemsstatus (for å sjekke 
 Skal også legges til: mulighet for å rapportere community og "gå ut av gruppen"
 
 Admin skal kunne: slette community (?)
+
+**BT**
+
+eks:
+```postman
+https://localhost:7128/stables/12345678-0000-0000-0031-123456780001
+```
+
+Response:
+```json
+{
+    "id": "12345678-0000-0000-0031-123456780001",
+    "name": "Skedsmo Rideklubb",
+    "description": "",
+    "pictureUrl": "12345678-0000-0000-0031-123456780001.jpg",
+    "isMember": true
+}
+```
+
+Videre må man hente meldinger med neste endpoint
+
+## :red_circle: :smiling_imp: :apple: GET /stablemessages/{stableId}
+
+eks:
+```postman
+https://localhost:7128/stablemessages/12345678-0000-0000-0031-123456780001?pagesize=10&pagenumber=1
+```
+
+Response:
+```json
+[
+    {
+        "content": "Jeg skal ri klokka 11 imorgen. Noen som vil være med?",
+        "timestamp": "2025-03-12T18:49:13.743609Z",
+        "senderId": "12345678-0000-0000-0001-123456780003",
+        "senderAlias": "Embalasjen"
+    },
+    {
+        "content": "Det passer ikke idag, fordi idag kommer det en som skal klippe negler på hestene, så da må alle hestene være tilgjengelig. Har du glemt det?",
+        "timestamp": "2025-03-11T18:49:13.743608Z",
+        "senderId": "12345678-0000-0000-0001-123456780002",
+        "senderAlias": "Kamuflasjen"
+    },
+    {
+        "content": "Heisann å hopla ofallerallera. Er det noen her inne som vil være med på ridetur ida?",
+        "timestamp": "2025-03-08T18:49:13.743605Z",
+        "senderId": "12345678-0000-0000-0001-123456780001",
+        "senderAlias": "MangeBallerILufra"
+    },
+    {
+        "content": "Det passer ikke idag, fordi det hestene er fulle etter julebordet. Du burde da skjønne det?",
+        "timestamp": "2025-03-07T18:49:13.743604Z",
+        "senderId": "12345678-0000-0000-0001-123456780002",
+        "senderAlias": "Kamuflasjen"
+    },
+    {
+        "content": "Heisann å hopla ofallerallera. Er det noen her inne som vil være med på ridetur ida?",
+        "timestamp": "2025-03-06T18:49:13.743604Z",
+        "senderId": "12345678-0000-0000-0001-123456780001",
+        "senderAlias": "MangeBallerILufra"
+    },
+    {
+        "content": "Det passer ikke idag, fordi det hestene er pyntet til julebordet. Har du glemt det?",
+        "timestamp": "2025-03-05T18:49:13.743604Z",
+        "senderId": "12345678-0000-0000-0001-123456780002",
+        "senderAlias": "Kamuflasjen"
+    }
+]
+```
+
 </td>
 </tr>
 <tr>

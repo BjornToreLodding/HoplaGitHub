@@ -20,6 +20,8 @@ public class Stable
     public int LikesCount { get ; set ; } = 0 ;
     public int CommentsCount { get ; set ; } = 0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public virtual ICollection<StableUser> StableUsers { get; set; } = new List<StableUser>();
+
 
     //public virtual ICollection<Stablemessage> Stablemessages { get; set; } = new List<Stablemessage>();
 

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Data;
 using HoplaBackend.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace HoplaBackend.Controllers;
 
 
-[Route("stablemessage")]
+[Route("stablemessages")]
 [ApiController]
 public class StableMessageController : ControllerBase
 {
@@ -18,10 +20,13 @@ public class StableMessageController : ControllerBase
         _context = context;
     }
 
+    [Authorize]
     [HttpGet("{stableId}")] // Returnerer meldinger mellom to brukere eller siste melding per bruker
     public async Task<IActionResult> GetMessagesBetweenUsers(
         Guid stableId,
-        [FromQuery] Guid? userid) // id er optional, men hvis spesifisert så returneres alle meldinger som user har sendt til stableId
+        [FromQuery] Guid? userid,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] int pageNumber = 1) // id er optional, men hvis spesifisert så returneres alle meldinger som user har sendt til stableId
     {
        /*
         // Hvis id er spesifisert: Hent alle meldinger mellom userId og stableId
@@ -61,6 +66,8 @@ public class StableMessageController : ControllerBase
                 SenderAlias = s.User.Alias,
                 
             })
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(); // Hent resultatet før vi inkluderer brukere
 
         return Ok(stablemessages);

@@ -74,7 +74,7 @@ public class StableController : ControllerBase
     }
     [Authorize]
     [HttpGet("all")] 
-    public async Task<IActionResult> GetStables([FromQuery] string? search, double latitude, double longitude, int pageSize = 10, int pageNumber = 1)
+    public async Task<IActionResult> GetAllStables([FromQuery] string? search, double latitude, double longitude, int pageSize = 10, int pageNumber = 1)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
@@ -109,7 +109,7 @@ public class StableController : ControllerBase
    private string FixPictureUrl(string? originalUrl)
 {
     if (string.IsNullOrWhiteSpace(originalUrl))
-        return "https://files.hopla.no/default.jpg";
+        return "https://hopla.imgix.net/default.jpg";
 
     try
     {
@@ -118,36 +118,62 @@ public class StableController : ControllerBase
 
         // Finn de 4 siste sifrene (kan være f.eks. 0086)
         var match = Regex.Match(filename, @"(\d{4})(?=\.|$)");
-        if (!match.Success) return "https://files.hopla.no/" + originalUrl;
+        if (!match.Success) return "https://hopla.imgix.net/" + originalUrl + "?h=140&w394&crop";;
 
         var originalNumberStr = match.Groups[1].Value;
         if (!int.TryParse(originalNumberStr, out int originalNumber))
-            return "https://files.hopla.no/" + originalUrl;
+            return "https://hopla.imgix.net/" + originalUrl + "?h=140&w394&crop";
 
         // Regn ut nytt tall basert på kun 50 tilgjengelige bilder
-        int reduced = originalNumber % 50;
-        int finalNumber = (reduced / 10) * 10 + 1; // alltid ende på 1
+        int reduced = (originalNumber-1) % 50 + 1;
+        int finalNumber = reduced ;/// 10 * 10 + 1; // alltid ende på 1
 
         string newNumberStr = finalNumber.ToString("D4");
 
         // Bytt ut tallet i filnavnet
         string newFilename = Regex.Replace(filename, @"\d{4}(?=\.|$)", newNumberStr);
 
-        return $"https://files.hopla.no/{newFilename}{extension}";
+        return $"https://hopla.imgix.net/{newFilename}{extension}?h=140&w394&crop";
     }
     catch
     {
-        return "https://files.hopla.no/default.jpg";
+        return "https://hopla.imgix.net/default.jpg";
     }
 }
 
-}
 
-/*
-    [HttpGet("{stableId}")] // Returnerer meldinger mellom to brukere eller siste melding per bruker
-    public async Task<IActionResult> GetMessagesBetweenUsers(
-        Guid stableId,
-        [FromQuery] Guid? userid) // id er optional, men hvis spesifisert så returneres alle meldinger som user har sendt til stableId
+
+    [Authorize]
+    [HttpGet("{stableId}")] 
+    public async Task<IActionResult> GetStable(Guid stableId) 
     {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
+
+        var stable = await _context.Stables
+        .Include(s => s.StableUsers)
+        .Where(s => s.Id == stableId)
+        .Select(s => new
+        {
+            s.Id,
+            s.Name,
+            s.Description,
+            s.PictureUrl,
+            IsMember = s.StableUsers.Any(su => su.UserId == parsedUserId)
+        })
+        .FirstOrDefaultAsync();
+
+    if (stable == null)
+    {
+        return NotFound();
     }
-    */
+
+    return Ok(stable);
+}
+
+}
