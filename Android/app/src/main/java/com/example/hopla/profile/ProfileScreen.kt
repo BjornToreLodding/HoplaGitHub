@@ -307,10 +307,11 @@ fun UserChanges(modifier: Modifier = Modifier) {
             // Username
             EditableTextField(
                 label = stringResource(R.string.username),
-                value = username ?: "",
+                value = username,
                 onValueChange = { username = it },
                 onSave = {
-                    val (statusCode, message) = updateUserInfo(UserSession.token, username ?: "", UserSession.name ?: "")
+                    val (statusCode, message) = updateUserInfo(UserSession.token,
+                        username, UserSession.name ?: "")
                     if (statusCode == 200) {
                         UserSession.alias = username
                     }

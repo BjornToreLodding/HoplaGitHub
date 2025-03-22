@@ -387,15 +387,19 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                             )
                         }
                         Button(onClick = {
-                            if (email.isEmpty() || password.isEmpty() || confirmedPassword.isEmpty()) {
+                            val trimmedEmail = email.trim()
+                            val trimmedPassword = password.trim()
+                            val trimmedConfirmedPassword = confirmedPassword.trim()
+
+                            if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty() || trimmedConfirmedPassword.isEmpty()) {
                                 errorMessage = allFieldsRequiredMessage
                                 showError = true
-                            } else if (password != confirmedPassword) {
+                            } else if (trimmedPassword != trimmedConfirmedPassword) {
                                 errorMessage = passwordsDoNotMatchMessage
                                 showError = true
                             } else {
                                 coroutineScope.launch {
-                                    val (result, code) = registerUser(email, password)
+                                    val (result, code) = registerUser(trimmedEmail, trimmedPassword)
                                     if (code == 200) {
                                         responseMessage = result
                                         showSuccessDialog = true
