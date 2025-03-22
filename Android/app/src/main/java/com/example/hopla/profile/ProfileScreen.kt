@@ -23,9 +23,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -65,6 +65,8 @@ import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
+import com.example.hopla.universalData.DateOfBirthPicker
+import com.example.hopla.universalData.EditableTextField
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.UserSession
@@ -237,48 +239,6 @@ fun ProfileButtons(navController: NavController) {
 }
 
 @Composable
-fun EditableTextField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    onSave: suspend () -> Unit,
-    isPhone: Boolean = false,
-    singleLine: Boolean = true,
-    maxLines: Int = 1
-) {
-    val coroutineScope = rememberCoroutineScope()
-
-    Column {
-        Text(text = label)
-        TextField(
-            value = value,
-            onValueChange = { newValue ->
-                if (!isPhone || newValue.all { it.isDigit() } && newValue.length <= 8) {
-                    onValueChange(newValue)
-                }
-            },
-            singleLine = singleLine,
-            maxLines = maxLines,
-            modifier = Modifier.fillMaxWidth(),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = stringResource(R.string.save),
-                    modifier = Modifier.clickable {
-                        coroutineScope.launch {
-                            onSave()
-                        }
-                    }
-                )
-            }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-}
-
-@Composable
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
     var username by remember { mutableStateOf(UserSession.alias) }
@@ -380,12 +340,22 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 maxLines = 5
             )
 
+            var selectedDay by remember { mutableIntStateOf(1) }
+            var selectedMonth by remember { mutableIntStateOf(1) }
+            var selectedYear by remember { mutableIntStateOf(2000) }
+
             // Date of Birth
-            EditableTextField(
-                label = stringResource(R.string.date_of_birth),
-                value = dob ?: "",
-                onValueChange = { dob = it },
-                onSave = { UserSession.dob = dob }
+            DateOfBirthPicker(
+                selectedDay = selectedDay,
+                selectedMonth = selectedMonth,
+                selectedYear = selectedYear,
+                onDateSelected = { day, month, year ->
+                    selectedDay = day
+                    selectedMonth = month
+                    selectedYear = year
+                    dob = "$year-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
+                },
+                onSave = { /*TODO*/}
             )
 
             Spacer(modifier = Modifier.height(8.dp))

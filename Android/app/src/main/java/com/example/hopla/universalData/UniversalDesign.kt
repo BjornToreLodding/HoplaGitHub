@@ -25,19 +25,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -58,6 +63,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.hopla.R
 import com.example.hopla.apiService.createUserReport
+import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleSmall
@@ -66,6 +72,7 @@ import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -449,5 +456,154 @@ fun CustomButton(text: String, onClick: () -> Unit) {
             contentDescription = null,
             modifier = Modifier.size(16.dp)
         )
+    }
+}
+
+//--------------------- For dropdown menue for date --------------------------------------
+@Composable
+fun DateOfBirthPicker(
+    selectedDay: Int,
+    selectedMonth: Int,
+    selectedYear: Int,
+    onDateSelected: (Int, Int, Int) -> Unit,
+    onSave: suspend () -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val days = (1..31).toList()
+    val months = listOf(
+        stringResource(R.string.january),
+        stringResource(R.string.february),
+        stringResource(R.string.march),
+        stringResource(R.string.april),
+        stringResource(R.string.may),
+        stringResource(R.string.june),
+        stringResource(R.string.july),
+        stringResource(R.string.august),
+        stringResource(R.string.september),
+        stringResource(R.string.october),
+        stringResource(R.string.november),
+        stringResource(R.string.december)
+    )
+    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+    val years = (1925..currentYear).toList()
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(8.dp)
+    ) {
+        // Day Dropdown
+        DropdownMenuBox(
+            items = days,
+            selectedItem = selectedDay,
+            onItemSelected = { day -> onDateSelected(day, selectedMonth, selectedYear) }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Month Dropdown
+        DropdownMenuBox(
+            items = months,
+            selectedItem = months[selectedMonth - 1],  // Display month name
+            displayText = months[selectedMonth - 1].take(3),  // Display first 3 letters
+            onItemSelected = { month ->
+                val index = months.indexOf(month) + 1
+                onDateSelected(selectedDay, index, selectedYear)
+            }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Year Dropdown
+        DropdownMenuBox(
+            items = years,
+            selectedItem = selectedYear,
+            onItemSelected = { year -> onDateSelected(selectedDay, selectedMonth, year) }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Save Icon
+        Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = stringResource(R.string.save),
+            modifier = Modifier.clickable {
+                coroutineScope.launch {
+                    onSave()
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun <T> DropdownMenuBox(
+    items: List<T>,
+    selectedItem: T,
+    onItemSelected: (T) -> Unit,
+    displayText: String = selectedItem.toString()
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        OutlinedButton(
+            onClick = { expanded = true },
+            modifier = Modifier.width(90.dp)
+        ) {
+            Text(text = displayText)
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            items.forEach { item ->
+                DropdownMenuItem(onClick = {
+                    onItemSelected(item)
+                    expanded = false
+                }) {
+                    Text(text = item.toString())
+                }
+            }
+        }
+    }
+}
+
+//--------------- Standard text field with trailing icon ------------------------
+@Composable
+fun EditableTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSave: suspend () -> Unit,
+    isPhone: Boolean = false,
+    singleLine: Boolean = true,
+    maxLines: Int = 1
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    Column {
+        Text(text = label)
+        androidx.compose.material.TextField(
+            value = value,
+            onValueChange = { newValue ->
+                if (!isPhone || newValue.all { it.isDigit() } && newValue.length <= 8) {
+                    onValueChange(newValue)
+                }
+            },
+            singleLine = singleLine,
+            maxLines = maxLines,
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = stringResource(R.string.save),
+                    modifier = Modifier.clickable {
+                        coroutineScope.launch {
+                            onSave()
+                        }
+                    }
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
