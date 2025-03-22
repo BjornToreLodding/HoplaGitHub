@@ -263,3 +263,14 @@ data class DeleteUserResponse(val message: String)
 //-------------Data classes for updating user information----------------
 @Serializable
 data class ChangePasswordResponse(val message: String)
+
+
+//-----------Data classes for stables----------------
+@Serializable
+data class Stable(
+    val stableId: String,
+    val stableName: String,
+    val distance: Double,
+    val member: Boolean,
+    val pictureUrl: String
+)

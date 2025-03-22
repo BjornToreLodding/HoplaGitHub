@@ -57,7 +57,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.hopla.apiService.fetchMessages
+import com.example.hopla.apiService.fetchStables
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.Community
 import com.example.hopla.universalData.CommunityMemberStatus
@@ -69,8 +71,20 @@ import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.SimpleMapScreen
+import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.UserSession
 import com.google.android.gms.maps.model.LatLng
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Bundle
+import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import kotlinx.coroutines.launch
 
 // Define the communities list
 val communities = listOf(
@@ -117,18 +131,37 @@ val communities = listOf(
         communityStatus = CommunityStatus.PRIVATE
     )
 )
-
-// Composable function to display the community screen
 @Composable
-fun CommunityScreen(navController: NavController) {
+fun CommunityScreen(navController: NavController, token: String) {
     var searchQuery by remember { mutableStateOf("") }
     var showLikedOnly by remember { mutableStateOf(false) }
-    val likedCommunities = remember { mutableStateListOf<Community>() }
+    val likedStables = remember { mutableStateListOf<Stable>() }
+    var stables by remember { mutableStateOf(listOf<Stable>()) }
+    var latitude by remember { mutableStateOf(0.0) }
+    var longitude by remember { mutableStateOf(0.0) }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
-    // Filter the communities based on the search query and liked status
-    val filteredCommunities = communities.filter {
-        it.name.contains(searchQuery, ignoreCase = true) &&
-                (!showLikedOnly || likedCommunities.contains(it))
+    // Fetch the current location when the composable is first launched
+    LaunchedEffect(Unit) {
+        Log.d("CommunityScreen", "LaunchedEffect triggered")
+        getCurrentLocation(context) { location ->
+            Log.d("CommunityScreen", "Location received: ${location.latitude}, ${location.longitude}")
+            latitude = location.latitude
+            longitude = location.longitude
+            coroutineScope.launch {
+                Log.d("CommunityScreen", "Coroutine launched")
+                val fetchedStables = fetchStables(token, "", latitude, longitude, 1)
+                Log.d("CommunityScreen", "Stables fetched: ${fetchedStables.size}")
+                stables = fetchedStables
+            }
+        }
+    }
+
+    // Filter the stables based on the search query and liked status
+    val filteredStables = stables.filter {
+        it.stableName.contains(searchQuery, ignoreCase = true) &&
+                (!showLikedOnly || likedStables.contains(it))
     }
 
     // Column for the community screen (whole screen)
@@ -151,8 +184,8 @@ fun CommunityScreen(navController: NavController) {
                     .padding(top = 1.dp)
             ) {
                 // Display the community groups
-                items(filteredCommunities) { community ->
-                    CommunityCard(community, navController, likedCommunities)
+                items(filteredStables) { stable ->
+                    StableCard(stable, navController, likedStables)
                 }
             }
         }
@@ -161,10 +194,9 @@ fun CommunityScreen(navController: NavController) {
     }
 }
 
-// Composable function to display a community group card
 @Composable
-fun CommunityCard(community: Community, navController: NavController, likedCommunities: MutableList<Community>) {
-    var isLiked by remember { mutableStateOf(likedCommunities.contains(community)) }
+fun StableCard(stable: Stable, navController: NavController, likedStables: MutableList<Stable>) {
+    var isLiked by remember { mutableStateOf(likedStables.contains(stable)) }
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -172,12 +204,12 @@ fun CommunityCard(community: Community, navController: NavController, likedCommu
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 4.dp)
-            .clickable { navController.navigate("communityDetail/${community.name}") }
+            .clickable { navController.navigate("stableDetail/${stable.stableId}") }
     ) {
         Box {
             Image(
-                painter = painterResource(id = community.imageResource),
-                contentDescription = community.name,
+                painter = rememberImagePainter(stable.pictureUrl),
+                contentDescription = stable.stableName,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -189,7 +221,7 @@ fun CommunityCard(community: Community, navController: NavController, likedCommu
                     .background(Color.Black.copy(alpha = 0.3f))
             )
             Text(
-                text = community.name,
+                text = stable.stableName,
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier
@@ -205,9 +237,9 @@ fun CommunityCard(community: Community, navController: NavController, likedCommu
                     onClick = {
                         isLiked = !isLiked
                         if (isLiked) {
-                            likedCommunities.add(community)
+                            likedStables.add(stable)
                         } else {
-                            likedCommunities.remove(community)
+                            likedStables.remove(stable)
                         }
                     }
                 ) {
@@ -540,3 +572,43 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
     }
 }
 
+fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    val locationProvider = LocationManager.GPS_PROVIDER
+
+    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        val lastKnownLocation: Location? = locationManager.getLastKnownLocation(locationProvider)
+        if (lastKnownLocation != null) {
+            Log.d("CommunityScreen", "Location found: ${lastKnownLocation.latitude}, ${lastKnownLocation.longitude}")
+            val userLocation = LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude)
+            onLocationReceived(userLocation)
+        } else {
+            Log.d("CommunityScreen", "No last known location available, requesting location update")
+            val locationListener = object : android.location.LocationListener {
+                override fun onLocationChanged(location: Location) {
+                    Log.d("CommunityScreen", "Location update received: ${location.latitude}, ${location.longitude}")
+                    val userLocation = LatLng(location.latitude, location.longitude)
+                    onLocationReceived(userLocation)
+                    locationManager.removeUpdates(this)
+                }
+
+                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+                override fun onProviderEnabled(provider: String) {}
+                override fun onProviderDisabled(provider: String) {}
+            }
+            locationManager.requestSingleUpdate(locationProvider, locationListener, null)
+
+            // Add a timeout to handle cases where the location update is not received
+            val handler = android.os.Handler(context.mainLooper)
+            handler.postDelayed({
+                Log.d("CommunityScreen", "Location update timeout")
+                locationManager.removeUpdates(locationListener)
+                // Handle the timeout case, e.g., show a message to the user
+            }, 10000) // 10 seconds timeout
+        }
+    } else {
+        Log.d("CommunityScreen", "Location permissions not granted")
+        // Handle the case where permissions are not granted
+    }
+}

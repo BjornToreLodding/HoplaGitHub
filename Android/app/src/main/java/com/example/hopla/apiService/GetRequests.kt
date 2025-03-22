@@ -11,6 +11,7 @@ import com.example.hopla.universalData.HorseDetail
 import com.example.hopla.universalData.MapTrail
 import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.OtherUsers
+import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.*
@@ -298,5 +299,39 @@ suspend fun fetchAllUsers(token: String): List<OtherUsers> {
             }
         }
         response.body()
+    }
+}
+
+//-------------------GET requests for stables--------------
+suspend fun fetchStables(token: String, search: String, latitude: Double, longitude: Double, pageNumber: Int): List<Stable> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        try {
+
+            Log.d("fetchStables", "Requesting stables with parameters: search=$search, latitude=$latitude, longitude=$longitude, pageNumber=$pageNumber")
+            val response: HttpResponse = client.get("https://hopla.onrender.com/stables/all?search=$search&latitude=$latitude&longitude=$longitude&pagenumber=$pageNumber") {
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
+            }
+            val responseBody: String = response.bodyAsText()
+            Log.d("fetchStables", "Response: $responseBody")
+            if (response.status == HttpStatusCode.OK) {
+                response.body()
+            } else {
+                Log.e("fetchStables", "Request failed with status: ${response.status}")
+                Log.e("fetchStables", "Error response: $responseBody")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("fetchStables", "Exception occurred: ${e.message}", e)
+            emptyList()
+        }
     }
 }

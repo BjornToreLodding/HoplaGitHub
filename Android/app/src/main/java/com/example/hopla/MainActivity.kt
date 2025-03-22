@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Home.route) { HomeScreen() }
                             composable(Screen.Trails.route) { TrailsScreen(navController) }
                             composable(Screen.NewTrip.route) { NewTripScreen() }
-                            composable(Screen.Community.route) { CommunityScreen(navController) }
+                            composable(Screen.Community.route) { CommunityScreen(navController, UserSession.token) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("friends_list/{userId}") { backStackEntry ->
                                 val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
