@@ -241,7 +241,8 @@ fun EditableTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    onSave: suspend () -> Unit
+    onSave: suspend () -> Unit,
+    isPhone: Boolean = false
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -249,7 +250,11 @@ fun EditableTextField(
         Text(text = label)
         TextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                if (!isPhone || newValue.all { it.isDigit() } && newValue.length <= 8) {
+                    onValueChange(newValue)
+                }
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
@@ -324,12 +329,20 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onSave = { UserSession.email = email }
             )
 
-            // Phone (Handled as a nullable integer)
+            // Phone
             EditableTextField(
                 label = stringResource(R.string.phone),
                 value = phone,
                 onValueChange = { phone = it },
-                onSave = { UserSession.telephone = phone.toIntOrNull() }
+                onSave = {
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias, UserSession.name, phone)
+                    if (statusCode == 200) {
+                        UserSession.telephone = phone.toIntOrNull()
+                    }
+                    responseMessage = message
+                    showResponseDialog = true
+                },
+                isPhone = true
             )
 
             // Name

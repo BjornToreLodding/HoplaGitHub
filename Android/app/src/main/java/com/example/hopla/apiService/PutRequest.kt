@@ -87,7 +87,7 @@ suspend fun changePassword(
     return response.status.value to message
 }
 
-suspend fun updateUserInfo(token: String, alias: String, name: String): Pair<Int, String> {
+suspend fun updateUserInfo(token: String, alias: String, name: String, phone: String? = null): Pair<Int, String> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -98,16 +98,19 @@ suspend fun updateUserInfo(token: String, alias: String, name: String): Pair<Int
         }
     }
 
+    val requestBody = mutableMapOf(
+        "Alias" to alias,
+        "Name" to name
+    )
+    phone?.let {
+        requestBody["Telephone"] = it
+    }
+
     val response: HttpResponse = httpClient.use { client ->
-        client.put(apiUrl+"users/update") {
+        client.put(apiUrl + "users/update") {
             header("Authorization", "Bearer $token")
             contentType(ContentType.Application.Json)
-            setBody(
-                mapOf(
-                    "Alias" to alias,
-                    "Name" to name
-                )
-            )
+            setBody(requestBody)
         }
     }
 
