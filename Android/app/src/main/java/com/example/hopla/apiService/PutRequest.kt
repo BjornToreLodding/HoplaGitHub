@@ -87,7 +87,14 @@ suspend fun changePassword(
     return response.status.value to message
 }
 
-suspend fun updateUserInfo(token: String, alias: String, name: String, phone: String? = null, description: String? = null): Pair<Int, String> {
+suspend fun updateUserInfo(
+    token: String,
+    alias: String,
+    name: String,
+    phone: String? = null,
+    description: String? = null,
+    password: String? = null
+): Pair<Int, String> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -108,6 +115,11 @@ suspend fun updateUserInfo(token: String, alias: String, name: String, phone: St
     description?.let {
         requestBody["Description"] = it
     }
+    password?.let {
+        requestBody["Password"] = it
+    }
+
+    Log.d("updateUserInfo", "Request Body: $requestBody")
 
     val response: HttpResponse = httpClient.use { client ->
         client.put(apiUrl + "users/update") {

@@ -600,7 +600,9 @@ fun EditableTextField(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = stringResource(R.string.save),
                     modifier = Modifier.clickable {
-                        showPasswordDialog = true
+                        coroutineScope.launch {
+                            onSave()
+                        }
                     }
                 )
             }
