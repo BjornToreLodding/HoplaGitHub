@@ -4,11 +4,11 @@ object UserSession {
     var token: String = ""
     var userId: String = ""
     var email: String = ""
-    var name: String = ""
-    var alias: String = ""
+    var name: String? = ""
+    var alias: String? = ""
     var profilePictureURL: String = ""
     var telephone: Int? = null
-    var description: String = ""
+    var description: String? = ""
     var dob: String? = ""
     var redirect: String = ""
 

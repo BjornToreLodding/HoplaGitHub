@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.hopla.apiService.handleLogin
+import com.example.hopla.apiService.registerUser
 import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
@@ -55,6 +56,7 @@ import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleBig
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.ImagePicker
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit) {
@@ -185,8 +187,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
             onDismiss = { showCreateUserDialogue = false },
             onCreateUser = { email, password ->
                 onCreateUser()
-            },
-            onLogin = onLogin
+            }
         )
     }
 
@@ -320,227 +321,111 @@ fun InfoDialog(onDismiss: () -> Unit) {
 
 // Dialog for creating a new user
 @Composable
-fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Unit, onLogin: () -> Unit) {
+fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmedPassword by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    var showAdditionalUserInfoDialog by remember { mutableStateOf(false) }
+    var responseMessage by remember { mutableStateOf("") }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     val allFieldsRequiredMessage = stringResource(R.string.all_fields_are_required)
     val passwordsDoNotMatchMessage = stringResource(R.string.passwords_do_not_match)
+    val coroutineScope = rememberCoroutineScope()
 
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.background,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+    if (showSuccessDialog) {
+        SuccessDialog(message = responseMessage, onDismiss = onDismiss)
+    } else {
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.background,
+                modifier = Modifier.padding(16.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.create_user),
-                    style = underheaderTextStyle,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },                    singleLine = true,
-                    isError = showError && email.isEmpty(),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true,
-                    isError = showError && password.isEmpty(),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = confirmedPassword,
-                    onValueChange = { confirmedPassword = it },
-                    label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },                    visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true,
-                    isError = showError && (confirmedPassword.isEmpty() || password != confirmedPassword),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                if (showError) {
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(onClick = onDismiss) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            style = buttonTextStyle
-                        )
-                    }
-                    Button(onClick = {
-                        if (email.isEmpty() || password.isEmpty() || confirmedPassword.isEmpty()) {
-                            errorMessage = allFieldsRequiredMessage
-                            showError = true
-                        } else if (password != confirmedPassword) {
-                            errorMessage = passwordsDoNotMatchMessage
-                            showError = true
-                        } else {
-                            onCreateUser(email, password)
-                            showAdditionalUserInfoDialog = true
-                        }
-                    }) {
-                        Text(
-                            text = stringResource(R.string.create_user),
-                            style = buttonTextStyle
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    if (showAdditionalUserInfoDialog) {
-        AdditionalUserInfoDialog(onDismiss = { showAdditionalUserInfoDialog = false }, onConfirm = { alias, name, description, birthDate, phone, imageBitmap ->
-            // Handle the additional user info and log in the user
-            onLogin()
-        })
-    }
-}
-
-@Composable
-fun AdditionalUserInfoDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String, String, String, String, String?, Bitmap?) -> Unit
-) {
-    var alias by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var birthDate by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var showError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    val allFieldsRequiredMessage = stringResource(R.string.fill_inn_marked_fields)
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.background,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.additional_user_info),
-                    style = underheaderTextStyle,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                TextField(
-                    value = alias,
-                    onValueChange = { alias = it },
-                    label = { Text(text = stringResource(R.string.alias), style = textFieldLabelTextStyle) },                    singleLine = true,
-                    isError = showError && alias.isEmpty(),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text(text = stringResource(R.string.name), style = textFieldLabelTextStyle) },
-                    singleLine = true,
-                    isError = showError && name.isEmpty(),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(text = stringResource(R.string.description), style = textFieldLabelTextStyle) },                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = birthDate,
-                    onValueChange = { birthDate = it },
-                    label = { Text(text = stringResource(R.string.birth_date), style = textFieldLabelTextStyle) },                    singleLine = true,
-                    isError = showError && birthDate.isEmpty(),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = phone,
-                    onValueChange = { phone = it },
-                    label = { Text(text = stringResource(R.string.phone), style = textFieldLabelTextStyle) },                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
-
-                // Image Picker Section
-                ImagePicker(
-                    onImageSelected = { bitmap -> imageBitmap = bitmap },
-                    text = if (imageBitmap == null) stringResource(R.string.select_image) else stringResource(R.string.change_image)
-                )
-
-                imageBitmap?.let { bitmap ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Text(
+                        text = stringResource(R.string.create_user),
+                        style = underheaderTextStyle,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },
+                        singleLine = true,
+                        isError = showError && email.isEmpty(),
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                    ) {
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = stringResource(R.string.selected_image),
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(CircleShape)
-                                .border(1.dp, PrimaryGray, CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = { imageBitmap = null }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.remove_image))
-                        }
-                    }
-                }
-
-                if (showError) {
-                    Text(
-                        text = errorMessage,
-                        style = generalTextStyleRed,
-                        modifier = Modifier.padding(top = 8.dp)
                     )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(onClick = onDismiss) {
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        isError = showError && password.isEmpty(),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+                    TextField(
+                        value = confirmedPassword,
+                        onValueChange = { confirmedPassword = it },
+                        label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        isError = showError && (confirmedPassword.isEmpty() || password != confirmedPassword),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+                    if (showError) {
                         Text(
-                            text = stringResource(R.string.cancel),
-                            style = buttonTextStyle
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
-                    Button(onClick = {
-                        if (alias.isEmpty() || name.isEmpty() || birthDate.isEmpty()) {
-                            errorMessage = allFieldsRequiredMessage
-                            showError = true
-                        } else {
-                            onConfirm(alias, name, description, birthDate, phone, imageBitmap)
-                            onDismiss()
-                        }
-                    }) {
+                    if (responseMessage.isNotEmpty()) {
                         Text(
-                            text = stringResource(R.string.confirm),
-                            style = buttonTextStyle
+                            text = responseMessage,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 8.dp)
                         )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(onClick = onDismiss) {
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                style = buttonTextStyle
+                            )
+                        }
+                        Button(onClick = {
+                            if (email.isEmpty() || password.isEmpty() || confirmedPassword.isEmpty()) {
+                                errorMessage = allFieldsRequiredMessage
+                                showError = true
+                            } else if (password != confirmedPassword) {
+                                errorMessage = passwordsDoNotMatchMessage
+                                showError = true
+                            } else {
+                                coroutineScope.launch {
+                                    val (result, code) = registerUser(email, password)
+                                    if (code == 200) {
+                                        responseMessage = result
+                                        showSuccessDialog = true
+                                    } else {
+                                        responseMessage = result
+                                    }
+                                }
+                            }
+                        }) {
+                            Text(
+                                text = stringResource(R.string.create_user),
+                                style = buttonTextStyle
+                            )
+                        }
                     }
                 }
             }
@@ -548,3 +433,32 @@ fun AdditionalUserInfoDialog(
     }
 }
 
+// Define the SuccessDialog composable
+@Composable
+fun SuccessDialog(message: String, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.success),
+                    style = underheaderTextStyle,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(text = message)
+                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
+                    Text(
+                        text = stringResource(R.string.ok),
+                        style = buttonTextStyle
+                    )
+                }
+            }
+        }
+    }
+}

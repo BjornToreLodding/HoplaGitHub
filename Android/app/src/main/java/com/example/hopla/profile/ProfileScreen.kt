@@ -276,10 +276,10 @@ fun PasswordConfirmationDialog(
 @Composable
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
-    var username by remember { mutableStateOf(UserSession.alias) }
+    var username by remember { mutableStateOf(UserSession.alias ?: "") }
     var phone by remember { mutableStateOf(UserSession.telephone?.toString() ?: "") }
-    var name by remember { mutableStateOf(UserSession.name) }
-    var description by remember { mutableStateOf(UserSession.description) }
+    var name by remember { mutableStateOf(UserSession.name ?: "")}
+    var description by remember { mutableStateOf(UserSession.description ?: "")}
     var dob by remember { mutableStateOf(UserSession.dob) }
     var responseMessage by remember { mutableStateOf("") }
     var showResponseDialog by remember { mutableStateOf(false) }
@@ -307,10 +307,10 @@ fun UserChanges(modifier: Modifier = Modifier) {
             // Username
             EditableTextField(
                 label = stringResource(R.string.username),
-                value = username,
+                value = username ?: "",
                 onValueChange = { username = it },
                 onSave = {
-                    val (statusCode, message) = updateUserInfo(UserSession.token, username, UserSession.name)
+                    val (statusCode, message) = updateUserInfo(UserSession.token, username ?: "", UserSession.name ?: "")
                     if (statusCode == 200) {
                         UserSession.alias = username
                     }
@@ -333,7 +333,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = phone,
                 onValueChange = { phone = it },
                 onSave = {
-                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias, UserSession.name, phone)
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", phone)
                     if (statusCode == 200) {
                         UserSession.telephone = phone.toIntOrNull()
                     }
@@ -349,7 +349,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = name,
                 onValueChange = { name = it },
                 onSave = {
-                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias, name)
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", name)
                     if (statusCode == 200) {
                         UserSession.name = name
                     }
@@ -364,7 +364,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 value = description,
                 onValueChange = { description = it },
                 onSave = {
-                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias, UserSession.name, description = description)
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", description = description)
                     if (statusCode == 200) {
                         UserSession.description = description
                     }

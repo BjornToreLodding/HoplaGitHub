@@ -158,5 +158,6 @@
     <string name="day">Day</string>
     <string name="month">Month</string>
     <string name="year">Year</string>
+    <string name="success">Success</string>
 
 </resources>

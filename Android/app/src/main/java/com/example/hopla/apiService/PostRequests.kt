@@ -167,3 +167,32 @@ suspend fun changeEmail(newEmail: String, password: String): String {
         }
     }
 }
+
+//-------------- Create a new user -> 1st step---------------------
+suspend fun registerUser(email: String, password: String): Pair<String, Int> {
+    val url = apiUrl + "users/register"
+    val requestBody = JSONObject().apply {
+        put("Email", email)
+        put("Password", password)
+    }.toString()
+
+    val client = OkHttpClient()
+    val request = Request.Builder()
+        .url(url)
+        .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
+        .build()
+
+    return withContext(Dispatchers.IO) {
+        try {
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string()
+            Log.d("registerUser", "Response Code: ${response.code}")
+            Log.d("registerUser", "Response Body: $responseBody")
+
+            Pair(responseBody ?: "Success", response.code)
+        } catch (e: Exception) {
+            Log.e("registerUser", "Exception: ${e.message}")
+            Pair("Exception: ${e.message}", -1)
+        }
+    }
+}

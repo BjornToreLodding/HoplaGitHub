@@ -47,11 +47,11 @@ data class Horse(
 data class User(
     val token: String,
     val userId: String,
-    val name: String,
-    val alias: String,
+    val name: String? = null,
+    val alias: String? = null,
     val pictureUrl: String,
     val telephone: Int? = null,
-    val description: String,
+    val description: String? = null,
     val dob: String? = null,
     val redirect: String
 )

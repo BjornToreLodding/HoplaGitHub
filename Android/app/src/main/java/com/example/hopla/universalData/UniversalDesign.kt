@@ -357,7 +357,7 @@ fun MessageBox(
                                 id = UUID.randomUUID().toString(),
                                 content = newMessage,
                                 timestamp = System.currentTimeMillis(),
-                                username = UserSession.alias
+                                username = UserSession.alias?: ""
                             )
                             messages.add(newMsg)
                             onMessageChange("")
