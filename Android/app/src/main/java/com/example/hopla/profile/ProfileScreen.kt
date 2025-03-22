@@ -242,7 +242,9 @@ fun EditableTextField(
     value: String,
     onValueChange: (String) -> Unit,
     onSave: suspend () -> Unit,
-    isPhone: Boolean = false
+    isPhone: Boolean = false,
+    singleLine: Boolean = true,
+    maxLines: Int = 1
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -255,7 +257,8 @@ fun EditableTextField(
                     onValueChange(newValue)
                 }
             },
-            singleLine = true,
+            singleLine = singleLine,
+            maxLines = maxLines,
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 Icon(
@@ -365,7 +368,16 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 label = stringResource(R.string.description),
                 value = description,
                 onValueChange = { description = it },
-                onSave = { UserSession.description = description }
+                onSave = {
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias, UserSession.name, description = description)
+                    if (statusCode == 200) {
+                        UserSession.description = description
+                    }
+                    responseMessage = message
+                    showResponseDialog = true
+                },
+                singleLine = false,
+                maxLines = 5
             )
 
             // Date of Birth
