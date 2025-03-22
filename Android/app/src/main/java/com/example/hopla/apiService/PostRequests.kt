@@ -25,6 +25,13 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 fun handleLogin(
     username: String,
@@ -122,4 +129,41 @@ suspend fun createUserReport(token: String, reportRequest: UserReportRequest): U
     Log.d("createUserReport", "Response: $responseBody")
     client.close()
     return Json.decodeFromString(UserReportResponse.serializer(), responseBody)
+}
+
+//----------- Post request for changing email -----------------------------
+suspend fun changeEmail(newEmail: String, password: String): String {
+    val url = apiUrl+"users/change-email"
+    val requestBody = JSONObject().apply {
+        put("NewEmail", newEmail)
+        put("Password", password)
+    }.toString()
+
+    Log.d("changeEmail", "Request URL: $url")
+    Log.d("changeEmail", "Request Body: $requestBody")
+
+    val client = OkHttpClient()
+    val request = Request.Builder()
+        .url(url)
+        .addHeader("Authorization", "Bearer ${UserSession.token}")
+        .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
+        .build()
+
+    return withContext(Dispatchers.IO) {
+        try {
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string()
+            Log.d("changeEmail", "Response Code: ${response.code}")
+            Log.d("changeEmail", "Response Body: $responseBody")
+
+            if (response.isSuccessful) {
+                responseBody ?: "Success"
+            } else {
+                responseBody ?: "Error: ${response.message}"
+            }
+        } catch (e: Exception) {
+            Log.e("changeEmail", "Exception: ${e.message}")
+            "Exception: ${e.message}"
+        }
+    }
 }

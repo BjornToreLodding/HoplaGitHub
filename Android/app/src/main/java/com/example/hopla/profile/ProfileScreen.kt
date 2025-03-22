@@ -239,6 +239,41 @@ fun ProfileButtons(navController: NavController) {
 }
 
 @Composable
+fun PasswordConfirmationDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var password by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.confirm_password)) },
+        text = {
+            Column {
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text(text = stringResource(R.string.password)) },
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm(password) }) {
+                Text(text = stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
     var username by remember { mutableStateOf(UserSession.alias) }

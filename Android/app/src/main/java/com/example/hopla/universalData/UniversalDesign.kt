@@ -62,7 +62,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.hopla.R
+import com.example.hopla.apiService.changeEmail
 import com.example.hopla.apiService.createUserReport
+import com.example.hopla.profile.PasswordConfirmationDialog
 import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
@@ -577,6 +579,9 @@ fun EditableTextField(
     maxLines: Int = 1
 ) {
     val coroutineScope = rememberCoroutineScope()
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var responseMessage by remember { mutableStateOf("") }
+    var showResponseDialog by remember { mutableStateOf(false) }
 
     Column {
         Text(text = label)
@@ -595,9 +600,7 @@ fun EditableTextField(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = stringResource(R.string.save),
                     modifier = Modifier.clickable {
-                        coroutineScope.launch {
-                            onSave()
-                        }
+                        showPasswordDialog = true
                     }
                 )
             }
@@ -605,5 +608,31 @@ fun EditableTextField(
         Spacer(modifier = Modifier.height(8.dp))
         HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
         Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (showPasswordDialog) {
+        PasswordConfirmationDialog(
+            onDismiss = { showPasswordDialog = false },
+            onConfirm = { password ->
+                coroutineScope.launch {
+                    val response = changeEmail(value, password)
+                    responseMessage = response
+                    showResponseDialog = true
+                    showPasswordDialog = false
+                }
+            }
+        )
+    }
+
+    if (showResponseDialog) {
+        AlertDialog(
+            onDismissRequest = { showResponseDialog = false },
+            text = { Text(text = responseMessage) },
+            confirmButton = {
+                Button(onClick = { showResponseDialog = false }) {
+                    Text(text = stringResource(R.string.close))
+                }
+            }
+        )
     }
 }
