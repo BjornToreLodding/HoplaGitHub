@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using HoplaBackend.Helpers;
 using System.Text.RegularExpressions;
+using HoplaBackend.Services;
+using Org.BouncyCastle.Bcpg;
 
 namespace HoplaBackend.Controllers;
 
@@ -15,12 +17,68 @@ namespace HoplaBackend.Controllers;
 public class StableController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly ImageUploadService _imageUploadService;
 
-    public StableController(AppDbContext context)
+    public StableController(AppDbContext context, ImageUploadService imageUploadService)
     {
         _context = context;
+        _imageUploadService = imageUploadService;
     }
 
+    [Authorize]
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateStable([FromForm] CreateStableForm request)
+    {
+        if (request == null || string.IsNullOrEmpty(request.Name))
+            return BadRequest("Stable cannot be empty when creating it.");
+
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+
+        var user = await _context.Users.FindAsync(parsedUserId);
+        if (user == null)
+            return NotFound(new { message = "Brukeren ble ikke funnet." });
+
+        // Last opp bildet (hvis det finnes)
+        string? pictureUrl = null;
+        if (request.Image != null)
+        {
+            pictureUrl = await _imageUploadService.UploadImageAsync(request.Image);
+        }
+
+        var stable = new Stable
+        {
+            Name = request.Name,
+            Description = request.Description,
+            PictureUrl = pictureUrl,
+            Latitude = request.Latitude,
+            Longitude = request.Longitude,
+            PrivateGroup = request.PrivateGroup
+        };
+
+        _context.Stables.Add(stable);
+        await _context.SaveChangesAsync();
+
+        var stableUser = new StableUser
+        {
+            UserId = parsedUserId,
+            StableId = stable.Id,
+            IsOwner = true,
+            IsAdmin = true,
+            User = user,
+            Stable = stable
+        };
+
+        _context.StableUsers.Add(stableUser);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Stable created successfully.", StableId = stable.Id });
+    }
+
+
+    /* Gammelt Backup før bildeopplasting
     [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> CreateStable([FromBody] CreateStableRequest request)
@@ -72,9 +130,11 @@ public class StableController : ControllerBase
 
         return Ok(new { message = "Stable created successfully.", StableId = stable.Id });
     }
+    */
+
     [Authorize]
     [HttpGet("all")] 
-    public async Task<IActionResult> GetAllStables([FromQuery] string? search, double latitude, double longitude, int pageSize = 10, int pageNumber = 1)
+    public async Task<IActionResult> GetAllStables([FromQuery] string? search, Guid? userId, double latitude, double longitude, int pageSize = 10, int pageNumber = 1)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
@@ -83,10 +143,19 @@ public class StableController : ControllerBase
         }
         if (latitude == 0 || longitude == 0)
             return BadRequest(new {message = "latitude og longitude må oppgis i querystring"});
-        // Trinn 1: Hent stables fra databasen (kun det nødvendige først)
-        var stables = await _context.Stables
-            .Where(s => string.IsNullOrEmpty(search) || s.Name.Contains(search))
-            .ToListAsync(); // Henter alle stables som matcher søket
+        
+        // Trinn 1: Hent stables fra databasen (kun det nødvendige først og hvis)
+        var stablesQuery = _context.Stables
+            .Where(s => string.IsNullOrEmpty(search) || s.Name.Contains(search));
+
+        // Filtrer på medlemskap hvis userId er oppgitt
+        if (userId.HasValue)
+        {
+            stablesQuery = stablesQuery
+                .Where(s => _context.StableUsers.Any(su => su.StableId == s.Id && su.UserId == userId.Value));
+        }
+
+        var stables = await stablesQuery.ToListAsync();
 
         // Trinn 2: Gå over til minnet og beregn avstand
         
@@ -106,42 +175,46 @@ public class StableController : ControllerBase
 
         return Ok(result);
     }
-   private string FixPictureUrl(string? originalUrl)
-{
-    if (string.IsNullOrWhiteSpace(originalUrl))
-        return "https://hopla.imgix.net/default.jpg";
 
-    try
+    //Midlertidig fiks da det kun er bilder for stall 1-50. For stall 51-899 så brukes bilde 1-50
+    //0071 får 0021
+    //0235 får 0035
+    //0888 får 0038
+    // altså modlo NNNN % 50, men med noen justeringer.
+    private string FixPictureUrl(string? originalUrl)
     {
-        var filename = Path.GetFileNameWithoutExtension(originalUrl);
-        var extension = Path.GetExtension(originalUrl);
+        if (string.IsNullOrWhiteSpace(originalUrl))
+            return "https://hopla.imgix.net/default.jpg";
 
-        // Finn de 4 siste sifrene (kan være f.eks. 0086)
-        var match = Regex.Match(filename, @"(\d{4})(?=\.|$)");
-        if (!match.Success) return "https://hopla.imgix.net/" + originalUrl + "?h=140&w394&crop";;
+        try
+        {
+            var filename = Path.GetFileNameWithoutExtension(originalUrl);
+            var extension = Path.GetExtension(originalUrl);
 
-        var originalNumberStr = match.Groups[1].Value;
-        if (!int.TryParse(originalNumberStr, out int originalNumber))
-            return "https://hopla.imgix.net/" + originalUrl + "?h=140&w394&crop";
+            // Finn de 4 siste sifrene (kan være f.eks. 0086)
+            var match = Regex.Match(filename, @"(\d{4})(?=\.|$)");
+            if (!match.Success) return "https://hopla.imgix.net/" + originalUrl + "?h=140&w394&crop";;
 
-        // Regn ut nytt tall basert på kun 50 tilgjengelige bilder
-        int reduced = (originalNumber-1) % 50 + 1;
-        int finalNumber = reduced ;/// 10 * 10 + 1; // alltid ende på 1
+            var originalNumberStr = match.Groups[1].Value;
+            if (!int.TryParse(originalNumberStr, out int originalNumber))
+                return "https://hopla.imgix.net/" + originalUrl + "?h=140&w394&crop";
 
-        string newNumberStr = finalNumber.ToString("D4");
+            // Regn ut nytt tall basert på kun 50 tilgjengelige bilder
+            int reduced = (originalNumber-1) % 50 + 1;
+            int finalNumber = reduced ;/// 10 * 10 + 1; // alltid ende på 1
 
-        // Bytt ut tallet i filnavnet
-        string newFilename = Regex.Replace(filename, @"\d{4}(?=\.|$)", newNumberStr);
+            string newNumberStr = finalNumber.ToString("D4");
 
-        return $"https://hopla.imgix.net/{newFilename}{extension}?h=140&w394&crop";
+            // Bytt ut tallet i filnavnet
+            string newFilename = Regex.Replace(filename, @"\d{4}(?=\.|$)", newNumberStr);
+
+            return $"https://hopla.imgix.net/{newFilename}{extension}?h=140&w394&crop";
+        }
+        catch
+        {
+            return "https://hopla.imgix.net/default.jpg";
+        }
     }
-    catch
-    {
-        return "https://hopla.imgix.net/default.jpg";
-    }
-}
-
-
 
     [Authorize]
     [HttpGet("{stableId}")] 

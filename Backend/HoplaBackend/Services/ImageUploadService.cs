@@ -72,6 +72,11 @@ public class ImageUploadService : IImageUploadService
                 var horse = await _context.Horses.FirstOrDefaultAsync(h => h.Id == entityId);
                 if (horse != null) { horse.PictureUrl = fileName; updated = true; }
                 break;
+            case "Stables":
+                var stable = await _context.Stables.FirstOrDefaultAsync(s => s.Id == entityId);
+                if (stable != null) { stable.PictureUrl = fileName; updated = true; }
+                break;
+
         }
 
         if (updated) await _context.SaveChangesAsync();
