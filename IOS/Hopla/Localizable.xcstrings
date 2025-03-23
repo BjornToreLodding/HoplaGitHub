@@ -11,9 +11,6 @@
         }
       }
     },
-    "%lld⭐️" : {
-
-    },
     "Add a Horse" : {
       "localizations" : {
         "nb" : {
@@ -23,6 +20,9 @@
           }
         }
       }
+    },
+    "Add Friend" : {
+
     },
     "Add Horse" : {
       "localizations" : {
@@ -346,6 +346,9 @@
         }
       }
     },
+    "Enter username..." : {
+
+    },
     "Enter your email" : {
       "localizations" : {
         "nb" : {
@@ -425,9 +428,6 @@
           }
         }
       }
-    },
-    "Halla" : {
-
     },
     "Hi" : {
 
@@ -517,6 +517,9 @@
           }
         }
       }
+    },
+    "My Friends" : {
+
     },
     "My hikes" : {
       "localizations" : {
@@ -651,7 +654,7 @@
         }
       }
     },
-    "Search bar" : {
+    "Search for Users to Add" : {
 
     },
     "Search groups..." : {

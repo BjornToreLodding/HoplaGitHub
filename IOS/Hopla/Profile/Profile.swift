@@ -106,7 +106,7 @@ struct Profile: View {
                                 .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                         }
                         
-                        NavigationLink(destination: Following()) {
+                        NavigationLink(destination: FollowingView()) {
                             Text("Following")
                                 .frame(width: 180, height: 50)
                                 .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))

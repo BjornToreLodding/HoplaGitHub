@@ -11,7 +11,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var locationManager = CLLocationManager()
 
     @Published var userLocation: CLLocation? = nil
-    
     @Published var latitude: Double?
     @Published var longitude: Double?
 
