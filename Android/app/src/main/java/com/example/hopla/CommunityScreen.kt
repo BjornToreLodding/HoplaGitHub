@@ -22,11 +22,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -92,6 +94,7 @@ import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
+import java.time.ZonedDateTime
 
 @Composable
 fun CommunityScreen(navController: NavController, token: String) {
@@ -444,6 +447,7 @@ fun MessageBox(stableId: String, token: String) {
     var messages by remember { mutableStateOf(listOf<Message>()) }
     var pageNumber by remember { mutableIntStateOf(1) }
     var loading by remember { mutableStateOf(false) }
+    var newMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
     // Function to load messages
@@ -469,41 +473,73 @@ fun MessageBox(stableId: String, token: String) {
     // Group messages by date
     val groupedMessages = messages.groupBy { formatDateTime(it.timestamp).first }
 
-    // LazyColumn to display messages
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        reverseLayout = true // To display the latest message at the top
-    ) {
-        // Loading indicator at the top
-        item {
-            if (loading) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+    Column(modifier = Modifier.fillMaxSize()) {
+        // LazyColumn to display messages
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            reverseLayout = true // To display the latest message at the top
+        ) {
+            // Loading indicator at the top
+            item {
+                if (loading) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+            // Display grouped messages
+            groupedMessages.forEach { (date, messagesForDate) ->
+                items(messagesForDate) { message ->
+                    MessageCard(message)
+                }
+                item {
+                    Text(
+                        text = date,
+                        style = generalTextStyleBold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            // Load more messages when scrolled to the top
+            item {
+                LaunchedEffect(Unit) {
+                    loadMessages()
                 }
             }
         }
 
-        // Display grouped messages
-        groupedMessages.forEach { (date, messagesForDate) ->
-            items(messagesForDate) { message ->
-                MessageCard(message)
-            }
-            item {
-                Text(
-                    text = date,
-                    style = generalTextStyleBold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        // Load more messages when scrolled to the top
-        item {
-            LaunchedEffect(Unit) {
-                loadMessages()
+        // TextField and Button to send a new message
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = newMessage,
+                onValueChange = { newMessage = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text(text = stringResource(R.string.enter_you_message)) }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(onClick = {
+                if (newMessage.isNotBlank()) {
+                    val message = Message(
+                        senderId = UserSession.userId,
+                        senderAlias = "Me",
+                        content = newMessage,
+                        timestamp = ZonedDateTime.now().toString()
+                    )
+                    messages = listOf(message) + messages
+                    newMessage = ""
+                }
+            }) {
+                Text(text = stringResource(R.string.publish))
             }
         }
     }
