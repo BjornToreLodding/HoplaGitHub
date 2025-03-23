@@ -205,6 +205,7 @@ fun CommunityScreen(navController: NavController, token: String) {
 @Composable
 fun StableCard(stable: Stable, navController: NavController, likedStables: MutableList<Stable>) {
     var isLiked by remember { mutableStateOf(likedStables.contains(stable)) }
+    val coroutineScope = rememberCoroutineScope()
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -248,6 +249,17 @@ fun StableCard(stable: Stable, navController: NavController, likedStables: Mutab
                             likedStables.add(stable)
                         } else {
                             likedStables.remove(stable)
+                        }
+                        coroutineScope.launch {
+                            // Send a new GET request when the heart icon is pressed
+                            val fetchedStables = fetchStables(
+                                token = UserSession.token,
+                                search = "",
+                                userid = if (isLiked) UserSession.userId else "",
+                                latitude = 0.0,
+                                longitude = 0.0,
+                                pageNumber = 1
+                            )
                         }
                     }
                 ) {
