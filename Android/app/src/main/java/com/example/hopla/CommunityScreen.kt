@@ -16,31 +16,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,28 +55,24 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.hopla.apiService.fetchMessages
+import com.example.hopla.apiService.createStable
 import com.example.hopla.apiService.fetchStables
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.Community
 import com.example.hopla.universalData.CommunityMemberStatus
 import com.example.hopla.universalData.CommunityStatus
 import com.example.hopla.universalData.ImagePicker
-import com.example.hopla.universalData.Message
-import com.example.hopla.universalData.MessageBox
-import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.SimpleMapScreen
 import com.example.hopla.universalData.Stable
-import com.example.hopla.universalData.UserSession
+import com.example.hopla.universalData.StableRequest
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
@@ -100,7 +88,7 @@ fun CommunityScreen(navController: NavController, token: String) {
     var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
+    Log.d("CommunityScreen", "CommunityScreen launched")
     // Fetch the current location when the composable is first launched
     LaunchedEffect(Unit) {
         Log.d("CommunityScreen", "LaunchedEffect triggered")
@@ -430,14 +418,17 @@ fun CommunityDetailScreen(navController: NavController, community: String) {
 
 // Add a new community group screen
 @Composable
-fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit) {
+fun AddCommunityScreen(navController: NavController, token: String) {
     var name by remember { mutableStateOf("") }
-    var imageResource by remember { mutableIntStateOf(0) }
     var description by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var selectedOption by remember { mutableStateOf<String?>(null) }
     var showMap by remember { mutableStateOf(false) }
     var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val privateString = stringResource(R.string.private_string)
+    val publicString = stringResource(R.string.public_string)
 
     LazyColumn(
         modifier = Modifier
@@ -493,7 +484,7 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                listOf(stringResource(R.string.private_string), stringResource(R.string.public_string)).forEach { option ->
+                listOf(privateString, publicString).forEach { option ->
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -532,21 +523,26 @@ fun AddCommunityScreen(navController: NavController, onAdd: (Community) -> Unit)
 
             Button(
                 onClick = {
-                    if (selectedOption != null && selectedPosition != null) {
-                        val newCommunity = Community(
-                            name, imageResource, description,
-                            communityMemberStatus = CommunityMemberStatus.ADMIN,
-                            communityStatus = CommunityStatus.PRIVATE,
-                            latitude = selectedPosition!!.latitude,
-                            longitude = selectedPosition!!.longitude
+                    if (selectedOption != null && selectedPosition != null && imageBitmap != null) {
+                        val isPrivate = selectedOption == privateString
+                        val stableRequest = StableRequest(
+                            Name = name,
+                            Description = description,
+                            PictureUrl = "https://hopla.imgix.net/51053800-5fd2-421d-b0bc-f3d9d9cdca3e.jpg?w=200&h=200&fit=crop", // Replace with actual image URL
+                            Latitude = selectedPosition!!.latitude,
+                            Longitude = selectedPosition!!.longitude,
+                            PrivateGroup = isPrivate
                         )
-                        onAdd(newCommunity)
-                        navController.popBackStack()
+                        coroutineScope.launch {
+                            val response = createStable(token, stableRequest)
+                            Log.d("AddCommunityScreen", "Response: $response")
+                            navController.popBackStack()
+                        }
                     } else {
-                        // Show a message to select an option and position
+                        // Show a message to select an option, position, and image
                     }
                 },
-                enabled = name.isNotBlank() && description.isNotBlank() && selectedOption != null && selectedPosition != null
+                enabled = name.isNotBlank() && description.isNotBlank() && selectedOption != null && selectedPosition != null && imageBitmap != null
             ) {
                 Text(text = stringResource(R.string.add_new_community))
             }

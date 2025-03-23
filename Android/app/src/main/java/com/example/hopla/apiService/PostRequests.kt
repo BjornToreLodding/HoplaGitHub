@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.R
+import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.User
 import com.example.hopla.universalData.UserReportRequest
 import com.example.hopla.universalData.UserReportResponse
@@ -195,4 +196,33 @@ suspend fun registerUser(email: String, password: String): Pair<String, Int> {
             Pair("Exception: ${e.message}", -1)
         }
     }
+}
+
+//----------------------Community Post Request-------------------------
+suspend fun createStable(token: String, stableRequest: StableRequest): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    Log.d("createStable", "Request URL: https://hopla.onrender.com/stable/create")
+    Log.d("createStable", "Request Body: $stableRequest")
+
+    val response: HttpResponse = client.post("https://hopla.onrender.com/stable/create") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(stableRequest)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("createStable", "Response Code: ${response.status.value}")
+    Log.d("createStable", "Response Body: $responseBody")
+
+    client.close()
+    return responseBody
 }

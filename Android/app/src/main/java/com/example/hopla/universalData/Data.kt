@@ -274,3 +274,13 @@ data class Stable(
     val member: Boolean,
     val pictureUrl: String
 )
+
+@Serializable
+data class StableRequest(
+    val Name: String,
+    val Description: String,
+    val PictureUrl: String,
+    val Latitude: Double,
+    val Longitude: Double,
+    val PrivateGroup: Boolean
+)

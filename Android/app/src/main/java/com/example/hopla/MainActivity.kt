@@ -150,9 +150,7 @@ class MainActivity : ComponentActivity() {
                                 //CommunityDetailScreen(navController, community)
                             }
                             composable("addCommunityScreen") {
-                                AddCommunityScreen(navController) { newCommunity ->
-                                    // Handle the addition of the new community here
-                                }
+                                AddCommunityScreen(navController, UserSession.token)
                             }
                             composable("addFriendScreen") {
                                 AddNewType(navController, "Friend") { name, imageBitmap, friendType, friendAge ->
