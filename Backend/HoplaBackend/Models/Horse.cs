@@ -23,7 +23,7 @@ public partial class Horse
     public string? Breed { get; set; }
     public string? PictureUrl { get; set; }
 
-    public DateTime? Dob { get; set; }
+    public DateOnly? Dob { get; set; }
     public int LikesCount { get ; set ; } = 0 ;
     public int CommentsCount { get ; set ; } = 0;
 

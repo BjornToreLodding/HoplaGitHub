@@ -201,6 +201,7 @@ builder.Services.AddScoped<UserHikeService>();
 builder.Services.AddScoped<TrailFavoriteService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<EntityService>();
+builder.Services.AddScoped<ImageUploadService>();
 
 
 

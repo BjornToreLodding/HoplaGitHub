@@ -11,6 +11,10 @@ using DotNetEnv;
 using HoplaBackend.Data;
 using Microsoft.AspNetCore.Authorization; // For miljøvariabler
 
+//
+// Integrer denne inn i ImageUploadService og Helpers.
+//
+
 [Route("upload")]
 [ApiController]
 public class UploadController : ControllerBase

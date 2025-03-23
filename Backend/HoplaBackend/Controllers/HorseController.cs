@@ -7,6 +7,7 @@ using HoplaBackend.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using HoplaBackend.DTOs;
+using HoplaBackend.Services;
 
 namespace HoplaBackend.Controllers;
 
@@ -16,10 +17,11 @@ namespace HoplaBackend.Controllers;
 public class HorseController : ControllerBase
 {
     private readonly AppDbContext _context;
-
-    public HorseController(AppDbContext context)
+    private readonly ImageUploadService _imageUploadService;
+    public HorseController(AppDbContext context, ImageUploadService imageUploadService)
     {
         _context = context;
+        _imageUploadService = imageUploadService;
     }
 
     [Authorize]
@@ -95,6 +97,54 @@ public class HorseController : ControllerBase
     }
     [Authorize]
     [HttpPost("create")]
+    public async Task<IActionResult> CreateHorse([FromForm] RegisterHorseForm request)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+
+        string? pictureUrl = null;
+
+        if (request.Image != null)
+        {
+            var fileName = await _imageUploadService.UploadImageAsync(request.Image);
+            pictureUrl = fileName;
+        }
+        DateOnly? dob = null;
+
+        if (request.Year.HasValue && request.Month.HasValue && request.Day.HasValue)
+        {
+            try
+            {
+                dob = new DateOnly(request.Year.Value, request.Month.Value, request.Day.Value);
+            }
+            catch
+            {
+                return BadRequest(new { error = "Ugyldig fødselsdato." });
+            }
+        }
+        var horse = new Horse
+        {
+            Name = request.Name,
+            UserId = parsedUserId,
+            Breed = request.Breed,
+            PictureUrl = pictureUrl,
+            Dob = dob
+        };
+
+        _context.Horses.Add(horse);
+        await _context.SaveChangesAsync();
+
+        return Ok("Horse Created");
+    }
+
+
+
+}
+/*  //Denne oppgraderes med bildeopplasting
+    [Authorize]
+    [HttpPost("create-old")]
     public async Task<IActionResult> CreateHorse([FromBody] RegisterHorse request)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -123,7 +173,6 @@ public class HorseController : ControllerBase
     }
 }
 
-/*
         //brukes ikke lenger
         [HttpGet("int/{horseId}")] 
         public async Task<IActionResult> GetIntHorse(int horseId)
