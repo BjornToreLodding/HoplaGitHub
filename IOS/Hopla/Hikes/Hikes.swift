@@ -6,20 +6,20 @@
 //
 
 import SwiftUI
+import Foundation
 
 // MARK: - Hike Model
-struct Hike: Identifiable {
-    let id = UUID()
+struct Hike: Codable, Identifiable {
+    let id: String
     let name: String
-    let filters: [HikeFilter]
-    let rating: Int
-    var isFavorite: Bool
-    let imageName: String
-    let description: String
+    let pictureUrl: String
+    let averageRating: Int
+    let isFavorite: Bool
 }
 
+
 // MARK: - Filters for Hikes
-enum HikeFilter: String, CaseIterable, Identifiable {
+enum HikeFilter: String, CaseIterable, Identifiable, Codable {
     case asphalt = "Asphalt"
     case gravel = "Gravel"
     case parking = "Parking"
@@ -28,6 +28,14 @@ enum HikeFilter: String, CaseIterable, Identifiable {
     
     var id: String { self.rawValue }
 }
+
+struct HikeResponse: Codable {
+    let trails: [Hike]  // Matches "trails" in JSON
+    let pageNumber: Int
+    let pageSize: Int
+}
+
+
 
 // MARK: - Filter bar Options
 enum FilterOption: String, CaseIterable, Identifiable {
@@ -50,58 +58,130 @@ enum FilterOption: String, CaseIterable, Identifiable {
     }
 }
 
+// MARK: - Fetching Hikes from Backend
+class HikeService {
+    static let shared = HikeService()
+    @Published var hikes: [Hike] = []
+    
+    private let baseURL = "https://hopla.onrender.com/trails/all"
+    
+    func fetchHikes(page: Int, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
+        guard let token = TokenManager.shared.getToken() else {
+            print("❌ No token found")
+            completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unauthorized - No Token"])))
+            return
+        }
+        
+        let urlString = "\(baseURL)?pageNumber=\(page)&pageSize=10"
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Request error:", error.localizedDescription)
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+            
+            do {
+                // Print the raw JSON data to inspect it
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("📜 Raw JSON Data:\n", jsonString)
+                }
+                
+                // Decode the response into TrailsResponse
+                let decodedResponse = try JSONDecoder().decode(HikeResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(decodedResponse)) // Pass the decoded response to the completion handler
+                }
+            } catch {
+                print("❌ Error decoding hikes: \(error.localizedDescription)")
+                completion(.failure(error)) // Pass error if decoding fails
+            }
+        }.resume()
+    }
+}
+
+
 // MARK: - Main View
 struct Hikes: View {
     @Environment(\.colorScheme) var colorScheme
-    @State private var selectedFilter: FilterOption = .location
-    @State private var searchText: String = "" // Search bar
-    
-    @State private var hikes: [Hike] = [
-        Hike(name: "Boredalstien", filters: [.asphalt, .forest, .gravel, .parking], rating: 2, isFavorite: false, imageName: "HorseImage", description: "An easy trail through a beautiful forest. There is parking available at the start and end of the trail."),
-        Hike(name: "Fjellstien", filters: [.mountain, .forest], rating: 4, isFavorite: false, imageName: "HorseImage2", description: "A challenging trail with stunning mountain views. There is no parking available at the start and end of the trail."),
-        Hike(name: "Skogsstien", filters: [.forest, .gravel, .parking], rating: 5, isFavorite: true, imageName: "HorseImage3", description: "This hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."),
-        Hike(name: "Dalstien", filters: [.asphalt, .gravel], rating: 3, isFavorite: false, imageName: "HorseImage", description: "A difficult trail with beautiful views of the valley. It is best to go in the summer when the weather is good.")
-    ]
-    
-    private var filteredHikes: [Hike] {
-        let filtered = selectedFilter == .heart ? hikes.filter { $0.isFavorite } : hikes
-        return searchText.isEmpty ? filtered : filtered.filter { $0.name.lowercased().contains(searchText.lowercased()) }
-    }
+    @State private var selectedFilter: FilterOption = .map
+    @State private var searchText: String = ""
+    @State private var hikes: [Hike] = []
+    @State private var isLoading = false
+    @State private var currentPage = 1
+    @State private var canLoadMore = true  // Track if more data is available
     
     var body: some View {
         VStack(spacing: 0) {
-            // Place filterBar and searchBar at the top with no extra spacing between them
             filterBar
             searchBar
-        }
-        .frame(maxWidth: .infinity)
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-        ZStack {
-            // Main content wrapped in NavigationView
-            NavigationView {
-                // Scrollable content, adjusting padding and top space
+            
+            if isLoading && hikes.isEmpty {
+                ProgressView("Loading Hikes...")
+            } else {
                 ScrollView {
-                    VStack(spacing: 10) {
-                        ForEach(filteredHikes, id: \.id) { hike in
-                            HikeCard(hike: binding(for: hike))
+                    LazyVStack(spacing: 10) {
+                        ForEach(hikes.indices, id: \.self) { index in
+                            HikeCard(hike: hikes[index])
+                                .onAppear {
+                                    if index == hikes.count - 1 { // If last item is visible, load more
+                                        loadMoreHikes()
+                                    }
+                                }
                         }
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        
+                        if isLoading {
+                            ProgressView("Loading more hikes...")
+                        }
                     }
                 }
-                .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
             }
         }
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+        .onAppear {
+            fetchHikes()
+        }
         .navigationBarHidden(true)
     }
     
-    
-    
-    private func binding(for hike: Hike) -> Binding<Hike> {
-        guard let index = hikes.firstIndex(where: { $0.id == hike.id }) else {
-            fatalError("Hike not found in list")
+    private func fetchHikes() {
+        guard !isLoading else { return }  // Prevent multiple requests
+        isLoading = true
+        
+        HikeService.shared.fetchHikes(page: currentPage) { result in
+            DispatchQueue.main.async {
+                isLoading = false
+                switch result {
+                case .success(let response):
+                    if response.trails.isEmpty {
+                        canLoadMore = false  // No more data available
+                    } else {
+                        hikes.append(contentsOf: response.trails)
+                        currentPage += 1
+                    }
+                case .failure(let error):
+                    print("❌ Error fetching hikes: \(error.localizedDescription)")
+                }
+            }
         }
-        return $hikes[index]
+    }
+    
+    private func loadMoreHikes() {
+        if canLoadMore {
+            fetchHikes()
+        }
     }
     
     private var filterBar: some View {
@@ -114,10 +194,9 @@ struct Hikes: View {
             .pickerStyle(SegmentedPickerStyle())
         }
         .frame(height: 30)
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+        //.background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
     
-    // MARK: - Search bar
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -132,80 +211,48 @@ struct Hikes: View {
 }
 
 
-// MARK: - Hike Card
 
+
+// MARK: - Hike Card
 struct HikeCard: View {
-    @Binding var hike: Hike
+    let hike: Hike  // Change from @Binding
     
     var body: some View {
-        NavigationLink(destination: HikesDetails(hike: hike)) {
-            VStack {
-                ZStack(alignment: .top) {
-                    Image(hike.imageName)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 150)
-                        .clipped()
-                    
-                    Color.black.opacity(0.4)
-                        .frame(height: 150)
-                        .frame(maxWidth: .infinity)
-                    
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            hike.isFavorite.toggle()
-                        }) {
-                            Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
-                                .foregroundColor(hike.isFavorite ? .red : .white)
-                                .padding()
-                        }
-                    }
-                    
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Text(hike.name)
-                                .foregroundStyle(.white)
-                                .padding(.leading, 10)
-                            Spacer()
-                        }
-                    }
-                    
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            StarRating(rating: .constant(hike.rating))
-                                .padding(.top, 40)
-                                .padding(.trailing, 10)
-                                .foregroundStyle(.yellow)
-                        }
-                    }
+        VStack {
+            AsyncImage(url: URL(string: hike.pictureUrl)) { phase in
+                if let image = phase.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    Color.gray
                 }
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(hike.filters) { filter in
-                            Text(filter.rawValue)
-                                .font(.subheadline)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 5)
-                                .background(Color.green.opacity(0.2))
-                                .cornerRadius(10)
-                        }
-                    }
-                    .padding(.bottom, 8)
-                    .padding(.leading, 5)
-                }
-                
             }
-            .clipShape(Rectangle())
-            .shadow(radius: 3)
+            .frame(height: 150)
+            .clipped()
+            
+            HStack {
+                Text(hike.name)
+                    .font(.headline)
+                Spacer()
+                Text("\(hike.averageRating)⭐️")
+                    .font(.subheadline)
+            }
+            .padding()
+            
+            Button(action: {
+                print("Favorite button tapped for: \(hike.name)")
+            }) {
+                Image(systemName: (hike.isFavorite ?? false) ? "heart.fill" : "heart")
+                    .foregroundColor((hike.isFavorite ?? false) ? .red : .gray)
+            }
         }
-        .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 3)
     }
 }
+
+
+
 
 // MARK: - Star Rating With Tap Gesture
 struct StarRating: View {

@@ -11,6 +11,9 @@
         }
       }
     },
+    "%lld⭐️" : {
+
+    },
     "Add a Horse" : {
       "localizations" : {
         "nb" : {
@@ -62,6 +65,7 @@
       }
     },
     "Average rating: " : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -468,6 +472,12 @@
         }
       }
     },
+    "Loading Hikes..." : {
+
+    },
+    "Loading more hikes..." : {
+
+    },
     "Loading profile..." : {
       "localizations" : {
         "nb" : {
@@ -539,6 +549,7 @@
       }
     },
     "My rating: " : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -569,6 +580,7 @@
       }
     },
     "Newest updates on this hike" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -614,17 +626,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bilder"
-          }
-        }
-      }
-    },
-    "Posts" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Innlegg"
           }
         }
       }
