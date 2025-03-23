@@ -673,7 +673,7 @@ Profil -\> Bytte epost
 
 body:
 
-```json
+````json
 {
     "NewEmail": "test@test.no",
     "Password": "Hopla2025!"
@@ -687,7 +687,7 @@ Response trinn1:
 {
     "message": "E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer"
 }
-```
+````
 
 Åpne epost og trykk på aktiveringslenke. I noen tilfeller har det tatt opptil 30 minutter før eposten har kommet frem.
 
@@ -697,7 +697,7 @@ Profil -\> bytte passord
 
 body:
 
-```json
+````json
 {
     "OldPassword": "GammeltPass0rd!",
     "NewPassword": "Hopla2025!",
@@ -709,7 +709,7 @@ response:
 {
     "message": "Passordet er endret"
 }
-```
+````
 </td>
 </tr>
 <tr>
@@ -779,7 +779,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 **eks**
 
-[https://hopla.onrender.com:7128/trails/list](https://hopla.onrender.com:7128/trails/list)
+https://hopla.onrender.com:7128/trails/list
 
 Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
 
@@ -826,7 +826,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 
 * Kun løyper som brukeren har trykket liker på
 
-[https://hopla.onrender.com:7128/trails/favorites](https://hopla.onrender.com:7128/trails/favorites)
+https://hopla.onrender.com:7128/trails/favorites
 
 **query**
 
@@ -864,7 +864,7 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 
 * Løyper til brukere brukeren følger og venner med
 
-[http://hopla.onrender.com:7128/trails/relations](http://hopla.onrender.com:7128/trails/relations) ?friends=true & following=true
+http://hopla.onrender.com:7128/trails/relations ?friends=true & following=true
 
 **query**
 
@@ -1022,10 +1022,7 @@ Body:
 Brukerinformasjon oppdatert.
 ```
 
-
-
-
-## :green_book: :smiling_imp: :apple: POST /users/reset-password-request 
+## :green_book: :smiling_imp: :apple: POST /users/reset-password-request
 
 Glemt passord
 
@@ -1040,11 +1037,13 @@ Ganske lik som POST /users/register
 Endpoint: POST /users/reset-password-request
 
 Body:
+
 ```json
 {
     "Email": "test@test.no" //for å teste må man skrive inn en epost som eksisterer.
 }
 ```
+
 Response:
 
 ```postman
@@ -1056,7 +1055,7 @@ FROM: Ikke svar (noreply@hopla.no)
 Klikk på lenken for å fullføre registreringen: Bekreft e-post
 ```
 
-**Trinn 2** 
+**Trinn 2**
 
 **Når man trykker bekreft, sendes man hit:**
 
@@ -1064,7 +1063,7 @@ GET https://password.hopla.no/index.html?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK
 
 Nettside for tilbakestilling av passord, for å gjøre det enklest mulig for brukeren. Tungvint å åpne en epost med appen.
 
-PWHOPLA
+![image](uploads/d6f3ab64cfa3ff25ec4e19bcba6cc3da/image.png){width="446" height="338"}
 
 **eksempel på response:**
 
@@ -1073,8 +1072,6 @@ Passord tilbakestilt. Du kan nå logge inn med ditt nye passord.
 ```
 
 **Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
-
-
 </td>
 </tr>
 <tr>
@@ -1290,7 +1287,7 @@ Response
 
 sånn cirka
 
-## :green_book: :smiling_imp: :apple: GET /stables/member (?)
+## :green_book: :alien: :apple: GET /stables/member (?)
 
 Trenger endpoint her også for å vise kun staller som man er medlem hos (der man trykker på hjerte øverst på bilde)
 
@@ -1299,6 +1296,7 @@ Dette er lagt inn i GET /stables/all hvor man spesifiserer optional query userid
 GET https://hopla.onrender.com/stables/all?userid=12345678-0000-0000-0001-123456780001&latitude=60&longitude=10
 
 Response:
+
 ```json
 [
     {
@@ -1317,7 +1315,6 @@ Response:
     }
 ]
 ```
-
 </td>
 </tr>
 <tr>
@@ -1341,7 +1338,7 @@ Body FORMDATA
 
 ```formdata
     Key             Value
-    PictureUrl      stall.jpg
+    Image           stall.jpg
     Name            Stallione
     Description     Flott Stall
     Latitude        60.01223
@@ -1404,7 +1401,7 @@ Response:
 
 Videre må man hente meldinger med neste endpoint
 
-## :green_book: :smiling_imp: :apple: GET /stablemessages/{stableId}
+## :green_book: :alien: :apple: GET /stablemessages/{stableId}
 
 **Query**
 
@@ -1469,7 +1466,7 @@ Response:
 </td>
 <td>
 
-## :green_book:  :smiling_imp: :apple: POST /horses/create
+## :green_book: :smiling_imp: :apple: POST /horses/create
 
 Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
 
@@ -1500,7 +1497,7 @@ Horse Created
 <td></td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: POST friendrequest
+## :green_book: :smiling_imp: :apple: POST friendrequest
 
 Trenger endpoints for å endre på venneforhold:
 
@@ -1511,13 +1508,42 @@ Hvis knapp følg er trykket på: endre follow fra NONE til følger
 Hvis knapp fjern venn er trykker: endre forhold til NONE
 
 Hvis knapp blokker er trykket på: endre til blocked
+
+**BT**
+
+BodyEksempel:
+```json
+{
+    "TargetUserId": "12345678-0000-0000-0001-123456780050",
+    "Status": "PENDING"
+}
+```
+
+Oversikt over hva som brukes i hvilken situasjon
+
+| Situasjon      | Handling         | Metode  | Endpoint           | Body / Info                                                                 |
+|----------------|------------------|---------|--------------------|------------------------------------------------------------------------------|
+| **Ingen relasjon** | Følg             | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "FOLLOWING"`                                       |
+|                | Vennforespørsel   | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "PENDING"`                                         |
+|                | Blokkering        | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"`                                           |
+| **Venn**        | Fjern venn        | `DELETE`| `/userrelations`    | `TargetUserId`                                                              |
+|                | Blokker venn      | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"` <br>⚠️ Sjekk at blokkering går riktig vei |
+| **Følger**      | Vennforespørsel   | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "PENDING"` <br>➡️ Opprettes som egen relasjon i tillegg til eksisterende "FOLLOWING"      |
+|                | Blokker           | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"`                                           |
+|                | Slutt å følge     | `DELETE`| `/userrelations`    | `TargetUserId`                                                              |
+| **Pending**     | Aksepter          | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "FRIENDS"` <br>🧹 Følger-relasjoner fjernes evt på begge brukerne        |
+|                | Avvis             | `DELETE`| `/userrelations`    | `TargetUserId`                                                              |
+|                | Blokker           | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"` <br>⚠️ Sjekk at blokkering går riktig vei |
+
+
+
 </td>
 </tr>
 <tr>
 <td></td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: GET friendrequests
+## :green_book: :smiling_imp: :apple: GET friendrequests
 
 Endpoint som henter alle venneforespørseler innlogget bruker har. Trenger også her et POST endpoint der bruker kan godkjenne eller slette forespørseler. Endre fra request til enten NONE eller FRIENDS
 </td>

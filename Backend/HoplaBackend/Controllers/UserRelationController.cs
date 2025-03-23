@@ -188,91 +188,138 @@ public class UserRelationsController : ControllerBase
 
         return Ok(blockedUsers);
     }
-[Authorize]
-[HttpPost("following")]
-public async Task<IActionResult> FollowUser([FromBody] UserRelationRequest request)
-{
-    var userId = _authentication.GetUserIdFromToken(User);
-    if (userId == request.TargetUserId)
-        return BadRequest(new { message = "Kan ikke følge deg selv" });
-
-    var existing = await _context.UserRelations
-        .FirstOrDefaultAsync(r => r.FromUserId == userId && r.ToUserId == request.TargetUserId);
-
-    if (existing != null)
-        return BadRequest(new { message = "Relasjon finnes allerede" });
-
-    var relation = new UserRelation
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> CreateRelation([FromBody] UserRelationRequest request)
     {
-        FromUserId = userId,
-        ToUserId = request.TargetUserId,
-        Status = "FOLLOWING",
-        CreatedAt = DateTime.UtcNow
-    };
+        var userId = _authentication.GetUserIdFromToken(User);
 
-    _context.UserRelations.Add(relation);
-    await _context.SaveChangesAsync();
+        if (userId == request.TargetUserId)
+            return BadRequest(new { message = "Kan ikke opprette relasjon til deg selv" });
 
-    return Ok(new { message = "Følger bruker" });
-}
+        var allowedStatuses = new[] { "FOLLOWING", "PENDING", "BLOCK" };
+        if (!allowedStatuses.Contains(request.Status?.ToUpperInvariant()))
+            return BadRequest(new { message = "Ugyldig statusverdi. Må være FOLLOWING, PENDING eller BLOCK." });
 
-[Authorize]
-[HttpPost("pending")]
-public async Task<IActionResult> SendFriendRequest([FromBody] UserRelationRequest request)
-{
-    var userId = _authentication.GetUserIdFromToken(User);
-    if (userId == request.TargetUserId)
-        return BadRequest(new { message = "Kan ikke sende venneforespørsel til deg selv" });
+        // Sjekk om relasjon allerede finnes
+        var existing = await _context.UserRelations.FirstOrDefaultAsync(r =>
+            request.Status == "PENDING"
+                ? (r.FromUserId == userId && r.ToUserId == request.TargetUserId) ||
+                (r.FromUserId == request.TargetUserId && r.ToUserId == userId)
+                : r.FromUserId == userId && r.ToUserId == request.TargetUserId);
 
-    var existing = await _context.UserRelations
-        .FirstOrDefaultAsync(r =>
-            (r.FromUserId == userId && r.ToUserId == request.TargetUserId) ||
-            (r.FromUserId == request.TargetUserId && r.ToUserId == userId));
+        if (existing != null)
+            return BadRequest(new { message = "Relasjon finnes allerede" });
 
-    if (existing != null)
-        return BadRequest(new { message = "Relasjon finnes allerede" });
+        var relation = new UserRelation
+        {
+            FromUserId = userId,
+            ToUserId = request.TargetUserId,
+            Status = request.Status.ToUpperInvariant(),
+            CreatedAt = DateTime.UtcNow
+        };
 
-    var relation = new UserRelation
+        _context.UserRelations.Add(relation);
+        await _context.SaveChangesAsync();
+
+        string readable = request.Status switch
+        {
+            "FOLLOWING" => "Følger bruker",
+            "PENDING" => "Venneforespørsel sendt",
+            "BLOCK" => "Bruker blokkert",
+            _ => "Relasjon opprettet"
+        };
+
+        return Ok(new { message = readable });
+    }
+
+    /*
+    [Authorize]
+    [HttpPost("following")]
+    public async Task<IActionResult> FollowUser([FromBody] UserRelationRequest request)
     {
-        FromUserId = userId,
-        ToUserId = request.TargetUserId,
-        Status = "PENDING",
-        CreatedAt = DateTime.UtcNow
-    };
+        var userId = _authentication.GetUserIdFromToken(User);
+        if (userId == request.TargetUserId)
+            return BadRequest(new { message = "Kan ikke følge deg selv" });
 
-    _context.UserRelations.Add(relation);
-    await _context.SaveChangesAsync();
+        var existing = await _context.UserRelations
+            .FirstOrDefaultAsync(r => r.FromUserId == userId && r.ToUserId == request.TargetUserId);
 
-    return Ok(new { message = "Venneforespørsel sendt" });
-}
+        if (existing != null)
+            return BadRequest(new { message = "Relasjon finnes allerede" });
 
-[Authorize]
-[HttpPost("block")]
-public async Task<IActionResult> BlockUser([FromBody] UserRelationRequest request)
-{
-    var userId = _authentication.GetUserIdFromToken(User);
-    if (userId == request.TargetUserId)
-        return BadRequest(new { message = "Kan ikke blokkere deg selv" });
+        var relation = new UserRelation
+        {
+            FromUserId = userId,
+            ToUserId = request.TargetUserId,
+            Status = "FOLLOWING",
+            CreatedAt = DateTime.UtcNow
+        };
 
-    var existing = await _context.UserRelations
-        .FirstOrDefaultAsync(r => r.FromUserId == userId && r.ToUserId == request.TargetUserId);
+        _context.UserRelations.Add(relation);
+        await _context.SaveChangesAsync();
 
-    if (existing != null)
-        return BadRequest(new { message = "Relasjon finnes allerede" });
+        return Ok(new { message = "Følger bruker" });
+    }
 
-    var relation = new UserRelation
+    [Authorize]
+    [HttpPost("pending")]
+    public async Task<IActionResult> SendFriendRequest([FromBody] UserRelationRequest request)
     {
-        FromUserId = userId,
-        ToUserId = request.TargetUserId,
-        Status = "BLOCK",
-        CreatedAt = DateTime.UtcNow
-    };
+        var userId = _authentication.GetUserIdFromToken(User);
+        if (userId == request.TargetUserId)
+            return BadRequest(new { message = "Kan ikke sende venneforespørsel til deg selv" });
 
-    _context.UserRelations.Add(relation);
-    await _context.SaveChangesAsync();
+        var existing = await _context.UserRelations
+            .FirstOrDefaultAsync(r =>
+                (r.FromUserId == userId && r.ToUserId == request.TargetUserId) ||
+                (r.FromUserId == request.TargetUserId && r.ToUserId == userId));
 
-    return Ok(new { message = "Bruker blokkert" });
-}
+        if (existing != null)
+            return BadRequest(new { message = "Relasjon finnes allerede" });
+
+        var relation = new UserRelation
+        {
+            FromUserId = userId,
+            ToUserId = request.TargetUserId,
+            Status = "PENDING",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.UserRelations.Add(relation);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Venneforespørsel sendt" });
+    }
+
+    [Authorize]
+    [HttpPost("block")]
+    public async Task<IActionResult> BlockUser([FromBody] UserRelationRequest request)
+    {
+        var userId = _authentication.GetUserIdFromToken(User);
+        if (userId == request.TargetUserId)
+            return BadRequest(new { message = "Kan ikke blokkere deg selv" });
+
+        var existing = await _context.UserRelations
+            .FirstOrDefaultAsync(r => r.FromUserId == userId && r.ToUserId == request.TargetUserId);
+
+        if (existing != null)
+            return BadRequest(new { message = "Relasjon finnes allerede" });
+
+        var relation = new UserRelation
+        {
+            FromUserId = userId,
+            ToUserId = request.TargetUserId,
+            Status = "BLOCK",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.UserRelations.Add(relation);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Bruker blokkert" });
+    }
+    */
 
 
     [Authorize]

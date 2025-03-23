@@ -1,5 +1,12 @@
 namespace HoplaBackend.DTOs;
 
+public class UserRelationRequest
+{
+    public Guid? Id { get; set; }
+    public Guid TargetUserId { get; set; }
+    public string? Status { get; set; }
+}
+/*
 public class CreateUserRelationDto
 {
     //public required Guid FromUserId { get; set; }
@@ -30,9 +37,4 @@ public class UpdateUserRelationStatusDto
     public Guid? ToUserId { get; set; } //brukes ved blokkering
 
 }
-public class UserRelationRequest
-{
-    public Guid? Id { get; set; }
-    public Guid TargetUserId { get; set; }
-    public string? Status { get; set; }
-}
+*/
