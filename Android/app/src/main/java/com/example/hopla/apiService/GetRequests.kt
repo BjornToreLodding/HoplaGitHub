@@ -283,7 +283,7 @@ suspend fun fetchAllUsers(token: String): List<OtherUsers> {
 }
 
 //-------------------GET requests for stables--------------
-suspend fun fetchStables(token: String, search: String, latitude: Double, longitude: Double, pageNumber: Int): List<Stable> {
+suspend fun fetchStables(token: String, search: String, userid: String, latitude: Double, longitude: Double, pageNumber: Int): List<Stable> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -295,7 +295,7 @@ suspend fun fetchStables(token: String, search: String, latitude: Double, longit
         try {
 
             Log.d("fetchStables", "Requesting stables with parameters: search=$search, latitude=$latitude, longitude=$longitude, pageNumber=$pageNumber")
-            val response: HttpResponse = client.get("https://hopla.onrender.com/stables/all?search=$search&latitude=$latitude&longitude=$longitude&pagenumber=$pageNumber") {
+            val response: HttpResponse = client.get(apiUrl+"stables/all?search=$search&userid=$userid&latitude=$latitude&longitude=$longitude&pagenumber=$pageNumber") {
                 headers {
                     append("Authorization", "Bearer $token")
                 }

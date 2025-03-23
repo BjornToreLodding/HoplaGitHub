@@ -99,7 +99,6 @@ import java.time.ZonedDateTime
 @Composable
 fun CommunityScreen(navController: NavController, token: String) {
     var searchQuery by remember { mutableStateOf("") }
-    var showLikedOnly by remember { mutableStateOf(false) }
     val likedStables = remember { mutableStateListOf<Stable>() }
     var stables by remember { mutableStateOf(listOf<Stable>()) }
     var latitude by remember { mutableDoubleStateOf(0.0) }
@@ -108,7 +107,10 @@ fun CommunityScreen(navController: NavController, token: String) {
     var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    var currentPage by remember { mutableStateOf("position") }
+
     Log.d("CommunityScreen", "CommunityScreen launched")
+
     // Fetch the current location when the composable is first launched
     LaunchedEffect(Unit) {
         Log.d("CommunityScreen", "LaunchedEffect triggered")
@@ -118,7 +120,7 @@ fun CommunityScreen(navController: NavController, token: String) {
             longitude = location.longitude
             coroutineScope.launch {
                 Log.d("CommunityScreen", "Coroutine launched")
-                val fetchedStables = fetchStables(token, "", latitude, longitude, pageNumber)
+                val fetchedStables = fetchStables(token, searchQuery, "", latitude, longitude, pageNumber)
                 Log.d("CommunityScreen", "Stables fetched: ${fetchedStables.size}")
                 stables = fetchedStables
             }
@@ -131,7 +133,7 @@ fun CommunityScreen(navController: NavController, token: String) {
             loading = true
             coroutineScope.launch {
                 val newPageNumber = pageNumber + 1
-                val fetchedStables = fetchStables(token, "", latitude, longitude, newPageNumber)
+                val fetchedStables = fetchStables(token, searchQuery, if (currentPage == "liked") UserSession.userId else "", latitude, longitude, newPageNumber)
                 if (fetchedStables.isNotEmpty()) {
                     stables = stables + fetchedStables
                     pageNumber = newPageNumber
@@ -141,10 +143,15 @@ fun CommunityScreen(navController: NavController, token: String) {
         }
     }
 
-    // Filter the stables based on the search query and liked status
-    val filteredStables = stables.filter {
-        it.stableName.contains(searchQuery, ignoreCase = true) &&
-                (!showLikedOnly || likedStables.contains(it))
+    // Function to fetch stables based on the current filter
+    fun fetchFilteredStables() {
+        coroutineScope.launch {
+            loading = true
+            pageNumber = 1
+            val fetchedStables = fetchStables(token, searchQuery, if (currentPage == "liked") UserSession.userId else "", latitude, longitude, pageNumber)
+            stables = fetchedStables
+            loading = false
+        }
     }
 
     // Column for the community screen (whole screen)
@@ -154,11 +161,17 @@ fun CommunityScreen(navController: NavController, token: String) {
                 .fillMaxSize()
         ) {
             // Top text for filtering the groups based on position and liked status
-            TopTextCommunity(currentPage = if (showLikedOnly) "liked" else "position") { showLikedOnly = it }
+            TopTextCommunity(currentPage = currentPage) { page ->
+                currentPage = page
+                fetchFilteredStables()
+            }
             // A search bar to search for community groups
             SearchBar(
                 searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it }
+                onSearchQueryChange = { query ->
+                    searchQuery = query
+                    fetchFilteredStables()
+                }
             )
             // Scrollview for displaying the community groups
             LazyColumn(
@@ -167,7 +180,7 @@ fun CommunityScreen(navController: NavController, token: String) {
                     .padding(top = 1.dp)
             ) {
                 // Display the community groups
-                items(filteredStables) { stable ->
+                items(stables) { stable ->
                     StableCard(stable, navController, likedStables)
                 }
                 // Show loading indicator at the bottom
@@ -251,7 +264,7 @@ fun StableCard(stable: Stable, navController: NavController, likedStables: Mutab
 
 // Top text for filtering the groups based on position and liked status
 @Composable
-fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Unit) {
+fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (String) -> Unit) {
     // Column for the top text
     Column(
         modifier = Modifier
@@ -269,7 +282,7 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .clickable { onShowLikedOnlyChange(false) }
+                    .clickable { onShowLikedOnlyChange("position") }
                     .background(if (currentPage == "position") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
@@ -284,7 +297,7 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .clickable { onShowLikedOnlyChange(true) }
+                    .clickable { onShowLikedOnlyChange("liked") }
                     .background(if (currentPage == "liked") colorResource(id = R.color.transparentWhite) else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
@@ -303,8 +316,6 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
 @Composable
 fun CommunityDetailScreen(navController: NavController, stableId: String, token: String) {
     var showDialog by remember { mutableStateOf(false) }
-    //var newMessage by remember { mutableStateOf("") }
-    //val messages = remember { mutableStateListOf<Message>() }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     var stable by remember { mutableStateOf<StableDetails?>(null) }
