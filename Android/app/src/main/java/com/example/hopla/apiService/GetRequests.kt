@@ -12,6 +12,7 @@ import com.example.hopla.universalData.MapTrail
 import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.Stable
+import com.example.hopla.universalData.StableDetails
 import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.*
@@ -333,5 +334,37 @@ suspend fun fetchStables(token: String, search: String, latitude: Double, longit
             Log.e("fetchStables", "Exception occurred: ${e.message}", e)
             emptyList()
         }
+    }
+}
+
+suspend fun fetchStableDetails(token: String, stableId: String): StableDetails? {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
+    Log.d("fetchStableDetails", "Request URL: https://hopla.onrender.com/stables/$stableId")
+    Log.d("fetchStableDetails", "Token: $token")
+
+    return try {
+        httpClient.use { client ->
+            val response: HttpResponse = client.get("https://hopla.onrender.com/stables/$stableId") {
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
+            }
+
+            val responseBody: String = response.bodyAsText()
+            Log.d("fetchStableDetails", "Response Code: ${response.status.value}")
+            Log.d("fetchStableDetails", "Response Body: $responseBody")
+
+            response.body()
+        }
+    } catch (e: Exception) {
+        Log.e("fetchStableDetails", "Error fetching stable details", e)
+        null
     }
 }

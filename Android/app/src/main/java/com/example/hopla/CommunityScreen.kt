@@ -16,23 +16,31 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,14 +70,18 @@ import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.createStable
+import com.example.hopla.apiService.fetchStableDetails
 import com.example.hopla.apiService.fetchStables
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.SimpleMapScreen
 import com.example.hopla.universalData.Stable
+import com.example.hopla.universalData.StableDetails
 import com.example.hopla.universalData.StableRequest
+import com.example.hopla.universalData.UserSession
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
@@ -275,20 +287,23 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (Boolean) -> Un
     }
 }
 
-/*
+
 // Details about a specific community
 @Composable
-fun CommunityDetailScreen(navController: NavController, community: String) {
+fun CommunityDetailScreen(navController: NavController, stableId: String, token: String) {
     var showDialog by remember { mutableStateOf(false) }
-    var newMessage by remember { mutableStateOf("") }
-    val messages = remember { mutableStateListOf<Message>() }
+    //var newMessage by remember { mutableStateOf("") }
+    //val messages = remember { mutableStateListOf<Message>() }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    var stable by remember { mutableStateOf<StableDetails?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
-    // Load messages from the database
-    LaunchedEffect(community.name) {
-        val fetchedMessages = fetchMessages(community.name)
-        messages.addAll(fetchedMessages)
+    // Load stable details from the server
+    LaunchedEffect(stableId) {
+        coroutineScope.launch {
+            stable = fetchStableDetails(token, stableId)
+        }
     }
 
     // Whole screen
@@ -296,122 +311,125 @@ fun CommunityDetailScreen(navController: NavController, community: String) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Box for the header of the screen
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.2f)
-        ) {
-            // Image of the community group
-            Image(
-                painter = painterResource(id = community.imageResource),
-                contentDescription = community.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            // Transparent box as overlay over the image
+        stable?.let { community ->
+            // Box for the header of the screen
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-            )
-            // Row for the back button, title, and info button
-            Row(
-                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .fillMaxHeight(0.2f)
             ) {
-                // Back button
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-                // Title of the community group
-                Text(
-                    text = community.name,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                // Image of the community group
+                Image(
+                    painter = rememberAsyncImagePainter(community.pictureUrl),
+                    contentDescription = community.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                // Info button to show details about the community
-                IconButton(onClick = { showDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = stringResource(R.string.info)
-                    )
-                }
-            }
-        }
-        // Column for the messages posted in the group
-        MessageBox(messages, newMessage, onMessageChange = { newMessage = it }, community)
-    }
-
-    // Show a dialog with the description of the community group and a report button
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            text = {
+                // Transparent box as overlay over the image
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                )
+                // Row for the back button, title, and info button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    verticalAlignment = Alignment.Top
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = community.description,
-                            modifier = Modifier.padding(end = 8.dp)
+                    // Back button
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize(Alignment.TopEnd)
-                    ) {
-                        IconButton(onClick = { isDropdownExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More options",
-                                tint = Color.Black
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = isDropdownExpanded,
-                            onDismissRequest = { isDropdownExpanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Report") },
-                                onClick = {
-                                    isDropdownExpanded = false
-                                    showReportDialog = true
-                                }
-                            )
-                        }
+                    // Title of the community group
+                    Text(
+                        text = community.name,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    // Info button to show details about the community
+                    IconButton(onClick = { showDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = stringResource(R.string.info)
+                        )
                     }
                 }
-            },
-            confirmButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text(text = stringResource(R.string.close))
-                }
             }
-        )
+            // Column for the messages posted in the group
+            //MessageBox(messages, newMessage, onMessageChange = { newMessage = it }, community)
+        }
     }
-    // !!!! Change entityID to communityid
+
+    // Show a dialog with the description of the community group and a report button
+    if (showDialog) {
+        stable?.let { community ->
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                text = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = community.description,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .wrapContentSize(Alignment.TopEnd)
+                        ) {
+                            IconButton(onClick = { isDropdownExpanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More options",
+                                    tint = Color.Black
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = isDropdownExpanded,
+                                onDismissRequest = { isDropdownExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Report") },
+                                    onClick = {
+                                        isDropdownExpanded = false
+                                        showReportDialog = true
+                                    }
+                                )
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text(text = stringResource(R.string.close))
+                    }
+                }
+            )
+        }
+    }
+
     if (showReportDialog) {
         ReportDialog(
-            entityId = UserSession.userId,
+            entityId = stableId,
             entityName = "Community",
             token = UserSession.token,
             onDismiss = { showReportDialog = false }
         )
     }
 }
-*/
 
 // Add a new community group screen
 @Composable

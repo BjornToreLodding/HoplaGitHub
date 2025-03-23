@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigation
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -142,12 +144,12 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("following") { FollowingScreen(navController) }
                             composable(
-                                "communityDetail/{communityName}",
-                                arguments = listOf(navArgument("communityName") { type = NavType.StringType })
+                                "stableDetail/{stableId}",
+                                arguments = listOf(navArgument("stableId") { type = NavType.StringType })
                             ) { backStackEntry ->
-                                val communityName = backStackEntry.arguments?.getString("communityName") ?: ""
-                                val community = "Gjøvik Rideklubb"
-                                //CommunityDetailScreen(navController, community)
+                                val stableId = backStackEntry.arguments?.getString("stableId") ?: return@composable
+                                Log.d("fetchStableDetails", "Navigating to CommunityDetailScreen with stableId: $stableId")
+                                CommunityDetailScreen(navController, stableId, UserSession.token)
                             }
                             composable("addCommunityScreen") {
                                 AddCommunityScreen(navController, UserSession.token)

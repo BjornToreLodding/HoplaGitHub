@@ -256,6 +256,15 @@ data class Stable(
 )
 
 @Serializable
+data class StableDetails(
+    val id: String,
+    val name: String,
+    val description: String,
+    val pictureUrl: String,
+    val isMember: Boolean
+)
+
+@Serializable
 data class StableRequest(
     val Name: String,
     val Description: String,
