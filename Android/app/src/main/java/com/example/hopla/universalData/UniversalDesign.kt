@@ -69,6 +69,8 @@ import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.launch
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 // A search bar with a icon and a text field
@@ -515,4 +517,16 @@ fun EditableTextField(
             }
         )
     }
+}
+
+// Function to format date and time strings from backend to a more readable format
+fun formatDateTime(dateTimeString: String): Pair<String, String> {
+    val zonedDateTime = ZonedDateTime.parse(dateTimeString)
+    val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val timeFormatter = DateTimeFormatter.ofPattern("HH.mm")
+
+    val formattedDate = zonedDateTime.format(dateFormatter)
+    val formattedTime = zonedDateTime.format(timeFormatter)
+
+    return Pair(formattedDate, formattedTime)
 }

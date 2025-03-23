@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -61,9 +62,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -74,6 +77,7 @@ import com.example.hopla.apiService.fetchStableDetails
 import com.example.hopla.apiService.fetchStableMessages
 import com.example.hopla.apiService.fetchStables
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.Message
@@ -85,6 +89,7 @@ import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.StableDetails
 import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.UserSession
+import com.example.hopla.universalData.formatDateTime
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
@@ -448,7 +453,7 @@ fun MessageBox(stableId: String, token: String) {
             coroutineScope.launch {
                 val fetchedMessages = fetchStableMessages(token, stableId, pageNumber)
                 if (fetchedMessages.isNotEmpty()) {
-                    messages = fetchedMessages + messages
+                    messages = messages + fetchedMessages
                     pageNumber += 1
                 }
                 loading = false
@@ -460,6 +465,9 @@ fun MessageBox(stableId: String, token: String) {
     LaunchedEffect(Unit) {
         loadMessages()
     }
+
+    // Group messages by date
+    val groupedMessages = messages.groupBy { formatDateTime(it.timestamp).first }
 
     // LazyColumn to display messages
     LazyColumn(
@@ -475,9 +483,21 @@ fun MessageBox(stableId: String, token: String) {
             }
         }
 
-        // Display messages
-        items(messages) { message ->
-            MessageCard(message)
+        // Display grouped messages
+        groupedMessages.forEach { (date, messagesForDate) ->
+            items(messagesForDate) { message ->
+                MessageCard(message)
+            }
+            item {
+                Text(
+                    text = date,
+                    style = generalTextStyleBold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
 
         // Load more messages when scrolled to the top
@@ -491,15 +511,44 @@ fun MessageBox(stableId: String, token: String) {
 
 @Composable
 fun MessageCard(message: Message) {
-    Card(
+    val backgroundColor = if (message.senderId == UserSession.userId) {
+        MaterialTheme.colorScheme.primary // Green color
+    } else {
+        MaterialTheme.colorScheme.surface // Default color
+    }
+
+    val displayAlias = if (message.senderId == UserSession.userId) {
+        stringResource(R.string.me) // "Me"
+    } else {
+        message.senderAlias
+    }
+
+    val (_, formattedTime) = formatDateTime(message.timestamp)
+
+    val alignment = if (message.senderId == UserSession.userId) Alignment.CenterEnd else Alignment.CenterStart
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        contentAlignment = alignment
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = message.senderAlias, style = generalTextStyle)
-            Text(text = message.content, style = generalTextStyle)
-            Text(text = message.timestamp, style = generalTextStyle)
+        Card(
+            modifier = Modifier
+                .widthIn(min = 100.dp, max = (0.75f * LocalConfiguration.current.screenWidthDp).dp)
+                .padding(horizontal = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = displayAlias, style = generalTextStyle, modifier = Modifier.align(Alignment.CenterVertically))
+                    Text(text = formattedTime, style = generalTextStyle, modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Text(text = message.content, style = generalTextStyle)
+            }
         }
     }
 }
