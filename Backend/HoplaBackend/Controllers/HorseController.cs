@@ -52,9 +52,7 @@ public class HorseController : ControllerBase
             {
                 h.Id,
                 h.Name,
-                horsePictureUrl = !string.IsNullOrEmpty(h.PictureUrl) 
-                    ? $"{h.PictureUrl}?h=64&w=64&fit=crop"
-                    : ""
+                horsePictureUrl = !string.IsNullOrEmpty(h.PictureUrl) ? (h.PictureUrl.Contains("http") ? h.PictureUrl : "https://hopla.imgix.net/" + h.PictureUrl) + "?w=200&h=200&fit=crop" : ""
             })
             .ToListAsync(); // Krever Microsoft.EntityFrameworkCore
 
