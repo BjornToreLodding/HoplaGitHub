@@ -12,6 +12,8 @@ public class UserRelationService
 
     public string RelationStatus(Guid userId, Guid targetUserId)
     {
+        //Se først etter om dem er venner. 
+        //Lage rutiner for hva som skal overstyre hva. Hvis de følger hverandre og er venner, skal det kun vises at de er venner.
         var relation = _context.UserRelations
             .FirstOrDefault(r => 
                 (r.FromUserId == userId && r.ToUserId == targetUserId) || 

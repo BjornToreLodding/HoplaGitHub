@@ -16,7 +16,7 @@ public class Authentication
     {
         _configuration = configuration;
     }
-
+    /* gammel
     public string GenerateJwtToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -46,6 +46,64 @@ public class Authentication
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+    */
+    public string GenerateJwtToken(User user)
+{
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var secretKey = _configuration["Jwt:Key"];
+
+    if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
+    {
+        throw new Exception("🚨 Jwt:Key er for kort eller mangler!");
+    }
+
+    var key = Encoding.UTF8.GetBytes(secretKey);
+
+    // Sett opp claims
+    var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Email, user.Email)
+    };
+
+    // Legg til rolle hvis brukeren er admin
+    if (user.Admin)
+    {
+        claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+    }
+
+    var tokenDescriptor = new SecurityTokenDescriptor
+    {
+        Subject = new ClaimsIdentity(claims),
+        Expires = DateTime.UtcNow.AddDays(7),
+        SigningCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(key),
+            SecurityAlgorithms.HmacSha256Signature
+        )
+    };
+
+    var token = tokenHandler.CreateToken(tokenDescriptor);
+    return tokenHandler.WriteToken(token);
+}
+
+    public Guid GetUserIdFromToken(ClaimsPrincipal user)
+    {
+        var userIdStr = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(userIdStr, out var id)
+            ? id
+            : throw new UnauthorizedAccessException("Bruker-ID ikke funnet i token");
+    }
+
+    public string? GetRoleFromToken(ClaimsPrincipal user)
+    {
+        return user.FindFirst(ClaimTypes.Role)?.Value;
+    }
+
+    public string? GetEmailFromToken(ClaimsPrincipal user)
+    {
+        return user.FindFirst(ClaimTypes.Email)?.Value;
+    }
+
 
     // ✅ Beholder `static` her for enkel tilgang uten instans
     public static string HashPassword(string password)

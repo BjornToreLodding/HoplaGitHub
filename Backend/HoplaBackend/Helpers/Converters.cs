@@ -1,7 +1,9 @@
 using HoplaBackend.Helpers;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
+//
+// Denne brukes bare til test.
+//
 namespace HoplaBackend.Helpers;
 public static class CustomConvert { //Kunne ikke bruke Convert da det denne klassen allerede eksisterer i C#
     public static Guid IntToGuid(string tabell, int idValue)
