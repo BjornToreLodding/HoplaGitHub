@@ -190,6 +190,10 @@ public class StableController : ControllerBase
         {
             var filename = Path.GetFileNameWithoutExtension(originalUrl);
             var extension = Path.GetExtension(originalUrl);
+    
+            // Hvis filnavnet inneholder a-f, behold som det er
+            if (Regex.IsMatch(filename, @"[a-f]", RegexOptions.IgnoreCase))
+            return $"https://hopla.imgix.net/{originalUrl}?h=140&w394&crop";
 
             // Finn de 4 siste sifrene (kan være f.eks. 0086)
             var match = Regex.Match(filename, @"(\d{4})(?=\.|$)");

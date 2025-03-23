@@ -479,7 +479,7 @@ public class UserController : ControllerBase
         await _emailService.SendEmailAsync(request.Email, "Tilbakestill passord",
             $"Klikk på lenken for å tilbakestille passordet: <a href='{resetLink}'>Tilbakestill passord</a> Dette må gjøres innen 4 timer fra da du tilbakestilte passordet");
 
-        return Ok("E-post sendt. Sjekk innboksen din.");
+        return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å tilbakestille passordet. Sjekk evt søppelpost og Other/Annet mappen. Passordet må tilbakestilles innen 24 timer");
     }
 
     // Denne kan kun gjøres på web! https://password.hopla.no

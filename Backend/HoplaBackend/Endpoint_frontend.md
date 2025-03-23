@@ -5,6 +5,10 @@ trails/all mangler: beskrivelse av løypen
 
 Skal trails/map få liste med koordinater når zoomlevel er under et vist nivå? Gjerne få lagt inn dette så jeg får testet
 
+GET /stables/{stableId} -\> Kan det sendes med om stallen er privat eller public her? Så det kan brukes til å vise innhold eller ikke? Eller hvordan tenker du med det? Bildet her fører ikke til noe ordentlig sted/ikke noe bilde vises
+
+POST /stables/create -\> Form data istede for raw data for bilder?
+
 # Kort informasjon
 
 Backend: :green_book: Lagd :yellow_circle: Delvis laget :red_circle: Ikke lagd
@@ -130,7 +134,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 </td>
 <td>
 
-## :green_book: :alien: :green_apple:  GET /horses/userhorses
+## :green_book: :alien: :green_apple: GET /horses/userhorses
 
 **Profil -\> Mine hester**
 
@@ -639,7 +643,9 @@ Response:
 
 Profil -\> Bytte brukernavn
 
-## :green_book: :smiling_imp: :apple: PUT /users/update
+## :yellow_circle: :grimacing: :apple: PUT /users/update
+
+(mangler fungerende Dob)
 
 Body:
 
@@ -663,11 +669,11 @@ Response:
 
 Profil -\> Bytte epost
 
-## :green_book: :smiling_imp: :apple: POST /users/change-email
+## :green_book: :alien: :apple: POST /users/change-email
 
 body:
 
-````json
+```json
 {
     "NewEmail": "test@test.no",
     "Password": "Hopla2025!"
@@ -681,7 +687,7 @@ Response trinn1:
 {
     "message": "E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer"
 }
-````
+```
 
 Åpne epost og trykk på aktiveringslenke. I noen tilfeller har det tatt opptil 30 minutter før eposten har kommet frem.
 
@@ -691,7 +697,7 @@ Profil -\> bytte passord
 
 body:
 
-````json
+```json
 {
     "OldPassword": "GammeltPass0rd!",
     "NewPassword": "Hopla2025!",
@@ -703,7 +709,7 @@ response:
 {
     "message": "Passordet er endret"
 }
-````
+```
 </td>
 </tr>
 <tr>
@@ -773,7 +779,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 **eks**
 
-[https://localhost:7128/trails/list](https://localhost:7128/trails/list)
+[https://hopla.onrender.com:7128/trails/list](https://hopla.onrender.com:7128/trails/list)
 
 Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
 
@@ -820,7 +826,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 
 * Kun løyper som brukeren har trykket liker på
 
-[https://localhost:7128/trails/favorites](https://localhost:7128/trails/favorites)
+[https://hopla.onrender.com:7128/trails/favorites](https://hopla.onrender.com:7128/trails/favorites)
 
 **query**
 
@@ -858,7 +864,7 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 
 * Løyper til brukere brukeren følger og venner med
 
-[http://localhost:7128/trails/relations](http://localhost:7128/trails/relations) ?friends=true & following=true
+[http://hopla.onrender.com:7128/trails/relations](http://hopla.onrender.com:7128/trails/relations) ?friends=true & following=true
 
 **query**
 
@@ -944,13 +950,9 @@ Spørsmål: finnes det en epost jeg kan teste glemt passord på? Eller er det "n
 </td>
 <td>
 
-## :green_book: :smiling_imp: :apple: POST /users/register
+## :green_book: :alien: :apple: POST /users/register
 
-Startsiden:
-
-:smiling_imp: :apple: Glemt passord: sender med en epost i requesten, som den da må sjekke at den finnes i databasen for så å på en måte sende en mail der brukeren kan bytte passordet sitt?
-
-:smiling_imp: :apple: Opprett bruker:
+:alien: :apple: Opprett bruker:
 
 **Trinn 1:** Registrer epost, passord
 
@@ -1019,6 +1021,60 @@ Body:
 ```postman_message
 Brukerinformasjon oppdatert.
 ```
+
+
+
+
+## :green_book: :smiling_imp: :apple: POST /users/reset-password-request 
+
+Glemt passord
+
+sender med en epost i requesten, som den da må sjekke at den finnes i databasen for så å på en måte sende en mail der brukeren kan bytte passordet sitt?
+
+**BT**
+
+Ganske lik som POST /users/register
+
+**Trinn 1**
+
+Endpoint: POST /users/reset-password-request
+
+Body:
+```json
+{
+    "Email": "test@test.no" //for å teste må man skrive inn en epost som eksisterer.
+}
+```
+Response:
+
+```postman
+"E-post sendt. Sjekk innboksen og trykk på lenken for å tilbakestille passordet. Sjekk evt søppelpost og Other/Annet mappen. Passordet må tilbakestilles innen 24 timer"
+```
+
+```email
+FROM: Ikke svar (noreply@hopla.no)
+Klikk på lenken for å fullføre registreringen: Bekreft e-post
+```
+
+**Trinn 2** 
+
+**Når man trykker bekreft, sendes man hit:**
+
+GET https://password.hopla.no/index.html?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
+
+Nettside for tilbakestilling av passord, for å gjøre det enklest mulig for brukeren. Tungvint å åpne en epost med appen.
+
+PWHOPLA
+
+**eksempel på response:**
+
+```http_message
+Passord tilbakestilt. Du kan nå logge inn med ditt nye passord.
+```
+
+**Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
+
+
 </td>
 </tr>
 <tr>
@@ -1168,7 +1224,7 @@ https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlev
 </td>
 <td>
 
-## :green_book: :smiling_imp: :apple: GET /stables/all
+## :green_book: :alien: :apple: GET /stables/all
 
 Community/Fellesskap/Grupper
 
@@ -1197,14 +1253,16 @@ Den sorterer nå på distanse
 **Query**
 
 * search= (optioanal) tekst som skal matche med stallnavnet
+* userID= (opt) viser kun staller hvis userId er medlem
 * latitude = latitude til bruker
 * longitude = longitude til bruker
 * page? = (Optional) side nummer. Hvis ikke oppgitt, settes den til 1
 * pageSize? = (Optional) antall treff pr side. Hvis ikke oppgitt, så settes den til 10.
 
 **eks**
+
 ```postman
-https://localhost:7128/stables/all?search=byen&latitude=60.8&longitude=10.7&pagesize=50&pagenumber=1
+https://hopla.onrender.com/stables/all?search=byen&latitude=60.8&longitude=10.7&pagesize=50&pagenumber=1
 ```
 
 Response
@@ -1228,9 +1286,38 @@ Response
 }
 ```
 
-**Avrunding? på Distanse kan evt frontend gjøre :-) **
+\*\*Avrunding? på Distanse kan evt frontend gjøre :-) \*\*
 
 sånn cirka
+
+## :green_book: :smiling_imp: :apple: GET /stables/member (?)
+
+Trenger endpoint her også for å vise kun staller som man er medlem hos (der man trykker på hjerte øverst på bilde)
+
+Dette er lagt inn i GET /stables/all hvor man spesifiserer optional query userid. Her kan man også sjekke hvilke staller andre brukere er medlem i.
+
+GET https://hopla.onrender.com/stables/all?userid=12345678-0000-0000-0001-123456780001&latitude=60&longitude=10
+
+Response:
+```json
+[
+    {
+        "stableId": "12345678-0000-0000-0031-123456780005",
+        "stableName": "Asker Rideklubb",
+        "distance": 30.613510835652864,
+        "member": true,
+        "pictureUrl": "https://hopla.imgix.net/12345678-0000-0000-0031-123456780005.jpg?h=140&w394&crop"
+    },
+    {
+        "stableId": "12345678-0000-0000-0031-123456780003",
+        "stableName": "Sørkedalen Rideklubb",
+        "distance": 32.264149828696908,
+        "member": true,
+        "pictureUrl": "https://hopla.imgix.net/12345678-0000-0000-0031-123456780003.jpg?h=140&w394&crop"
+    }
+]
+```
+
 </td>
 </tr>
 <tr>
@@ -1240,7 +1327,7 @@ sånn cirka
 </td>
 <td>
 
-## :green_book: :smiling_imp: :apple: POST /stables/create
+## :green_book: :upside_down: :apple: POST /stables/create
 
 Legg til nytt fellesskap:
 
@@ -1250,20 +1337,19 @@ Informasjon som må bli lagt til: navn, beskrivelse, bilde, privat/offentlig og 
 
 \*\*POST \*\***https://hopla.onrender.com/stable/create**
 
-Body:
+Body FORMDATA
 
-```json
-{
-    "Name": "Stallione",
-    "Description": "Flott Stall",
-    "PictureUrl": "asdfjkl.jpg", //skal det lastes opp her, eller skal man kunne oppdatere det senere?
-    "Latitude": 60.01223,
-    "Longitude": 10.5433,
-    "PrivateGroup": false
-}
+```formdata
+    Key             Value
+    PictureUrl      stall.jpg
+    Name            Stallione
+    Description     Flott Stall
+    Latitude        60.01223
+    Longitude       10.5433
+    PrivateGroup    false
 ```
 
-Responce:
+Response:
 
 ```json
 {
@@ -1282,7 +1368,7 @@ Denne lager ny stall i Stables OG bruker som lager stallen blir satt som admin i
 </td>
 <td>
 
-## :green_book: :smiling_imp: :apple: GET /stables/{stableId}
+## :green_book: :alien: :apple: GET /stables/{stableId}
 
 Community details
 
@@ -1299,11 +1385,13 @@ Admin skal kunne: slette community (?)
 **BT**
 
 eks:
+
 ```postman
-https://localhost:7128/stables/12345678-0000-0000-0031-123456780001
+https://hopla.onrender.com:7128/stables/12345678-0000-0000-0031-123456780001
 ```
 
 Response:
+
 ```json
 {
     "id": "12345678-0000-0000-0031-123456780001",
@@ -1319,16 +1407,19 @@ Videre må man hente meldinger med neste endpoint
 ## :green_book: :smiling_imp: :apple: GET /stablemessages/{stableId}
 
 **Query**
+
 * page? = (Optional) side nummer. Hvis ikke oppgitt, settes den til 1
 * pageSize? = (Optional) antall treff pr side. Hvis ikke oppgitt, så settes den til 10.
 * Annet som burde være med?
 
 eks:
+
 ```postman
-https://localhost:7128/stablemessages/12345678-0000-0000-0031-123456780001?pagesize=10&pagenumber=1
+https://hopla.onrender.com:7128/stablemessages/12345678-0000-0000-0031-123456780001?pagesize=10&pagenumber=1
 ```
 
 Response:
+
 ```json
 [
     {
@@ -1369,7 +1460,6 @@ Response:
     }
 ]
 ```
-
 </td>
 </tr>
 <tr>
@@ -1379,25 +1469,31 @@ Response:
 </td>
 <td>
 
-## :green_book: :smiling_imp: :apple: POST /horses/create
+## :green_book:  :smiling_imp: :apple: POST /horses/create
 
 Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
 
 eks: https://hopla.onrender.com/horses/create
 
 Body:
-```json
+
+```formdata
 {
-    "Name": "KongDurek",
-    "Age": 5
+    Key                     Obj     Value
+    Image                   File    kingdurek.jpg
+    Name                    Text    KongDurek
+    Breed                   Text    Lurendreier
+    Year                    Text    1969
+    Month                   Text    1
+    Day                     Text    1
 }
 ```
 
 Response:
+
 ```json
 Horse Created
 ```
-
 </td>
 </tr>
 <tr>
