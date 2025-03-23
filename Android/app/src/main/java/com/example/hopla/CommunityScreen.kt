@@ -64,9 +64,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.createStable
 import com.example.hopla.apiService.fetchStables
 import com.example.hopla.universalData.AddButton
-import com.example.hopla.universalData.Community
-import com.example.hopla.universalData.CommunityMemberStatus
-import com.example.hopla.universalData.CommunityStatus
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar

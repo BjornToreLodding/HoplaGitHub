@@ -7,14 +7,6 @@ import java.util.Locale
 // Base URL for the API
 const val apiUrl = "https://hopla.onrender.com/"
 
-// Class for the data of a trip
-data class Trip(
-    val name: String,
-    val date: String,
-    val length: String,
-    val time: String,
-    val imageResource: Int
-)
 
 // Different status relationship between users can be
 enum class PersonStatus {
@@ -70,23 +62,11 @@ data class Community(
     val name: String,
     val imageResource: Int,
     val description: String,
-    val communityMemberStatus: CommunityMemberStatus,
-    val communityStatus: CommunityStatus,
+    val communityMemberStatus: String = "MEMBER",
+    val communityStatus: String = "PUBLIC",
     val latitude: Double? = null,
     val longitude: Double? = null
 )
-
-enum class CommunityMemberStatus{
-    NONE,
-    REQUEST,
-    MEMBER,
-    ADMIN
-}
-
-enum class CommunityStatus{
-    PUBLIC,
-    PRIVATE
-}
 
 // Class for the data of a post
 data class Message(

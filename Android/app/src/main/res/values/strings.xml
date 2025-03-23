@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Hopla</string>
     <string name="home_screen">Home Screen</string>
     <string name="profile_screen">Profile Screen</string>
@@ -85,7 +85,7 @@
     <string name="asphalt">Asfalt</string>
 
     <string name="comment">Kommentar: </string>
-    <string name="publish">Publiser</string>
+    <string name="publish" tools:ignore="Typos">Publiser</string>
     <string name="dateString">Dato</string>
     <string name="length">Lengde</string>
     <string name="hourString">Timer</string>
