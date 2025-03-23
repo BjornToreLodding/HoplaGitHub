@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
@@ -35,8 +33,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -53,7 +49,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -74,11 +69,7 @@ import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import java.util.UUID
 
 // A search bar with a icon and a text field
 @Composable
@@ -256,120 +247,6 @@ fun ImagePicker(
                 }
             }
         )
-    }
-}
-
-// Standard for how a messaging board should look like
-@Composable
-fun MessageBox(
-    messages: SnapshotStateList<Message>,
-    newMessage: String,
-    onMessageChange: (String) -> Unit,
-    community: Community
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(bottom = 4.dp) // Reduced padding
-            ) {
-                val groupedMessages = messages.groupBy { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it.timestamp)) }
-                groupedMessages.forEach { (date, messagesForDate) ->
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp), // Reduced padding
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = date,
-                                style = generalTextStyle
-                            )
-                        }
-                    }
-                    items(messagesForDate) { message ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalAlignment = if (message.username == UserSession.alias) Alignment.End else Alignment.Start
-                        ) {
-                            // Timestamp and name above the message box
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = if (message.username == UserSession.alias) Arrangement.End else Arrangement.Start
-                            ) {
-                                Text(
-                                    text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(message.timestamp)),
-                                    style = generalTextStyle,
-                                    modifier = Modifier.align(Alignment.CenterVertically)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = if (message.username == UserSession.alias) stringResource(
-                                        R.string.me
-                                    ) else message.username, // Change username to "me"
-                                    style = generalTextStyle,
-                                    modifier = Modifier.align(Alignment.CenterVertically)
-                                )
-                            }
-                            // Message box with rounded corners and different background color for user's messages
-                            Card(
-                                shape = RoundedCornerShape(8.dp), // Rounded corners
-                                colors = CardDefaults.cardColors(
-                                    containerColor = if (message.username == UserSession.alias)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.surface
-                                ),
-                                modifier = Modifier.padding(8.dp) // Reduced padding
-                            ) {
-                                Text(
-                                    text = message.content,
-                                    style = generalTextStyle,
-                                    modifier = Modifier.padding(8.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextField(
-                    value = newMessage,
-                    onValueChange = onMessageChange,
-                    modifier = Modifier.weight(1f),
-                    placeholder = { Text(text = stringResource(R.string.enter_you_message), style = textFieldLabelTextStyle) }
-                )
-                Button(
-                    onClick = {
-                        if (newMessage.isNotBlank()) {
-                            val newMsg = Message(
-                                id = UUID.randomUUID().toString(),
-                                content = newMessage,
-                                timestamp = System.currentTimeMillis(),
-                                username = UserSession.alias?: ""
-                            )
-                            messages.add(newMsg)
-                            onMessageChange("")
-                        }
-                    },
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
-                    Text(text = stringResource(R.string.publish), style = buttonTextStyle)
-                }
-            }
-        }
     }
 }
 

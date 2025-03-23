@@ -69,12 +69,12 @@ data class Community(
 )
 
 // Class for the data of a post
+@Serializable
 data class Message(
-    val id: String,
     val content: String,
-    val timestamp: Long,
-    val imageUrl: String? = null,
-    val username: String
+    val timestamp: String,
+    val senderId: String,
+    val senderAlias: String
 )
 
 interface UserItem {

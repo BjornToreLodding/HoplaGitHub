@@ -71,9 +71,12 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.createStable
 import com.example.hopla.apiService.fetchStableDetails
+import com.example.hopla.apiService.fetchStableMessages
 import com.example.hopla.apiService.fetchStables
+import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
@@ -362,7 +365,7 @@ fun CommunityDetailScreen(navController: NavController, stableId: String, token:
                 }
             }
             // Column for the messages posted in the group
-            //MessageBox(messages, newMessage, onMessageChange = { newMessage = it }, community)
+            MessageBox(stableId = stableId, token = token)
         }
     }
 
@@ -428,6 +431,76 @@ fun CommunityDetailScreen(navController: NavController, stableId: String, token:
             token = UserSession.token,
             onDismiss = { showReportDialog = false }
         )
+    }
+}
+
+@Composable
+fun MessageBox(stableId: String, token: String) {
+    var messages by remember { mutableStateOf(listOf<Message>()) }
+    var pageNumber by remember { mutableIntStateOf(1) }
+    var loading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Function to load messages
+    fun loadMessages() {
+        if (!loading) {
+            loading = true
+            coroutineScope.launch {
+                val fetchedMessages = fetchStableMessages(token, stableId, pageNumber)
+                if (fetchedMessages.isNotEmpty()) {
+                    messages = fetchedMessages + messages
+                    pageNumber += 1
+                }
+                loading = false
+            }
+        }
+    }
+
+    // Initial load
+    LaunchedEffect(Unit) {
+        loadMessages()
+    }
+
+    // LazyColumn to display messages
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        reverseLayout = true // To display the latest message at the top
+    ) {
+        // Loading indicator at the top
+        item {
+            if (loading) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+
+        // Display messages
+        items(messages) { message ->
+            MessageCard(message)
+        }
+
+        // Load more messages when scrolled to the top
+        item {
+            LaunchedEffect(Unit) {
+                loadMessages()
+            }
+        }
+    }
+}
+
+@Composable
+fun MessageCard(message: Message) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = message.senderAlias, style = generalTextStyle)
+            Text(text = message.content, style = generalTextStyle)
+            Text(text = message.timestamp, style = generalTextStyle)
+        }
     }
 }
 

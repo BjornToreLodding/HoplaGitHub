@@ -25,27 +25,6 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-fun fetchMessages(messageName: String): List<Message> {
-    val currentTime = System.currentTimeMillis()
-    val oneDayInMillis = 24 * 60 * 60 * 1000
-    val yesterdayTime = currentTime - oneDayInMillis
-
-    return listOf(
-        Message(
-            id = "1",
-            content = "Welcome to the community!",
-            timestamp = yesterdayTime,
-            username = "Bob"
-        ),
-        Message(
-            id = "2",
-            content = "Hello everyone!",
-            timestamp = yesterdayTime,
-            username = "Maria"
-        )
-    )
-}
-
 suspend fun fetchHorses(userId: String, token: String): List<Horse> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -366,5 +345,38 @@ suspend fun fetchStableDetails(token: String, stableId: String): StableDetails? 
     } catch (e: Exception) {
         Log.e("fetchStableDetails", "Error fetching stable details", e)
         null
+    }
+}
+
+suspend fun fetchStableMessages(token: String, stableId: String, pageNumber: Int): List<Message> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
+    val url = "https://hopla.onrender.com/stablemessages/$stableId?pagenumber=$pageNumber"
+    Log.d("fetchStableMessages", "Request URL: $url")
+    Log.d("fetchStableMessages", "Token: $token")
+
+    return try {
+        httpClient.use { client ->
+            val response: HttpResponse = client.get(url) {
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
+            }
+
+            val responseBody: String = response.bodyAsText()
+            Log.d("fetchStableMessages", "Response Code: ${response.status.value}")
+            Log.d("fetchStableMessages", "Response Body: $responseBody")
+
+            response.body()
+        }
+    } catch (e: Exception) {
+        Log.e("fetchStableMessages", "Error fetching stable messages", e)
+        emptyList()
     }
 }

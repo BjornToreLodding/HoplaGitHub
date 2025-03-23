@@ -957,8 +957,8 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
 
                     // Sample messages list
                     val messages = listOf(
-                        Message(id = "1", content = "Trail is clear and well-maintained.", timestamp = System.currentTimeMillis(), imageUrl = "https://c8.alamy.com/compde/b7n5n2/schneebedeckte-umgesturzten-baum-in-einem-wald-in-haanja-estland-b7n5n2.jpg", username = "Bob"),
-                        Message(id = "2", content = "Watch out for fallen branches.", timestamp = System.currentTimeMillis() - 3600000, username = "Alice")
+                        Message(content = "Trail is clear and well-maintained.", timestamp = "2202002", senderId = "12345678-0000-0000-0001-123456780004", senderAlias = "Bob"),
+                        Message(content = "Watch out for fallen branches.", timestamp = "11.01.11", senderId = "12345678-0000-0000-0001-123456780004", senderAlias = "Maria")
                     )
 
                     LazyColumn {
@@ -981,6 +981,7 @@ fun MessageItem(message: Message) {
             .background(MaterialTheme.colorScheme.surface)
             .padding(8.dp)
     ) {
+        /*
         message.imageUrl?.let { imageUrl ->
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
@@ -991,7 +992,7 @@ fun MessageItem(message: Message) {
                     .height(200.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
-        }
+        }*/
         Text(text = message.content)
         Text(
             text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(message.timestamp)),
