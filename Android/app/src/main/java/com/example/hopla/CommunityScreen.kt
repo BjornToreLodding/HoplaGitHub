@@ -111,7 +111,6 @@ fun CommunityScreen(navController: NavController, token: String) {
 
     Log.d("CommunityScreen", "CommunityScreen launched")
 
-    // Fetch the current location when the composable is first launched
     LaunchedEffect(Unit) {
         Log.d("CommunityScreen", "LaunchedEffect triggered")
         getCurrentLocation(context) { location ->
@@ -127,7 +126,6 @@ fun CommunityScreen(navController: NavController, token: String) {
         }
     }
 
-    // Function to load more stables
     fun loadMoreStables() {
         if (!loading) {
             loading = true
@@ -143,7 +141,6 @@ fun CommunityScreen(navController: NavController, token: String) {
         }
     }
 
-    // Function to fetch stables based on the current filter
     fun fetchFilteredStables() {
         coroutineScope.launch {
             loading = true
@@ -154,18 +151,15 @@ fun CommunityScreen(navController: NavController, token: String) {
         }
     }
 
-    // Column for the community screen (whole screen)
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            // Top text for filtering the groups based on position and liked status
             TopTextCommunity(currentPage = currentPage) { page ->
                 currentPage = page
                 fetchFilteredStables()
             }
-            // A search bar to search for community groups
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query ->
@@ -173,17 +167,14 @@ fun CommunityScreen(navController: NavController, token: String) {
                     fetchFilteredStables()
                 }
             )
-            // Scrollview for displaying the community groups
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 1.dp)
             ) {
-                // Display the community groups
-                items(stables) { stable ->
+                items(stables, key = { it.stableId }) { stable ->
                     StableCard(stable, navController, likedStables)
                 }
-                // Show loading indicator at the bottom
                 item {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         if (loading) {
@@ -197,14 +188,13 @@ fun CommunityScreen(navController: NavController, token: String) {
                 }
             }
         }
-        // Add button to add a new community group
         AddButton(onClick = { navController.navigate("addCommunityScreen") })
     }
 }
 
 @Composable
 fun StableCard(stable: Stable, navController: NavController, likedStables: MutableList<Stable>) {
-    var isLiked by remember { mutableStateOf(likedStables.contains(stable)) }
+    var isLiked by remember { mutableStateOf(stable.member || likedStables.contains(stable)) }
     val coroutineScope = rememberCoroutineScope()
 
     Card(
