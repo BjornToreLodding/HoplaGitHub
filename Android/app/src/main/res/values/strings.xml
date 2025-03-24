@@ -159,5 +159,6 @@
     <string name="year">År</string>
     <string name="success">Suksess</string>
     <string name="error_occurred">Noe feil skjedde, prøv igjen senere</string>
+    <string name="add_new_horse">Legg til ny hest</string>
 
 </resources>

@@ -549,7 +549,7 @@ fun AddNewType(
     ) {
         when (type) {
             "Horse" -> {
-                Text(text = "Add New $type", style = headerTextStyleSmall)
+                Text(text = stringResource(R.string.add_new_horse), style = headerTextStyleSmall)
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = name,
