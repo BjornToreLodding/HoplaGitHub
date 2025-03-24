@@ -66,8 +66,9 @@ public class UpdateUserDto
     //public string? PictureUrl { get; set; } // Direkte lagring av profilbilde-URL
 
     public string? Description { get ; set; }
-    public DateTime? Dob { get; set; }
-
+    public int? Year { get; set; }
+    public int? Month { get; set; }
+    public int? Day { get; set; }
 
     //public string? PasswordHash { get; set; }
     //public string? ProfilePictureUrl { get; set; } // Direkte lagring av profilbilde-URL

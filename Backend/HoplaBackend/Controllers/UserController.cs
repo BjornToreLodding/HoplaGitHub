@@ -296,14 +296,26 @@ public class UserController : ControllerBase
             user.Telephone = request.Telephone;
         if (request.Dob.HasValue)
             user.Dob = request.Dob;
-        */
+        */        
         if (request.Name != null) user.Name = request.Name;
         if (request.Alias != null) user.Alias = request.Alias;
         if (request.Description != null) user.Description = request.Description;
         if (request.Telephone != null) user.Telephone = request.Telephone;
 
-        // Hvis Dob er eksplisitt satt til null, fjern datoen
-        user.Dob = request.Dob;
+        // Hvis Dob ikke endres, blir den fjernet.
+        DateOnly? dob = null;
+        if (request.Year.HasValue && request.Month.HasValue && request.Day.HasValue)
+        {
+            try
+            {
+                dob = new DateOnly(request.Year.Value, request.Month.Value, request.Day.Value);
+            }
+            catch
+            {
+                return BadRequest(new { error = "Ugyldig fødselsdato." });
+            }
+        }
+        user.Dob = dob;
         Console.WriteLine("users/update checkpoint før save og return ok");
 
 
