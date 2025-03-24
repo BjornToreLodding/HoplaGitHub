@@ -172,6 +172,9 @@ public class AppDbContext : DbContext
             .WithOne(t => t.TrailAllCoordinates)
             .HasForeignKey<TrailAllCoordinate>(tc => tc.Id)
             .OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<TrailDetail>()
+            .OwnsMany(t => t.Coordinates50);
 
 
 

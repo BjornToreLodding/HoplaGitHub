@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 //using HoplaBackend.Models;
 
 namespace HoplaBackend.Models;
@@ -21,9 +22,16 @@ public class TrailDetail
     public double? LatMax { get; set; }
     public double? LongMax { get; set; }
 
-    public string? JsonCoordinates50 { get; set; } // 50 koordinater for forhåndsvisning, bør kanskje forrandres til Liste som under.
-    //public List<TrailCoordinate50> Coordinates50 { get; set; } = new();
+    //public string? JsonCoordinates50 { get; set; } // 50 koordinater for forhåndsvisning, bør kanskje forrandres til Liste som under.
+    public List<TrailCoordinate50> Coordinates50 { get; set; } = new();
     public List<EntityImage> Images { get; set; } = new();
     public string Notes { get; set; } = string.Empty;
 
 }
+[Owned]
+public class TrailCoordinate50
+{
+public double Lat { get; set; }
+public double Long { get; set; }
+}
+

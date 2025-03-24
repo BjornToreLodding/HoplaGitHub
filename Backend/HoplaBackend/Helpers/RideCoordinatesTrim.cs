@@ -1,10 +1,11 @@
 using HoplaBackend.DTOs;
+using HoplaBackend.Models;
 
 namespace HoplaBackend.Helpers;
 
-public static class RideCoordinatesTrim
+public static class TrailCoordinatesTrim
 {
-    public static List<RideCoordinateDto> ReduceTo50Coordinates(List<RideCoordinateDto> coordinates)
+    public static List<TrailCoordinateDto> ReduceTo50Coordinates(List<TrailCoordinateDto> coordinates)
     {
         if (coordinates.Count <= 50)
             return coordinates;

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 using Microsoft.VisualBasic;
 using HoplaBackend.Services;
+using HoplaBackend.Models.DTOs;
 
 namespace HoplaBackend.Controllers;
 
@@ -533,6 +534,56 @@ public class TrailController : ControllerBase
         return Ok(new {message = "Updated TrailRating"}); //, rating = existing});
     }
     
+    [HttpPost("mock")]
+    public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)
+    {
+        var allCoords = MockHelper.GenerateCircularTrail(dto.LatMean, dto.LongMean, dto.Distance);
+        var reducedCoords = TrailCoordinatesTrim.ReduceTo50Coordinates(allCoords.Select(c => new TrailCoordinateDto { Lat = c.Lat, Long = c.Long }).ToList());
+
+        var convertedCoords = reducedCoords
+            .Select(c => new TrailCoordinate50 { Lat = c.Lat, Long = c.Long })
+            .ToList();
+        var latMin = allCoords.Min(c => c.Lat);
+        var latMax = allCoords.Max(c => c.Lat);
+        var longMin = allCoords.Min(c => c.Long);
+        var longMax = allCoords.Max(c => c.Long);
+
+        var trail = new Trail
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            LatMean = dto.LatMean,
+            LongMean = dto.LongMean,
+            Distance = dto.Distance,
+            PictureUrl = null,
+            Visibility = TrailVisibility.Private,
+            UserId = null, // evt. UserId fra innlogget bruker?
+            TrailDetails = new TrailDetail
+            {
+                Description = "Auto-generert mock-løype",
+                Coordinates50 = convertedCoords, //Rødt strek under reducedCoords
+                LatMin = latMin,
+                LatMax = latMax,
+                LongMin = longMin,
+                LongMax = longMax,
+            },
+            TrailAllCoordinates = new TrailAllCoordinate
+            {
+                Coordinates = allCoords
+                    .Select(c => new TrailCoordinate
+                    {
+                        Lat = c.Lat,
+                        Long = c.Long
+                    }).ToList()
+            }
+        };
+
+        _context.Trails.Add(trail);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { trail.Id, Message = "Mock trail created" });
+    }
+}
     /*
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
@@ -783,4 +834,4 @@ public class TrailController : ControllerBase
         return R * c; // Avstand i km
     }
     */
-}
+
