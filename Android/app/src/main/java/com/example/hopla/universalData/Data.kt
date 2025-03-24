@@ -1,5 +1,8 @@
 package com.example.hopla.universalData
 
+import android.graphics.Bitmap
+import android.net.Uri
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -268,12 +271,12 @@ data class StableDetails(
 data class StableRequest(
     val Name: String,
     val Description: String,
-    val PictureUrl: String,
+    @Contextual val Image: Bitmap,
     val Latitude: Double,
     val Longitude: Double,
     val PrivateGroup: Boolean
 )
 
-//---------------- Data classes for lonin page ----------------
+//---------------- Data classes for login page ----------------
 @Serializable
 data class ResetPasswordRequest(val Email: String)

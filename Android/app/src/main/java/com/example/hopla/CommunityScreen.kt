@@ -1,5 +1,6 @@
 package com.example.hopla
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -28,7 +29,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -95,6 +95,7 @@ import com.example.hopla.universalData.formatDateTime
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
+
 
 @Composable
 fun CommunityScreen(navController: NavController, token: String) {
@@ -312,7 +313,6 @@ fun TopTextCommunity(currentPage: String, onShowLikedOnlyChange: (String) -> Uni
         }
     }
 }
-
 
 // Details about a specific community
 @Composable
@@ -613,17 +613,18 @@ fun AddCommunityScreen(navController: NavController, token: String) {
     var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    val privateString = stringResource(R.string.private_string)
-    val publicString = stringResource(R.string.public_string)
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         item {
-            ScreenHeader(navController = navController, headerText = stringResource(R.string.add_new_community))
+            // Now inside composable scope
+            val privateString = stringResource(R.string.private_string)
+            val publicString = stringResource(R.string.public_string)
+            val context = LocalContext.current
 
+            ScreenHeader(navController = navController, headerText = stringResource(R.string.add_new_community))
             Spacer(modifier = Modifier.height(16.dp))
 
             TextField(
@@ -633,6 +634,7 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
+
             TextField(
                 value = description,
                 onValueChange = { description = it },
@@ -661,7 +663,7 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                 }
             }
             ImagePicker(
-                onImageSelected = { bitmap -> imageBitmap = bitmap },
+                onImageSelected = { bitmap: Bitmap? -> imageBitmap = bitmap },
                 text = if (imageBitmap == null) stringResource(R.string.add_image) else stringResource(R.string.change_image)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -714,14 +716,14 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                         val stableRequest = StableRequest(
                             Name = name,
                             Description = description,
-                            PictureUrl = "https://hopla.imgix.net/51053800-5fd2-421d-b0bc-f3d9d9cdca3e.jpg?w=200&h=200&fit=crop", // Replace with actual image URL
+                            Image = imageBitmap!!,
                             Latitude = selectedPosition!!.latitude,
                             Longitude = selectedPosition!!.longitude,
                             PrivateGroup = isPrivate
                         )
                         coroutineScope.launch {
-                            val response = createStable(token, stableRequest)
-                            Log.d("AddCommunityScreen", "Response: $response")
+                            val response = createStable(token, stableRequest, context)
+                            Log.d("createStable", "Response: $response")
                             navController.popBackStack()
                         }
                     } else {
@@ -735,6 +737,7 @@ fun AddCommunityScreen(navController: NavController, token: String) {
         }
     }
 }
+
 
 fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager

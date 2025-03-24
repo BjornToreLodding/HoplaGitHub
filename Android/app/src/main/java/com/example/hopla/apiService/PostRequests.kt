@@ -1,10 +1,11 @@
 package com.example.hopla.apiService
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
+import com.example.hopla.R
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.LoginRequest
-import com.example.hopla.R
 import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.User
@@ -12,28 +13,26 @@ import com.example.hopla.universalData.UserReportRequest
 import com.example.hopla.universalData.UserReportResponse
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.apiUrl
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 
 fun handleLogin(
     username: String,
@@ -200,31 +199,40 @@ suspend fun registerUser(email: String, password: String): Pair<String, Int> {
 }
 
 //----------------------Community Post Request-------------------------
-suspend fun createStable(token: String, stableRequest: StableRequest): String {
-    val client = HttpClient {
+suspend fun createStable(token: String, stableRequest: StableRequest, context: Context): String {
+    val httpClient = HttpClient {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-                encodeDefaults = true
-            })
+            json()
         }
     }
 
-    Log.d("createStable", "Request URL: https://hopla.onrender.com/stable/create")
-    Log.d("createStable", "Request Body: $stableRequest")
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    stableRequest.Image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    val imageBytes = byteArrayOutputStream.toByteArray()
 
-    val response: HttpResponse = client.post("https://hopla.onrender.com/stable/create") {
-        header("Authorization", "Bearer $token")
-        contentType(ContentType.Application.Json)
-        setBody(stableRequest)
+    val response: HttpResponse = httpClient.use { client ->
+        client.post("https://hopla.onrender.com/stables/create") {
+            header("Authorization", "Bearer $token")
+            setBody(MultiPartFormDataContent(
+                formData {
+                    append("image", imageBytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"stable.jpg\"")
+                    })
+                    append("Name", stableRequest.Name)
+                    append("Description", stableRequest.Description)
+                    append("Latitude", stableRequest.Latitude.toString())
+                    append("Longitude", stableRequest.Longitude.toString())
+                    append("PrivateGroup", stableRequest.PrivateGroup.toString())
+                }
+            ))
+        }
     }
 
     val responseBody: String = response.bodyAsText()
-    Log.d("createStable", "Response Code: ${response.status.value}")
+    Log.d("createStable", "Response Status: ${response.status}")
+    Log.d("createStable", "Response Headers: ${response.headers}")
     Log.d("createStable", "Response Body: $responseBody")
-
-    client.close()
     return responseBody
 }
 
