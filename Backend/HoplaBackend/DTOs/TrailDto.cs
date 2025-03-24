@@ -10,6 +10,16 @@ public class TrailDto
     public double AverageRating { get; set; }
     public bool IsFavorite { get; set; }
 }
+
+public class CreateTrailDto
+{
+    public string Name { get; set; }
+    public string? PictureUrl { get; set; }
+    public string Coordinates { get; set; }
+    public double Distance { get; set; }
+    
+
+}
 public class TrailRateDto
 {
     public Guid TrailId { get; set; }
