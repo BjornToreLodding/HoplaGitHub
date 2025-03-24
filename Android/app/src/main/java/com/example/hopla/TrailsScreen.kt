@@ -100,6 +100,8 @@ import java.util.Locale
 import android.Manifest
 import com.example.hopla.apiService.fetchFavoriteTrails
 import com.example.hopla.apiService.fetchTrailsRelations
+import com.example.hopla.apiService.rateTrail
+import com.example.hopla.universalData.TrailRatingRequest
 
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -906,7 +908,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(text = stringResource(R.string.my_assessment))
-                            StarRating(rating = userRating, onRatingChanged = { userRating = it })
+                            StarRating(trailId = contentBoxInfo.id, rating = userRating, onRatingChanged = { userRating = it })
                         }
                     }
                     // Outer box of latest update
@@ -1004,7 +1006,10 @@ fun MessageItem(message: Message) {
 
 // Function to be able to change the rating
 @Composable
-fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
+fun StarRating(trailId: String, rating: Int, onRatingChanged: (Int) -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
+
     Row {
         repeat(5) { index ->
             Icon(
@@ -1013,7 +1018,18 @@ fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
                 tint = StarColor,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { onRatingChanged(index + 1) }
+                    .clickable {
+                        val newRating = index + 1
+                        onRatingChanged(newRating)
+                        coroutineScope.launch {
+                            try {
+                                val response = rateTrail(token, TrailRatingRequest(TrailId = trailId, Rating = newRating))
+                                Log.d("rateTrail", "Response: ${response.message}")
+                            } catch (e: Exception) {
+                                Log.e("rateTrail", "Error rating trail", e)
+                            }
+                        }
+                    }
             )
         }
     }

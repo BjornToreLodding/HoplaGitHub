@@ -289,3 +289,10 @@ data class HorseRequest(
     val Day: String,
     @Contextual val Image: Bitmap
 )
+
+//------------------Data classes for trails -----------------
+@Serializable
+data class TrailRatingResponse(val message: String)
+
+@Serializable
+data class TrailRatingRequest(val TrailId: String, val Rating: Int)

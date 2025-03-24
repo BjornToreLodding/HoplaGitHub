@@ -9,6 +9,8 @@ import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableRequest
+import com.example.hopla.universalData.TrailRatingRequest
+import com.example.hopla.universalData.TrailRatingResponse
 import com.example.hopla.universalData.User
 import com.example.hopla.universalData.UserReportRequest
 import com.example.hopla.universalData.UserReportResponse
@@ -114,7 +116,7 @@ suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
                 formData {
                     append("image", imageBytes, Headers.build {
                         append(HttpHeaders.ContentType, "image/jpeg")
-                        append(HttpHeaders.ContentDisposition, "filename=\"kingdurek.jpg\"")
+                        append(HttpHeaders.ContentDisposition, "filename=\"horse.jpg\"")
                     })
                     append("Name", horseRequest.Name)
                     append("Breed", horseRequest.Breed)
@@ -295,5 +297,36 @@ suspend fun createStable(token: String, stableRequest: StableRequest, context: C
     Log.d("createStable", "Response Headers: ${response.headers}")
     Log.d("createStable", "Response Body: $responseBody")
     return responseBody
+}
+
+//----------------------Post requests for trails ---------------------
+suspend fun rateTrail(token: String, trailRatingRequest: TrailRatingRequest): TrailRatingResponse {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    Log.d("rateTrail", "Request URL: https://hopla.onrender.com/trails/rate")
+    Log.d("rateTrail", "Request Body: $trailRatingRequest")
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.post(apiUrl+"trails/rate") {
+            header("Authorization", "Bearer $token")
+            contentType(ContentType.Application.Json)
+            setBody(trailRatingRequest)
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("rateTrail", "Response Status: ${response.status}")
+    Log.d("rateTrail", "Response Body: $responseBody")
+
+    httpClient.close()
+    return TrailRatingResponse(message = responseBody)
 }
 
