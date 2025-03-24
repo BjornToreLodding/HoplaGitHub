@@ -592,16 +592,8 @@ public class TrailController : ControllerBase
         _context.TrailReviews.Add(review);
         await _context.SaveChangesAsync();
 
-        return Ok(new TrailReviewResponseDto
-        {
-            Id = review.Id,
-            Comment = review.Comment,
-            PictureUrl = review.PictureUrl,
-            Condition = review.Condition,
-            CreatedAt = review.CreatedAt,
-            Alias = review.User?.Alias ?? "Ukjent"
-        });
-    }
+        return Ok("Review opprettet");
+            }
 
     [HttpGet("prepare")]
     public async Task<IActionResult> StartTrail([FromQuery] Guid trailId)

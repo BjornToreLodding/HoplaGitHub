@@ -1619,16 +1619,23 @@ brukerens id, løypens id, oppdateringen, optional bilde, tidspunkt (tid og dato
 ```postman
 https://hopla.onrender.com/trails/review
 ```
+Enum:
+```enum
+    Ukjent = 0,
+    Bra = 1, 
+    Vått = 2,
+    Møkkette = 3,
+    Farlig = 4, 
+    Blokkert = 5
+```
 
 Form (Ikke Body!!)
 ```postmanForm
     Key             Type    Value
-    File            file    bilde.jpg
+    Image            file    bilde.jpg
     TrailId         txt     12345678-0000-0000-0021-123456780001
     Message         txt     Bekken renner over veien ved stallen
-    Condition       txt     //Litt usikker på hvordan enum funker? 
-    
-    //Skal man gi med nummeret eller navnet? Prøv Bra, Blokkert, Dårlig, 1,2,3,4
+    Condition       txt     Møkkette
 ```
 
 Resonse:
@@ -1656,10 +1663,10 @@ https://hopla.onrender.com/trails/review
 
 ```json
 [
-    {
+      {
         "id": "d6f59b42-1c35-4c3f-b377-b399804f2f49",
         "comment": "Fossen har brent ned",
-        "pictureUrl": "afd1a62d-10ce-4f27-95c1-2f818f855d5d.jpg",
+        "pictureUrl": "https://hopla.imgix.net/afd1a62d-10ce-4f27-95c1-2f818f855d5d.jpg?w=200&h=200&fit=crop",
         "condition": 0,
         "createdAt": "2025-03-24T18:30:38.058704Z",
         "alias": "MangeBallerILufra"
