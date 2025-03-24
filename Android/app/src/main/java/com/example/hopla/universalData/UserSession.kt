@@ -9,7 +9,7 @@ object UserSession {
     var profilePictureURL: String = ""
     var telephone: Int? = null
     var description: String? = ""
-    var dob: String? = ""
+    var dob: DateOfBirth? = null
     var redirect: String = ""
 
     fun clear() {
@@ -21,7 +21,7 @@ object UserSession {
         profilePictureURL = ""
         telephone = null
         description = ""
-        dob = ""
+        dob = null
         redirect = ""
     }
 }

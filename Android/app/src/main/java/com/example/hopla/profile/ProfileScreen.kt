@@ -57,6 +57,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.R
 import com.example.hopla.apiService.changePassword
+import com.example.hopla.apiService.createHorse
 import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.apiService.updateUserInfo
 import com.example.hopla.apiService.uploadProfilePicture
@@ -64,14 +65,19 @@ import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.PrimaryWhite
+import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
+import com.example.hopla.universalData.DateOfBirth
 import com.example.hopla.universalData.DateOfBirthPicker
 import com.example.hopla.universalData.EditableTextField
+import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.time.LocalDate
+import java.time.temporal.ChronoField
 
 // Main profile function
 @Composable
@@ -389,9 +395,17 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     selectedDay = day
                     selectedMonth = month
                     selectedYear = year
-                    dob = "$year-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
+                    val date = LocalDate.of(year, month, day)
+                    dob = DateOfBirth(
+                        year = year,
+                        month = month,
+                        day = day,
+                        dayOfWeek = date.get(ChronoField.DAY_OF_WEEK),
+                        dayOfYear = date.get(ChronoField.DAY_OF_YEAR),
+                        dayNumber = date.toEpochDay().toInt()
+                    )
                 },
-                onSave = { /*TODO*/}
+                onSave = { /* Handle save action if needed */ }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -487,17 +501,18 @@ fun UserChanges(modifier: Modifier = Modifier) {
     }
 }
 
-
 @Composable
 fun AddNewType(
     navController: NavController,
     type: String,
-    onAdd: (String, Bitmap?, String, Int) -> Unit
+    onAdd: (String, Bitmap?, String, Int, Int, Int) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var breedOrFriendType by remember { mutableStateOf("") }
-    var ageOrFriendAge by remember { mutableIntStateOf(0) }
+    var selectedDay by remember { mutableIntStateOf(1) }
+    var selectedMonth by remember { mutableIntStateOf(1) }
+    var selectedYear by remember { mutableIntStateOf(2000) }
     var searchQuery by remember { mutableStateOf("") }
     var users by remember { mutableStateOf<List<OtherUsers>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
@@ -527,7 +542,7 @@ fun AddNewType(
     ) {
         when (type) {
             "Horse" -> {
-                Text(text = "Add New $type", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Add New $type", style = headerTextStyleSmall)
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = name,
@@ -548,11 +563,16 @@ fun AddNewType(
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        TextField(
-                            value = ageOrFriendAge.toString(),
-                            onValueChange = { ageOrFriendAge = it.toIntOrNull() ?: 0 },
-                            label = { Text(text = stringResource(R.string.age)) },
-                            modifier = Modifier.fillMaxWidth()
+                        DateOfBirthPicker(
+                            selectedDay = selectedDay,
+                            selectedMonth = selectedMonth,
+                            selectedYear = selectedYear,
+                            onDateSelected = { day, month, year ->
+                                selectedDay = day
+                                selectedMonth = month
+                                selectedYear = year
+                            },
+                            onSave = { /* Handle save action if needed */ }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -583,7 +603,23 @@ fun AddNewType(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
-                    onAdd(name, imageBitmap, breedOrFriendType, ageOrFriendAge)
+                    coroutineScope.launch {
+                        try {
+                            val horseRequest = HorseRequest(
+                                Name = name,
+                                Breed = breedOrFriendType,
+                                Year = selectedYear.toString(),
+                                Month = selectedMonth.toString(),
+                                Day = selectedDay.toString(),
+                                Image = imageBitmap!!
+                            )
+                            Log.d("createHorse", "Sending request: $horseRequest")
+                            val response = createHorse(token, horseRequest)
+                            Log.d("createHorse", "Response: $response")
+                        } catch (e: Exception) {
+                            Log.e("createHorse", "Error creating horse", e)
+                        }
+                    }
                     navController.popBackStack()
                 }) {
                     Text(text = "Add $type")

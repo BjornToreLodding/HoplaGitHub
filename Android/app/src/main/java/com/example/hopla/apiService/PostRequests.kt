@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.example.hopla.R
 import com.example.hopla.universalData.ErrorResponse
+import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableRequest
@@ -33,6 +34,156 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+
+//---------- Post requests for several pages  ---------------
+suspend fun createUserReport(token: String, reportRequest: UserReportRequest): UserReportResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.post(apiUrl+"userreports/create") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(reportRequest)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("createUserReport", "Response: $responseBody")
+    client.close()
+    return Json.decodeFromString(UserReportResponse.serializer(), responseBody)
+}
+
+//----------- Post request for profile -----------------------------
+suspend fun changeEmail(newEmail: String, password: String): String {
+    val url = apiUrl+"users/change-email"
+    val requestBody = JSONObject().apply {
+        put("NewEmail", newEmail)
+        put("Password", password)
+    }.toString()
+
+    Log.d("changeEmail", "Request URL: $url")
+    Log.d("changeEmail", "Request Body: $requestBody")
+
+    val client = OkHttpClient()
+    val request = Request.Builder()
+        .url(url)
+        .addHeader("Authorization", "Bearer ${UserSession.token}")
+        .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
+        .build()
+
+    return withContext(Dispatchers.IO) {
+        try {
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string()
+            Log.d("changeEmail", "Response Code: ${response.code}")
+            Log.d("changeEmail", "Response Body: $responseBody")
+
+            if (response.isSuccessful) {
+                responseBody ?: "Success"
+            } else {
+                responseBody ?: "Error: ${response.message}"
+            }
+        } catch (e: Exception) {
+            Log.e("changeEmail", "Exception: ${e.message}")
+            "Exception: ${e.message}"
+        }
+    }
+}
+
+suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    horseRequest.Image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    val imageBytes = byteArrayOutputStream.toByteArray()
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.post("https://hopla.onrender.com/horses/create") {
+            header("Authorization", "Bearer $token")
+            setBody(MultiPartFormDataContent(
+                formData {
+                    append("image", imageBytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"kingdurek.jpg\"")
+                    })
+                    append("Name", horseRequest.Name)
+                    append("Breed", horseRequest.Breed)
+                    append("Year", horseRequest.Year)
+                    append("Month", horseRequest.Month)
+                    append("Day", horseRequest.Day)
+                }
+            ))
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("createHorse", "Response Status: ${response.status}")
+    Log.d("createHorse", "Response Headers: ${response.headers}")
+    Log.d("createHorse", "Response Body: $responseBody")
+    return responseBody
+}
+
+//-------------- Post request for login page---------------------
+suspend fun registerUser(email: String, password: String): Pair<String, Int> {
+    val url = apiUrl + "users/register"
+    val requestBody = JSONObject().apply {
+        put("Email", email)
+        put("Password", password)
+    }.toString()
+
+    val client = OkHttpClient()
+    val request = Request.Builder()
+        .url(url)
+        .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
+        .build()
+
+    return withContext(Dispatchers.IO) {
+        try {
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string()
+            Log.d("registerUser", "Response Code: ${response.code}")
+            Log.d("registerUser", "Response Body: $responseBody")
+
+            Pair(responseBody ?: "Success", response.code)
+        } catch (e: Exception) {
+            Log.e("registerUser", "Exception: ${e.message}")
+            Pair("Exception: ${e.message}", -1)
+        }
+    }
+}
+
+suspend fun resetPassword(email: String): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val requestBody = ResetPasswordRequest(email)
+    val response: HttpResponse = client.post(apiUrl + "users/reset-password-request") {
+        contentType(ContentType.Application.Json)
+        setBody(requestBody)
+    }
+
+    val responseBody: String = response.body()
+    Log.d("resetPassword", "Response: $responseBody")
+    client.close()
+    return responseBody
+}
 
 fun handleLogin(
     username: String,
@@ -108,96 +259,6 @@ fun handleLogin(
     }
 }
 
-//---------- Post requests for creating a user report ---------------
-suspend fun createUserReport(token: String, reportRequest: UserReportRequest): UserReportResponse {
-    val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
-    }
-
-    val response: HttpResponse = client.post(apiUrl+"userreports/create") {
-        header("Authorization", "Bearer $token")
-        contentType(ContentType.Application.Json)
-        setBody(reportRequest)
-    }
-
-    val responseBody: String = response.bodyAsText()
-    Log.d("createUserReport", "Response: $responseBody")
-    client.close()
-    return Json.decodeFromString(UserReportResponse.serializer(), responseBody)
-}
-
-//----------- Post request for changing email -----------------------------
-suspend fun changeEmail(newEmail: String, password: String): String {
-    val url = apiUrl+"users/change-email"
-    val requestBody = JSONObject().apply {
-        put("NewEmail", newEmail)
-        put("Password", password)
-    }.toString()
-
-    Log.d("changeEmail", "Request URL: $url")
-    Log.d("changeEmail", "Request Body: $requestBody")
-
-    val client = OkHttpClient()
-    val request = Request.Builder()
-        .url(url)
-        .addHeader("Authorization", "Bearer ${UserSession.token}")
-        .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
-        .build()
-
-    return withContext(Dispatchers.IO) {
-        try {
-            val response = client.newCall(request).execute()
-            val responseBody = response.body?.string()
-            Log.d("changeEmail", "Response Code: ${response.code}")
-            Log.d("changeEmail", "Response Body: $responseBody")
-
-            if (response.isSuccessful) {
-                responseBody ?: "Success"
-            } else {
-                responseBody ?: "Error: ${response.message}"
-            }
-        } catch (e: Exception) {
-            Log.e("changeEmail", "Exception: ${e.message}")
-            "Exception: ${e.message}"
-        }
-    }
-}
-
-//-------------- Create a new user -> 1st step---------------------
-suspend fun registerUser(email: String, password: String): Pair<String, Int> {
-    val url = apiUrl + "users/register"
-    val requestBody = JSONObject().apply {
-        put("Email", email)
-        put("Password", password)
-    }.toString()
-
-    val client = OkHttpClient()
-    val request = Request.Builder()
-        .url(url)
-        .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
-        .build()
-
-    return withContext(Dispatchers.IO) {
-        try {
-            val response = client.newCall(request).execute()
-            val responseBody = response.body?.string()
-            Log.d("registerUser", "Response Code: ${response.code}")
-            Log.d("registerUser", "Response Body: $responseBody")
-
-            Pair(responseBody ?: "Success", response.code)
-        } catch (e: Exception) {
-            Log.e("registerUser", "Exception: ${e.message}")
-            Pair("Exception: ${e.message}", -1)
-        }
-    }
-}
-
 //----------------------Community Post Request-------------------------
 suspend fun createStable(token: String, stableRequest: StableRequest, context: Context): String {
     val httpClient = HttpClient {
@@ -236,26 +297,3 @@ suspend fun createStable(token: String, stableRequest: StableRequest, context: C
     return responseBody
 }
 
-//------------------ Post requests for login page ---------------------------------------------
-suspend fun resetPassword(email: String): String {
-    val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
-    }
-
-    val requestBody = ResetPasswordRequest(email)
-    val response: HttpResponse = client.post(apiUrl + "users/reset-password-request") {
-        contentType(ContentType.Application.Json)
-        setBody(requestBody)
-    }
-
-    val responseBody: String = response.body()
-    Log.d("resetPassword", "Response: $responseBody")
-    client.close()
-    return responseBody
-}

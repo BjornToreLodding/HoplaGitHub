@@ -38,6 +38,16 @@ data class Horse(
 
 // Class for the data of a user (yourself)
 @Serializable
+data class DateOfBirth(
+    val year: Int,
+    val month: Int,
+    val day: Int,
+    val dayOfWeek: Int,
+    val dayOfYear: Int,
+    val dayNumber: Int
+)
+
+@Serializable
 data class User(
     val token: String,
     val userId: String,
@@ -46,10 +56,9 @@ data class User(
     val pictureUrl: String,
     val telephone: Int? = null,
     val description: String? = null,
-    val dob: String? = null,
+    val dob: DateOfBirth? = null,
     val redirect: String
 )
-
 
 @Serializable
 data class OtherUsers(
@@ -268,3 +277,15 @@ data class StableRequest(
 //---------------- Data classes for login page ----------------
 @Serializable
 data class ResetPasswordRequest(val Email: String)
+
+
+//-------------------- Data classes for horses -----------
+@Serializable
+data class HorseRequest(
+    val Name: String,
+    val Breed: String,
+    val Year: String,
+    val Month: String,
+    val Day: String,
+    @Contextual val Image: Bitmap
+)

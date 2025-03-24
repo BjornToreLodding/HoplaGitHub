@@ -217,7 +217,6 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
     }
 }
 
-// Horsedetail commented out until method for connecting to database is implemented
 @Composable
 fun HorseItem(horse: Horse, navController: NavController) {
     Row(
