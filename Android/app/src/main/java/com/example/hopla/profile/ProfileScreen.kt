@@ -27,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -82,7 +83,6 @@ import java.time.temporal.ChronoField
 // Main profile function
 @Composable
 fun ProfileScreen(navController: NavController) {
-    Log.d("ProfilePicture", "Profile Screen entry: ${UserSession.profilePictureURL}")
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -95,8 +95,17 @@ fun ProfileScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(3.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                IconButton(
+                    onClick = { navController.navigate("notifications") },
+                    modifier = Modifier.padding(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = stringResource(R.string.notifications)
+                    )
+                }
                 IconButton(
                     onClick = { navController.navigate("settings") },
                     modifier = Modifier.padding(6.dp)

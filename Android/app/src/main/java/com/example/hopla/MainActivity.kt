@@ -63,6 +63,7 @@ import com.example.hopla.profile.HorseDetailScreen
 import com.example.hopla.profile.LanguageViewModel
 import com.example.hopla.profile.MyHorsesScreen
 import com.example.hopla.profile.MyTripsScreen
+import com.example.hopla.profile.NotificationsScreen
 import com.example.hopla.profile.ProfileScreen
 import com.example.hopla.profile.SettingsScreen
 import com.example.hopla.profile.UserHorsesScreen
@@ -181,6 +182,7 @@ class MainActivity : ComponentActivity() {
                                 val horseId = backStackEntry.arguments?.getString("horseId") ?: ""
                                 HorseDetailScreen(navController, horseId)
                             }
+                            composable("notifications") { NotificationsScreen(navController) }
                         }
                     }
                 } else {

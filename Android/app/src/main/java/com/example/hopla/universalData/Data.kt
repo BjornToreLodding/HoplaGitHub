@@ -296,3 +296,17 @@ data class TrailRatingResponse(val message: String)
 
 @Serializable
 data class TrailRatingRequest(val TrailId: String, val Rating: Int)
+
+@Serializable
+data class UserHikesResponse(
+    val userHikes: List<Hike>
+)
+
+// Data classes for friends
+@Serializable
+data class UserRelationRequest(
+    val id: String,
+    val fromUserId: String,
+    val fromUserAlias: String,
+    val fromUserName: String
+)

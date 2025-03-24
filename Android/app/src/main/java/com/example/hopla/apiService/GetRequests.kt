@@ -14,6 +14,8 @@ import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.StableDetails
 import com.example.hopla.universalData.TrailsResponse
+import com.example.hopla.universalData.UserHikesResponse
+import com.example.hopla.universalData.UserRelationRequest
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -22,7 +24,6 @@ import io.ktor.client.statement.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 suspend fun fetchHorses(userId: String, token: String): List<Horse> {
@@ -107,11 +108,6 @@ suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
     }
 }
 
-@Serializable
-data class UserHikesResponse(
-    val userHikes: List<Hike>
-)
-
 suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -149,6 +145,7 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
         response.body()
     }
 }
+
 //---------------------------------Trails---------------------------------
 // All trails
 suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): TrailsResponse {
@@ -170,6 +167,7 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): Tr
         response.body()
     }
 }
+
 // Trails by position
 suspend fun fetchTrailsByLocation(token: String, latitude: Double, longitude: Double, pageNumber: Int): TrailsResponse {
     val httpClient = HttpClient {
@@ -265,7 +263,8 @@ suspend fun fetchTrailsOnMap(token: String, latitude: Double, longitude: Double,
     }
 }
 
-//-----------------------------------------------------------------------------------------------
+//-------------------------------Other users--------------------------------------------------
+// All users
 suspend fun fetchAllUsers(token: String): List<OtherUsers> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -277,6 +276,26 @@ suspend fun fetchAllUsers(token: String): List<OtherUsers> {
             headers {
                 append("Authorization", "Bearer $token")
             }
+        }
+        response.body()
+    }
+}
+
+// Users that have a friend request sent to logged in user
+suspend fun fetchUserRelationRequests(token: String): List<UserRelationRequest> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl+"userrelations/requests") {
+            header("Authorization", "Bearer $token")
         }
         response.body()
     }
