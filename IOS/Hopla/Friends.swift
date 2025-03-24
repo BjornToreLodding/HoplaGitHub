@@ -15,14 +15,26 @@ struct Friend: Identifiable, Decodable {
     var name: String
     var alias: String
     var profilePictureUrl: String?
-    
+    var status: PersonStatus = .friend // Always a friend by default
+
     enum CodingKeys: String, CodingKey {
         case id = "friendId"
         case name = "friendName"
         case alias = "friendAlias"
         case profilePictureUrl = "friendPictureURL"
+        // No need for friendRelation since it's always .friend
     }
 }
+
+
+
+enum PersonStatus: String, Decodable {
+    case friend = "FRIEND"
+    case following = "FOLLOWING"
+    case none = "NONE"
+    case pending = "PENDING"
+}
+
 
 // MARK: - Header
 struct FriendsHeaderView: View {
@@ -125,7 +137,7 @@ struct Friends: View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-            TextField("Search friends...", text: $vm.searchText) // ✅ Now updates `vm.searchText`
+            TextField("Search friends...", text: $vm.searchText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
@@ -145,8 +157,8 @@ struct FriendListView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
-                ForEach(vm.filteredFriends) { friend in // ✅ No more key path error
-                    NavigationLink(destination: FriendsDetails()) {
+                ForEach(vm.filteredFriends) { friend in
+                    NavigationLink(destination: FriendsDetails(friend: friend)) {
                         FriendRowView(colorScheme: colorScheme, friend: friend)
                     }
                     .buttonStyle(PlainButtonStyle())

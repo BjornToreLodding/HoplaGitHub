@@ -14,7 +14,8 @@ struct Following: Identifiable, Decodable {
     var name: String
     var alias: String
     var profilePictureUrl: String?
-    
+    var status: PersonStatus = .following // Always 'following' by default
+
     enum CodingKeys: String, CodingKey {
         case id = "followingUserId"
         case name = "followingUserName"
@@ -22,6 +23,7 @@ struct Following: Identifiable, Decodable {
         case profilePictureUrl = "followingUserPicture"
     }
 }
+
 
 // MARK: - Header
 struct FollowingHeaderView: View {
@@ -140,9 +142,9 @@ struct FollowingListView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
-                ForEach(vm.filteredFollowing) { friend in
-                    NavigationLink(destination: FriendsDetails()) {
-                        FollowingRowView(colorScheme: colorScheme, user: friend)
+                ForEach(vm.filteredFollowing) { following in
+                    NavigationLink(destination: FollowingDetails(user: following)) {
+                        FollowingRowView(colorScheme: colorScheme, user: following)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -150,6 +152,7 @@ struct FollowingListView: View {
         }
     }
 }
+
 
 // MARK: - Following Row
 struct FollowingRowView: View {

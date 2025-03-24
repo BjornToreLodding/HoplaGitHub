@@ -22,7 +22,14 @@
       }
     },
     "Add Friend" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legg til venn"
+          }
+        }
+      }
     },
     "Add Horse" : {
       "localizations" : {
@@ -60,17 +67,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sikker på at du vil logge ut?"
-          }
-        }
-      }
-    },
-    "Average rating: " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gjennomsnitt: "
           }
         }
       }
@@ -347,7 +343,14 @@
       }
     },
     "Enter username..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv brukernavn…"
+          }
+        }
+      }
     },
     "Enter your email" : {
       "localizations" : {
@@ -429,9 +432,6 @@
         }
       }
     },
-    "Hei" : {
-
-    },
     "Hi" : {
 
     },
@@ -457,13 +457,34 @@
       }
     },
     "Hopla" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hopla"
+          }
+        }
+      }
     },
     "Horse Details" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mer info hest"
+          }
+        }
+      }
     },
     "Image Selection" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg bilde"
+          }
+        }
+      }
     },
     "Join now" : {
       "localizations" : {
@@ -476,10 +497,24 @@
       }
     },
     "Loading Hikes..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laster løyper…"
+          }
+        }
+      }
     },
     "Loading more hikes..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laster flere løyper…"
+          }
+        }
+      }
     },
     "Loading profile..." : {
       "localizations" : {
@@ -522,7 +557,14 @@
       }
     },
     "My friends" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine venner"
+          }
+        }
+      }
     },
     "My hikes" : {
       "localizations" : {
@@ -554,17 +596,6 @@
         }
       }
     },
-    "My rating: " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Min vurdering:"
-          }
-        }
-      }
-    },
     "New Hike" : {
       "localizations" : {
         "nb" : {
@@ -581,17 +612,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ny oppdatering"
-          }
-        }
-      }
-    },
-    "Newest updates on this hike" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nyeste oppdateringer om løypen"
           }
         }
       }
@@ -658,13 +678,34 @@
       }
     },
     "Search following..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk gjennom de du følger…"
+          }
+        }
+      }
     },
     "Search for Users to Add" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk etter brukere å legge til"
+          }
+        }
+      }
     },
     "Search friends..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk etter venner…"
+          }
+        }
+      }
     },
     "Search groups..." : {
       "localizations" : {
@@ -745,6 +786,12 @@
           }
         }
       }
+    },
+    "Status: Following" : {
+
+    },
+    "Status: Friend" : {
+
     },
     "Submit" : {
       "localizations" : {
