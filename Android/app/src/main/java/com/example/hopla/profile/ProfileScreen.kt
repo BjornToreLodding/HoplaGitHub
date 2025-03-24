@@ -382,9 +382,9 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 maxLines = 5
             )
 
-            var selectedDay by remember { mutableIntStateOf(1) }
-            var selectedMonth by remember { mutableIntStateOf(1) }
-            var selectedYear by remember { mutableIntStateOf(2000) }
+            var selectedDay by remember { mutableIntStateOf(UserSession.dob?.day ?: 1) }
+            var selectedMonth by remember { mutableIntStateOf(UserSession.dob?.month ?: 1) }
+            var selectedYear by remember { mutableIntStateOf(UserSession.dob?.year ?: 2000) }
 
             // Date of Birth
             DateOfBirthPicker(
