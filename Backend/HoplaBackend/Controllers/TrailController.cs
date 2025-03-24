@@ -537,6 +537,7 @@ public class TrailController : ControllerBase
     [HttpPost("mock")]
     public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)
     {
+        Console.WriteLine("trails/mock start");
         var allCoords = MockHelper.GenerateCircularTrail(dto.LatMean, dto.LongMean, dto.Distance);
         var reducedCoords = TrailCoordinatesTrim.ReduceTo50Coordinates(allCoords.Select(c => new TrailCoordinateDto { Lat = c.Lat, Long = c.Long }).ToList());
 
@@ -547,7 +548,7 @@ public class TrailController : ControllerBase
         var latMax = allCoords.Max(c => c.Lat);
         var longMin = allCoords.Min(c => c.Long);
         var longMax = allCoords.Max(c => c.Long);
-
+        Console.WriteLine(latMin);
         var trail = new Trail
         {
             Id = Guid.NewGuid(),
