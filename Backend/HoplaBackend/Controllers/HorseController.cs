@@ -81,7 +81,7 @@ public class HorseController : ControllerBase
         {
             //id = horse.Id,
             name = horse.Name,
-            horsePictureUrl = !string.IsNullOrEmpty(horse.PictureUrl) ? (horse.PictureUrl.Contains("http") ? horse.PictureUrl : "https://hopla.imgix.net/" + horse.PictureUrl) + "?w=64&h=64&fit=crop" : "",
+            horsePictureUrl = !string.IsNullOrEmpty(horse.PictureUrl) ? (horse.PictureUrl.Contains("http") ? horse.PictureUrl : "https://hopla.imgix.net/" + horse.PictureUrl) + "?w=200&h=200&fit=crop" : "",
             breed = horse.Breed,
             dob = horse.Dob,
             age = horse.Dob.HasValue 
