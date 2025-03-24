@@ -22,8 +22,8 @@ public class TrailDetail
     public double? LongMax { get; set; }
 
     public string? JsonCoordinates50 { get; set; } // 50 koordinater for forhåndsvisning, bør kanskje forrandres til Liste som under.
+    //public List<TrailCoordinate50> Coordinates50 { get; set; } = new();
     public List<EntityImage> Images { get; set; } = new();
     public string Notes { get; set; } = string.Empty;
 
-    // For å vise punkt istedenfor hele ruta ved store kartutsnitt
 }

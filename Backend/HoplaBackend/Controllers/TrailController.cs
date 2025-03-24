@@ -497,6 +497,8 @@ public class TrailController : ControllerBase
 
         return Ok(trails);   
     }
+
+
     [Authorize]
     [HttpPost("rate")]
     public async Task<IActionResult> CreateRating([FromBody] TrailRateDto request)
@@ -519,6 +521,8 @@ public class TrailController : ControllerBase
 
         return Ok("Trail Rated");
     }
+
+    //I tilfelle en bruker har ratet en trail fra før, så brukes denne funksjonen for å oppdatere ratingen.
     public async Task<IActionResult> UpdateRating(Guid trailRatingId, int rating)
     {
         var existing = await _context.TrailRatings.FirstOrDefaultAsync(tr => tr.Id == trailRatingId);
@@ -526,7 +530,7 @@ public class TrailController : ControllerBase
         
         existing.Rating = rating;
         await _context.SaveChangesAsync();
-        return Ok(new {message = "Updated TrailRating", rating = existing});
+        return Ok(new {message = "Updated TrailRating"}); //, rating = existing});
     }
     
     /*

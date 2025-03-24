@@ -1,5 +1,7 @@
 
-# OBS
+
+
+# **OBS**
 
 trails/all mangler: beskrivelse av løypen
 
@@ -9,21 +11,21 @@ GET /stables/{stableId} -\> Kan det sendes med om stallen er privat eller public
 
 POST /stables/create -\> Form data istede for raw data for bilder?
 
-# Kort informasjon
+# **Kort informasjon**
 
-Backend: :green_book: Lagd :yellow_circle: Delvis laget :red_circle: Ikke lagd
+Backend: :green_book: Lagd :yellow_circle: Delvis laget :red_circle: Ikke lagd
 
-Android: :alien: Lagt inn :grimacing: Delvis lagt inn :smiling_imp: Ikke lagt inn
+Android: :alien: Lagt inn :grimacing: Delvis lagt inn :smiling_imp: Ikke lagt inn
 
-iOs: :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
+iOs: :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
 
-# Liste
+# **Liste**
 
 <table>
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"} <br><br>**Status:** <br>si ifra hvis det ønskes forandringer
+![image.png](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"}<br><br>**Status:**<br>si ifra hvis det ønskes forandringer
 
 `Android: Nå mulig å logge inn`
 
@@ -37,16 +39,16 @@ iOs: :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
 </td>
 <td>
 
-## :green_book: :alien: :green_apple: POST /users/login
+## **:green_book: :alien: :green_apple: POST /users/login**
 
 Logg inn
 
-* **`POST` hvis passord og epost stemmer med det i databasen ellers feilmelding -\> token**
+* **`POST` hvis passord og epost stemmer med det i databasen ellers feilmelding -\> token**
   * **test@test.no**\*\* Hopla2025!\*\*
 
 POSTMAN
 
-Post https://hopla.onrender.com/users/login/
+Post https://hopla.onrender.com/users/login/
 
 Body:
 
@@ -93,22 +95,22 @@ JSON-Response for brukere som har registrert navn og alias
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/b59f667b696efff50d4b81ce91ca3c72/image.png){width="248" height="456"} <br><br>**Status:** <br>si ifra hvis det ønskes forandringer. <br><br>(NB Bruker ikke userID, men Token)
+![image.png](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/b59f667b696efff50d4b81ce91ca3c72/image.png){width="248" height="456"}<br><br>**Status:**<br>si ifra hvis det ønskes forandringer.<br><br>(NB Bruker ikke userID, men Token)
 
 `Android: Bruker lagret informasjon fra login for øyeblikket for å displaye informasjon`
 </td>
 <td>
 
-## :green_book: :alien: :green_apple: GET /users/profile
+## **:green_book: :alien: :green_apple: GET /users/profile**
 
 Main profil side
 
-* **`Get `request ~~som bruker userID med informasjon~~ :** (NB Bruker ikke userID, men Token)
+* **`Get `request ~~som bruker userID med informasjon~~ :** (NB Bruker ikke userID, men Token)
   * **Brukernavn(alias), epost og bilde**
   * **(Bilde: bruker size 200.dp og clip circleshape)**
 * \*\*GET med Authorization:
-  * \*\*GET \*\***https://hopla.onrender.com/users/myprofile** Denne erstattes av den under (/users/profile)
-  * \*\*Get \*\***https://hopla.onrender.com/users/profile** Denne kan også brukes til å hente andre brukere ved å spesifisere optional ?userid=Guid f.eks https://hopla.onrender.com/users/profile?userid=12345678-0000-0000-0001-123456780002 Mer om dette lenger ned.
+  * \*\*GET \*\***https://hopla.onrender.com/users/myprofile** Denne erstattes av den under (/users/profile)
+  * \*\*Get \*\***https://hopla.onrender.com/users/profile** Denne kan også brukes til å hente andre brukere ved å spesifisere optional ?userid=Guid f.eks https://hopla.onrender.com/users/profile?userid=12345678-0000-0000-0001-123456780002 Mer om dette lenger ned.
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
@@ -128,23 +130,23 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/68cec6509720727d6fcc482677031ce9/image.png){width="324" height="565"} <br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
+![image.png](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/68cec6509720727d6fcc482677031ce9/image.png){width="324" height="565"}<br><br>**Status:**<br>Denne skal virke når databasen blir oppdatert
 
 `Android: Lagt inn`
 </td>
 <td>
 
-## :green_book: :alien: :green_apple: GET /horses/userhorses
+## **:green_book: :alien: :green_apple: GET /horses/userhorses**
 
 **Profil -\> Mine hester**
 
-* `Get` request på å hente brukeren som er logget inn sine hester
+* `Get` request på å hente brukeren som er logget inn sine hester
 * Trenger å få: bilde og navn på hesten (hestens id for å kunne brukes til å gå til detalj siden om hver enkelt hest? )
 * \*\*GET med Authorization:
   * \*\*GET GET \*\***https://hopla.onrender.com/horses/userhorses/**
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
-* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003 -\> Hester tilhørende brukerid
+* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003 -\> Hester tilhørende brukerid
 
 **Eksempel på response body JSON**
 
@@ -175,20 +177,20 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/6ea310ba1383bdd11b753b2f2803cf05/image.png){width="316" height="517"} <br><br>**Status:** <br>Denne skal virke når databasen blir oppdatert
+![image.png](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/6ea310ba1383bdd11b753b2f2803cf05/image.png){width="316" height="517"}<br><br>**Status:**<br>Denne skal virke når databasen blir oppdatert
 
 `Android: lagt inn`
 </td>
 <td>
 
-## :green_book: :alien: :green_apple: GET /horses/{horseId}
+## **:green_book: :alien: :green_apple: GET /horses/{horseId}**
 
 **Profil -\> Mine hester -\> Velge en spesifikk hest**
 
 * Get request ut ifra hestens id for å hente: navn, bilde, rase og alder/fødselsdato
 * \*\*GET med Authorization:
   * \*\*GET \*\***https://hopla.onrender.com/horses/{horseGuid}**
-  * **auth Type Bearer Token** (kan enkelt deaktiveres)
+  * **auth Type Bearer Token** (kan enkelt deaktiveres)
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
   **Eksempel på response body**
@@ -212,14 +214,14 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 
 \
 \
-**Status:** \
+**Status:**\
 BT: Denne skal virke nå
 
 `Android: Lagt til venner liste side & venners venner`
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /userrelations/friends
+## **:green_book: :alien: :green_apple: GET /userrelations/friends**
 
 **Profil -\> Venner**
 
@@ -240,13 +242,13 @@ enum class PersonStatus {
 
 **Eksempel på request**
 
-GET https://hopla.onrender.com/userrelations/friends \
+GET https://hopla.onrender.com/userrelations/friends\
 Denne henter vennene til innlogget bruker
 
-GET https://hopla.onrender.com/userrelations/friends?userid=12345678-0000-0000-0001-123456780003 \
+GET https://hopla.onrender.com/userrelations/friends?userid=12345678-0000-0000-0001-123456780003\
 Denne henter vennen til oppgitt userid
 
-Alle brukere: https://hopla.onrender.com/users/all
+Alle brukere: https://hopla.onrender.com/users/all
 
 **NB!! Begge må ha authorization Bearer Token**
 
@@ -283,14 +285,14 @@ Alle brukere: https://hopla.onrender.com/users/all
 
 \
 \
-**Status:** \
+**Status:**\
 BT: Denne skal virke nå
 
 `Android: Lagt til følger liste side`
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /userrelations/following
+## **:green_book: :alien: :green_apple: GET /userrelations/following**
 
 **Profil -\> Følger**
 
@@ -301,10 +303,10 @@ BT: Denne skal virke nå
 
 **Eksempel på request**
 
-GET https://hopla.onrender.com/userrelations/following \
+GET https://hopla.onrender.com/userrelations/following\
 Denne henter følgere til innlogget bruker
 
-GET https://hopla.onrender.com/userrelations/follwing?userid=12345678-0000-0000-0001-123456780003 \
+GET https://hopla.onrender.com/userrelations/follwing?userid=12345678-0000-0000-0001-123456780003\
 Denne henter følgere til oppgitt userid
 
 **NB!! Begge må ha authorization Bearer Token**
@@ -344,7 +346,7 @@ Har ikke bilde for øyeblikket, profil -\> Venner -\> Trykke på spesifikk venn
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /users/profile?userid=
+## **:green_book: :alien: :apple: GET /users/profile?userid=**
 
 GET request
 
@@ -354,28 +356,28 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(både of
 
 (Skal komme knapp der man kan trykke på deres venner og deres hester, knapp til resten av turene deres)
 
-Vilde bruker: https://hopla.onrender.com/users/profile?userId=12345678-0000-0000-0001-123456780001&pageNumber=1
+Vilde bruker: https://hopla.onrender.com/users/profile?userId=12345678-0000-0000-0001-123456780001&pageNumber=1
 
 **BT:**
 
-:pushpin: **Beskrivelse:** Henter ut informasjon om en bruker, eller en brukers venn. Endpointet vil tilpasse innholdet ettersom ?userId er oppgitt, om brukeren fra token og user id er venner, følger eller blokkerer. Kanskje også man skulle returnert status? slik at når man åpner profilen så står det at dem er venner? Hvis det ikke blir masse styr?
+:pushpin: **Beskrivelse:** Henter ut informasjon om en bruker, eller en brukers venn. Endpointet vil tilpasse innholdet ettersom ?userId er oppgitt, om brukeren fra token og user id er venner, følger eller blokkerer. Kanskje også man skulle returnert status? slik at når man åpner profilen så står det at dem er venner? Hvis det ikke blir masse styr?
 
-:bookmark_tabs: **Parametere:**
+:bookmark_tabs: **Parametere:**
 
 | Parameter | Name | Type | Påkrevd | Beskrivelse |
 |-----------|------|------|---------|-------------|
-| :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
-| :mag_right: Query | `userId` | Guid | :yellow_circle: Nei | ID-en til brukeren |
-| :mag_right: Query | `pageNumber` | int | :yellow_circle: Nei | Side nummer |
-| :mag_right: Query | `pageSize` | int | :yellow_circle: Nei | Antall resultater pr side |
+| :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
+| :mag_right: Query | `userId` | Guid | :yellow_circle: Nei | ID-en til brukeren |
+| :mag_right: Query | `pageNumber` | int | :yellow_circle: Nei | Side nummer |
+| :mag_right: Query | `pageSize` | int | :yellow_circle: Nei | Antall resultater pr side |
 
-:mag_right: Query:
+:mag_right: Query:
 
-* `?userId=[Guid]` - :yellow_circle: Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-* `?pageNumber=[int]` - :yellow_circle: Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
-* `?pageSize=[int]` - :yellow_circle: Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - :yellow_circle: Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - :yellow_circle: Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
+* `?pageSize=[int]` - :yellow_circle: Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
-:floppy_disk: Syntax:
+:floppy_disk: Syntax:
 
 ```bash
 curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
@@ -383,7 +385,7 @@ curl -X GET "https://hopla.onrender.com/users/profile?userId=[Guid]" \
      -H "Authorization: Bearer <TOKEN>"
 ```
 
-:outbox_tray: **Eksempel på respons uten query:**
+:outbox_tray: **Eksempel på respons uten query:**
 
 ```json
 {
@@ -395,7 +397,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
 ```
 
-:outbox_tray: **Eksempel på respons med query når bruker fra token er venner med userId fra query:**
+:outbox_tray: **Eksempel på respons med query når bruker fra token er venner med userId fra query:**
 
 ```json
 {
@@ -437,7 +439,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
 ```
 
-:outbox_tray: **Eksempel på respons med query når bruker fra token ikke er venner med userId fra query:**
+:outbox_tray: **Eksempel på respons med query når bruker fra token ikke er venner med userId fra query:**
 
 ```json
 {
@@ -476,18 +478,18 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
 }
 ```
 
-:outbox_tray: **Eksempel på respons med query når bruker fra token er blokkert av userId fra query:**
+:outbox_tray: **Eksempel på respons med query når bruker fra token er blokkert av userId fra query:**
 
 ```json
 { Tomt? skal vi vise noe i det hele tatt? }
 ```
 
-:pager: **Mulige statuskoder:**
+:pager: **Mulige statuskoder:**
 
-- :white_check_mark: `200 OK` – Brukeren ble hentet.
-- :x: `401 Unauthorized` - Ingen eller ugyldig token sendt.
-- :x: `404 Not Found` – Bruker ikke funnet.
-- :x: `500 Internal Server Error` – Server Feil.
+* :white_check_mark: `200 OK` – Brukeren ble hentet.
+* :x: `401 Unauthorized` - Ingen eller ugyldig token sendt.
+* :x: `404 Not Found` – Bruker ikke funnet.
+* :x: `500 Internal Server Error` – Server Feil.
 </td>
 </tr>
 <tr>
@@ -499,7 +501,7 @@ Har ikke bilde for øyeblikket, profil -\> Følger -\> Trykke på spesifikk pers
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /userrelations/following?userid=
+## **:green_book: :alien: :apple: GET /userrelations/following?userid=**
 
 GET request
 
@@ -521,7 +523,7 @@ Trenger: id, navn, alias, bilde, beskrivelse, deres delte turer siste 3(bare off
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /userhikes/user
+## **:green_book: :alien: :apple: GET /userhikes/user**
 
 Profil -\> Mine turer
 
@@ -531,26 +533,26 @@ Trenger: navn, bilde(r), dato, tid, lengde, status (offentlig, privat, kun venne
 
 **BT: Har laget dette endpointet:**
 
-\*\*### **GET /usershikes/user**
+\*\*### **GET /usershikes/user**
 
-:pushpin: **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
+:pushpin: **Beskrivelse:** Henter ut informasjon om turer til liste som vises på f.eks profil eller turoversikt til en bruker.
 
-:bookmark_tabs: **Parametere:**
+:bookmark_tabs: **Parametere:**
 
 | Parameter | Name | Type | Påkrevd | Beskrivelse |
 |-----------|------|------|---------|-------------|
-| :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
-| :mag_right: Query | `userId` | Guid | :yellow_circle: Nei | ID-en til brukeren |
-| :mag_right: Query | `pageNumber` | int | :yellow_circle: Nei | Side nummer |
-| :mag_right: Query | `pageSize` | int | :yellow_circle: Nei | Antall resultater pr side |
+| :lock: Header | `Authorization` | Bearer Token | :key: Ja | Krever autenseringstoken |
+| :mag_right: Query | `userId` | Guid | :yellow_circle: Nei | ID-en til brukeren |
+| :mag_right: Query | `pageNumber` | int | :yellow_circle: Nei | Side nummer |
+| :mag_right: Query | `pageSize` | int | :yellow_circle: Nei | Antall resultater pr side |
 
-\*\*#### **:mag_right: Query:**
+\*\*#### **:mag_right: Query:**
 
-* `?userId=[Guid]` - :yellow_circle: Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
-* `?pageNumber=[int]` - :yellow_circle: Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
-* `?pageSize=[int]` - :yellow_circle: Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
+* `?userId=[Guid]` - :yellow_circle: Valgfritt: Henter bruker hvis spesifisert. Hvis utelatt hentes bruker ut fra Bearer Token.
+* `?pageNumber=[int]` - :yellow_circle: Valgfritt: Viser neste resultater. Hvis ikke oppgitt, settes denne til 1.
+* `?pageSize=[int]` - :yellow_circle: Valgfritt: Antall resultater pr side. Hvis ikke oppgitt, settes denne til angit verdi i SystemSettings
 
-**:floppy_disk: Syntax:**
+**:floppy_disk: Syntax:**
 
 ```bash
 curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=[int]&pageSize=[int]" \
@@ -558,7 +560,7 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
      -H "Authorization: Bearer <TOKEN>"
 ```
 
-:outbox_tray: **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
+:outbox_tray: **Eksempel på respons med queryene pageNumber=7 og pageSize=2**
 
 ```json
 {
@@ -583,22 +585,22 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 }
 ```
 
-:pager: **Mulige statuskoder:**
+:pager: **Mulige statuskoder:**
 
-- :white_check_mark: `200 OK` – Brukeren ble hentet.
-- :x: `401 Unauthorized` - Ingen eller ugyldig token sendt.'
-- :x: `404 Not Found` – Bruker ikke funnet.
-- :x: `500 Internal Server Error` – Server feil.
+* :white_check_mark: `200 OK` – Brukeren ble hentet.
+* :x: `401 Unauthorized` - Ingen eller ugyldig token sendt.'
+* :x: `404 Not Found` – Bruker ikke funnet.
+* :x: `500 Internal Server Error` – Server feil.
 </td>
 </tr>
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/b59f667b696efff50d4b81ce91ca3c72/image.png){width="244" height="448"}
+![image.png](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/b59f667b696efff50d4b81ce91ca3c72/image.png){width="244" height="448"}
 </td>
 <td>
 
-## :green_book: :alien: :apple: PUT /upload
+## **:green_book: :alien: :apple: PUT /upload**
 
 Profil -\> Endre profilbilde
 
@@ -643,7 +645,7 @@ Response:
 
 Profil -\> Bytte brukernavn
 
-## :yellow_circle: :grimacing: :apple: PUT /users/update
+## **:green_book: :grimacing: :apple: PUT /users/update**
 
 (mangler fungerende Dob)
 
@@ -655,11 +657,14 @@ Body:
     "Alias": "",
     "Telephone": "",
     "Description": "",
-    "Dob": "Date"
+    "Year": NNNN,
+    "Month": NN, // 1-12
+    "Day": NN //1-31
 }
 ```
 
 Response:
+
 ```json
 {
     "message": "Brukerinformasjon oppdatert."
@@ -668,9 +673,10 @@ Response:
 
 Profil -\> Bytte epost
 
-## :green_book: :alien: :apple: POST /users/change-email
+## **:green_book: :alien: :apple: POST /users/change-email**
 
 body:
+
 ```json
 {
     "NewEmail": "test@test.no",
@@ -678,9 +684,10 @@ body:
 }
 ```
 
-Mottar epost med beskjed om å bekrefte epostadressen ved å trykke på en lenke.. 
+Mottar epost med beskjed om å bekrefte epostadressen ved å trykke på en lenke..
 
 Response trinn1:
+
 ```json
 {
     "message": "E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer"
@@ -691,7 +698,7 @@ Response trinn1:
 
 Profil -\> bytte passord
 
-## :green_book: :alien: :apple: PUT /users/change-password
+## **:green_book: :alien: :apple: PUT /users/change-password**
 
 body:
 
@@ -702,7 +709,9 @@ body:
     "ConfirmPassword": "Hopla2025!"
 }
 ```
+
 response:
+
 ```json
 {
     "message": "Passordet er endret"
@@ -719,7 +728,7 @@ response:
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /trails/all
+## **:green_book: :alien: :apple: GET /trails/all**
 
 (Alle disse sidene skal displaye lister på samme måte)
 
@@ -729,7 +738,7 @@ response:
 * Sorteres etter nyeste øverst
 * Tenke på: offentlig, privat, kun venner?
 
-:alien: :apple: **Løyper -\> Første side**
+:alien: :apple: **Løyper -\> Første side**
 
 https://hopla.onrender.com/trails/all
 
@@ -740,7 +749,7 @@ https://hopla.onrender.com/trails/all
 * pageNumber Optional. Hvis ikke oppgitt, settes den til 1
 * pageSize Optional. Hvis ikke oppgitt settes den til 10
 
-:alien: :apple: **eks**
+:alien: :apple: **eks**
 
 https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
@@ -771,7 +780,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 * Vise alle løyper som brukere har lagt inn i appen. Flest stjerner øverst (hvis likt antall stjerner, nyeste av de øverst. Runde opp så det er f.eks 5 istede for 4.6 så sortere). Løypene må være offentlig eller fra venner
 
-:alien: :apple: **Løyper -\> Icon 2 fra venstre**
+:alien: :apple: **Løyper -\> Icon 2 fra venstre**
 
 * Vise løyper nærmest brukerens posisjon
 
@@ -779,7 +788,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 https://hopla.onrender.com:7128/trails/list
 
-Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
+Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
 
 **query**
 
@@ -820,7 +829,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 }
 ```
 
-:alien: :apple: **Løyper -\> Hjerte ikon**
+:alien: :apple: **Løyper -\> Hjerte ikon**
 
 * Kun løyper som brukeren har trykket liker på
 
@@ -858,11 +867,11 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 }
 ```
 
-:alien: :apple: **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
+:alien: :apple: **Løyper -\> Stjerne ikon (bytte til 2 personers ikon)**
 
 * Løyper til brukere brukeren følger og venner med
 
-http://hopla.onrender.com:7128/trails/relations ?friends=true & following=true
+http://hopla.onrender.com:7128/trails/relations ?friends=true & following=true
 
 **query**
 
@@ -906,7 +915,7 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
 </td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: Get /home?
+## **:red_circle: :smiling_imp: :apple: Get /home?**
 
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
@@ -942,19 +951,19 @@ Brukere skal kunne gi dem "likes". Skal stå hvor mange likes innlegget har fåt
 <tr>
 <td>
 
-![image.png](/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"}
+![image.png](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/b4ebfe4c9253d1e43e64b8b78cf50690/image.png){width="208" height="408"}
 
 Spørsmål: finnes det en epost jeg kan teste glemt passord på? Eller er det "nok" at jeg for nå tester at jeg sjekker at jeg får riktig respons?
 </td>
 <td>
 
-## :green_book: :alien: :apple: POST /users/register
+## **:green_book: :alien: :apple: POST /users/register**
 
-:alien: :apple: Opprett bruker:
+:alien: :apple: Opprett bruker:
 
-**Trinn 1:** Registrer epost, passord
+**Trinn 1:** Registrer epost, passord
 
-POST https://hopla.onrender.com/users/register
+POST https://hopla.onrender.com/users/register
 
 ```json
 {
@@ -969,7 +978,7 @@ POST https://hopla.onrender.com/users/register
 E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost.
 ```
 
-**Trinn 2:** Bekreft epostadressen
+**Trinn 2:** Bekreft epostadressen
 
 **Mail innboks/søppelpost:**
 
@@ -980,7 +989,7 @@ Klikk på lenken for å fullføre registreringen: Bekreft e-post
 
 **Når man trykker bekreft, sendes man hit:**
 
-GET https://hopla.onrender.com/users/confirm-email?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
+GET https://hopla.onrender.com/users/confirm-email?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
 
 **eksempel på response:**
 
@@ -988,7 +997,7 @@ GET https://hopla.onrender.com/users/confirm-email?token=oZZyH9UJ3DgoenPA5jVeoMS
 E-post bekreftet! Du kan nå gå tilbake til appen og logge inn med epost og passord.
 ```
 
-**Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
+**Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
 
 Når man logger inn her får man:
 
@@ -997,9 +1006,9 @@ Når man logger inn her får man:
 
 _Se nærmere info om login på enpoint først i dokumentet._
 
-**Trinn 4** Oppdatere profilinfo: alias, navn, beskrivelse (optional), fødselsdato, tlf (optional), bilde (optional)
+**Trinn 4** Oppdatere profilinfo: alias, navn, beskrivelse (optional), fødselsdato, tlf (optional), bilde (optional)
 
-PUT https://lhopla.onrender.com/users/update
+PUT https://lhopla.onrender.com/users/update
 
 Body:
 
@@ -1020,7 +1029,7 @@ Body:
 Brukerinformasjon oppdatert.
 ```
 
-## :green_book: :smiling_imp: :apple: POST /users/reset-password-request
+## **:green_book: :alien: :apple: POST /users/reset-password-request**
 
 Glemt passord
 
@@ -1057,7 +1066,7 @@ Klikk på lenken for å fullføre registreringen: Bekreft e-post
 
 **Når man trykker bekreft, sendes man hit:**
 
-GET https://password.hopla.no/index.html?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
+GET https://password.hopla.no/index.html?token=oZZyH9UJ3DgoenPA5jVeoMS22rbjyfbwK1AwwAbL4BE%3D
 
 Nettside for tilbakestilling av passord, for å gjøre det enklest mulig for brukeren. Tungvint å åpne en epost med appen.
 
@@ -1069,7 +1078,7 @@ Nettside for tilbakestilling av passord, for å gjøre det enklest mulig for bru
 Passord tilbakestilt. Du kan nå logge inn med ditt nye passord.
 ```
 
-**Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
+**Trinn 3:** Logg inn for videre registrering **logger inn med endpoint for login:**
 </td>
 </tr>
 <tr>
@@ -1079,7 +1088,7 @@ Passord tilbakestilt. Du kan nå logge inn med ditt nye passord.
 </td>
 <td>
 
-## :green_book: :alien: :apple: POST /userreports/create
+## **:green_book: :alien: :apple: POST /userreports/create**
 
 Profil -\> Innstillinger -\> Send en rapport (skal også legges inn: innlegg(hjem), løyper, profiler, community)
 
@@ -1118,13 +1127,13 @@ Response:
 }
 ```
 
-## :green_book: :alien: :apple: PATCH /users/delete
+## **:green_book: :alien: :apple: PATCH /users/delete**
 
 Profil -\> Innstillinger -\> Slett bruker
 
 Bruker må skrive inn passordet sitt som må bekreftes stemmer (Sjekkes i backend) så slette brukeren om det stemmer eller feilmelding hvis ikke
 
-PATCH https://hopla.onrender.com/users/delete
+PATCH https://hopla.onrender.com/users/delete
 
 Request Body:
 
@@ -1152,7 +1161,7 @@ Responce Body:
 </td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: GET /filters?
+## **:red_circle: :smiling_imp: :apple: GET /filters?**
 
 Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene.
 
@@ -1170,7 +1179,7 @@ Nå har jeg det satt opp slik (ikke lagt til "riktig" filter):
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /trails/map
+## **:green_book: :alien: :apple: GET /trails/map**
 
 Løyper -\> Kart
 
@@ -1219,7 +1228,7 @@ https://hopla.onrender.com/trails/map?latitude=59.8833&longitude=10.6167&zoomlev
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /stables/all
+## **:green_book: :alien: :apple: GET /stables/all**
 
 Community/Fellesskap/Grupper
 
@@ -1285,13 +1294,13 @@ Response
 
 sånn cirka
 
-## :green_book: :alien: :apple: GET /stables/member (?)
+## **:green_book: :alien: :apple: GET /stables/member (?)**
 
 Trenger endpoint her også for å vise kun staller som man er medlem hos (der man trykker på hjerte øverst på bilde)
 
 Dette er lagt inn i GET /stables/all hvor man spesifiserer optional query userid. Her kan man også sjekke hvilke staller andre brukere er medlem i.
 
-GET https://hopla.onrender.com/stables/all?userid=12345678-0000-0000-0001-123456780001&latitude=60&longitude=10
+GET https://hopla.onrender.com/stables/all?userid=12345678-0000-0000-0001-123456780001&latitude=60&longitude=10
 
 Response:
 
@@ -1318,11 +1327,11 @@ Response:
 <tr>
 <td>
 
-![Screenshot_20250317_130457_com.example.hopla\[1\].jpg](/vakvaer/hopla/-/wikis/uploads/515ed0b7ac115e1ecfc2399bb7939b3c/Screenshot_20250317_130457_com.example.hopla_1_.jpg){width="200" height="400"}![Screenshot_20250317_144901_com.example.hopla\[1\].jpg](uploads/80267b25c43c34dde9ee60ddb8977a9e/Screenshot_20250317_144901_com.example.hopla_1_.jpg)
+![Screenshot_20250317_130457_com.example.hopla\[1\].jpg](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/515ed0b7ac115e1ecfc2399bb7939b3c/Screenshot_20250317_130457_com.example.hopla_1_.jpg){width="200" height="400"}![Screenshot_20250317_144901_com.example.hopla\[1\].jpg](uploads/80267b25c43c34dde9ee60ddb8977a9e/Screenshot_20250317_144901_com.example.hopla_1_.jpg)
 </td>
 <td>
 
-## :green_book: :upside_down: :apple: POST /stables/create
+## **:green_book:**  :alien:  **:apple: POST /stables/create**
 
 Legg til nytt fellesskap:
 
@@ -1363,7 +1372,7 @@ Denne lager ny stall i Stables OG bruker som lager stallen blir satt som admin i
 </td>
 <td>
 
-## :green_book: :alien: :apple: GET /stables/{stableId}
+## **:green_book: :alien: :apple: GET /stables/{stableId}**
 
 Community details
 
@@ -1399,7 +1408,7 @@ Response:
 
 Videre må man hente meldinger med neste endpoint
 
-## :green_book: :alien: :apple: GET /stablemessages/{stableId}
+## **:green_book: :alien: :apple: GET /stablemessages/{stableId}**
 
 **Query**
 
@@ -1464,11 +1473,11 @@ Response:
 </td>
 <td>
 
-## :green_book: :smiling_imp: :apple: POST /horses/create
+## **:green_book: :smiling_imp: :apple: POST /horses/create**
 
 Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
 
-eks: https://hopla.onrender.com/horses/create
+eks: https://hopla.onrender.com/horses/create
 
 Body:
 
@@ -1495,7 +1504,7 @@ Horse Created
 <td></td>
 <td>
 
-## :green_book: :smiling_imp: :apple: POST friendrequest
+## **:green_book: :smiling_imp: :apple: POST friendrequest**
 
 Trenger endpoints for å endre på venneforhold:
 
@@ -1510,6 +1519,7 @@ Hvis knapp blokker er trykket på: endre til blocked
 **BT**
 
 BodyEksempel:
+
 ```json
 {
     "TargetUserId": "12345678-0000-0000-0001-123456780050",
@@ -1519,21 +1529,19 @@ BodyEksempel:
 
 Oversikt over hva som brukes i hvilken situasjon
 
-| Situasjon      | Handling         | Metode  | Endpoint           | Body / Info                                                                 |
-|----------------|------------------|---------|--------------------|------------------------------------------------------------------------------|
-| **Ingen relasjon** | Følg             | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "FOLLOWING"`                                       |
-|                | Vennforespørsel   | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "PENDING"`                                         |
-|                | Blokkering        | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"`                                           |
-| **Venn**        | Fjern venn        | `DELETE`| `/userrelations`    | `TargetUserId`                                                              |
-|                | Blokker venn      | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"` <br>⚠️ Sjekk at blokkering går riktig vei |
-| **Følger**      | Vennforespørsel   | `POST`  | `/userrelations`    | `TargetUserId`, `Status: "PENDING"` <br>➡️ Opprettes som egen relasjon i tillegg til eksisterende "FOLLOWING"      |
-|                | Blokker           | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"`                                           |
-|                | Slutt å følge     | `DELETE`| `/userrelations`    | `TargetUserId`                                                              |
-| **Pending**     | Aksepter          | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "FRIENDS"` <br>🧹 Følger-relasjoner fjernes evt på begge brukerne        |
-|                | Avvis             | `DELETE`| `/userrelations`    | `TargetUserId`                                                              |
-|                | Blokker           | `PUT`   | `/userrelations`    | `TargetUserId`, `Status: "BLOCK"` <br>⚠️ Sjekk at blokkering går riktig vei |
-
-
+| Situasjon | Handling | Metode | Endpoint | Body / Info |
+|-----------|----------|--------|----------|-------------|
+| **Ingen relasjon** | Følg | `POST` | `/userrelations` | `TargetUserId`, `Status: "FOLLOWING"` |
+|  | Vennforespørsel | `POST` | `/userrelations` | `TargetUserId`, `Status: "PENDING"` |
+|  | Blokkering | `POST` | `/userrelations` | `TargetUserId`, `Status: "BLOCK"` |
+| **Venn** | Fjern venn | `DELETE` | `/userrelations` | `TargetUserId` |
+|  | Blokker venn | `PUT` | `/userrelations` | `TargetUserId`, `Status: "BLOCK"`<br>:warning: Sjekk at blokkering går riktig vei |
+| **Følger** | Vennforespørsel | `POST` | `/userrelations` | `TargetUserId`, `Status: "PENDING"`<br>:arrow_right: Opprettes som egen relasjon i tillegg til eksisterende "FOLLOWING" |
+|  | Blokker | `PUT` | `/userrelations` | `TargetUserId`, `Status: "BLOCK"` |
+|  | Slutt å følge | `DELETE` | `/userrelations` | `TargetUserId` |
+| **Pending** | Aksepter | `PUT` | `/userrelations` | `TargetUserId`, `Status: "FRIENDS"`<br>:broom: Følger-relasjoner fjernes evt på begge brukerne |
+|  | Avvis | `DELETE` | `/userrelations` | `TargetUserId` |
+|  | Blokker | `PUT` | `/userrelations` | `TargetUserId`, `Status: "BLOCK"`<br>:warning: Sjekk at blokkering går riktig vei |
 
 </td>
 </tr>
@@ -1541,22 +1549,24 @@ Oversikt over hva som brukes i hvilken situasjon
 <td></td>
 <td>
 
-## :green_book: :smiling_imp: :apple: GET /userrelations/requests 
+## **:green_book: :smiling_imp: :apple: GET /userrelations/requests**
 
 **Trenger også her et POST endpoint der bruker kan godkjenne eller slette forespørseler. Endre fra request til enten NONE eller FRIENDS**
 
 se POST friendrequest ovenfor her.
 
-Endpoint som henter alle venneforespørseler innlogget bruker har. 
+Endpoint som henter alle venneforespørseler innlogget bruker har.
 
 **BT**
 
 Eksempel:
+
 ```postman
 GET https://hopla.onrender.com/userrelations/requests
 ```
 
 Response:
+
 ```
 [
     {
@@ -1575,23 +1585,24 @@ Response:
         "fromUserName": "Klara Snøfterud"
     }
 ]
-
 ```
-
-
 </td>
 </tr>
 <tr>
 <td></td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: POST ny tur (ny tur knapp)
+## **:red_circle: :smiling_imp: :apple: POST ny tur (ny tur knapp)**
 
-Denne generer en liste koordinater, sammen med tid og distanse fra bruker trykker på start til stopp. Da kan brukeren velge å bare trykke lagre eller fylle inn mer informasjon (navn på tur, beskrivelse, antall stjerner (?), filtere, bilde, privat/public (?). Hvis public så gjøres denne om til en løype også.
+Denne generer en liste koordinater, sammen med tid og distanse fra bruker trykker på start til stopp.\
+Da kan brukeren velge å bare trykke lagre eller fylle inn mer informasjon\
+(navn på tur, beskrivelse, antall stjerner (?), filtere, bilde, privat/public (?).\
+Hvis public så gjøres denne om til en løype også.
 
-## :red_circle: :smiling_imp: :apple: PUT (?) redigere informasjon om en tur
+## **:red_circle: :smiling_imp: :apple: PUT (?) redigere informasjon om en tur**
 
-Endpoint der informasjonen over skal kunne redigeres i ettertid. Hvis public her også må det lages en løype av den.
+Endpoint der informasjonen over skal kunne redigeres i ettertid.\
+Hvis public her også må det lages en løype av den.
 </td>
 </tr>
 <tr>
@@ -1601,23 +1612,48 @@ Endpoint der informasjonen over skal kunne redigeres i ettertid. Hvis public her
 </td>
 <td>
 
-## :red_circle: :smiling_imp: :apple: POST ny oppdatering om løype
+## **:red_circle: :smiling_imp: :apple: POST ny oppdatering om løype**
 
-Når brukeren poster en ny oppdatering om løypen (trykker på ny oppdatering): informasjon post requesten trenger: brukerens id, løypens id, oppdateringen, optional bilde, tidspunkt (tid og dato)
+Når brukeren poster en ny oppdatering om løypen (trykker på ny oppdatering):\
+informasjon post requesten trenger:\
+brukerens id, løypens id, oppdateringen, optional bilde, tidspunkt (tid og dato)
 
-## :red_circle: :smiling_imp: :apple: GET nye oppdateringer om løypen
+## **:red_circle: :smiling_imp: :apple: GET nye oppdateringer om løypen**
 
-Når brukeren trykker på nyeste oppdatering om løypen skal de få: selve oppdateringen, tid den ble lagt ut, evt bilde, bruker som har lagt ut
+Når brukeren trykker på nyeste oppdatering om løypen skal de få:\
+selve oppdateringen, tid den ble lagt ut, evt bilde, bruker som har lagt ut
 
-## :red_circle: :smiling_imp: :apple: POST vurdering av løype
+## **:green_book: :smiling_imp: :apple: POST /trails/rate**
+
+**vurdering av løype**
 
 Endpoint som henter hvor mange stjerner brukeren har trykket på og legger de til i totale vurderinger.
 
-## :red_circle: :smiling_imp: :apple: GET start tur
+**BT**
+```postman
+https://hopla.onrender.com/trails/rate
+```
+
+**Denne lager ny rating. Hvis brukeren har ratet tidligere, så oppdateres denne ratingen.**
+
+Body:
+```json
+{
+    "TrailId": "12345678-0000-0000-0021-123456780001",
+    "Rating": 5 //kun heltall mellom 1-5 aksepteres
+}
+```
+
+Response:
+```json
+Trail Rated / Updated TrailRating
+```
+
+## **:red_circle: :smiling_imp: :apple: GET start tur**
 
 Henter opp alle koordinater til løypen og tegner de opp på kartet, samt tid, og distanse (id for å lagre det som en tur etterpå.
 
-## :red_circle: :smiling_imp: :apple: POST ny tur
+## **:red_circle: :smiling_imp: :apple: POST ny tur**
 
 Etter turen er ferdig (brukeren er på sluttkoordinatet eller trykker på stopp.
 
@@ -1626,49 +1662,49 @@ Turen lagres som en ny tur koblet til brukeren
 </tr>
 </table>
 
-# Android bilder
+# **Android bilder**
 
 Sist oppdatert: 17.03
 
-#### Profil
+#### **Profil**
 
 ![Screenshot_20250317_124010_com.example.hopla\[1\].jpg](uploads/f8190e21008789c6e3e58247da22c021/Screenshot_20250317_124010_com.example.hopla_1_.jpg){width="162" height="324"}![Screenshot_20250317_124013_com.example.hopla\[1\].jpg](uploads/552463dd776087f1eb5f473dd34c8f60/Screenshot_20250317_124013_com.example.hopla_1_.jpg){width="163" height="326"}
 
-#### Innstillinger
+#### **Innstillinger**
 
-#### ![Screenshot_20250317_124017_com.example.hopla\[1\].jpg](uploads/36fb2c9be1d8808d86b4bcd2966ba39f/Screenshot_20250317_124017_com.example.hopla_1_.jpg){width="173" height="346"}![Screenshot_20250317_124019_com.example.hopla\[1\].jpg](uploads/a7169e8e79125cbdb133a84416b55b23/Screenshot_20250317_124019_com.example.hopla_1_.jpg){width="172" height="344"}
+#### **![Screenshot_20250317_124017_com.example.hopla\[1\].jpg](uploads/36fb2c9be1d8808d86b4bcd2966ba39f/Screenshot_20250317_124017_com.example.hopla_1_.jpg){width="173" height="346"}![Screenshot_20250317_124019_com.example.hopla\[1\].jpg](uploads/a7169e8e79125cbdb133a84416b55b23/Screenshot_20250317_124019_com.example.hopla_1_.jpg){width="172" height="344"}**
 
-#### Mine turer
+#### **Mine turer**
 
 ![Screenshot_20250317_124334_com.example.hopla\[1\].jpg](uploads/f06cc71ef8673c8afe7519b9495f5249/Screenshot_20250317_124334_com.example.hopla_1_.jpg){width="170" height="340"}
 
-#### Mine hester Detaljer hester
+#### **Mine hester Detaljer hester**
 
 ![Screenshot_20250317_124339_com.example.hopla\[1\].jpg](uploads/99c3c75e8ca782c180eea4ae4e5f3c14/Screenshot_20250317_124339_com.example.hopla_1_.jpg){width="180" height="360"}![Screenshot_20250317_124343_com.example.hopla\[1\].jpg](uploads/8c112519d0d5552045e638f050d645b6/Screenshot_20250317_124343_com.example.hopla_1_.jpg){width="181" height="362"}
 
-#### Venner
+#### **Venner**
 
 Brukers venner--------------Venns detaljer--------------Venners hester------------Venners venner
 
-![Screenshot_20250317_124723_com.example.hopla\[1\].jpg](uploads/efbe8d4623b04f7f3843ec43a602a165/Screenshot_20250317_124723_com.example.hopla_1_.jpg){width="175" height="350"} ![Screenshot_20250317_124736_com.example.hopla\[1\].jpg](uploads/1b2f2b35581588d950eb7bb382dbbb7f/Screenshot_20250317_124736_com.example.hopla_1_.jpg){width="175" height="350"}![Screenshot_20250317_124739_com.example.hopla\[1\].jpg](uploads/885be5e7017df675cfe7a1802e7bff97/Screenshot_20250317_124739_com.example.hopla_1_.jpg){width="175" height="350"}![Screenshot_20250317_124744_com.example.hopla\[1\].jpg](uploads/6367179be9512955e12b66e10bfb6621/Screenshot_20250317_124744_com.example.hopla_1_.jpg){width="175" height="350"}
+![Screenshot_20250317_124723_com.example.hopla\[1\].jpg](uploads/efbe8d4623b04f7f3843ec43a602a165/Screenshot_20250317_124723_com.example.hopla_1_.jpg){width="175" height="350"} ![Screenshot_20250317_124736_com.example.hopla\[1\].jpg](uploads/1b2f2b35581588d950eb7bb382dbbb7f/Screenshot_20250317_124736_com.example.hopla_1_.jpg){width="175" height="350"}![Screenshot_20250317_124739_com.example.hopla\[1\].jpg](uploads/885be5e7017df675cfe7a1802e7bff97/Screenshot_20250317_124739_com.example.hopla_1_.jpg){width="175" height="350"}![Screenshot_20250317_124744_com.example.hopla\[1\].jpg](uploads/6367179be9512955e12b66e10bfb6621/Screenshot_20250317_124744_com.example.hopla_1_.jpg){width="175" height="350"}
 
 Venners profil lengre ned----Venners blokker/rapporter
 
-![Screenshot_20250317_125226_com.example.hopla\[1\].jpg](uploads/0631ad3c215f5cf58125ca1ebe2dee1a/Screenshot_20250317_125226_com.example.hopla_1_.jpg){width="167" height="334"}![Screenshot_20250317_124751_com.example.hopla\[1\].jpg](/vakvaer/hopla/-/wikis/uploads/64369284df67c6bffbf52c7cf99ad8f4/Screenshot_20250317_124751_com.example.hopla_1_.jpg){width="168" height="336"}
+![Screenshot_20250317_125226_com.example.hopla\[1\].jpg](uploads/0631ad3c215f5cf58125ca1ebe2dee1a/Screenshot_20250317_125226_com.example.hopla_1_.jpg){width="167" height="334"}![Screenshot_20250317_124751_com.example.hopla\[1\].jpg](https://gitlab.stud.idi.ntnu.no/vakvaer/hopla/-/wikis/uploads/64369284df67c6bffbf52c7cf99ad8f4/Screenshot_20250317_124751_com.example.hopla_1_.jpg){width="168" height="336"}
 
-#### Følger
+#### **Følger**
 
 Bruker følger----------------Følger detaljer-----------Følger "valg"
 
 ![Screenshot_20250317_130004_com.example.hopla\[1\].jpg](uploads/c788a2cf85ae88661f4544fc17db72f9/Screenshot_20250317_130004_com.example.hopla_1_.jpg){width="167" height="334"}![Screenshot_20250317_130008_com.example.hopla\[1\].jpg](uploads/a6eff64ea0f0c6f526416b473e6b3f9f/Screenshot_20250317_130008_com.example.hopla_1_.jpg){width="168" height="336"}![Screenshot_20250317_130012_com.example.hopla\[1\].jpg](uploads/9138d3f3908741745c585ee3e872b3b3/Screenshot_20250317_130012_com.example.hopla_1_.jpg){width="167" height="334"}
 
-#### Alle brukere
+#### **Alle brukere**
 
 Alle brukere-------------------Relation=None-------------Relation=Pending
 
 ![Screenshot_20250317_130021_com.example.hopla\[1\].jpg](uploads/0587ebbfcce70acbbf2846fec2871771/Screenshot_20250317_130021_com.example.hopla_1_.jpg){width="180" height="360"}![Screenshot_20250317_130207_com.example.hopla\[1\].jpg](uploads/78c1f253c2416a1e6d2722779a534eb4/Screenshot_20250317_130207_com.example.hopla_1_.jpg){width="180" height="360"}![Screenshot_20250317_130258_com.example.hopla\[1\].jpg](uploads/0e7e86915a87a1bb496a3bf4c793a62d/Screenshot_20250317_130258_com.example.hopla_1_.jpg){width="180" height="360"}
 
-#### Fellesskap
+#### **Fellesskap**
 
 Fellesskap første side(posisjon)----Likte fellesskap---------------Legge til nytt fellesskap-------Legge til posisjon nytt fellesskap
 
@@ -1680,15 +1716,15 @@ Community skjerm ------------- Beskrivelse av community (når man trykker på i 
 
 ![Screenshot_20250317_145505_com.example.hopla\[1\].jpg](uploads/967fafb066d5d0615535d399235241d5/Screenshot_20250317_145505_com.example.hopla_1_.jpg){width="194" height="388"}![Screenshot_20250317_145508_com.example.hopla\[1\].jpg](uploads/9d0123cae0afe57f3d95ea37944d0267/Screenshot_20250317_145508_com.example.hopla_1_.jpg){width="196" height="392"}
 
-#### Ny tur (skal nok endres litt)
+#### **Ny tur (skal nok endres litt)**
 
 Start på ny tur-----------------Når ny tur er ferdig
 
 ![Screenshot_20250317_130846_com.example.hopla\[1\].jpg](uploads/b02689a03b7be70d2222649f1782de2e/Screenshot_20250317_130846_com.example.hopla_1_.jpg){width="177" height="354"}![Screenshot_20250317_130854_com.example.hopla\[1\].jpg](uploads/06fde64999c226b8a16adfa913341360/Screenshot_20250317_130854_com.example.hopla_1_.jpg){width="178" height="356"}
 
-#### Løyper
+#### **Løyper**
 
-(Ja jeg vet jeg har "ødelagt" kvaliteten på bildene litt, fiks kommer :laughing: )
+(Ja jeg vet jeg har "ødelagt" kvaliteten på bildene litt, fiks kommer :laughing: )
 
 Første side---------------------Nær bruker-----------------Likte løyper-------------Venner og følger
 
@@ -1698,7 +1734,7 @@ Filter liste
 
 ![Screenshot_20250317_131335_com.example.hopla\[1\].jpg](uploads/f2b34108e4a09755dee7f313047a304e/Screenshot_20250317_131335_com.example.hopla_1_.jpg){width="189" height="378"}
 
-#### Hjem
+#### **Hjem**
 
 Mer detaljer om denne siden i listen over, men foreløpig design
 
