@@ -429,6 +429,9 @@
         }
       }
     },
+    "Hei" : {
+
+    },
     "Hi" : {
 
     },
@@ -518,7 +521,7 @@
         }
       }
     },
-    "My Friends" : {
+    "My friends" : {
 
     },
     "My hikes" : {
@@ -654,7 +657,13 @@
         }
       }
     },
+    "Search following..." : {
+
+    },
     "Search for Users to Add" : {
+
+    },
+    "Search friends..." : {
 
     },
     "Search groups..." : {

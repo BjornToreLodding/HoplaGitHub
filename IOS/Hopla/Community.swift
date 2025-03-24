@@ -48,7 +48,7 @@ struct Community: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 10) {
             filterBar
             searchBar
         }

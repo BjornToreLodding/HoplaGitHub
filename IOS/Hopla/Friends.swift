@@ -15,7 +15,7 @@ struct Friend: Identifiable, Decodable {
     var name: String
     var alias: String
     var profilePictureUrl: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case id = "friendId"
         case name = "friendName"
@@ -24,37 +24,61 @@ struct Friend: Identifiable, Decodable {
     }
 }
 
+// MARK: - Header
+struct FriendsHeaderView: View {
+    var colorScheme: ColorScheme
+    
+    var body: some View {
+        Text("My friends")
+            .font(.title)
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+            .foregroundColor(.white)
+    }
+}
+
 
 class FriendViewModel: ObservableObject {
     @Published var friends: [Friend] = []
-    
+    @Published var searchText: String = "" // ✅ Added searchText
+
+    var filteredFriends: [Friend] { // ✅ Moved filteredFriends inside FriendViewModel
+        if searchText.isEmpty {
+            return friends
+        } else {
+            return friends.filter { friend in
+                friend.name.localizedCaseInsensitiveContains(searchText) ||
+                friend.alias.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+
     func fetchFriends() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-        
+
         let url = URL(string: "https://hopla.onrender.com/userrelations/friends")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
+
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-            
+
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
                 print("Invalid response or status code")
                 return
             }
-            
+
             do {
                 let friends = try JSONDecoder().decode([Friend].self, from: data)
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print("Received JSON: \(jsonString)")
-                }
                 DispatchQueue.main.async {
                     self.friends = friends
                 }
@@ -66,38 +90,80 @@ class FriendViewModel: ObservableObject {
 }
 
 
+
 // MARK: - Friends View
 struct Friends: View {
     @StateObject private var vm = FriendViewModel()
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        VStack(spacing: 0) {
-            Text("My Friends")
-                .font(.title)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .foregroundColor(.white)
-
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(vm.friends) { friend in
-                        FriendRowView(friend: friend)
+        ZStack {
+            VStack(spacing: 0) {
+                FriendsHeaderView(colorScheme: colorScheme)
+                searchBar
+                    .frame(maxWidth: .infinity)
+                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+                NavigationStack {
+                    ZStack {
+                        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                            .color(for: colorScheme)
+                            .edgesIgnoringSafeArea(.all)
+                        
+                        FriendListView(vm: vm, colorScheme: colorScheme) // ✅ Pass vm directly
                     }
                 }
+                .navigationBarBackButtonHidden(true)
             }
+            .onAppear {
+                vm.fetchFriends()
+            }
+            CustomBackButton(colorScheme: colorScheme)
         }
-        .onAppear {
-            vm.fetchFriends()
+    }
+
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+            TextField("Search friends...", text: $vm.searchText) // ✅ Now updates `vm.searchText`
+                .textFieldStyle(PlainTextFieldStyle())
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+        }
+        .padding(.horizontal)
+    }
+}
+
+
+
+
+// MARK: - Friend List
+struct FriendListView: View {
+    @ObservedObject var vm: FriendViewModel
+    var colorScheme: ColorScheme
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 10) {
+                ForEach(vm.filteredFriends) { friend in // ✅ No more key path error
+                    NavigationLink(destination: FriendsDetails()) {
+                        FriendRowView(colorScheme: colorScheme, friend: friend)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
         }
     }
 }
 
+
+
+
 // MARK: - Friend Row
 struct FriendRowView: View {
+    var colorScheme: ColorScheme
     var friend: Friend
-
+    
     var body: some View {
         HStack {
             if let urlString = friend.profilePictureUrl, let url = URL(string: urlString) {
@@ -116,11 +182,11 @@ struct FriendRowView: View {
                     .fill(Color.gray.opacity(0.5))
                     .frame(width: 60, height: 60)
             }
-
+            
             Text(friend.name)
                 .font(.headline)
                 .padding(.leading, 10)
-
+            
             Spacer()
         }
         .padding()

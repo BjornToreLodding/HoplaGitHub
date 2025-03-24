@@ -14,7 +14,7 @@ struct Following: Identifiable, Decodable {
     var name: String
     var alias: String
     var profilePictureUrl: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case id = "followingUserId"
         case name = "followingUserName"
@@ -23,8 +23,32 @@ struct Following: Identifiable, Decodable {
     }
 }
 
+// MARK: - Header
+struct FollowingHeaderView: View {
+    var colorScheme: ColorScheme
+    
+    var body: some View {
+        Text("Following")
+            .font(.title)
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+            .foregroundColor(.white)
+    }
+}
+
 class FollowingViewModel: ObservableObject {
     @Published var following: [Following] = []
+    @Published var searchText: String = ""
+    
+    var filteredFollowing: [Following] {
+            if searchText.isEmpty {
+                return following
+            } else {
+                return following.filter { $0.name.localizedCaseInsensitiveContains(searchText) || $0.alias.localizedCaseInsensitiveContains(searchText) }
+            }
+        }
     
     func fetchFollowing() {
         guard let token = TokenManager.shared.getToken() else {
@@ -67,32 +91,69 @@ class FollowingViewModel: ObservableObject {
 struct FollowingView: View {
     @StateObject private var vm = FollowingViewModel()
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            Text("Following")
-                .font(.title)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .foregroundColor(.white)
-            
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(vm.following) { user in
-                        FollowingRowView(user: user)
+        ZStack {
+            VStack(spacing: 0) {
+                FollowingHeaderView(colorScheme: colorScheme)
+                searchBar
+                    .frame(maxWidth: .infinity)
+                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+                NavigationStack {
+                    ZStack {
+                        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                            .color(for: colorScheme)
+                            .edgesIgnoringSafeArea(.all)
+                        
+                        FollowingListView(vm: vm, colorScheme: colorScheme)
                     }
                 }
+                .navigationBarBackButtonHidden(true)
             }
+            .onAppear {
+                vm.fetchFollowing()
+            }
+            CustomBackButton(colorScheme: colorScheme)
         }
-        .onAppear {
-            vm.fetchFollowing()
+    }
+
+    // MARK: - Search Bar
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+            TextField("Search following...", text: $vm.searchText)
+                .textFieldStyle(PlainTextFieldStyle())
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+        }
+        .padding(.horizontal)
+    }
+}
+
+
+// MARK: - Following List
+struct FollowingListView: View {
+    @ObservedObject var vm: FollowingViewModel
+    var colorScheme: ColorScheme
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 10) {
+                ForEach(vm.filteredFollowing) { friend in
+                    NavigationLink(destination: FriendsDetails()) {
+                        FollowingRowView(colorScheme: colorScheme, user: friend)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
         }
     }
 }
 
 // MARK: - Following Row
 struct FollowingRowView: View {
+    var colorScheme: ColorScheme
     var user: Following
     
     var body: some View {
@@ -128,4 +189,3 @@ struct FollowingRowView: View {
         .padding(.horizontal)
     }
 }
-

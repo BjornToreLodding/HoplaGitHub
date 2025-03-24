@@ -1,0 +1,18 @@
+//
+//  FriendsDetails.swift
+//  Hopla
+//
+//  Created by Ane Marie Johnsen on 23/03/2025.
+//
+
+import SwiftUI
+import Combine
+import KeychainAccess
+import KeychainSwift
+
+struct FriendsDetails: View {
+
+    var body: some View {
+        Text("Hei")
+    }
+}
