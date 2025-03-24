@@ -533,7 +533,28 @@ public class TrailController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(new {message = "Updated TrailRating"}); //, rating = existing});
     }
-    
+
+    [HttpGet("prepare")]
+    public async Task<IActionResult> StartTrail([FromQuery] Guid trailId)
+    {
+        var trailData = await _context.Trails.FirstOrDefaultAsync(t => t.Id == trailId);
+        if (trailData == null) 
+        {
+            return BadRequest("Trail finnes ikke");
+        }
+        //Bare fiktiv for å generere løypa
+        var allCoords = MockHelper.GenerateCircularTrail(trailData.LatMean, trailData.LongMean, trailData.Distance);
+        var response = new
+        {
+            trailData.Id,
+            trailData.Distance,
+            allCoords
+        };
+
+        return Ok(response);
+    }
+
+
     [HttpPost("mock")]
     public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)
     {
