@@ -137,11 +137,10 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
     ) {
         horseDetail?.let { horse ->
             val formattedDob = try {
-                val dateTime = horse.dob.split("T")[0]
-                val (year, month, day) = dateTime.split("-")
-                "$day.$month.$year"
+                val dob = horse.dob
+                "${dob.day}.${dob.month}.${dob.year}"
             } catch (e: Exception) {
-                Log.e("HorseDetailScreen", "Error parsing date of birth", e)
+                Log.e("HorseDetailScreen", "Error formatting date of birth", e)
                 "Unknown"
             }
 

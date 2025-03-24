@@ -616,14 +616,15 @@ fun AddNewType(
                             Log.d("createHorse", "Sending request: $horseRequest")
                             val response = createHorse(token, horseRequest)
                             Log.d("createHorse", "Response: $response")
+                            navController.popBackStack()  // Navigate only after successful response
                         } catch (e: Exception) {
                             Log.e("createHorse", "Error creating horse", e)
                         }
                     }
-                    navController.popBackStack()
                 }) {
                     Text(text = "Add $type")
                 }
+
             }
             else -> {
                 Column(

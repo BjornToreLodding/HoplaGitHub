@@ -23,7 +23,7 @@ enum class PersonStatus {
 data class HorseDetail(
     val name: String,
     val horsePictureUrl: String,
-    val dob: String,
+    val dob: DateOfBirth,
     val age: Int,
     val breed: String
 )
