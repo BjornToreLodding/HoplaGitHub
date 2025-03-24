@@ -93,7 +93,10 @@ suspend fun updateUserInfo(
     name: String,
     phone: String? = null,
     description: String? = null,
-    password: String? = null
+    password: String? = null,
+    year: Int? = null,
+    month: Int? = null,
+    day: Int? = null
 ): Pair<Int, String> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -117,6 +120,15 @@ suspend fun updateUserInfo(
     }
     password?.let {
         requestBody["Password"] = it
+    }
+    year?.let {
+        requestBody["Year"] = it.toString()
+    }
+    month?.let {
+        requestBody["Month"] = it.toString()
+    }
+    day?.let {
+        requestBody["Day"] = it.toString()
     }
 
     Log.d("updateUserInfo", "Request Body: $requestBody")

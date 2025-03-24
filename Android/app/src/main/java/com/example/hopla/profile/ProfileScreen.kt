@@ -405,7 +405,14 @@ fun UserChanges(modifier: Modifier = Modifier) {
                         dayNumber = date.toEpochDay().toInt()
                     )
                 },
-                onSave = { /* Handle save action if needed */ }
+                onSave = {
+                    val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", year = dob?.year, month = dob?.month, day = dob?.day)
+                    if (statusCode == 200) {
+                        UserSession.dob = dob
+                    }
+                    responseMessage = message
+                    showResponseDialog = true
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
