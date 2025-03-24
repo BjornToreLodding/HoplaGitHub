@@ -1,4 +1,5 @@
 using System.Drawing;
+using HoplaBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HoplaBackend.DTOs;
@@ -17,7 +18,7 @@ public class CreateTrailDto
     public string? PictureUrl { get; set; }
     public string Coordinates { get; set; }
     public double Distance { get; set; }
-    
+
 
 }
 public class TrailRateDto
@@ -25,7 +26,21 @@ public class TrailRateDto
     public Guid TrailId { get; set; }
     public int Rating { get; set; } //1-5 stjerner
 }
-
+public class TrailReviewForm{
+    public Guid TrailId { get; set; }
+    public string Message { get; set; }
+    public IFormFile? Image { get; set; }
+    public TrailConditionType Condition { get; set; } = TrailConditionType.Ukjent;
+}
+public class TrailReviewResponseDto
+{
+    public Guid Id { get; set; }
+    public string Comment { get; set; } = string.Empty;
+    public string PictureUrl { get; set; } = string.Empty;
+    public TrailConditionType Condition { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string Alias { get; set; } = string.Empty;
+}
 
 //Trenger ikke å brukes.
 [Owned] // Dette gjør at EF håndterer det uten å lage en egen tabell manuelt

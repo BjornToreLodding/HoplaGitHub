@@ -15,9 +15,19 @@ public class TrailReview
 
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
-
-    public int Rating { get; set; } // 1-5 stjerner
     public string Comment { get; set; } = string.Empty;
     public string PictureUrl { get; set; } = string.Empty;
+    public TrailConditionType Condition { get; set; } = TrailConditionType.Ukjent;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+}
+
+public enum TrailConditionType
+{
+    Ukjent = 0,
+    Bra = 1, 
+    Vått = 2,
+    Møkkette = 3,
+    Farlig = 4, 
+    Blokkert = 5
 }

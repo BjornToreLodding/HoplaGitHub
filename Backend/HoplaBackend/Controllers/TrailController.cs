@@ -8,12 +8,12 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using HoplaBackend.Services;
 using HoplaBackend.Helpers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 using Microsoft.VisualBasic;
-using HoplaBackend.Services;
 using HoplaBackend.Models.DTOs;
 
 namespace HoplaBackend.Controllers;
@@ -25,11 +25,13 @@ public class TrailController : ControllerBase
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
     private readonly TrailFavoriteService _trailFavoriteService;
-        public TrailController(Authentication authentication, AppDbContext context, TrailFavoriteService trailFavoriteService)
+    private readonly ImageUploadService _imageUploadService;
+            public TrailController(Authentication authentication, AppDbContext context, TrailFavoriteService trailFavoriteService, ImageUploadService imageUploadService)
     {
         _authentication = authentication;
         _context = context;
         _trailFavoriteService = trailFavoriteService;
+        _imageUploadService = imageUploadService;
     }
 
     [Authorize]
@@ -532,6 +534,73 @@ public class TrailController : ControllerBase
         existing.Rating = rating;
         await _context.SaveChangesAsync();
         return Ok(new {message = "Updated TrailRating"}); //, rating = existing});
+    }
+    [Authorize]
+    [HttpGet("updates")]
+    public async Task<IActionResult> GetTrailReviews([FromQuery] Guid trailId, [FromQuery] Guid? trailReviewId, [FromQuery] int? pageSize = 10, [FromQuery] int? pageNumber = 1)
+    {
+        var query = _context.TrailReviews
+            .Where(r => r.TrailId == trailId);
+
+        if (trailReviewId.HasValue)
+        {
+            query = query.Where(r => r.Id == trailReviewId.Value);
+        }
+
+        var reviews = await query
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new TrailReviewResponseDto
+            {
+                Id = r.Id,
+                Comment = r.Comment,
+                PictureUrl = r.PictureUrl,
+                Condition = r.Condition,
+                CreatedAt = r.CreatedAt,
+                Alias = r.User.Alias
+            })
+            .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
+            .Take(pageSize ?? 10)
+            .ToListAsync();
+
+        return Ok(reviews);
+    }
+
+
+    [Authorize]
+    [HttpPost("review")]
+    public async Task<IActionResult> CreateReview([FromForm] TrailReviewForm dto)
+    {
+        string? image = null;
+
+        if (dto.Image != null)
+        {
+            // Bruk din ImageUploadService eller tilsvarende her
+            image = await _imageUploadService.UploadImageAsync(dto.Image);
+        }
+
+        var review = new TrailReview
+        {
+            Id = Guid.NewGuid(),
+            TrailId = dto.TrailId,
+            UserId = _authentication.GetUserIdFromToken(User),
+            Comment = dto.Message,
+            PictureUrl = image,
+            Condition = dto.Condition,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.TrailReviews.Add(review);
+        await _context.SaveChangesAsync();
+
+        return Ok(new TrailReviewResponseDto
+        {
+            Id = review.Id,
+            Comment = review.Comment,
+            PictureUrl = review.PictureUrl,
+            Condition = review.Condition,
+            CreatedAt = review.CreatedAt,
+            Alias = review.User?.Alias ?? "Ukjent"
+        });
     }
 
     [HttpGet("prepare")]

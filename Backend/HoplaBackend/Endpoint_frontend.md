@@ -1,6 +1,7 @@
 
 
 
+
 # **OBS**
 
 trails/all mangler: beskrivelse av løypen
@@ -109,8 +110,8 @@ Main profil side
   * **Brukernavn(alias), epost og bilde**
   * **(Bilde: bruker size 200.dp og clip circleshape)**
 * \*\*GET med Authorization:
-  * \*\*GET \*\***https://hopla.onrender.com/users/myprofile** Denne erstattes av den under (/users/profile)
-  * \*\*Get \*\***https://hopla.onrender.com/users/profile** Denne kan også brukes til å hente andre brukere ved å spesifisere optional ?userid=Guid f.eks https://hopla.onrender.com/users/profile?userid=12345678-0000-0000-0001-123456780002 Mer om dette lenger ned.
+  * \*\*GET \*\*\*\*https://hopla.onrender.com/users/myprofile\\\*\\\* Denne erstattes av den under (/users/profile)
+  * \*\*Get \*\*\*\*https://hopla.onrender.com/users/profile\\\*\\\* Denne kan også brukes til å hente andre brukere ved å spesifisere optional ?userid=Guid f.eks https://hopla.onrender.com/users/profile?userid=12345678-0000-0000-0001-123456780002 Mer om dette lenger ned.
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
 
@@ -146,7 +147,7 @@ photo-1614203586837-1da2bef106a2?h=200&w=200&fit=crop"
   * \*\*GET GET \*\***https://hopla.onrender.com/horses/userhorses/**
   * **auth Type Bearer Token**
   * **Token = "LangTokenStringFraResponsenPå/users/login"**
-* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003 -\> Hester tilhørende brukerid
+* GET https://hopla.onrender.com/horses/userhorses?userid=12345678-0000-0000-0001-123456780003 -\\\\\\\> Hester tilhørende brukerid
 
 **Eksempel på response body JSON**
 
@@ -242,11 +243,9 @@ enum class PersonStatus {
 
 **Eksempel på request**
 
-GET https://hopla.onrender.com/userrelations/friends\
-Denne henter vennene til innlogget bruker
+GET https://hopla.onrender.com/userrelations/friends\\\\ Denne henter vennene til innlogget bruker
 
-GET https://hopla.onrender.com/userrelations/friends?userid=12345678-0000-0000-0001-123456780003\
-Denne henter vennen til oppgitt userid
+GET https://hopla.onrender.com/userrelations/friends?userid=12345678-0000-0000-0001-123456780003\\\\ Denne henter vennen til oppgitt userid
 
 Alle brukere: https://hopla.onrender.com/users/all
 
@@ -303,11 +302,9 @@ BT: Denne skal virke nå
 
 **Eksempel på request**
 
-GET https://hopla.onrender.com/userrelations/following\
-Denne henter følgere til innlogget bruker
+GET https://hopla.onrender.com/userrelations/following\\\\ Denne henter følgere til innlogget bruker
 
-GET https://hopla.onrender.com/userrelations/follwing?userid=12345678-0000-0000-0001-123456780003\
-Denne henter følgere til oppgitt userid
+GET https://hopla.onrender.com/userrelations/follwing?userid=12345678-0000-0000-0001-123456780003\\\\ Denne henter følgere til oppgitt userid
 
 **NB!! Begge må ha authorization Bearer Token**
 
@@ -645,9 +642,7 @@ Response:
 
 Profil -\> Bytte brukernavn
 
-## **:green_book: :grimacing: :apple: PUT /users/update**
-
-(mangler fungerende Dob)
+## **:green_book:** :alien: **:apple: PUT /users/update**
 
 Body:
 
@@ -1331,7 +1326,7 @@ Response:
 </td>
 <td>
 
-## **:green_book:**  :alien:  **:apple: POST /stables/create**
+## **:green_book:**  :alien: **:apple: POST /stables/create**
 
 Legg til nytt fellesskap:
 
@@ -1473,7 +1468,7 @@ Response:
 </td>
 <td>
 
-## **:green_book: :smiling_imp: :apple: POST /horses/create**
+## **:green_book:** :alien: **:apple: POST /horses/create**
 
 Legge til ny hest, sende med: navn, rase, alder/dob (?), bilde (kun 1)
 
@@ -1612,13 +1607,21 @@ Hvis public her også må det lages en løype av den.
 </td>
 <td>
 
-## **:red_circle: :smiling_imp: :apple: POST ny oppdatering om løype**
+## **:green_book: :smiling_imp: :apple: POST /trails/review**
+ny oppdatering om løype
 
 Når brukeren poster en ny oppdatering om løypen (trykker på ny oppdatering):\
 informasjon post requesten trenger:\
 brukerens id, løypens id, oppdateringen, optional bilde, tidspunkt (tid og dato)
 
-## **:red_circle: :smiling_imp: :apple: GET nye oppdateringer om løypen**
+**BT**
+
+```postman
+
+```
+
+## **:green_book: :smiling_imp: :apple: GET /trails/update**
+nye oppdateringer om løypen
 
 Når brukeren trykker på nyeste oppdatering om løypen skal de få:\
 selve oppdateringen, tid den ble lagt ut, evt bilde, bruker som har lagt ut
@@ -1630,6 +1633,7 @@ selve oppdateringen, tid den ble lagt ut, evt bilde, bruker som har lagt ut
 Endpoint som henter hvor mange stjerner brukeren har trykket på og legger de til i totale vurderinger.
 
 **BT**
+
 ```postman
 https://hopla.onrender.com/trails/rate
 ```
@@ -1637,6 +1641,7 @@ https://hopla.onrender.com/trails/rate
 **Denne lager ny rating. Hvis brukeren har ratet tidligere, så oppdateres denne ratingen.**
 
 Body:
+
 ```json
 {
     "TrailId": "12345678-0000-0000-0021-123456780001",
@@ -1645,19 +1650,78 @@ Body:
 ```
 
 Response:
+
 ```json
 Trail Rated / Updated TrailRating
 ```
 
-## **:red_circle: :smiling_imp: :apple: GET start tur**
+## **:green_book: :smiling_imp: :apple: GET /trails/prepare**
+start tur
 
 Henter opp alle koordinater til løypen og tegner de opp på kartet, samt tid, og distanse (id for å lagre det som en tur etterpå.
 
-## **:red_circle: :smiling_imp: :apple: POST ny tur**
+**BT**
+```postman
+https://hopla.onrender.com/trails/prepare?trailId=12345678-0000-0000-0021-123456780001
+```
+
+Response:
+```json
+{
+    "id": "12345678-0000-0000-0021-123456780001",
+    "distance": 15.536,
+    "allCoords": [
+        {
+            "lat": 60.792499999999997,
+            "long": 10.740518666940543
+        },
+        {
+            "lat": 60.792779115902121,
+            "long": 10.740515072977953
+        },
+        {
+            "lat": 60.793058187728604,
+            "long": 10.740504291657713
+        },
+        ...
+        ...osv  //lager 500 koordinatpar
+        ...
+        {
+            "lat": 60.791941812271389,
+            "long": 10.740504291657713
+        },
+        {
+            "lat": 60.792220884097873,
+            "long": 10.740515072977953
+        }
+```
+
+
+## **:yellow_circle: :smiling_imp: :apple: POST ny tur**
 
 Etter turen er ferdig (brukeren er på sluttkoordinatet eller trykker på stopp.
 
 Turen lagres som en ny tur koblet til brukeren
+
+**BT**
+
+Skal dette være hike eller trail?  
+Jeg trenger også å vite litt mer om hvordan det er enklest å få sendt inn data her.  
+
+```postman
+https://hopla.onrender.com/trails/create
+```
+
+Body:
+```json
+{
+    "Name": "TestRunden",
+    "Distance": 314.159
+    "Coordinates": //sendes på en hensiktsmessig måte som tuppelpar i liste eller json.
+    //Andre ting?
+}
+```
+
 </td>
 </tr>
 </table>
