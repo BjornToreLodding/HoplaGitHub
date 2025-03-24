@@ -1617,7 +1617,23 @@ brukerens id, løypens id, oppdateringen, optional bilde, tidspunkt (tid og dato
 **BT**
 
 ```postman
+https://hopla.onrender.com/trails/review
+```
 
+Form (Ikke Body!!)
+```postmanForm
+    Key             Type    Value
+    File            file    bilde.jpg
+    TrailId         txt     12345678-0000-0000-0021-123456780001
+    Message         txt     Bekken renner over veien ved stallen
+    Condition       txt     //Litt usikker på hvordan enum funker? 
+    
+    //Skal man gi med nummeret eller navnet? Prøv Bra, Blokkert, Dårlig, 1,2,3,4
+```
+
+Resonse:
+```json
+Ok
 ```
 
 ## **:green_book: :smiling_imp: :apple: GET /trails/update**
@@ -1625,6 +1641,31 @@ nye oppdateringer om løypen
 
 Når brukeren trykker på nyeste oppdatering om løypen skal de få:\
 selve oppdateringen, tid den ble lagt ut, evt bilde, bruker som har lagt ut
+
+**BT**
+```postman
+https://hopla.onrender.com/trails/review
+```
+
+```query
+?trailId (Påkrevd) Id på trail
+?reviewId (Optional) for å kun se dette reviewet, men gir samme responsedata som i lista. 
+?pageNumber (optional) settes til 1 hvis ikke annet er spesifisert.
+?pageSize (Optional) settes til 10 hvis ikke annet er spesifisert.
+```
+
+```json
+[
+    {
+        "id": "d6f59b42-1c35-4c3f-b377-b399804f2f49",
+        "comment": "Fossen har brent ned",
+        "pictureUrl": "afd1a62d-10ce-4f27-95c1-2f818f855d5d.jpg",
+        "condition": 0,
+        "createdAt": "2025-03-24T18:30:38.058704Z",
+        "alias": "MangeBallerILufra"
+    }
+]
+```
 
 ## **:green_book: :smiling_imp: :apple: POST /trails/rate**
 

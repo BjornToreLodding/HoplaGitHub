@@ -553,7 +553,7 @@ public class TrailController : ControllerBase
             {
                 Id = r.Id,
                 Comment = r.Comment,
-                PictureUrl = r.PictureUrl,
+                PictureUrl =  !string.IsNullOrEmpty(r.PictureUrl)  ? (r.PictureUrl.Contains("http") ? r.PictureUrl : "https://hopla.imgix.net/" + r.PictureUrl) + "?w=200&h=200&fit=crop" : "",
                 Condition = r.Condition,
                 CreatedAt = r.CreatedAt,
                 Alias = r.User.Alias
