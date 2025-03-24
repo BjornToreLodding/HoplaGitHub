@@ -143,7 +143,8 @@ struct FollowingListView: View {
         ScrollView {
             VStack(spacing: 10) {
                 ForEach(vm.filteredFollowing) { following in
-                    NavigationLink(destination: FollowingDetails(user: following)) {
+                    // Pass the correct argument (user or userId) to FollowingDetails
+                    NavigationLink(destination: FollowingDetails(userId: following.id)) {
                         FollowingRowView(colorScheme: colorScheme, user: following)
                     }
                     .buttonStyle(PlainButtonStyle())

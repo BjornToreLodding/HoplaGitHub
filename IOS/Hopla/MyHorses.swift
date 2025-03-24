@@ -50,7 +50,6 @@ class HorseViewModel: ObservableObject {
         }.resume()
     }
     
-    
     func addHorse(name: String, breed: String?, age: Int?, horsePictureURL: UIImage?, dob: String?) {
         var imageUrlString: String? = nil
         
@@ -62,39 +61,30 @@ class HorseViewModel: ObservableObject {
         }
         
         let newHorse = Horse(
-            id: UUID().uuidString,
             name: name,
             breed: breed,
             age: age,
-            horsePictureUrl: imageUrlString, // Correctly assigning URL as a string
+            horsePictureUrl: imageUrlString,
             dob: dob
         )
         
         horses.append(newHorse)
     }
-    
 }
+
 
 
 // MARK: - Horse Model
 struct Horse: Identifiable, Decodable {
-    var id: String? // Some APIs might not return an ID, so make it optional
+    var id: String
     var name: String
     var breed: String?
     var age: Int?
     var horsePictureUrl: String?
     var dob: String?
-    
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case breed
-        case age
-        case horsePictureUrl
-        case dob
-    }
-    
-    init(id: String?, name: String, breed: String?, age: Int?, horsePictureUrl: String?, dob: String?) {
+
+    // Regular initializer
+    init(id: String = UUID().uuidString, name: String, breed: String? = nil, age: Int? = nil, horsePictureUrl: String? = nil, dob: String? = nil) {
         self.id = id
         self.name = name
         self.breed = breed
@@ -102,17 +92,37 @@ struct Horse: Identifiable, Decodable {
         self.horsePictureUrl = horsePictureUrl
         self.dob = dob
     }
-    
+
+    // Custom decoder for 'dob' if necessary
+    private enum CodingKeys: String, CodingKey {
+        case id, name, breed, age, horsePictureUrl, dob
+    }
+
+    private enum DOBKeys: String, CodingKey {
+        case year, month, day
+    }
+
+    // Custom decoding to handle DOB format
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decodeIfPresent(String.self, forKey: .id) // Include `id`
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
         name = try container.decode(String.self, forKey: .name)
         breed = try container.decodeIfPresent(String.self, forKey: .breed)
         age = try container.decodeIfPresent(Int.self, forKey: .age)
         horsePictureUrl = try container.decodeIfPresent(String.self, forKey: .horsePictureUrl)
-        dob = try container.decodeIfPresent(String.self, forKey: .dob) // Keep `dob` as a String?
+
+        if let dobContainer = try? container.nestedContainer(keyedBy: DOBKeys.self, forKey: .dob) {
+            let year = try dobContainer.decode(Int.self, forKey: .year)
+            let month = try dobContainer.decode(Int.self, forKey: .month)
+            let day = try dobContainer.decode(Int.self, forKey: .day)
+            dob = "\(year)-\(String(format: "%02d", month))-\(String(format: "%02d", day))"
+        } else {
+            dob = nil
+        }
     }
 }
+
+
 
 
 struct MyHorses: View {
@@ -177,17 +187,16 @@ struct HorseListView: View {
         ScrollView {
             VStack(spacing: 10) {
                 ForEach(vm.horses) { horse in
-                    if let horseId = horse.id {  // Ensure it's non-optional
-                        NavigationLink(destination: HorseDetails(horseId: horseId)) {
-                            HorseRowView(horse: horse, colorScheme: colorScheme)
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                    NavigationLink(destination: HorseDetails(horseId: horse.id)) {
+                        HorseRowView(horse: horse, colorScheme: colorScheme)
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }
     }
 }
+
 
 // MARK: - Horse Row
 struct HorseRowView: View {

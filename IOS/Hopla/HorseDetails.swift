@@ -13,7 +13,7 @@ import KeychainSwift
 
 class HorseDetailsViewModel: ObservableObject {
     @Published var horse: Horse?
-
+    
     func fetchHorseDetails(horseId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -25,22 +25,22 @@ class HorseDetailsViewModel: ObservableObject {
             print("Invalid URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             guard let httpResponse = response as? HTTPURLResponse, let data = data else {
                 print("Invalid response")
                 return
             }
-
+            
             if httpResponse.statusCode == 200 {
                 print("Received data: \(String(data: data, encoding: .utf8) ?? "No data")") // Log the raw response
                 do {
@@ -68,8 +68,8 @@ class HorseDetailsViewModel: ObservableObject {
             }
         }.resume()
     }
-
-
+    
+    
 }
 
 
@@ -77,36 +77,38 @@ class HorseDetailsViewModel: ObservableObject {
 struct HorseDetails: View {
     @ObservedObject var vm = HorseDetailsViewModel()
     var horseId: String
-
+    
     var body: some View {
         VStack(spacing: 20) {
             if let horse = vm.horse {
+                // Name
                 Text(horse.name)
                     .font(.largeTitle)
                     .fontWeight(.bold)
-
-                if let breed = horse.breed {
-                    Text("Breed: \(breed)")
-                        .font(.title2)
-                }
-
-                if let age = horse.age {
-                    Text("Age: \(age) years old")
-                        .font(.title2)
-                }
-
-                if let urlString = horse.horsePictureUrl, let url = URL(string: urlString) {
+                
+                // Horse Image
+                if let horsePictureUrl = horse.horsePictureUrl,
+                   let url = URL(string: horsePictureUrl) {
                     AsyncImage(url: url) { image in
-                        image.resizable()
-                            .scaledToFill()
-                            .frame(width: 150, height: 150)
-                            .clipShape(Circle())
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 200, height: 200)
                     } placeholder: {
                         ProgressView()
-                            .frame(width: 150, height: 150)
                     }
                 }
-            } else {
+                
+                // Breed
+                Text("Breed: \(horse.breed ?? "Unknown")")
+                    .font(.title2)
+                    .foregroundColor(.gray)
+                
+                // Age
+                Text("Age: \(horse.age ?? 0) years old")
+                    .font(.title3)
+                    .foregroundColor(.gray)
+            }  else {
                 ProgressView()
             }
         }

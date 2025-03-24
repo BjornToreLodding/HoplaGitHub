@@ -15,19 +15,26 @@ struct Friend: Identifiable, Decodable {
     var name: String
     var alias: String
     var profilePictureUrl: String?
-    var status: PersonStatus = .friend // Always a friend by default
 
     enum CodingKeys: String, CodingKey {
-        case id = "friendId"
-        case name = "friendName"
-        case alias = "friendAlias"
-        case profilePictureUrl = "friendPictureURL"
-        // No need for friendRelation since it's always .friend
+        case id = "friendId" // maps friendId to id
+        case name = "friendName" // maps friendName to name
+        case alias = "friendAlias" // maps friendAlias to alias
+        case profilePictureUrl = "friendPictureURL" // maps friendPictureURL to profilePictureUrl
     }
 }
 
 
+// MARK: - Post Model / Hikes (userHikes)
+struct Post: Identifiable, Decodable {
+    var id: String
+    var trailName: String
+    var length: Double
+    var duration: Double
+    var pictureUrl: String?
+}
 
+// Enum for relation status
 enum PersonStatus: String, Decodable {
     case friend = "FRIEND"
     case following = "FOLLOWING"
@@ -90,6 +97,11 @@ class FriendViewModel: ObservableObject {
             }
 
             do {
+                // Print the raw JSON data for inspection
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("Raw JSON Response: \(jsonString)")
+                }
+
                 let friends = try JSONDecoder().decode([Friend].self, from: data)
                 DispatchQueue.main.async {
                     self.friends = friends
@@ -99,6 +111,9 @@ class FriendViewModel: ObservableObject {
             }
         }.resume()
     }
+
+
+
 }
 
 
@@ -158,7 +173,7 @@ struct FriendListView: View {
         ScrollView {
             VStack(spacing: 10) {
                 ForEach(vm.filteredFriends) { friend in
-                    NavigationLink(destination: FriendsDetails(friend: friend)) {
+                    NavigationLink(destination: FriendsDetails(friendId: friend.id)) {
                         FriendRowView(colorScheme: colorScheme, friend: friend)
                     }
                     .buttonStyle(PlainButtonStyle())
