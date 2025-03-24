@@ -501,8 +501,9 @@ public class TrailController : ControllerBase
     [HttpPost("rate")]
     public async Task<IActionResult> CreateRating([FromBody] TrailRateDto request)
     {
+        if (request.Rating < 1 || request.Rating > 5) return BadRequest("Ratingen må være mellom 1 og 5");
         var userId = _authentication.GetUserIdFromToken(User);
-
+        
         var existing = await _context.TrailRatings.FirstOrDefaultAsync(
             tr => tr.UserId == userId && tr.TrailId == request.TrailId);
         if (existing != null) return await UpdateRating(existing.Id, request.Rating);

@@ -322,6 +322,19 @@ public class UserRelationsController : ControllerBase
     */
 
 
+    /*
+    Tillatte kombinasjoner
+    
+    PENDING     ->  PUT     FRIENDS (slett evt FOLLOWING begge veier.)
+    PENDING     ->  PUT     BLOCKED
+    PENDING     ->  DELETE
+    FOLLOWING   ->  POST    PENDING
+    FOLLOWING   ->  PUT     BLOCKED
+    FOLLOWING   ->  DELETE
+    BLOCKED     ->  PUT     PENDING
+    BLOCKED     ->  PUT     FOLLOWING
+    */
+
     [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateRelationStatus([FromBody] UserRelationRequest request)
@@ -330,8 +343,11 @@ public class UserRelationsController : ControllerBase
         if (userId == request.TargetUserId)
             return BadRequest(new { message = "Ugyldig målbruker" });
 
-        if (string.IsNullOrEmpty(request.Status))
-            return BadRequest(new { message = "Status må angis" });
+        var allowedStatuses = new[] { "PENDING", "FRIENDS", "BLOCK" }; //Må se på tillatte kombinasjoner
+
+        if (!allowedStatuses.Contains(request.Status?.ToUpperInvariant()))
+            return BadRequest(new { message = "Ugyldig statusverdi. Må være FOLLOWING, PENDING eller BLOCK." });
+        //if (string.IsNullOrEmpty(request.Status))   return BadRequest(new { message = "Status må angis" });
 
         // Finn relasjonen begge veier
         var relation = await _context.UserRelations.FirstOrDefaultAsync(r =>
