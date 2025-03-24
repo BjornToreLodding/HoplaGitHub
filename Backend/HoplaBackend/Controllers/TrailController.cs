@@ -521,7 +521,7 @@ public class TrailController : ControllerBase
     public async Task<IActionResult> UpdateRating(Guid trailRatingId, int rating)
     {
         var existing = await _context.TrailRatings.FirstOrDefaultAsync(tr => tr.Id == trailRatingId);
-        if (existing != null) return NotFound("Rating Not Found");
+        if (existing == null) return NotFound("Rating Not Found");
         
         existing.Rating = rating;
         await _context.SaveChangesAsync();
