@@ -9,4 +9,9 @@ public class TrailDto
     public double AverageRating { get; set; }
     public bool IsFavorite { get; set; }
 }
+public class TrailRateDto
+{
+    public Guid TrailId { get; set; }
+    public int Rating { get; set; } //1-5 stjerner
+}
 //Lage flere underklasser ettersom hva som skal overføres.

@@ -660,7 +660,6 @@ Body:
 ```
 
 Response:
-
 ```json
 {
     "message": "Brukerinformasjon oppdatert."
@@ -672,13 +671,12 @@ Profil -\> Bytte epost
 ## :green_book: :alien: :apple: POST /users/change-email
 
 body:
-
-````json
+```json
 {
     "NewEmail": "test@test.no",
     "Password": "Hopla2025!"
 }
-´´´
+```
 
 Mottar epost med beskjed om å bekrefte epostadressen ved å trykke på en lenke.. 
 
@@ -687,7 +685,7 @@ Response trinn1:
 {
     "message": "E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer"
 }
-````
+```
 
 Åpne epost og trykk på aktiveringslenke. I noen tilfeller har det tatt opptil 30 minutter før eposten har kommet frem.
 
@@ -697,19 +695,19 @@ Profil -\> bytte passord
 
 body:
 
-````json
+```json
 {
     "OldPassword": "GammeltPass0rd!",
     "NewPassword": "Hopla2025!",
     "ConfirmPassword": "Hopla2025!"
 }
-
+```
 response:
 ```json
 {
     "message": "Passordet er endret"
 }
-````
+```
 </td>
 </tr>
 <tr>
@@ -1543,9 +1541,44 @@ Oversikt over hva som brukes i hvilken situasjon
 <td></td>
 <td>
 
-## :green_book: :smiling_imp: :apple: GET friendrequests
+## :green_book: :smiling_imp: :apple: GET /userrelations/requests 
 
-Endpoint som henter alle venneforespørseler innlogget bruker har. Trenger også her et POST endpoint der bruker kan godkjenne eller slette forespørseler. Endre fra request til enten NONE eller FRIENDS
+**Trenger også her et POST endpoint der bruker kan godkjenne eller slette forespørseler. Endre fra request til enten NONE eller FRIENDS**
+
+se POST friendrequest ovenfor her.
+
+Endpoint som henter alle venneforespørseler innlogget bruker har. 
+
+**BT**
+
+Eksempel:
+```postman
+GET https://hopla.onrender.com/userrelations/requests
+```
+
+Response:
+```
+[
+    {
+        "id": "768ee359-6e1f-4b61-83af-4155415ccbc5",
+        "fromUserId": "12345678-0000-0000-0001-123456780021",
+        "fromUserAlias": "AlltidISvime",
+        "fromUserName": "Ole Svimeslåtten"
+    },
+    ...
+    osv.
+    ...
+    {
+        "id": "f23f5fc0-d7ab-4382-88ee-76620a23786d",
+        "fromUserId": "12345678-0000-0000-0001-123456780025",
+        "fromUserAlias": "KlaraNøff",
+        "fromUserName": "Klara Snøfterud"
+    }
+]
+
+```
+
+
 </td>
 </tr>
 <tr>
