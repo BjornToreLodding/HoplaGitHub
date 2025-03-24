@@ -1,7 +1,6 @@
 package com.example.hopla.universalData
 
 import android.graphics.Bitmap
-import android.net.Uri
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
@@ -58,17 +57,6 @@ data class OtherUsers(
     val name: String?,
     val pictureUrl: String?,
     val alias: String?
-)
-
-// Class for the data of a community
-data class Community(
-    val name: String,
-    val imageResource: Int,
-    val description: String,
-    val communityMemberStatus: String = "MEMBER",
-    val communityStatus: String = "PUBLIC",
-    val latitude: Double? = null,
-    val longitude: Double? = null
 )
 
 // Class for the data of a post
