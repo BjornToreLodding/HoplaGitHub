@@ -36,14 +36,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.hopla.R
 import com.example.hopla.apiService.fetchUserRelationRequests
-import com.example.hopla.ui.theme.PrimaryGray
+import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.UserRelationRequest
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
@@ -70,19 +72,19 @@ fun NotificationsScreen(navController: NavController) {
             .padding(16.dp)
     ) {
         Text(
-            text = "Friend Requests",
+            text = stringResource(R.string.friend_requests),
             style = headerTextStyleSmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
         if (userRelationRequests.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "No friend requests at the moment.", color = PrimaryGray)
+                Text(text = stringResource(R.string.no_friend_requests), style = underheaderTextStyle)
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(userRelationRequests) { request ->
-                    NotificationItem(request)
+                    NotificationItem(request, navController)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -90,15 +92,16 @@ fun NotificationsScreen(navController: NavController) {
     }
 }
 
-
 @Composable
-fun NotificationItem(request: UserRelationRequest) {
+fun NotificationItem(request: UserRelationRequest, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.primary)
-            .clickable { /* Handle click if needed */ },
+            .clickable {
+                navController.navigate("friend_profile/${request.fromUserId}")
+            },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -107,7 +110,7 @@ fun NotificationItem(request: UserRelationRequest) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.Person,  // Replace with your user avatar/icon
+                imageVector = Icons.Default.Person,
                 contentDescription = "User Avatar",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(40.dp)
@@ -117,11 +120,11 @@ fun NotificationItem(request: UserRelationRequest) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "${request.fromUserName} (@${request.fromUserAlias})",
-                    style = generalTextStyle
+                    style = generalTextStyleBold
                 )
                 Text(
-                    text = "Sent you a friend request",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = PrimaryGray, fontSize = 14.sp)
+                    text = stringResource(R.string.sent_a_friend_request),
+                    style = generalTextStyle
                 )
             }
 
@@ -134,7 +137,7 @@ fun NotificationItem(request: UserRelationRequest) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Accept",
-                        tint = Color.Green.copy(alpha = 0.8f)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -144,7 +147,7 @@ fun NotificationItem(request: UserRelationRequest) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Decline",
-                        tint = Color.Red.copy(alpha = 0.8f)
+                        tint = HeartColor
                     )
                 }
             }

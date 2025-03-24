@@ -162,5 +162,8 @@
     <string name="error_occurred">Error occured, try again later</string>
     <string name="add_new_horse">Add new horse</string>
     <string name="notifications">Notifications</string>
+    <string name="friend_requests">Friend requests</string>
+    <string name="no_friend_requests">No friend requests at the moment</string>
+    <string name="sent_a_friend_request">Sent you a friend request</string>
 
 </resources>

@@ -162,5 +162,8 @@
     <string name="error_occurred">Noe feil skjedde, prøv igjen senere</string>
     <string name="add_new_horse">Legg til ny hest</string>
     <string name="notifications">Varsler</string>
+    <string name="friend_requests">Venne forespørsler</string>
+    <string name="no_friend_requests">Ingen venneforespørsler for øyeblikket</string>
+    <string name="sent_a_friend_request">Sendte deg en venneforespørsel</string>
 
 </resources>
