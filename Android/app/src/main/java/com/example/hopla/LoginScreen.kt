@@ -33,6 +33,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.hopla.apiService.handleLogin
 import com.example.hopla.apiService.registerUser
+import com.example.hopla.apiService.resetPassword
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyle
@@ -219,10 +220,21 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
 fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var showInfoDialog by remember { mutableStateOf(false) }
+    var showResponseDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var responseMessage by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+    val errorOccurredMessage = stringResource(R.string.error_occurred)
 
     if (showInfoDialog) {
         InfoDialog(onDismiss = {
             showInfoDialog = false
+            onDismiss()
+        })
+    } else if (showResponseDialog) {
+        ResponseDialog(message = responseMessage, onDismiss = {
+            showResponseDialog = false
             onDismiss()
         })
     } else {
@@ -249,25 +261,76 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                     )
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Button(onClick = onDismiss) {
-                            Text(
-                                text = stringResource(R.string.cancel),
-                                style = buttonTextStyle
-                            )
-                        }
-                        Button(onClick = {
-                            showInfoDialog = true
-                        }) {
-                            Text(
-                                text = stringResource(R.string.send),
-                                style = buttonTextStyle
-                            )
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(onClick = onDismiss) {
+                                Text(
+                                    text = stringResource(R.string.cancel),
+                                    style = buttonTextStyle
+                                )
+                            }
+                            Button(onClick = {
+                                isLoading = true
+                                coroutineScope.launch {
+                                    try {
+                                        val response = resetPassword(email)
+                                        responseMessage = response
+                                        showResponseDialog = true
+                                    } catch (e: Exception) {
+                                        errorMessage = e.message ?: errorOccurredMessage
+                                    } finally {
+                                        isLoading = false
+                                    }
+                                }
+                            }) {
+                                Text(
+                                    text = stringResource(R.string.send),
+                                    style = buttonTextStyle
+                                )
+                            }
                         }
                     }
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ResponseDialog(message: String, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.forgot_password),
+                    style = underheaderTextStyle,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(text = message)
+                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
+                    Text(
+                        text = stringResource(R.string.close),
+                        style = buttonTextStyle
+                    )
                 }
             }
         }

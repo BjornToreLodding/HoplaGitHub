@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.R
+import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.User
 import com.example.hopla.universalData.UserReportRequest
@@ -223,6 +224,30 @@ suspend fun createStable(token: String, stableRequest: StableRequest): String {
     Log.d("createStable", "Response Code: ${response.status.value}")
     Log.d("createStable", "Response Body: $responseBody")
 
+    client.close()
+    return responseBody
+}
+
+//------------------ Post requests for login page ---------------------------------------------
+suspend fun resetPassword(email: String): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val requestBody = ResetPasswordRequest(email)
+    val response: HttpResponse = client.post(apiUrl + "users/reset-password-request") {
+        contentType(ContentType.Application.Json)
+        setBody(requestBody)
+    }
+
+    val responseBody: String = response.body()
+    Log.d("resetPassword", "Response: $responseBody")
     client.close()
     return responseBody
 }

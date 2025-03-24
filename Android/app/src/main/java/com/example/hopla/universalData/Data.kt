@@ -273,3 +273,7 @@ data class StableRequest(
     val Longitude: Double,
     val PrivateGroup: Boolean
 )
+
+//---------------- Data classes for lonin page ----------------
+@Serializable
+data class ResetPasswordRequest(val Email: String)
