@@ -76,37 +76,37 @@ public class StableMessageController : ControllerBase
 
         return Ok(stablemessages);
     }
-[Authorize]
-[HttpPost]
-public async Task<IActionResult> PostMessage([FromBody] CreateStableMessageDto dto)
-{
-    var userId = _authentication.GetUserIdFromToken(User);
-
-    if (userId == Guid.Empty)
-        return Unauthorized(new { message = "Bruker ikke gyldig" });
-
-    if (string.IsNullOrWhiteSpace(dto.Content))
-        return BadRequest(new { message = "Meldingen kan ikke være tom" });
-
-    // Sjekk at stallen finnes
-    var stableExists = await _context.Stables.AnyAsync(s => s.Id == dto.StableId);
-    if (!stableExists)
-        return NotFound(new { message = "Stall ikke funnet" });
-
-    // Lagre meldingen
-    var stableMessage = new StableMessage
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> PostMessage([FromBody] CreateStableMessageDto dto)
     {
-        UserId = userId,
-        StableId = dto.StableId,
-        MessageText = dto.Content.Trim(),
-        SentAt = DateTime.UtcNow
-    };
+        var userId = _authentication.GetUserIdFromToken(User);
 
-    _context.StableMessages.Add(stableMessage);
-    await _context.SaveChangesAsync();
+        if (userId == Guid.Empty)
+            return Unauthorized(new { message = "Bruker ikke gyldig" });
 
-    return Ok(new { message = "Melding sendt" });
-}
+        if (string.IsNullOrWhiteSpace(dto.Content))
+            return BadRequest(new { message = "Meldingen kan ikke være tom" });
+
+        // Sjekk at stallen finnes
+        var stableExists = await _context.Stables.AnyAsync(s => s.Id == dto.StableId);
+        if (!stableExists)
+            return NotFound(new { message = "Stall ikke funnet" });
+
+        // Lagre meldingen
+        var stableMessage = new StableMessage
+        {
+            UserId = userId,
+            StableId = dto.StableId,
+            MessageText = dto.Content.Trim(),
+            SentAt = DateTime.UtcNow
+        };
+
+        _context.StableMessages.Add(stableMessage);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Melding sendt" });
+    }
 
     //Sletting av meldinger i stall. Kan kun gjøres hvis userID den som forsøker å slette er admin/moderator for stallen.
 }

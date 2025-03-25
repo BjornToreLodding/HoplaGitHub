@@ -18,11 +18,13 @@ public class StableController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly ImageUploadService _imageUploadService;
+    private readonly Authentication _authentication;
 
-    public StableController(AppDbContext context, ImageUploadService imageUploadService)
+    public StableController(AppDbContext context, ImageUploadService imageUploadService, Authentication authentication)
     {
         _context = context;
         _imageUploadService = imageUploadService;
+        _authentication = authentication;
     }
 
     [Authorize]
@@ -233,24 +235,61 @@ public class StableController : ControllerBase
         }
 
         var stable = await _context.Stables
-        .Include(s => s.StableUsers)
-        .Where(s => s.Id == stableId)
-        .Select(s => new
+            .Include(s => s.StableUsers)
+            .Where(s => s.Id == stableId)
+            .Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.Description,
+                PictureUrl = FixPictureUrl(s.PictureUrl),
+                IsMember = s.StableUsers.Any(su => su.UserId == parsedUserId)
+            })
+            .FirstOrDefaultAsync();
+
+        if (stable == null)
         {
-            s.Id,
-            s.Name,
-            s.Description,
-            PictureUrl = FixPictureUrl(s.PictureUrl),
-            IsMember = s.StableUsers.Any(su => su.UserId == parsedUserId)
-        })
-        .FirstOrDefaultAsync();
+            return NotFound();
+        }
 
-    if (stable == null)
-    {
-        return NotFound();
+        return Ok(stable);
     }
+[Authorize]
+[HttpPost("join")]
+public async Task<IActionResult> JoinStable([FromBody] AddStableUserDto dto)
+{
+    var userId = _authentication.GetUserIdFromToken(User);
 
-    return Ok(stable);
+    // Sjekk at brukeren finnes
+    var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+    if (!userExists)
+        return Unauthorized(new { message = "Bruker ikke funnet" });
+
+    // Sjekk at stallen finnes
+    var stableExists = await _context.Stables.AnyAsync(s => s.Id == dto.StableId);
+    if (!stableExists)
+        return NotFound(new { message = "Stall ikke funnet" });
+
+    // Sjekk om bruker allerede er medlem
+    var existing = await _context.StableUsers.FirstOrDefaultAsync(su =>
+        su.UserId == userId && su.StableId == dto.StableId);
+
+    if (existing != null)
+        return BadRequest(new { message = "Du er allerede medlem av denne stallen" });
+
+    // Legg til medlemskap
+    var stableUser = new StableUser
+    {
+        UserId = userId,
+        StableId = dto.StableId
+    };
+
+    _context.StableUsers.Add(stableUser);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Du er nå medlem av stallen" });
 }
+
+
 
 }

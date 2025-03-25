@@ -8,3 +8,9 @@ public class CreateStableForm
     public bool PrivateGroup { get; set; } = false;
     public IFormFile? Image { get; set; }
 }
+
+public class AddStableUserDto
+{
+    public Guid StableId { get; set; }
+    
+}
