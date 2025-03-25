@@ -13,6 +13,7 @@ import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.StableDetails
+import com.example.hopla.universalData.TrailUpdate
 import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.UserHikesResponse
 import com.example.hopla.universalData.UserRelationRequest
@@ -260,6 +261,27 @@ suspend fun fetchTrailsOnMap(token: String, latitude: Double, longitude: Double,
             Log.e("fetchTrailsOnMap", "Error: ${errorResponse.title}, Details: ${errorResponse.errors}")
             emptyList()
         }
+    }
+}
+
+// Fetch updates about the specified trail
+suspend fun fetchTrailUpdates(trailId: String, pageNumber: Int, token: String): List<TrailUpdate> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl+"trails/updates") {
+            parameter("trailId", trailId)
+            parameter("pageNumber", pageNumber)
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
     }
 }
 

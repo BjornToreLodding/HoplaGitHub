@@ -302,6 +302,17 @@ data class UserHikesResponse(
     val userHikes: List<Hike>
 )
 
+// Data class for updates about a specified trail
+@Serializable
+data class TrailUpdate(
+    val id: String,
+    val comment: String,
+    val pictureUrl: String,
+    val condition: Int,
+    val createdAt: String,
+    val alias: String
+)
+
 //---------------------Data classes for relations-----------
 // A request from another user of becoming friends
 @Serializable

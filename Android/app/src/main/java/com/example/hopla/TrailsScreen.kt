@@ -87,7 +87,6 @@ import com.example.hopla.universalData.ContentBoxInfo
 import com.example.hopla.universalData.Difficulty
 import com.example.hopla.universalData.Filters
 import com.example.hopla.universalData.MapScreen
-import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.Trail
@@ -95,13 +94,18 @@ import com.example.hopla.universalData.UserSession
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import com.example.hopla.apiService.fetchFavoriteTrails
+import com.example.hopla.apiService.fetchTrailUpdates
 import com.example.hopla.apiService.fetchTrailsRelations
 import com.example.hopla.apiService.rateTrail
 import com.example.hopla.universalData.TrailRatingRequest
+import com.example.hopla.universalData.TrailUpdate
 
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -659,7 +663,6 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
     }
 }
 
-
 // Function to display the trail that have been clicked
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -667,6 +670,9 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     var currentImageIndex by remember { mutableIntStateOf(0) }
     var userRating by remember { mutableIntStateOf(0) }
     var showMessageBox by remember { mutableStateOf(false) }
+    var trailUpdates by remember { mutableStateOf<List<TrailUpdate>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
     val images = contentBoxInfo.imageResource.toList()
 
@@ -800,10 +806,17 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 contentBoxInfo.filters.filterStrings.forEach { filter ->
                                     Box(
                                         modifier = Modifier
-                                            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(12.dp))
-                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                            .border(1.dp, Color.Gray)
+                                            .background(Color.LightGray)
+                                            .padding(2.dp)
+                                            .height(18.dp)
                                     ) {
-                                        Text(text = filter, color = Color.Black, fontSize = 14.sp)
+                                        Text(
+                                            text = filter.replaceFirstChar { it.uppercaseChar() },
+                                            color = Color.Black,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
                                     }
                                 }
                             }
@@ -838,7 +851,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
                             .background(MaterialTheme.colorScheme.primary)
-                            .clickable {  navController.navigate("update_screen")  },
+                            .clickable { showMessageBox = true },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = stringResource(R.string.new_updates))
@@ -883,10 +896,9 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             Row {
                                 repeat(5) { index ->
                                     Icon(
-                                        imageVector = if (index < contentBoxInfo.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
+                                        imageVector = if (index < userRating) Icons.Filled.Star else Icons.TwoTone.Star,
                                         contentDescription = null,
-                                        tint = StarColor,
-                                        modifier = Modifier.size(20.dp)
+                                        tint = StarColor
                                     )
                                 }
                             }
@@ -926,7 +938,12 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .fillMaxWidth()
                                 .padding(4.dp)
                                 .background(MaterialTheme.colorScheme.tertiaryContainer)
-                                .clickable { showMessageBox = true },
+                                .clickable {
+                                    showMessageBox = true
+                                    coroutineScope.launch {
+                                        trailUpdates = fetchTrailUpdates(contentBoxInfo.id, 1, token)
+                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(text = stringResource(R.string.latest_update_about_the_route))
@@ -938,7 +955,18 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     }
 
     if (showMessageBox) {
-        Dialog(onDismissRequest = { showMessageBox = false }) {
+        TrailUpdates(showMessageBox, trailUpdates, onDismissRequest = { showMessageBox = false })
+    }
+}
+
+@Composable
+private fun TrailUpdates(
+    showMessageBox: Boolean,
+    trailUpdates: List<TrailUpdate>,
+    onDismissRequest: () -> Unit
+) {
+    if (showMessageBox) {
+        Dialog(onDismissRequest = onDismissRequest) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -948,59 +976,89 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .border(2.dp, Color.Black)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.latest_update_about_the_route),
-                        modifier = Modifier.padding(8.dp),
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
                     )
 
-                    // Sample messages list
-                    val messages = listOf(
-                        Message(content = "Trail is clear and well-maintained.", timestamp = "2202002", senderId = "12345678-0000-0000-0001-123456780004", senderAlias = "Bob"),
-                        Message(content = "Watch out for fallen branches.", timestamp = "11.01.11", senderId = "12345678-0000-0000-0001-123456780004", senderAlias = "Maria")
-                    )
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(trailUpdates) { update ->
+                            Card(
+                                shape = RoundedCornerShape(12.dp),
+                                elevation = CardDefaults.cardElevation(4.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(12.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = update.comment,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
 
-                    LazyColumn {
-                        items(messages) { message ->
-                            MessageItem(message)
+                                    update.pictureUrl?.let { imageUrl ->
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Image(
+                                            painter = rememberAsyncImagePainter(model = imageUrl),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(180.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "User: ${update.alias}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
+                                                SimpleDateFormat(
+                                                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                                                    Locale.getDefault()
+                                                ).parse(update.createdAt)
+                                            ),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+
+                                    Text(
+                                        text = "Rating: ${update.condition}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(top = 4.dp),
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun MessageItem(message: Message) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(8.dp)
-    ) {
-        /*
-        message.imageUrl?.let { imageUrl ->
-            Image(
-                painter = rememberAsyncImagePainter(model = imageUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }*/
-        Text(text = message.content)
-        Text(
-            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(message.timestamp)),
-            fontSize = 10.sp,
-            modifier = Modifier.align(Alignment.End)
-        )
     }
 }
 
