@@ -254,42 +254,70 @@ public class StableController : ControllerBase
 
         return Ok(stable);
     }
-[Authorize]
-[HttpPost("join")]
-public async Task<IActionResult> JoinStable([FromBody] AddStableUserDto dto)
-{
-    var userId = _authentication.GetUserIdFromToken(User);
-
-    // Sjekk at brukeren finnes
-    var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
-    if (!userExists)
-        return Unauthorized(new { message = "Bruker ikke funnet" });
-
-    // Sjekk at stallen finnes
-    var stableExists = await _context.Stables.AnyAsync(s => s.Id == dto.StableId);
-    if (!stableExists)
-        return NotFound(new { message = "Stall ikke funnet" });
-
-    // Sjekk om bruker allerede er medlem
-    var existing = await _context.StableUsers.FirstOrDefaultAsync(su =>
-        su.UserId == userId && su.StableId == dto.StableId);
-
-    if (existing != null)
-        return BadRequest(new { message = "Du er allerede medlem av denne stallen" });
-
-    // Legg til medlemskap
-    var stableUser = new StableUser
+    [Authorize]
+    [HttpPost("join")]
+    public async Task<IActionResult> JoinStable([FromBody] AddStableUserDto dto)
     {
-        UserId = userId,
-        StableId = dto.StableId
-    };
+        var userId = _authentication.GetUserIdFromToken(User);
 
-    _context.StableUsers.Add(stableUser);
-    await _context.SaveChangesAsync();
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
 
-    return Ok(new { message = "Du er nå medlem av stallen" });
-}
+        // Sjekk at stallen finnes
+        var stableExists = await _context.Stables.AnyAsync(s => s.Id == dto.StableId);
+        if (!stableExists)
+            return NotFound(new { message = "Stall ikke funnet" });
 
+        // Sjekk om bruker allerede er medlem
+        var existing = await _context.StableUsers.FirstOrDefaultAsync(su =>
+            su.UserId == userId && su.StableId == dto.StableId);
+
+        if (existing != null)
+            return BadRequest(new { message = "Du er allerede medlem av denne stallen" });
+
+        // Legg til medlemskap
+        var stableUser = new StableUser
+        {
+            UserId = userId,
+            StableId = dto.StableId
+        };
+
+        _context.StableUsers.Add(stableUser);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Du er nå medlem av stallen" });
+    }
+
+    [Authorize]
+    [HttpDelete("leave")]
+    public async Task<IActionResult> LeaveStable([FromBody] AddStableUserDto dto)
+    {
+        var userId = _authentication.GetUserIdFromToken(User);
+
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+        // Sjekk at stallen finnes
+        var stableExists = await _context.Stables.AnyAsync(s => s.Id == dto.StableId);
+        if (!stableExists)
+            return NotFound(new { message = "Stall ikke funnet" });
+
+        // Finn medlemskapet
+        var stableUser = await _context.StableUsers.FirstOrDefaultAsync(su =>
+            su.UserId == userId && su.StableId == dto.StableId);
+
+        if (stableUser == null)
+            return NotFound(new { message = "Du er ikke medlem av denne stallen" });
+
+        _context.StableUsers.Remove(stableUser);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Du har forlatt stallen" });
+    }
 
 
 }
