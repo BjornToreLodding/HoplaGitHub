@@ -181,7 +181,7 @@ public class StableController : ControllerBase
     //0235 får 0035
     //0888 får 0038
     // altså modlo NNNN % 50, men med noen justeringer.
-    private string FixPictureUrl(string? originalUrl)
+    private static string FixPictureUrl(string? originalUrl)
     {
         if (string.IsNullOrWhiteSpace(originalUrl))
             return "https://hopla.imgix.net/default.jpg";
