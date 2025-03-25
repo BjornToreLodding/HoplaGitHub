@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.hopla.universalData.ChangePasswordResponse
+import com.example.hopla.universalData.UserRelationChangeRequest
+import com.example.hopla.universalData.UserRelationResponse
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -144,4 +146,28 @@ suspend fun updateUserInfo(
     val responseBody: String = response.bodyAsText()
     Log.d("updateUserInfo", "Response: $responseBody")
     return response.status.value to responseBody
+}
+
+//-------------------------PUT requests for relations between users-------------------------
+suspend fun sendUserRelationRequestPut(token: String, request: UserRelationChangeRequest): UserRelationResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.put(apiUrl + "userrelations") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(request)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("changeRelations", "Response: $responseBody")
+    client.close()
+    return Json.decodeFromString(UserRelationResponse.serializer(), responseBody)
 }

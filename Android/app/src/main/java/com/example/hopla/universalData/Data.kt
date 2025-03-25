@@ -321,5 +321,6 @@ data class UserRelationChangeRequest(
 
 @Serializable
 data class UserRelationResponse(
-    val message: String
+    val message: String,
+    val status: String ? = null
 )

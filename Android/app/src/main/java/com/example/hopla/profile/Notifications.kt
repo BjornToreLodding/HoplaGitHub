@@ -41,11 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.hopla.R
 import com.example.hopla.apiService.fetchUserRelationRequests
+import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.universalData.UserRelationChangeRequest
 import com.example.hopla.universalData.UserRelationRequest
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
@@ -84,7 +86,15 @@ fun NotificationsScreen(navController: NavController) {
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(userRelationRequests) { request ->
-                    NotificationItem(request, navController)
+                    NotificationItem(request, navController) {
+                        coroutineScope.launch {
+                            try {
+                                userRelationRequests = fetchUserRelationRequests(token)
+                            } catch (e: Exception) {
+                                Log.e("NotificationsScreen", "Error fetching user relation requests", e)
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -93,7 +103,12 @@ fun NotificationsScreen(navController: NavController) {
 }
 
 @Composable
-fun NotificationItem(request: UserRelationRequest, navController: NavController) {
+fun NotificationItem(
+    request: UserRelationRequest,
+    navController: NavController,
+    onReload: () -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +147,21 @@ fun NotificationItem(request: UserRelationRequest, navController: NavController)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 IconButton(
-                    onClick = { /* Handle accept logic */ }
+                    onClick = {
+                        val changeRequest = UserRelationChangeRequest(
+                            TargetUserId = request.fromUserId,
+                            Status = "FRIENDS"
+                        )
+                        coroutineScope.launch {
+                            try {
+                                val response = sendUserRelationRequestPut(UserSession.token, changeRequest)
+                                Log.d("changeRelations", "Response: ${response.message}")
+                                onReload()
+                            } catch (e: Exception) {
+                                Log.e("changeRelations", "Error accepting friend request", e)
+                            }
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,

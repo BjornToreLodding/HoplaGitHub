@@ -59,6 +59,7 @@ import com.example.hopla.apiService.fetchFriendProfile
 import com.example.hopla.apiService.fetchFriends
 import com.example.hopla.apiService.fetchUserFriends
 import com.example.hopla.apiService.sendUserRelationRequest
+import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.dropdownMenuTextStyle
@@ -175,11 +176,16 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                             )
                             coroutineScope.launch {
                                 try {
-                                    val response = sendUserRelationRequest(UserSession.token, request)
+                                    val response = if (profile.relationStatus == PersonStatus.NONE.name) {
+                                        sendUserRelationRequest(UserSession.token, request)
+                                    } else {
+                                        sendUserRelationRequestPut(UserSession.token, request)
+                                    }
                                     Log.d("changeRelations", "Response: ${response.message}")
                                     reloadTrigger++
                                 } catch (e: Exception) {
                                     Log.e("changeRelations", "Error sending user relation request", e)
+                                    reloadTrigger++
                                 }
                             }
                         }) {
@@ -237,6 +243,21 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     }
                     if (profile.relationStatus == PersonStatus.FOLLOWING.name) {
                         CustomButton(text = stringResource(R.string.following)) { /*Handle button click*/ }
+                        CustomButton(text = stringResource(R.string.add_friend)) {
+                            val request = UserRelationChangeRequest(
+                                TargetUserId = userId,
+                                Status = "PENDING"
+                            )
+                            coroutineScope.launch {
+                                try {
+                                    val response = sendUserRelationRequest(UserSession.token, request)
+                                    Log.d("changeRelations", "Response: ${response.message}")
+                                    reloadTrigger++
+                                } catch (e: Exception) {
+                                    Log.e("changeRelations", "Error sending user relation request", e)
+                                }
+                            }
+                        }
                     }
                     if (profile.relationStatus == PersonStatus.NONE.name) {
                         Column(
