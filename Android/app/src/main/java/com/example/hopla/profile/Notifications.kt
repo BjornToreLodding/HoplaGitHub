@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.hopla.R
 import com.example.hopla.apiService.fetchUserRelationRequests
+import com.example.hopla.apiService.sendUserRelationRequestDelete
 import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
@@ -169,9 +170,21 @@ fun NotificationItem(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-
                 IconButton(
-                    onClick = { /* Handle decline logic */ }
+                    onClick = {
+                        val deleteRequest = UserRelationChangeRequest(
+                            TargetUserId = request.fromUserId
+                        )
+                        coroutineScope.launch {
+                            try {
+                                val response = sendUserRelationRequestDelete(UserSession.token, deleteRequest)
+                                Log.d("changeRelations", "Response: $response")
+                                onReload()
+                            } catch (e: Exception) {
+                                Log.e("changeRelations", "Error declining friend request", e)
+                            }
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,

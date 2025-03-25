@@ -167,5 +167,6 @@
     <string name="are_you_sure_block">Er du sikker på at du vil blokkere denne brukeren?</string>
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
+    <string name="stop_following">Slutt å følge</string>
 
 </resources>

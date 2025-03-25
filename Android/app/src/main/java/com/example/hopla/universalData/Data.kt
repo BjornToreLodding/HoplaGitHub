@@ -316,7 +316,7 @@ data class UserRelationRequest(
 @Serializable
 data class UserRelationChangeRequest(
     val TargetUserId: String,
-    val Status: String
+    val Status: String? = null
 )
 
 @Serializable

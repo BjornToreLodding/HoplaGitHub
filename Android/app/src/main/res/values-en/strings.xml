@@ -168,5 +168,6 @@
     <string name="are_you_sure_block">Are you sure you want to block this user?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="stop_following">Stop following</string>
 
 </resources>

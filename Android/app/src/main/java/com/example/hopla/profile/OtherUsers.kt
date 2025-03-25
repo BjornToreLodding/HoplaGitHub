@@ -59,6 +59,7 @@ import com.example.hopla.apiService.fetchFriendProfile
 import com.example.hopla.apiService.fetchFriends
 import com.example.hopla.apiService.fetchUserFriends
 import com.example.hopla.apiService.sendUserRelationRequest
+import com.example.hopla.apiService.sendUserRelationRequestDelete
 import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.buttonTextStyle
@@ -94,7 +95,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     var showReportDialog by remember { mutableStateOf(false) }
     var pageNumber by remember { mutableIntStateOf(1) }
     var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
-    var reloadTrigger by remember { mutableStateOf(0) }
+    var reloadTrigger by remember { mutableIntStateOf(0) }
     var showBlockConfirmationDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId, reloadTrigger) {
@@ -242,7 +243,20 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         CustomButton(text = stringResource(R.string.pending)) { /*Handle button click*/ }
                     }
                     if (profile.relationStatus == PersonStatus.FOLLOWING.name) {
-                        CustomButton(text = stringResource(R.string.following)) { /*Handle button click*/ }
+                        CustomButton(text = stringResource(R.string.stop_following)) {
+                            val deleteRequest = UserRelationChangeRequest(
+                                TargetUserId = userId
+                            )
+                            coroutineScope.launch {
+                                try {
+                                    val response = sendUserRelationRequestDelete(UserSession.token, deleteRequest)
+                                    Log.d("changeRelations", "Response: $response")
+                                    reloadTrigger++
+                                } catch (e: Exception) {
+                                    Log.e("changeRelations", "Error stop following", e)
+                                }
+                            }
+                        }
                         CustomButton(text = stringResource(R.string.add_friend)) {
                             val request = UserRelationChangeRequest(
                                 TargetUserId = userId,
