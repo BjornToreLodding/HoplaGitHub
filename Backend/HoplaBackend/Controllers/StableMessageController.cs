@@ -77,7 +77,7 @@ public class StableMessageController : ControllerBase
         return Ok(stablemessages);
     }
 [Authorize]
-[HttpPost("send")]
+[HttpPost]
 public async Task<IActionResult> PostMessage([FromBody] CreateStableMessageDto dto)
 {
     var userId = _authentication.GetUserIdFromToken(User);
