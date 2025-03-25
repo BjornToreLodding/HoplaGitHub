@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 using Microsoft.VisualBasic;
 using HoplaBackend.Models.DTOs;
+using System.Formats.Tar;
 
 namespace HoplaBackend.Controllers;
 
@@ -668,6 +669,72 @@ public class TrailController : ControllerBase
 
         return Ok(new { trail.Id, Message = "Mock trail created" });
     }
+
+    [Authorize]
+    [HttpPost("favorite")]
+    public async Task<IActionResult> CreateTrailFavorite([FromBody] TrailFavoriteDto dto)
+    {
+        var userId = _authentication.GetUserIdFromToken(User);
+
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+        // Sjekk at løypa finnes
+        var trailExists = await _context.Trails.AnyAsync(t => t.Id == dto.TrailId);
+        if (!trailExists)
+            return NotFound(new { message = "Løype ikke funnet" });
+
+        // Sjekk om favoritt allerede finnes
+        var existing = await _context.TrailFavorites.FirstOrDefaultAsync(tf =>
+            tf.UserId == userId && tf.TrailId == dto.TrailId);
+
+        if (existing != null)
+            return BadRequest(new { message = "Løype er allerede lagt til som favoritt" });
+
+        // Opprett ny favoritt
+        var trailFavorite = new TrailFavorite
+        {
+            UserId = userId,
+            TrailId = dto.TrailId
+        };
+
+        _context.TrailFavorites.Add(trailFavorite);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Favoritt lagt til" });
+    }
+
+    [Authorize]
+    [HttpDelete("favorite")]
+    public async Task<IActionResult> RemoveTrailFavorite([FromBody] TrailFavoriteDto dto)
+    {
+        var userId = _authentication.GetUserIdFromToken(User);
+
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+        // Sjekk at løypa finnes
+        var trailExists = await _context.Trails.AnyAsync(t => t.Id == dto.TrailId);
+        if (!trailExists)
+            return NotFound(new { message = "Løype ikke funnet" });
+
+        // Finn favoritten
+        var trailFavorite = await _context.TrailFavorites.FirstOrDefaultAsync(tf =>
+            tf.UserId == userId && tf.TrailId == dto.TrailId);
+
+        if (trailFavorite == null)
+            return NotFound(new { message = "Favoritt ikke funnet" });
+
+        _context.TrailFavorites.Remove(trailFavorite);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Favoritt fjernet" });
+    }
+
 
     [HttpPost("mock")]
     public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)

@@ -21,6 +21,11 @@ public class CreateTrailDto
 
 
 }
+public class TrailFavoriteDto
+{
+    public Guid TrailId { get; set; }
+    
+}
 public class TrailRateDto
 {
     public Guid TrailId { get; set; }
@@ -49,4 +54,6 @@ public class TrailCoordinateDto
     public double Lat { get; set; }
     public double Long { get; set; }
 }
+
+
 //Lage flere underklasser ettersom hva som skal overføres.
