@@ -474,13 +474,12 @@ public class UserRelationsController : ControllerBase
         if (userId == request.TargetUserId)
             return BadRequest(new { message = "Ugyldig målbruker" });
 
-        var allowedStatuses = new[] { "PENDING", "FRIENDS", "BLOCK" }; //Må se på tillatte kombinasjoner
+        var status = request.Status?.ToUpperInvariant();
+        var allowedStatuses = new[] { "PENDING", "FOLLOWING", "BLOCK", "FRIENDS" };
 
-        if (!allowedStatuses.Contains(request.Status?.ToUpperInvariant()))
-            return BadRequest(new { message = "Ugyldig statusverdi. Må være FOLLOWING, PENDING eller BLOCK." });
-        //if (string.IsNullOrEmpty(request.Status))   return BadRequest(new { message = "Status må angis" });
+        if (!allowedStatuses.Contains(status))
+            return BadRequest(new { message = "Ugyldig statusverdi." });
 
-        // Finn relasjonen begge veier
         var relation = await _context.UserRelations.FirstOrDefaultAsync(r =>
             (r.FromUserId == userId && r.ToUserId == request.TargetUserId) ||
             (r.FromUserId == request.TargetUserId && r.ToUserId == userId));
@@ -488,41 +487,59 @@ public class UserRelationsController : ControllerBase
         if (relation == null)
             return NotFound(new { message = "Relasjon ikke funnet" });
 
-        if (request.Status == "FRIENDS")
+        var currentStatus = relation.Status;
+
+        // ✅ Godta venneforespørsel
+        if (status == "FRIENDS")
         {
-            if (relation.Status != "PENDING" || relation.ToUserId != userId)
-                return BadRequest(new { message = "Kan kun godta forespørsler som er sendt til deg" });
+            if (currentStatus != "PENDING" || relation.ToUserId != userId)
+                return BadRequest(new { message = "Kan kun godta venneforespørsel sendt til deg" });
 
             relation.Status = "FRIENDS";
 
-            // Fjern eventuell FOLLOWING i begge retninger
+            // Fjern eventuell FOLLOWING begge veier
             var toRemove = await _context.UserRelations
                 .Where(r =>
-                    (r.Status == "FOLLOWING") &&
+                    r.Status == "FOLLOWING" &&
                     (
                         (r.FromUserId == userId && r.ToUserId == request.TargetUserId) ||
                         (r.FromUserId == request.TargetUserId && r.ToUserId == userId)
-                    )
-                )
+                    ))
                 .ToListAsync();
 
             _context.UserRelations.RemoveRange(toRemove);
         }
-        else if (request.Status == "BLOCK")
+        // ✅ Hvis FRIENDS → BLOCK, bytt retning og status
+        else if (status == "BLOCK" && currentStatus == "FRIENDS")
         {
-            // Overstyr relasjonen og sett den ensidig
+            _context.UserRelations.Remove(relation);
+
+            var block = new UserRelation
+            {
+                FromUserId = userId,
+                ToUserId = request.TargetUserId,
+                Status = "BLOCK",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.UserRelations.Add(block);
+        }
+        // ✅ Andre tillatte oppdateringer (f.eks. BLOCK → FOLLOWING)
+        else if (currentStatus != "FRIENDS")
+        {
             relation.FromUserId = userId;
             relation.ToUserId = request.TargetUserId;
-            relation.Status = "BLOCK";
+            relation.Status = status;
         }
         else
         {
-            relation.Status = request.Status;
+            return BadRequest(new { message = $"Kan ikke endre en FRIENDS-relasjon til {status}. Fjern først vennskapet." });
         }
 
         await _context.SaveChangesAsync();
-        return Ok(new { message = "Status oppdatert", status = request.Status });
+        return Ok(new { message = $"Status oppdatert til {status}" });
     }
+
 
     //Denne mangler mulighet til å fjerne following
     [Authorize]
@@ -531,16 +548,18 @@ public class UserRelationsController : ControllerBase
     {
         var userId = _authentication.GetUserIdFromToken(User);
 
-        var relation = await _context.UserRelations
-            .FirstOrDefaultAsync(r =>
-                /*
+        var relation = await _context.UserRelations.FirstOrDefaultAsync(r =>
+            // FOLLOWING og BLOCK: kun én vei (fra meg til deg)
+            (r.Status == "FOLLOWING" || r.Status == "BLOCK") &&
+            r.FromUserId == userId && r.ToUserId == request.TargetUserId
+
+            // PENDING og FRIENDS: kan fjernes begge veier
+            || (r.Status == "PENDING" || r.Status == "FRIENDS") &&
+            (
                 (r.FromUserId == userId && r.ToUserId == request.TargetUserId) ||
-                (r.Status == "PENDING" || r.Status == "FOLLOWING" || r.Status == "FRIENDS") && // Sjekk begge veier
                 (r.FromUserId == request.TargetUserId && r.ToUserId == userId)
-                */
-                (r.FromUserId == userId && r.ToUserId == request.TargetUserId) || 
-                r.Status == "PENDING" || r.Status == "FOLLOWING" || r.Status == "BLOCK" || 
-                (r.Status == "FRIENDS" && r.FromUserId == request.TargetUserId && r.ToUserId == userId));
+            )
+        );
 
         if (relation == null)
             return NotFound(new { message = "Relasjon ikke funnet" });
@@ -550,7 +569,6 @@ public class UserRelationsController : ControllerBase
 
         return Ok(new { message = "Relasjon fjernet" });
     }
-
 }
 
 /*
