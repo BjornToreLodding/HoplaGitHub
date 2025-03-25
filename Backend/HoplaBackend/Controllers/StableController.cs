@@ -240,7 +240,7 @@ public class StableController : ControllerBase
             s.Id,
             s.Name,
             s.Description,
-            s.PictureUrl,
+            PictureUrl = FixPictureUrl(s.PictureUrl),
             IsMember = s.StableUsers.Any(su => su.UserId == parsedUserId)
         })
         .FirstOrDefaultAsync();
