@@ -302,11 +302,24 @@ data class UserHikesResponse(
     val userHikes: List<Hike>
 )
 
-// Data classes for friends
+//---------------------Data classes for relations-----------
+// A request from another user of becoming friends
 @Serializable
 data class UserRelationRequest(
     val id: String,
     val fromUserId: String,
     val fromUserAlias: String,
     val fromUserName: String
+)
+
+// Classes for responding to relation changes
+@Serializable
+data class UserRelationChangeRequest(
+    val TargetUserId: String,
+    val Status: String
+)
+
+@Serializable
+data class UserRelationResponse(
+    val message: String
 )

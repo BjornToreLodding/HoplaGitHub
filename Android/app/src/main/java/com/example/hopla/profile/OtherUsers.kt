@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -33,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,6 +58,7 @@ import com.example.hopla.apiService.fetchFollowing
 import com.example.hopla.apiService.fetchFriendProfile
 import com.example.hopla.apiService.fetchFriends
 import com.example.hopla.apiService.fetchUserFriends
+import com.example.hopla.apiService.sendUserRelationRequest
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.dropdownMenuTextStyle
@@ -74,6 +77,7 @@ import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.UserItem
+import com.example.hopla.universalData.UserRelationChangeRequest
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDate
 import kotlinx.coroutines.launch
@@ -89,8 +93,10 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     var showReportDialog by remember { mutableStateOf(false) }
     var pageNumber by remember { mutableIntStateOf(1) }
     var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
+    var reloadTrigger by remember { mutableStateOf(0) }
+    var showBlockConfirmationDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(userId) {
+    LaunchedEffect(userId, reloadTrigger) {
         coroutineScope.launch {
             try {
                 friendProfile = fetchFriendProfile(userId, token)
@@ -146,13 +152,46 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 ) {
                     DropdownMenuItem(
                         text = { Text(text = stringResource(R.string.block_user), style = dropdownMenuTextStyle) },
-                        onClick = { /* Handle block user */ }
+                        onClick = { showBlockConfirmationDialog = true }
                     )
                     DropdownMenuItem(
                         text = { Text(text = stringResource(R.string.report_user), style = dropdownMenuTextStyle) },
                         onClick = { showReportDialog = true }
                     )
                 }
+            }
+
+            if (showBlockConfirmationDialog) {
+                AlertDialog(
+                    onDismissRequest = { showBlockConfirmationDialog = false },
+                    title = { Text(text = stringResource(R.string.block_user)) },
+                    text = { Text(text = stringResource(R.string.are_you_sure_block)) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showBlockConfirmationDialog = false
+                            val request = UserRelationChangeRequest(
+                                TargetUserId = userId,
+                                Status = "BLOCK"
+                            )
+                            coroutineScope.launch {
+                                try {
+                                    val response = sendUserRelationRequest(UserSession.token, request)
+                                    Log.d("changeRelations", "Response: ${response.message}")
+                                    reloadTrigger++
+                                } catch (e: Exception) {
+                                    Log.e("changeRelations", "Error sending user relation request", e)
+                                }
+                            }
+                        }) {
+                            Text(text = stringResource(R.string.yes))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showBlockConfirmationDialog = false }) {
+                            Text(text = stringResource(R.string.no))
+                        }
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(3.dp))
@@ -192,6 +231,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         Spacer(modifier = Modifier.height(16.dp))
                         CustomButton(text = stringResource(R.string.friends)) { /*Handle button click*/ }
                     }
+                    profile.relationStatus?.let { Text(text = it, style = underheaderTextStyle) }
                     if (profile.relationStatus == PersonStatus.PENDING.name)  {
                         CustomButton(text = stringResource(R.string.pending)) { /*Handle button click*/ }
                     }
@@ -202,11 +242,36 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            // Sende en venneforespørsel hvis ingen relasjon fra før
                             CustomButton(text = stringResource(R.string.add)) {
-                                // Handle add button click
+                                val request = UserRelationChangeRequest(
+                                    TargetUserId = userId,
+                                    Status = "PENDING"
+                                )
+                                coroutineScope.launch {
+                                    try {
+                                        val response = sendUserRelationRequest(UserSession.token, request)
+                                        Log.d("changeRelations", "Response: ${response.message}")
+                                        reloadTrigger++
+                                    } catch (e: Exception) {
+                                        Log.e("changeRelations", "Error sending user relation request", e)
+                                    }
+                                }
                             }
                             CustomButton(text = stringResource(R.string.follow)) {
-                                // Handle follow button click
+                                val request = UserRelationChangeRequest(
+                                    TargetUserId = userId,
+                                    Status = "FOLLOWING"
+                                )
+                                coroutineScope.launch {
+                                    try {
+                                        val response = sendUserRelationRequest(UserSession.token, request)
+                                        Log.d("changeRelations", "Response: ${response.message}")
+                                        reloadTrigger++
+                                    } catch (e: Exception) {
+                                        Log.e("changeRelations", "Error sending user relation request", e)
+                                    }
+                                }
                             }
                         }
                     }

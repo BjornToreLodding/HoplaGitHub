@@ -165,5 +165,8 @@
     <string name="friend_requests">Friend requests</string>
     <string name="no_friend_requests">No friend requests at the moment</string>
     <string name="sent_a_friend_request">Sent you a friend request</string>
+    <string name="are_you_sure_block">Are you sure you want to block this user?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

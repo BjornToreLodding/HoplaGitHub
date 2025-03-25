@@ -59,6 +59,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +98,6 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
-
 @Composable
 fun CommunityScreen(navController: NavController, token: String) {
     var searchQuery by remember { mutableStateOf("") }
@@ -113,9 +113,11 @@ fun CommunityScreen(navController: NavController, token: String) {
 
     Log.d("CommunityScreen", "CommunityScreen launched")
 
+    val currentContext = rememberUpdatedState(context)
+
     LaunchedEffect(Unit) {
         Log.d("CommunityScreen", "LaunchedEffect triggered")
-        getCurrentLocation(context) { location ->
+        getCurrentLocation(currentContext.value) { location ->
             Log.d("CommunityScreen", "Location received: ${location.latitude}, ${location.longitude}")
             latitude = location.latitude
             longitude = location.longitude
@@ -739,7 +741,6 @@ fun AddCommunityScreen(navController: NavController, token: String) {
     }
 }
 
-
 fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     val locationProvider = LocationManager.GPS_PROVIDER
@@ -774,7 +775,7 @@ fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
                 Log.d("CommunityScreen", "Location update timeout")
                 locationManager.removeUpdates(locationListener)
                 // Handle the timeout case, e.g., show a message to the user
-            }, 10000) // 10 seconds timeout
+            }, 60000) // 10 seconds timeout
         }
     } else {
         Log.d("CommunityScreen", "Location permissions not granted")

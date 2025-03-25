@@ -12,6 +12,8 @@ import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.TrailRatingRequest
 import com.example.hopla.universalData.TrailRatingResponse
 import com.example.hopla.universalData.User
+import com.example.hopla.universalData.UserRelationChangeRequest
+import com.example.hopla.universalData.UserRelationResponse
 import com.example.hopla.universalData.UserReportRequest
 import com.example.hopla.universalData.UserReportResponse
 import com.example.hopla.universalData.UserSession
@@ -59,6 +61,29 @@ suspend fun createUserReport(token: String, reportRequest: UserReportRequest): U
     Log.d("createUserReport", "Response: $responseBody")
     client.close()
     return Json.decodeFromString(UserReportResponse.serializer(), responseBody)
+}
+
+suspend fun sendUserRelationRequest(token: String, request: UserRelationChangeRequest): UserRelationResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.post(apiUrl+"userrelations") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(request)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("changeRelations", "Response: $responseBody")
+    client.close()
+    return Json.decodeFromString(UserRelationResponse.serializer(), responseBody)
 }
 
 //----------- Post request for profile -----------------------------
