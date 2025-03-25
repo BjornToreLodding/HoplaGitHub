@@ -135,6 +135,27 @@ public class HorseController : ControllerBase
         return Ok("Horse Created");
     }
 
+    [Authorize]
+    [HttpDelete("delete/{horseId}")]
+    public async Task<IActionResult> DeleteHorse(Guid horseId)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+
+        var horse = await _context.Horses.FirstOrDefaultAsync(h =>
+            h.Id == horseId && h.UserId == parsedUserId);
+
+        if (horse == null)
+            return NotFound(new { message = "Hest ikke funnet eller du har ikke tilgang til å slette den" });
+
+        _context.Horses.Remove(horse);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Hest slettet" });
+    }
+
 
 
 }
