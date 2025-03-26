@@ -5,6 +5,7 @@ public class TrailFilterValue
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid TrailId { get; set; }
+    //Burde omdøpes til TrailFilterDefinitionId
     public Guid FilterDefinitionId { get; set; }
 
     public string Value { get; set; } = string.Empty;

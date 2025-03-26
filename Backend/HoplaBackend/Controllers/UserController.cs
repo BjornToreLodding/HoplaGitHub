@@ -386,7 +386,7 @@ public class UserController : ControllerBase
         return Ok("E-post sendt. Sjekk innboksen og trykk på lenken for å bekrefte registreringen. Sjekk evt søppelpost. Eposten må verifiseres innen 24 timer");
     }
 
-    // 1.2.c2 Trinn to av bytte epostadresse. Burde egentlig vært Put, men litt vanskelig når det er via epostlink.
+    // 1.2.c2 Trinn to av bytte epostadresse. Burde egentlig vært POST/PUT?, men litt vanskelig når det er via epostlink.
     [HttpGet("confirm-new-email")]
     public async Task<IActionResult> ConfirmNewEmail([FromQuery] string token)
     {
@@ -417,6 +417,9 @@ public class UserController : ControllerBase
 
         return Ok("E-post bekreftet! Du kan nå logge inn med din nye e-postadresse.");
     }
+    // 1.2.c2 Trinn to av bytte epostadresse.
+    //[HttpPost("verify-email")]
+
     // 1.2.d change-password
     [Authorize]
     [HttpPut("change-password")]

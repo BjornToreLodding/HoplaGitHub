@@ -149,6 +149,17 @@ public static class TrailFilterSeeder
                 DefaultValue = "0",
                 IsActive = true,
                 Order = 11
+            },
+            new()
+            {
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780012"),
+                Name = "Predetors",
+                DisplayName = "Rovryd",
+                Type = TrailFilterType.Int,
+                DefaultValue = "ingen",
+                OptionsJson = JsonSerializer.Serialize(new[] { "Ingen rovdyr (trygg familieløype)", "Rykter om hyener", "Løvespor observert", "Quetzalcoatlus luftrom. Svært farlig" }),
+                IsActive = true,
+                Order = 11
             }
         };
     }
