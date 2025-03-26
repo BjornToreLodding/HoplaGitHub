@@ -19,7 +19,7 @@ export async function render(container) {
     let customCounter = 1;
 
     try {
-        const response = await fetch(`${apiUrl}/admin/trailfilters/all`, {
+        const response = await fetch(`${apiUrl}/trailfilters/all`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
