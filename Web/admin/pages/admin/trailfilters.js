@@ -133,7 +133,7 @@ export async function render(container) {
                     const input = document.createElement("input");
                     input.type = "radio";
                     input.disabled = true;
-                    input.checked = defaultValue === (val === "true");
+                    input.checked = String(defaultValue) === val;
                     wrapper.appendChild(input);
                     wrapper.appendChild(document.createTextNode(" " + val));
                     boolGroup.appendChild(wrapper);
