@@ -6,7 +6,7 @@ export async function render(container) {
     const filtersContainer = document.getElementById("trail-filters");
 
     try {
-        const response = await fetch(`${apiUrl}/admin/filters/all`, {
+        const response = await fetch(`${apiUrl}/admin/all`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
