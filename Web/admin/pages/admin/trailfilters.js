@@ -88,7 +88,7 @@ export async function render(container) {
     } catch (error) {
         console.error('Feil ved henting av filtrene:', error);
     }
-
+/*
     // --- Nytt filter-skjema ---
     const displayInput = document.createElement("input");
     displayInput.placeholder = "Visningsnavn";
@@ -188,7 +188,7 @@ export async function render(container) {
             alert("Feil ved lagring av filter.");
         }
     });
-    
+  */  
 }
 
 

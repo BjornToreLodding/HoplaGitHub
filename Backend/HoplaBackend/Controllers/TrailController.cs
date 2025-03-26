@@ -338,8 +338,8 @@ public class TrailController : ControllerBase
         [FromQuery] int? pageNumber = 1, 
         [FromQuery] int? pageSize = 10,
         [FromQuery] string? filters = null, // JSON-baserte filtre
-        [FromQuery] double? lengthMin = null,
-        [FromQuery] double? lengthMax = null) 
+        [FromQuery] double? distMin = null,
+        [FromQuery] double? distMax = null) 
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
