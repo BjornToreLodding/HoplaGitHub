@@ -168,7 +168,7 @@ export async function render(container) {
         };
     
         try {
-            const response = await fetch(`${apiUrl}/admin/trailfilters/definitions/create`, {
+            const response = await fetch(`${apiUrl}/trailfilters/admin/trailfilters/definitions/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
