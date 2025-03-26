@@ -42,7 +42,7 @@ public static class TrailFilterSeeder
                 Name = "SurfaceType",
                 DisplayName = "Underlag",
                 Type = TrailFilterType.MultiEnum,
-                DefaultValue = "Gravel",
+                DefaultValue = "Gravel,Dirt",
                 OptionsJson = JsonSerializer.Serialize(new[] { "Gravel", "Sand", "Asphalt", "Dirt" }),
                 IsActive = true,
                 Order = 1
