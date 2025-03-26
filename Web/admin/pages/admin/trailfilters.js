@@ -56,6 +56,14 @@ export async function render(container) {
                 margin-top: 5px;
                 margin-left: 20px;
             }
+            .default-indicator {
+                font-weight: bold;
+                margin-left: 10px;
+                color: green;
+            }
+            #trail-filters {
+                padding-bottom: 100px;
+            }
         </style>
         <h2>Trail Filters</h2>
         <div id='trail-filters'></div>
@@ -102,9 +110,16 @@ export async function render(container) {
                 optionGroup.className = "options-inline";
 
                 options.forEach(opt => {
-                    const span = document.createElement("span");
-                    span.textContent = opt;
-                    optionGroup.appendChild(span);
+                    const wrapper = document.createElement("label");
+                    const input = document.createElement("input");
+                    input.type = type === "Enum" ? "radio" : "checkbox";
+                    input.disabled = true;
+                    input.checked = Array.isArray(defaultValue)
+                        ? defaultValue.includes(opt)
+                        : defaultValue === opt;
+                    wrapper.appendChild(input);
+                    wrapper.appendChild(document.createTextNode(" " + opt));
+                    optionGroup.appendChild(wrapper);
                 });
                 section.appendChild(optionGroup);
             }
@@ -113,12 +128,16 @@ export async function render(container) {
                 const boolGroup = document.createElement("div");
                 boolGroup.className = "options-inline";
 
-                const trueLabel = document.createElement("label");
-                trueLabel.innerText = "true";
-                const falseLabel = document.createElement("label");
-                falseLabel.innerText = "false";
-                boolGroup.appendChild(trueLabel);
-                boolGroup.appendChild(falseLabel);
+                ["true", "false"].forEach(val => {
+                    const wrapper = document.createElement("label");
+                    const input = document.createElement("input");
+                    input.type = "radio";
+                    input.disabled = true;
+                    input.checked = defaultValue === (val === "true");
+                    wrapper.appendChild(input);
+                    wrapper.appendChild(document.createTextNode(" " + val));
+                    boolGroup.appendChild(wrapper);
+                });
                 section.appendChild(boolGroup);
             }
 
