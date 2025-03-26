@@ -3,6 +3,22 @@ console.log("API URL:", apiUrl);
 
 export async function render(container) {
     container.innerHTML = `
+        <style>
+            #new-filter-form label,
+            #new-filter-form input,
+            #new-filter-form select,
+            #new-filter-form div {
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 5px;
+            }
+            #new-filter-form .inline {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 2px;
+            }
+        </style>
         <h2>Trail Filters</h2>
         <div id='trail-filters'></div>
         <hr>
@@ -47,15 +63,21 @@ export async function render(container) {
                 const group = document.createElement("div");
                 group.className = "checkbox-group";
                 options.forEach(opt => {
+                    const row = document.createElement("div");
+                    row.className = "inline";
+
                     const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
                     checkbox.name = id;
                     checkbox.value = opt;
                     checkbox.checked = defaultValue.includes(opt);
+
                     const optLabel = document.createElement("label");
-                    optLabel.appendChild(checkbox);
-                    optLabel.appendChild(document.createTextNode(" " + opt));
-                    group.appendChild(optLabel);
+                    optLabel.textContent = opt;
+
+                    row.appendChild(checkbox);
+                    row.appendChild(optLabel);
+                    group.appendChild(row);
                 });
                 wrapper.appendChild(group);
             } else if (type === "Enum") {
@@ -89,47 +111,81 @@ export async function render(container) {
         console.error('Feil ved henting av filtrene:', error);
     }
 
+    const displayLabel = document.createElement("label");
+    displayLabel.textContent = "Visningsnavn";
     const displayInput = document.createElement("input");
-    displayInput.placeholder = "Visningsnavn";
-    newForm.appendChild(displayInput);
+    displayLabel.appendChild(displayInput);
+    newForm.appendChild(displayLabel);
 
-    const typeSelect = document.createElement("select");
-    ["enum", "multiEnum", "int", "bool"].forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t;
-        opt.textContent = t;
-        typeSelect.appendChild(opt);
+    const typeLabel = document.createElement("label");
+    typeLabel.textContent = "Type";
+    newForm.appendChild(typeLabel);
+    const typeWrapper = document.createElement("div");
+    const types = ["enum", "multiEnum", "int", "bool"];
+    types.forEach((t, i) => {
+        const row = document.createElement("div");
+        row.className = "inline";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "filterType";
+        input.value = t;
+        input.id = `type-${i}`;
+        if (i === 0) input.checked = true;
+
+        const label = document.createElement("label");
+        label.htmlFor = input.id;
+        label.textContent = t;
+
+        row.appendChild(input);
+        row.appendChild(label);
+        typeWrapper.appendChild(row);
     });
-    newForm.appendChild(typeSelect);
+    newForm.appendChild(typeWrapper);
 
+    const alternativesLabel = document.createElement("label");
+    alternativesLabel.textContent = "Alternativer (skriv inn valg, separert med komma, f.eks. Grus, Gress, Asfalt)";
     const alternativesInput = document.createElement("input");
-    alternativesInput.placeholder = "Alternativer (komma-separert)";
-    newForm.appendChild(alternativesInput);
+    alternativesLabel.appendChild(alternativesInput);
+    newForm.appendChild(alternativesLabel);
 
+    const defaultValueLabel = document.createElement("label");
+    defaultValueLabel.textContent = "Defaultverdi(er)";
     const defaultValueContainer = document.createElement("div");
-    newForm.appendChild(defaultValueContainer);
+    defaultValueLabel.appendChild(defaultValueContainer);
+    newForm.appendChild(defaultValueLabel);
 
+    const activeWrapper = document.createElement("div");
+    activeWrapper.className = "inline";
     const activeCheckbox = document.createElement("input");
     activeCheckbox.type = "checkbox";
     activeCheckbox.checked = true;
-    newForm.appendChild(document.createTextNode(" Aktiv? "));
-    newForm.appendChild(activeCheckbox);
+    const activeLabel = document.createElement("label");
+    activeLabel.textContent = " Aktiv? ";
+    activeWrapper.appendChild(activeCheckbox);
+    activeWrapper.appendChild(activeLabel);
+    newForm.appendChild(activeWrapper);
 
     const addButton = document.createElement("button");
     addButton.textContent = "Legg til filter";
     newForm.appendChild(addButton);
 
-    typeSelect.addEventListener("change", updateVisibility);
+    newForm.addEventListener("change", updateVisibility);
     alternativesInput.addEventListener("input", updateVisibility);
 
     function updateVisibility() {
-        const type = typeSelect.value;
+        const type = newForm.querySelector("input[name='filterType']:checked")?.value;
         defaultValueContainer.innerHTML = "";
+
+        // Skjul/vis alternatives
+        alternativesLabel.style.display = (type === "enum" || type === "multiEnum") ? "block" : "none";
 
         if (type === "enum" || type === "multiEnum") {
             const options = alternativesInput.value.split(",").map(o => o.trim()).filter(Boolean);
-
             options.forEach((opt, index) => {
+                const row = document.createElement("div");
+                row.className = "inline";
+
                 const input = document.createElement("input");
                 input.type = (type === "enum") ? "radio" : "checkbox";
                 input.name = "defaultValue";
@@ -140,21 +196,37 @@ export async function render(container) {
                 label.htmlFor = input.id;
                 label.textContent = opt;
 
-                defaultValueContainer.appendChild(input);
-                defaultValueContainer.appendChild(label);
-                defaultValueContainer.appendChild(document.createElement("br"));
+                row.appendChild(input);
+                row.appendChild(label);
+                defaultValueContainer.appendChild(row);
             });
         } else if (type === "int") {
+            const row = document.createElement("div");
+            row.className = "inline";
             const input = document.createElement("input");
             input.type = "number";
             input.id = "default-int";
-            defaultValueContainer.appendChild(input);
+            row.appendChild(input);
+            defaultValueContainer.appendChild(row);
         } else if (type === "bool") {
-            const input = document.createElement("input");
-            input.type = "checkbox";
-            input.id = "default-bool";
-            defaultValueContainer.appendChild(document.createTextNode(" Standard: "));
-            defaultValueContainer.appendChild(input);
+            ["true", "false"].forEach((val, index) => {
+                const row = document.createElement("div");
+                row.className = "inline";
+
+                const input = document.createElement("input");
+                input.type = "radio";
+                input.name = "defaultValueBool";
+                input.value = val;
+                input.id = `bool-${index}`;
+
+                const label = document.createElement("label");
+                label.htmlFor = input.id;
+                label.textContent = val;
+
+                row.appendChild(input);
+                row.appendChild(label);
+                defaultValueContainer.appendChild(row);
+            });
         }
     }
 
@@ -162,7 +234,7 @@ export async function render(container) {
         e.preventDefault();
 
         const displayName = displayInput.value.trim();
-        const type = typeSelect.value;
+        const type = newForm.querySelector("input[name='filterType']:checked")?.value;
         const isActive = activeCheckbox.checked;
 
         const alternatives = (type === "enum" || type === "multiEnum")
@@ -181,8 +253,8 @@ export async function render(container) {
             const val = newForm.querySelector("#default-int").value;
             defaultValue = val ? parseInt(val) : null;
         } else if (type === "bool") {
-            const val = newForm.querySelector("#default-bool").checked;
-            defaultValue = val;
+            const selected = newForm.querySelector("input[name='defaultValueBool']:checked");
+            defaultValue = selected?.value === "true";
         }
 
         const payload = {
