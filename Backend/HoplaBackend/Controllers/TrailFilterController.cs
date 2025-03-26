@@ -106,47 +106,70 @@ public class TrailFilterController : ControllerBase
     }
 
     [HttpPost("admin/trailfilters/definitions/create")]
-    public async Task<IActionResult> CreateTrailFilterDefinition([FromBody] TrailFilterDefinitionDto dto)
+public async Task<IActionResult> CreateTrailFilterDefinition([FromBody] TrailFilterDefinitionDto dto) 
+{
+    var existingCount = await _context.TrailFilterDefinitions.CountAsync();
+
+    if (!Enum.TryParse<TrailFilterType>(dto.Type, true, out var parsedType))
     {
-        var existingCount = await _context.TrailFilterDefinitions.CountAsync();
-
-        if (!Enum.TryParse<TrailFilterType>(dto.Type, true, out var parsedType))
-        {
-            return BadRequest($"Ugyldig Type-verdi: {dto.Type}");
-        }
-
-        string? optionsJson = null;
-        if (parsedType == TrailFilterType.Enum || parsedType == TrailFilterType.MultiEnum)
-        {
-            optionsJson = dto.Alternatives != null
-                ? System.Text.Json.JsonSerializer.Serialize(dto.Alternatives)
-                : "[]";
-        }
-
-        string? defaultValue = null;
-        if (dto.DefaultValue != null)
-        {
-            defaultValue = parsedType == TrailFilterType.MultiEnum
-                ? System.Text.Json.JsonSerializer.Serialize(dto.DefaultValue)
-                : dto.DefaultValue.ToString();
-        }
-
-        var definition = new TrailFilterDefinition
-        {
-            Name = $"Custom{existingCount + 1}",
-            DisplayName = dto.DisplayName,
-            Type = parsedType,
-            OptionsJson = optionsJson,
-            DefaultValue = defaultValue,
-            IsActive = dto.IsActive,
-            Order = existingCount + 1
-        };
-
-        _context.TrailFilterDefinitions.Add(definition);
-        await _context.SaveChangesAsync();
-
-        return Ok(definition);
+        return BadRequest($"Ugyldig Type-verdi: {dto.Type}");
     }
+
+    // --- Rens og valider alternativer ---
+    string? optionsJson = null;
+    List<string>? trimmedAlternatives = null;
+
+    if (parsedType == TrailFilterType.Enum || parsedType == TrailFilterType.MultiEnum)
+    {
+        trimmedAlternatives = dto.Alternatives?
+            .Select(a => a?.Trim())
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .Distinct()
+            .ToList();
+
+        if (trimmedAlternatives == null || trimmedAlternatives.Count < 2)
+        {
+            return BadRequest("Alternativer må inneholde minst to unike verdier.");
+        }
+
+        optionsJson = System.Text.Json.JsonSerializer.Serialize(trimmedAlternatives);
+    }
+
+    // --- Defaultverdi-håndtering ---
+    string? defaultValue = null;
+
+    if (dto.DefaultValue != null)
+    {
+        if (parsedType == TrailFilterType.MultiEnum && dto.DefaultValue is JsonElement json && json.ValueKind == JsonValueKind.Array)
+        {
+            var values = json.EnumerateArray()
+                             .Select(x => x.GetString()?.Trim())
+                             .Where(x => !string.IsNullOrWhiteSpace(x));
+            defaultValue = string.Join(",", values).Trim();
+        }
+        else
+        {
+            defaultValue = dto.DefaultValue.ToString()?.Trim();
+        }
+    }
+
+    var definition = new TrailFilterDefinition
+    {
+        Name = $"Custom{existingCount + 1}",
+        DisplayName = dto.DisplayName,
+        Type = parsedType,
+        OptionsJson = optionsJson,
+        DefaultValue = defaultValue,
+        IsActive = dto.IsActive,
+        Order = existingCount + 1
+    };
+
+    _context.TrailFilterDefinitions.Add(definition);
+    await _context.SaveChangesAsync();
+
+    return Ok(definition);
+}
+
 
     public class TrailFilterInput
     {
