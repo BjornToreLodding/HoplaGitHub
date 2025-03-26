@@ -161,6 +161,31 @@ public class AppDbContext : DbContext
         //
         // Trail
         //
+        modelBuilder.Entity<TrailFilterDefinition>().HasData(
+            new TrailFilterDefinition
+            {
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780001"),
+                Name = "SurfaceType",
+                DisplayName = "Underlag",
+                Type = TrailFilterType.MultiEnum,
+                DefaultValue = "Gravel",
+                OptionsJson = "[\"Gravel\",\"Sand\",\"Asphalt\",\"Dirt\"]",
+                IsActive = true,
+                Order = 1
+            },
+            new TrailFilterDefinition
+            {
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780002"),
+                Name = "Difficulty",
+                DisplayName = "Vanskelighetsgrad",
+                Type = TrailFilterType.Enum,
+                DefaultValue = "Easy",
+                OptionsJson = "[\"Easy\",\"Medium\",\"Hard\"]",
+                IsActive = true,
+                Order = 2
+            }
+        );
+
         modelBuilder.Entity<TrailDetail>()
             .HasOne(td => td.Trail)
             .WithOne(t => t.TrailDetails)

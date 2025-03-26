@@ -158,6 +158,7 @@ function loadSideMenu(section) {
         case "admin":
             menuItems = [
                 { name: "SystemSettings", action: "loadContent('admin', 'systemsettings')" },
+                { name: "Filter Løyper", action: "loadContent('admin', 'trailfilters')" },
                 { name: "Rapporter", action: "loadContent('admin', 'reports')" },
                 { name: "Statistikker", action: "loadContent('admin', 'statistikker')" }
             ];
