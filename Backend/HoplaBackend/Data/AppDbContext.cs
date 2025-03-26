@@ -162,10 +162,10 @@ public class AppDbContext : DbContext
         // Trail
         //
         modelBuilder.Entity<TrailFilterDefinition>().HasData(
-            new TrailFilterDefinition
+           new TrailFilterDefinition
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780001"),
-                Name = "SurfaceType",
+                Name = "SurfaceType1",
                 DisplayName = "Underlag",
                 Type = TrailFilterType.MultiEnum,
                 DefaultValue = "Gravel",
@@ -176,7 +176,7 @@ public class AppDbContext : DbContext
             new TrailFilterDefinition
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780002"),
-                Name = "Difficulty",
+                Name = "Difficulty1",
                 DisplayName = "Vanskelighetsgrad",
                 Type = TrailFilterType.Enum,
                 DefaultValue = "Easy",
@@ -184,10 +184,10 @@ public class AppDbContext : DbContext
                 IsActive = true,
                 Order = 2
             },
-                new TrailFilterDefinition
+            new TrailFilterDefinition
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780003"),
-                Name = "SurfaceType",
+                Name = "SurfaceType2",
                 DisplayName = "Underlag2",
                 Type = TrailFilterType.MultiEnum,
                 DefaultValue = "Gravel",
@@ -198,7 +198,7 @@ public class AppDbContext : DbContext
             new TrailFilterDefinition
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780004"),
-                Name = "Difficulty",
+                Name = "Difficulty2",
                 DisplayName = "Vanskelighetsgrad2",
                 Type = TrailFilterType.Enum,
                 DefaultValue = "Easy",
@@ -287,6 +287,16 @@ public class AppDbContext : DbContext
                 DefaultValue = "false",
                 IsActive = true,
                 Order = 12
+            },
+            new TrailFilterDefinition
+            {
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780013"),
+                Name = "Insects",
+                DisplayName = "Mengde innsekter",
+                Type = TrailFilterType.Int,
+                DefaultValue = "0",
+                IsActive = true,
+                Order = 13
             }
         );
 

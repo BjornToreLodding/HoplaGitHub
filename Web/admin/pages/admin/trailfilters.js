@@ -52,7 +52,7 @@ export async function render(container) {
                 wrapper.appendChild(group);
             }
 
-            if (type === "Enum") {
+            else if (type === "Enum") {
                 const select = document.createElement("select");
                 select.name = id;
 
@@ -67,6 +67,24 @@ export async function render(container) {
                 wrapper.appendChild(select);
             }
 
+            else if (type === "Bool") {
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.name = id;
+                checkbox.checked = defaultValue === "true";
+
+                wrapper.appendChild(checkbox);
+            }
+
+            else if (type === "Int") {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.name = id;
+                input.value = defaultValue || 0;
+
+                wrapper.appendChild(input);
+            }
+
             filtersContainer.appendChild(wrapper);
         });
 
@@ -74,6 +92,7 @@ export async function render(container) {
         console.error('Feil ved henting av filtrene:', error);
     }
 }
+
 
 /*const apiUrl = window.appConfig?.API_URL || "https://localhost:7128";
 console.log("API URL:", apiUrl);
