@@ -88,8 +88,7 @@ export async function render(container) {
     } catch (error) {
         console.error('Feil ved henting av filtrene:', error);
     }
-/*
-    // --- Nytt filter-skjema ---
+
     const displayInput = document.createElement("input");
     displayInput.placeholder = "Visningsnavn";
     newForm.appendChild(displayInput);
@@ -107,9 +106,8 @@ export async function render(container) {
     alternativesInput.placeholder = "Alternativer (komma-separert)";
     newForm.appendChild(alternativesInput);
 
-    const defaultSelect = document.createElement("select");
-    defaultSelect.multiple = true;
-    newForm.appendChild(defaultSelect);
+    const defaultValueContainer = document.createElement("div");
+    newForm.appendChild(defaultValueContainer);
 
     const activeCheckbox = document.createElement("input");
     activeCheckbox.type = "checkbox";
@@ -122,43 +120,71 @@ export async function render(container) {
     newForm.appendChild(addButton);
 
     typeSelect.addEventListener("change", updateVisibility);
-    alternativesInput.addEventListener("input", updateDefaultOptions);
+    alternativesInput.addEventListener("input", updateVisibility);
 
     function updateVisibility() {
-        const t = typeSelect.value;
-        const show = (t === "enum" || t === "multiEnum");
-        alternativesInput.style.display = show ? "inline-block" : "none";
-        defaultSelect.style.display = show ? "inline-block" : "none";
-        updateDefaultOptions();
-    }
+        const type = typeSelect.value;
+        defaultValueContainer.innerHTML = "";
 
-    function updateDefaultOptions() {
-        const options = alternativesInput.value.split(",").map(o => o.trim()).filter(Boolean);
-        defaultSelect.innerHTML = "";
-        options.forEach(opt => {
-            const option = document.createElement("option");
-            option.value = opt;
-            option.textContent = opt;
-            defaultSelect.appendChild(option);
-        });
+        if (type === "enum" || type === "multiEnum") {
+            const options = alternativesInput.value.split(",").map(o => o.trim()).filter(Boolean);
+
+            options.forEach((opt, index) => {
+                const input = document.createElement("input");
+                input.type = (type === "enum") ? "radio" : "checkbox";
+                input.name = "defaultValue";
+                input.value = opt;
+                input.id = `default-${index}`;
+
+                const label = document.createElement("label");
+                label.htmlFor = input.id;
+                label.textContent = opt;
+
+                defaultValueContainer.appendChild(input);
+                defaultValueContainer.appendChild(label);
+                defaultValueContainer.appendChild(document.createElement("br"));
+            });
+        } else if (type === "int") {
+            const input = document.createElement("input");
+            input.type = "number";
+            input.id = "default-int";
+            defaultValueContainer.appendChild(input);
+        } else if (type === "bool") {
+            const input = document.createElement("input");
+            input.type = "checkbox";
+            input.id = "default-bool";
+            defaultValueContainer.appendChild(document.createTextNode(" Standard: "));
+            defaultValueContainer.appendChild(input);
+        }
     }
 
     addButton.addEventListener("click", async e => {
         e.preventDefault();
-    
+
         const displayName = displayInput.value.trim();
         const type = typeSelect.value;
         const isActive = activeCheckbox.checked;
-    
-        let alternatives = [];
+
+        const alternatives = (type === "enum" || type === "multiEnum")
+            ? alternativesInput.value.split(",").map(v => v.trim()).filter(Boolean)
+            : [];
+
         let defaultValue = null;
-    
-        if (type === "enum" || type === "multiEnum") {
-            alternatives = alternativesInput.value.split(",").map(v => v.trim()).filter(Boolean);
-            const selected = Array.from(defaultSelect.selectedOptions).map(o => o.value);
-            defaultValue = (type === "enum") ? selected[0] || null : selected;
+
+        if (type === "enum") {
+            const selected = newForm.querySelector("input[name='defaultValue']:checked");
+            defaultValue = selected?.value || null;
+        } else if (type === "multiEnum") {
+            const selected = Array.from(newForm.querySelectorAll("input[name='defaultValue']:checked"));
+            defaultValue = selected.map(i => i.value);
+        } else if (type === "int") {
+            const val = newForm.querySelector("#default-int").value;
+            defaultValue = val ? parseInt(val) : null;
+        } else if (type === "bool") {
+            const val = newForm.querySelector("#default-bool").checked;
+            defaultValue = val;
         }
-    
+
         const payload = {
             DisplayName: displayName,
             Type: type,
@@ -166,21 +192,20 @@ export async function render(container) {
             DefaultValue: defaultValue,
             IsActive: isActive
         };
-    
+
         try {
             const response = await fetch(`${apiUrl}/trailfilters/admin/trailfilters/definitions/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
-    
+
             if (!response.ok) throw new Error("Kunne ikke lagre filter!");
-    
+
             const result = await response.json();
             alert("Filter lagret!");
             console.log("Lagret filter:", result);
-    
-            // Legg til i preview
+
             filterList.push(result);
             output.textContent = JSON.stringify(filterList, null, 2);
         } catch (err) {
@@ -188,84 +213,6 @@ export async function render(container) {
             alert("Feil ved lagring av filter.");
         }
     });
-  */  
+
+    updateVisibility();
 }
-
-
-/*const apiUrl = window.appConfig?.API_URL || "https://localhost:7128";
-console.log("API URL:", apiUrl);
-
-export async function render(container) {
-    container.innerHTML = "<h2>Trail Filters</h2><div id='trail-filters'></div>";
-    const filtersContainer = document.getElementById("trail-filters");
-
-    try {
-        const response = await fetch(`${apiUrl}/admin/filters/all`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const filters = await response.json();
-        console.log("Received filters:", filters);
-
-        filters.forEach(filter => {
-            const { name, displayName, type, options, defaultValue } = filter;
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "filter";
-
-            const label = document.createElement("label");
-            label.textContent = displayName;
-            label.htmlFor = name;
-            wrapper.appendChild(label);
-
-            if (type === "MultiEnum") {
-                const group = document.createElement("div");
-                group.className = "checkbox-group";
-
-                options.forEach(opt => {
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.name = name;
-                    checkbox.value = opt;
-                    checkbox.checked = defaultValue.includes(opt);
-
-                    const optLabel = document.createElement("label");
-                    optLabel.appendChild(checkbox);
-                    optLabel.appendChild(document.createTextNode(" " + opt));
-
-                    group.appendChild(optLabel);
-                });
-                wrapper.appendChild(group);
-            }
-
-            if (type === "Enum") {
-                const select = document.createElement("select");
-                select.name = name;
-
-                options.forEach(opt => {
-                    const option = document.createElement("option");
-                    option.value = opt;
-                    option.textContent = opt;
-                    option.selected = defaultValue === opt;
-                    select.appendChild(option);
-                });
-
-                wrapper.appendChild(select);
-            }
-
-            filtersContainer.appendChild(wrapper);
-        });
-
-    } catch (error) {
-        console.error('Feil ved henting av filtrene:', error);
-    }
-}
-*/
