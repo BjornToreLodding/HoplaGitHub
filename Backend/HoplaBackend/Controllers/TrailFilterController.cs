@@ -6,7 +6,7 @@ using HoplaBackend.Data;
 using System.Text.Json; // <-- Endre til ditt prosjekt
 
 [ApiController]
-[Route("admin/trailfilters")]
+[Route("trailfilters")]
 public class TrailFilterController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -74,7 +74,7 @@ public class TrailFilterController : ControllerBase
     }
 
 
-    [HttpPost("{trailId}/filters")]
+    [HttpPost("{trailId}")]
     public async Task<IActionResult> SetTrailFilters(Guid trailId, [FromBody] List<TrailFilterInput> inputs)
     {
         var existingValues = await _context.TrailFilterValues
@@ -103,6 +103,49 @@ public class TrailFilterController : ControllerBase
 
         await _context.SaveChangesAsync();
         return Ok();
+    }
+
+    [HttpPost("admin/trailfilters/definitions/create")]
+    public async Task<IActionResult> CreateTrailFilterDefinition([FromBody] TrailFilterDefinitionDto dto)
+    {
+        var existingCount = await _context.TrailFilterDefinitions.CountAsync();
+
+        if (!Enum.TryParse<TrailFilterType>(dto.Type, true, out var parsedType))
+        {
+            return BadRequest($"Ugyldig Type-verdi: {dto.Type}");
+        }
+
+        string? optionsJson = null;
+        if (parsedType == TrailFilterType.Enum || parsedType == TrailFilterType.MultiEnum)
+        {
+            optionsJson = dto.Alternatives != null
+                ? System.Text.Json.JsonSerializer.Serialize(dto.Alternatives)
+                : "[]";
+        }
+
+        string? defaultValue = null;
+        if (dto.DefaultValue != null)
+        {
+            defaultValue = parsedType == TrailFilterType.MultiEnum
+                ? System.Text.Json.JsonSerializer.Serialize(dto.DefaultValue)
+                : dto.DefaultValue.ToString();
+        }
+
+        var definition = new TrailFilterDefinition
+        {
+            Name = $"Custom{existingCount + 1}",
+            DisplayName = dto.DisplayName,
+            Type = parsedType,
+            OptionsJson = optionsJson,
+            DefaultValue = defaultValue,
+            IsActive = dto.IsActive,
+            Order = existingCount + 1
+        };
+
+        _context.TrailFilterDefinitions.Add(definition);
+        await _context.SaveChangesAsync();
+
+        return Ok(definition);
     }
 
     public class TrailFilterInput
