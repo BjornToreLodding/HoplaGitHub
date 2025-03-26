@@ -1,153 +1,155 @@
-using HoplaBackend.Data;
+// TrailFilterSeeder.cs
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using HoplaBackend.Models;
+using HoplaBackend.Data; // <-- Endre til ditt namespace
 
 public static class TrailFilterSeeder
 {
-    public static async Task SeedAsync(AppDbContext context)
+    public static async Task SyncDefinitionsAsync(AppDbContext context)
     {
-        if (await context.TrailFilterDefinitions.AnyAsync()) return;
+        var predefined = GetPredefinedDefinitions();
 
-        var filters = new List<TrailFilterDefinition>
+        foreach (var seed in predefined)
         {
-            new TrailFilterDefinition
+            var existing = await context.TrailFilterDefinitions
+                .FirstOrDefaultAsync(x => x.Name == seed.Name);
+
+            if (existing == null)
+            {
+                context.TrailFilterDefinitions.Add(seed);
+            }
+            else
+            {
+                existing.DisplayName = seed.DisplayName;
+                existing.DefaultValue = seed.DefaultValue;
+                existing.OptionsJson = seed.OptionsJson;
+                existing.Order = seed.Order;
+                existing.IsActive = seed.IsActive;
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static List<TrailFilterDefinition> GetPredefinedDefinitions()
+    {
+        return new List<TrailFilterDefinition>
+        {
+            new()
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780001"),
-                Name = "SurfaceType1",
+                Name = "SurfaceType",
                 DisplayName = "Underlag",
                 Type = TrailFilterType.MultiEnum,
                 DefaultValue = "Gravel",
-                OptionsJson = "[\"Gravel\",\"Sand\",\"Asphalt\",\"Dirt\"]",
+                OptionsJson = JsonSerializer.Serialize(new[] { "Gravel", "Sand", "Asphalt", "Dirt" }),
                 IsActive = true,
                 Order = 1
             },
-            new TrailFilterDefinition
+            new()
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780002"),
-                Name = "Difficulty1",
+                Name = "Difficulty",
                 DisplayName = "Vanskelighetsgrad",
                 Type = TrailFilterType.Enum,
                 DefaultValue = "Easy",
-                OptionsJson = "[\"Easy\",\"Medium\",\"Hard\"]",
+                OptionsJson = JsonSerializer.Serialize(new[] { "Easy", "Medium", "Hard" }),
                 IsActive = true,
                 Order = 2
             },
-            new TrailFilterDefinition
+            new()
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780003"),
-                Name = "SurfaceType2",
-                DisplayName = "Underlag2",
-                Type = TrailFilterType.MultiEnum,
-                DefaultValue = "Gravel",
-                OptionsJson = "[\"Gravel\",\"Sand\",\"Asphalt\",\"Dirt\"]",
-                IsActive = true,
-                Order = 3
-            },
-            new TrailFilterDefinition
-            {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780004"),
-                Name = "Difficulty2",
-                DisplayName = "Vanskelighetsgrad2",
-                Type = TrailFilterType.Enum,
-                DefaultValue = "Easy",
-                OptionsJson = "[\"Easy\",\"Medium\",\"Hard\"]",
-                IsActive = true,
-                Order = 4
-            },
-            new TrailFilterDefinition
-            {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780005"),
                 Name = "WinterAccessible",
                 DisplayName = "Åpen om vinteren",
                 Type = TrailFilterType.Bool,
                 DefaultValue = "false",
                 IsActive = true,
-                Order = 5
+                Order = 3
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780006"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780004"),
                 Name = "HasBridge",
                 DisplayName = "Har bro over elv",
                 Type = TrailFilterType.Bool,
                 DefaultValue = "false",
                 IsActive = true,
-                Order = 6
+                Order = 4
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780007"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780005"),
                 Name = "StrollerFriendly",
                 DisplayName = "Tilrettelagt for vogn",
                 Type = TrailFilterType.Bool,
                 DefaultValue = "false",
                 IsActive = true,
-                Order = 7
+                Order = 5
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780008"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780006"),
                 Name = "TrafficLevel",
                 DisplayName = "Biltrafikk",
                 Type = TrailFilterType.Enum,
                 DefaultValue = "Lite",
-                OptionsJson = "[\"Ingen\",\"Lite\",\"Middels\",\"Mye\"]",
+                OptionsJson = JsonSerializer.Serialize(new[] { "Ingen", "Lite", "Middels", "Mye" }),
                 IsActive = true,
-                Order = 8
+                Order = 6
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780009"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780007"),
                 Name = "CrowdLevel",
                 DisplayName = "Folk langs veien",
                 Type = TrailFilterType.Enum,
                 DefaultValue = "Noe",
-                OptionsJson = "[\"Sjelden\",\"Noe\",\"Mye\"]",
+                OptionsJson = JsonSerializer.Serialize(new[] { "Sjelden", "Noe", "Mye" }),
                 IsActive = true,
-                Order = 9
+                Order = 7
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780010"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780008"),
                 Name = "SuitableForChildren",
                 DisplayName = "Egner seg for barnevogn",
                 Type = TrailFilterType.Bool,
                 DefaultValue = "false",
                 IsActive = true,
-                Order = 10
+                Order = 8
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780011"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780009"),
                 Name = "ForestArea",
                 DisplayName = "Skogsområde",
                 Type = TrailFilterType.Bool,
                 DefaultValue = "true",
                 IsActive = true,
-                Order = 11
+                Order = 9
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780012"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780010"),
                 Name = "SwimmingSpot",
                 DisplayName = "Mulighet for bading",
                 Type = TrailFilterType.Bool,
                 DefaultValue = "false",
                 IsActive = true,
-                Order = 12
+                Order = 10
             },
-            new TrailFilterDefinition
+            new()
             {
-                Id = Guid.Parse("12345678-0000-0000-0101-123456780013"),
+                Id = Guid.Parse("12345678-0000-0000-0101-123456780011"),
                 Name = "Insects",
                 DisplayName = "Mengde innsekter",
                 Type = TrailFilterType.Int,
                 DefaultValue = "0",
                 IsActive = true,
-                Order = 13
+                Order = 11
             }
         };
-
-        context.TrailFilterDefinitions.AddRange(filters);
-        await context.SaveChangesAsync();
     }
 }

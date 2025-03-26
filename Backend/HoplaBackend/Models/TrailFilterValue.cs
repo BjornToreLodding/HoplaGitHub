@@ -1,12 +1,17 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using HoplaBackend.Models;
 
 public class TrailFilterValue
 {
-    public Guid Id { get; set; } = Guid.NewGuid(); // ✅ Bruker Guid
-    public Guid TrailId { get; set; } // ✅ Referanse til Trail
-    public Guid FilterDefinitionId { get; set; } // ✅ Referanse til FilterDefinition
-    public string Value { get; set; } // Verdien (lagres som string)
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TrailId { get; set; }
+    public Guid FilterDefinitionId { get; set; }
 
-    public Trail Trail { get; set; }
-    public TrailFilterDefinition TrailFilterDefinition { get; set; }
+    public string Value { get; set; } = string.Empty;
+
+    [ForeignKey(nameof(TrailId))]
+    public Trail Trail { get; set; } = null!;
+
+    [ForeignKey(nameof(FilterDefinitionId))]
+    public TrailFilterDefinition TrailFilterDefinition { get; set; } = null!;
 }

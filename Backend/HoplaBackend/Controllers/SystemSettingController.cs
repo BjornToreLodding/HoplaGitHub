@@ -3,10 +3,10 @@ using HoplaBackend.Data;
 using HoplaBackend.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
+
 
 [ApiController]
-[Route("admin")]
+[Route("admin/settings")]
 public class SettingsController : ControllerBase
 {
     private readonly SystemSettingService _settingService;
@@ -19,7 +19,7 @@ public class SettingsController : ControllerBase
     }
     // Endpoint som returnerer alt som registrerer alle registrerte data i settingstabellen.
 
-    [HttpGet("settings/all")]
+    [HttpGet("all")]
     public async Task<ActionResult<List<ListSettings>>> GetAllSystemSettings()
     {
         if (!await _context.SystemSettings.AnyAsync())
@@ -43,7 +43,7 @@ public class SettingsController : ControllerBase
     
 
     // Endpoint som sjekker verdien på en innstilling. Brukes til opplasting av adminportalen.
-    [HttpGet("settings/{key}")]
+    [HttpGet("{key}")]
     public IActionResult GetSetting(string key)
     {
         try
@@ -60,7 +60,7 @@ public class SettingsController : ControllerBase
     }
 
     // Endpoint som endrer en lagret innstilling, hvis dette skal endres i adminportalen.
-    [HttpPut("settings/{key}")]
+    [HttpPut("{key}")]
     public IActionResult UpdateSetting(string key, [FromBody] UpdateSettingRequest request)
     {
         try
@@ -77,31 +77,7 @@ public class SettingsController : ControllerBase
         }
     }
 
-    [HttpGet("all")]
-    public async Task<IActionResult> GetAll()
-    {
-        var filters = await _context.TrailFilterDefinitions
-            .Where(f => f.IsActive)
-            .OrderBy(f => f.Order)
-            .ToListAsync(); // <- Nå henter vi fra databasen
 
-        var result = filters.Select(f => new
-        {
-            f.Id,
-            f.Name,
-            f.DisplayName,
-            Type = f.Type.ToString(),
-            Options = string.IsNullOrEmpty(f.OptionsJson)
-                ? new List<string>()
-                : JsonSerializer.Deserialize<List<string>>(f.OptionsJson!)!,
-            DefaultValue = f.Type == TrailFilterType.MultiEnum
-                ? (object)(f.DefaultValue?.Split(',') ?? new string[0])
-                : f.DefaultValue
-        }).ToList();
-
-        return Ok(result);
-
-    }
 
 }
 

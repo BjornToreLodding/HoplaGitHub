@@ -259,6 +259,35 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", trails });
 
     }
+    [HttpPost("cleartrailfiltervalues")]
+    public async Task<IActionResult> ClearTrailfilters()
+    {
+        _context.TrailFilterValues.RemoveRange(_context.TrailFilterValues); 
+        await _context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"TrailFilterValues\" RESTART IDENTITY CASCADE");
+        return Ok("Database cleared and IDs reset.");    
+    }
+    
+    [HttpPost("createtrailfiltervalues")]
+    public async Task<IActionResult> CreateTrailFilterValues()
+    {
+        //await TrailFilterSeeder.SyncDefinitionsAsync(context);
+
+        if (_context.TrailFilterValues.Any()) 
+        { 
+            return NoContent(); 
+        }
+
+        // Opprett mock trails basert på eksisterende rides
+        await TrailFilterMock.CreateTrailFilterValuesMock(_context);
+
+        await _context.SaveChangesAsync();
+
+        //return Created();
+        return Created("", new { message = "opprettet!"});
+
+    }
+
     [HttpPost("clearuserhikes")]
     public async Task<IActionResult> ClearUserHikes()
     {

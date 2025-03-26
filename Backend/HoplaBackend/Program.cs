@@ -205,6 +205,7 @@ builder.Services.AddScoped<ImageUploadService>();
 
 
 
+
 /*
 builder.Services.AddCors(options =>
 {
@@ -226,6 +227,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddMediatR(typeof(Program));
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await TrailFilterSeeder.SyncDefinitionsAsync(context);
+}
+
+
 app.UseHttpsRedirection();
 
 app.UseRouting();

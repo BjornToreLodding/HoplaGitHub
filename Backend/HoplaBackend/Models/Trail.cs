@@ -23,7 +23,8 @@ public class Trail
     public double? AverageRating { get; set; } = 0;
     public TrailVisibility Visibility { get; set; } = 0; // Enum, lenger ned
 
-    public ICollection<TrailFilterValue> TrailFilters { get; set; }
+    [InverseProperty(nameof(TrailFilterValue.Trail))]
+    public ICollection<TrailFilterValue> TrailFilters { get; set; } = new List<TrailFilterValue>();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public TrailDetail TrailDetails { get; set; } = null!;
     public TrailAllCoordinate TrailAllCoordinates { get; set; } = null!;
