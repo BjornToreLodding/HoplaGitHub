@@ -8,15 +8,39 @@ export async function render(container) {
             #new-filter-form input,
             #new-filter-form select,
             #new-filter-form div {
-                display: block;
-                margin-top: 10px;
                 margin-bottom: 5px;
             }
             #new-filter-form .inline {
                 display: flex;
                 align-items: center;
-                gap: 8px;
-                margin-bottom: 2px;
+                gap: 6px;
+            }
+            #new-filter-form .radio-group,
+            #new-filter-form .default-group {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                margin-left: 20px;
+                margin-top: 4px;
+            }
+            #new-filter-form .form-section {
+                border: 1px solid #ddd;
+                padding: 12px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                background: #f9f9f9;
+            }
+            #new-filter-form input[type="number"] {
+                width: 50px;
+            }
+            #new-filter-form .block-label {
+                display: block;
+                margin-top: 12px;
+                font-weight: bold;
+            }
+            #new-filter-form .indented-input {
+                margin-left: 20px;
+                margin-top: 4px;
             }
         </style>
         <h2>Trail Filters</h2>
@@ -49,19 +73,19 @@ export async function render(container) {
         console.log("Received filters:", filters);
 
         filters.forEach(filter => {
-            const { id, name, displayName, type, options, defaultValue } = filter;
+            const { id, displayName, type, options, defaultValue } = filter;
 
-            const wrapper = document.createElement("div");
-            wrapper.className = "filter";
+            const section = document.createElement("div");
+            section.className = "form-section";
 
             const label = document.createElement("label");
             label.textContent = displayName;
             label.htmlFor = id;
-            wrapper.appendChild(label);
+            section.appendChild(label);
 
             if (type === "MultiEnum") {
                 const group = document.createElement("div");
-                group.className = "checkbox-group";
+                group.className = "radio-group";
                 options.forEach(opt => {
                     const row = document.createElement("div");
                     row.className = "inline";
@@ -79,48 +103,83 @@ export async function render(container) {
                     row.appendChild(optLabel);
                     group.appendChild(row);
                 });
-                wrapper.appendChild(group);
+                section.appendChild(group);
             } else if (type === "Enum") {
-                const select = document.createElement("select");
-                select.name = id;
-                options.forEach(opt => {
-                    const option = document.createElement("option");
-                    option.value = opt;
-                    option.textContent = opt;
-                    option.selected = defaultValue === opt;
-                    select.appendChild(option);
+                const group = document.createElement("div");
+                group.className = "radio-group";
+                options.forEach((opt, index) => {
+                    const row = document.createElement("div");
+                    row.className = "inline";
+
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = id;
+                    radio.value = opt;
+                    radio.checked = defaultValue === opt;
+
+                    const optLabel = document.createElement("label");
+                    optLabel.textContent = opt;
+
+                    row.appendChild(radio);
+                    row.appendChild(optLabel);
+                    group.appendChild(row);
                 });
-                wrapper.appendChild(select);
+                section.appendChild(group);
             } else if (type === "Bool") {
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.name = id;
-                checkbox.checked = defaultValue === "true";
-                wrapper.appendChild(checkbox);
+                const group = document.createElement("div");
+                group.className = "radio-group";
+                ["true", "false"].forEach((val, index) => {
+                    const row = document.createElement("div");
+                    row.className = "inline";
+
+                    const input = document.createElement("input");
+                    input.type = "radio";
+                    input.name = id;
+                    input.value = val;
+                    input.checked = defaultValue === val;
+
+                    const label = document.createElement("label");
+                    label.textContent = val;
+
+                    row.appendChild(input);
+                    row.appendChild(label);
+                    group.appendChild(row);
+                });
+                section.appendChild(group);
             } else if (type === "Int") {
                 const input = document.createElement("input");
                 input.type = "number";
                 input.name = id;
                 input.value = defaultValue || 0;
-                wrapper.appendChild(input);
+                section.appendChild(input);
             }
 
-            filtersContainer.appendChild(wrapper);
+            filtersContainer.appendChild(section);
         });
     } catch (error) {
         console.error('Feil ved henting av filtrene:', error);
     }
 
+    const formSection = document.createElement("div");
+    formSection.className = "form-section";
+
     const displayLabel = document.createElement("label");
+    displayLabel.className = "block-label";
     displayLabel.textContent = "Visningsnavn";
     const displayInput = document.createElement("input");
+    displayInput.className = "indented-input";
+    displayLabel.appendChild(document.createElement("br"));
     displayLabel.appendChild(displayInput);
-    newForm.appendChild(displayLabel);
+    formSection.appendChild(displayLabel);
 
     const typeLabel = document.createElement("label");
+    typeLabel.className = "block-label";
+    typeLabel.style.marginTop = "20px";
     typeLabel.textContent = "Type";
-    newForm.appendChild(typeLabel);
+    formSection.appendChild(typeLabel);
+
     const typeWrapper = document.createElement("div");
+    typeWrapper.className = "radio-group";
     const types = ["enum", "multiEnum", "int", "bool"];
     types.forEach((t, i) => {
         const row = document.createElement("div");
@@ -141,19 +200,24 @@ export async function render(container) {
         row.appendChild(label);
         typeWrapper.appendChild(row);
     });
-    newForm.appendChild(typeWrapper);
+    formSection.appendChild(typeWrapper);
 
     const alternativesLabel = document.createElement("label");
+    alternativesLabel.className = "block-label";
     alternativesLabel.textContent = "Alternativer (skriv inn valg, separert med komma, f.eks. Grus, Gress, Asfalt)";
     const alternativesInput = document.createElement("input");
+    alternativesInput.className = "indented-input";
+    alternativesLabel.appendChild(document.createElement("br"));
     alternativesLabel.appendChild(alternativesInput);
-    newForm.appendChild(alternativesLabel);
+    formSection.appendChild(alternativesLabel);
 
     const defaultValueLabel = document.createElement("label");
-    defaultValueLabel.textContent = "Defaultverdi(er)";
+    defaultValueLabel.className = "block-label";
+    defaultValueLabel.textContent = "Standardverdi(er)";
     const defaultValueContainer = document.createElement("div");
+    defaultValueContainer.className = "default-group";
     defaultValueLabel.appendChild(defaultValueContainer);
-    newForm.appendChild(defaultValueLabel);
+    formSection.appendChild(defaultValueLabel);
 
     const activeWrapper = document.createElement("div");
     activeWrapper.className = "inline";
@@ -164,13 +228,15 @@ export async function render(container) {
     activeLabel.textContent = " Aktiv? ";
     activeWrapper.appendChild(activeCheckbox);
     activeWrapper.appendChild(activeLabel);
-    newForm.appendChild(activeWrapper);
+    formSection.appendChild(activeWrapper);
 
     const addButton = document.createElement("button");
     addButton.textContent = "Legg til filter";
-    newForm.appendChild(addButton);
+    formSection.appendChild(addButton);
 
-    newForm.addEventListener("change", updateVisibility);
+    newForm.appendChild(formSection);
+
+    typeWrapper.addEventListener("change", updateVisibility);
     alternativesInput.addEventListener("input", updateVisibility);
 
     function updateVisibility() {
@@ -206,6 +272,7 @@ export async function render(container) {
             const input = document.createElement("input");
             input.type = "number";
             input.id = "default-int";
+            input.style.width = "50px";
             row.appendChild(input);
             defaultValueContainer.appendChild(row);
         } else if (type === "bool") {
