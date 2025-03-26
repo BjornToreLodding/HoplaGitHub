@@ -42,6 +42,20 @@ export async function render(container) {
                 margin-left: 20px;
                 margin-top: 4px;
             }
+            .existing-filter {
+                border: 1px solid #ccc;
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                background-color: #fdfdfd;
+            }
+            .existing-filter .options-inline {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 5px;
+                margin-left: 20px;
+            }
         </style>
         <h2>Trail Filters</h2>
         <div id='trail-filters'></div>
@@ -76,81 +90,45 @@ export async function render(container) {
             const { id, displayName, type, options, defaultValue } = filter;
 
             const section = document.createElement("div");
-            section.className = "form-section";
+            section.className = "existing-filter";
 
             const label = document.createElement("label");
             label.textContent = displayName;
             label.htmlFor = id;
             section.appendChild(label);
 
-            if (type === "MultiEnum") {
-                const group = document.createElement("div");
-                group.className = "radio-group";
+            if ((type === "Enum" || type === "MultiEnum") && options?.length) {
+                const optionGroup = document.createElement("div");
+                optionGroup.className = "options-inline";
+
                 options.forEach(opt => {
-                    const row = document.createElement("div");
-                    row.className = "inline";
-
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.name = id;
-                    checkbox.value = opt;
-                    checkbox.checked = defaultValue.includes(opt);
-
-                    const optLabel = document.createElement("label");
-                    optLabel.textContent = opt;
-
-                    row.appendChild(checkbox);
-                    row.appendChild(optLabel);
-                    group.appendChild(row);
+                    const span = document.createElement("span");
+                    span.textContent = opt;
+                    optionGroup.appendChild(span);
                 });
-                section.appendChild(group);
-            } else if (type === "Enum") {
-                const group = document.createElement("div");
-                group.className = "radio-group";
-                options.forEach((opt, index) => {
-                    const row = document.createElement("div");
-                    row.className = "inline";
+                section.appendChild(optionGroup);
+            }
 
-                    const radio = document.createElement("input");
-                    radio.type = "radio";
-                    radio.name = id;
-                    radio.value = opt;
-                    radio.checked = defaultValue === opt;
+            if (type === "Bool") {
+                const boolGroup = document.createElement("div");
+                boolGroup.className = "options-inline";
 
-                    const optLabel = document.createElement("label");
-                    optLabel.textContent = opt;
+                const trueLabel = document.createElement("label");
+                trueLabel.innerText = "true";
+                const falseLabel = document.createElement("label");
+                falseLabel.innerText = "false";
+                boolGroup.appendChild(trueLabel);
+                boolGroup.appendChild(falseLabel);
+                section.appendChild(boolGroup);
+            }
 
-                    row.appendChild(radio);
-                    row.appendChild(optLabel);
-                    group.appendChild(row);
-                });
-                section.appendChild(group);
-            } else if (type === "Bool") {
-                const group = document.createElement("div");
-                group.className = "radio-group";
-                ["true", "false"].forEach((val, index) => {
-                    const row = document.createElement("div");
-                    row.className = "inline";
-
-                    const input = document.createElement("input");
-                    input.type = "radio";
-                    input.name = id;
-                    input.value = val;
-                    input.checked = defaultValue === val;
-
-                    const label = document.createElement("label");
-                    label.textContent = val;
-
-                    row.appendChild(input);
-                    row.appendChild(label);
-                    group.appendChild(row);
-                });
-                section.appendChild(group);
-            } else if (type === "Int") {
+            if (type === "Int") {
                 const input = document.createElement("input");
                 input.type = "number";
                 input.name = id;
                 input.value = defaultValue || 0;
+                input.style.width = "50px";
+                input.disabled = true;
                 section.appendChild(input);
             }
 
@@ -159,6 +137,8 @@ export async function render(container) {
     } catch (error) {
         console.error('Feil ved henting av filtrene:', error);
     }
+
+    // resten av koden for oppretting av filter (ikke endret)...
 
     const formSection = document.createElement("div");
     formSection.className = "form-section";
