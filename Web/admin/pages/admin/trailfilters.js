@@ -79,7 +79,7 @@ export async function render(container) {
 
     let filterList = [];
     let customCounter = 1;
-
+    //
     try {
         const response = await fetch(`${apiUrl}/trailfilters/all`, {
             method: 'GET',
