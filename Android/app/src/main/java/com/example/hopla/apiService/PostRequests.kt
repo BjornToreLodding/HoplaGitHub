@@ -355,3 +355,27 @@ suspend fun rateTrail(token: String, trailRatingRequest: TrailRatingRequest): Tr
     return TrailRatingResponse(message = responseBody)
 }
 
+// Add trail as a favorite trail
+suspend fun addFavoriteTrail(token: String, trailId: String): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.post(apiUrl+"trails/favorite") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(mapOf("TrailId" to trailId))
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("favoriteTrail", "Response: $responseBody")
+    client.close()
+    return responseBody
+}
+

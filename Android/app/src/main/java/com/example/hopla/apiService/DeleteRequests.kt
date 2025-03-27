@@ -67,3 +67,27 @@ suspend fun deleteHorse(token: String, horseId: String): String {
     client.close()
     return responseBody
 }
+
+// Remove trail from favorites list
+suspend fun removeFavoriteTrail(token: String, trailId: String): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.delete(apiUrl+"trails/favorite") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(mapOf("TrailId" to trailId))
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("favoriteTrail", "Response: $responseBody")
+    client.close()
+    return responseBody
+}

@@ -100,10 +100,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
+import com.example.hopla.apiService.addFavoriteTrail
 import com.example.hopla.apiService.fetchFavoriteTrails
 import com.example.hopla.apiService.fetchTrailUpdates
 import com.example.hopla.apiService.fetchTrailsRelations
 import com.example.hopla.apiService.rateTrail
+import com.example.hopla.apiService.removeFavoriteTrail
 import com.example.hopla.universalData.TrailRatingRequest
 import com.example.hopla.universalData.TrailUpdate
 
@@ -510,6 +512,8 @@ fun TrailsScreen(navController: NavController) {
 fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () -> Unit) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
     Box(
         modifier = Modifier
@@ -552,7 +556,20 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                         .padding(5.dp)
                 ) {
                     // Heart Icon
-                    IconButton(onClick = onHeartClick) {
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            try {
+                                if (info.isFavorite) {
+                                    removeFavoriteTrail(token, info.id)
+                                } else {
+                                    addFavoriteTrail(token, info.id)
+                                }
+                                onHeartClick()
+                            } catch (e: Exception) {
+                                Log.e("ContentBox", "Error updating favorite status", e)
+                            }
+                        }
+                    }) {
                         Icon(
                             imageVector = if (info.isFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = null,

@@ -159,7 +159,7 @@
     <string name="month">Month</string>
     <string name="year">Year</string>
     <string name="success">Success</string>
-    <string name="error_occurred">Error occured, try again later</string>
+    <string name="error_occurred">Error occurred, try again later</string>
     <string name="add_new_horse">Add new horse</string>
     <string name="notifications">Notifications</string>
     <string name="friend_requests">Friend requests</string>
