@@ -66,22 +66,19 @@ var logtailUrl = "https://s1209901.eu-nbg-2.betterstackdata.com:443/SqQyvVrV6jWs
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
 
-    // ⬇️ Vis kun Warnings+ fra system
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 
-    // ⬇️ Console får alt
     .WriteTo.Console()
 
-    // ⬇️ Logtail får bare RequestLogging
     .WriteTo.Logger(lc => lc
-    .Filter.ByIncludingOnly(logEvent =>
-        logEvent.Properties.ContainsKey("Category") &&
-        logEvent.Properties["Category"].ToString() == "\"RequestLogging\"")
-    .WriteTo.Sink(new PutLog.LogTail(logtailUrl))
-)
-
+        .Filter.ByIncludingOnly(logEvent =>
+            logEvent.Properties.ContainsKey("Category") &&
+            logEvent.Properties["Category"] is ScalarValue v &&
+            v.Value?.ToString() == "RequestLogging")
+        .WriteTo.Sink(new PutLog.LogTail(logtailUrl))
+    )
 
     .CreateLogger();
 
