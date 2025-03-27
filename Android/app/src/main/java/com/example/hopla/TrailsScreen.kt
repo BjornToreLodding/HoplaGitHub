@@ -96,21 +96,26 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 import android.Manifest
+import android.graphics.Bitmap
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.style.TextAlign
 import com.example.hopla.apiService.addFavoriteTrail
 import com.example.hopla.apiService.fetchFavoriteTrails
 import com.example.hopla.apiService.fetchTrailFilters
 import com.example.hopla.apiService.fetchTrailUpdates
 import com.example.hopla.apiService.fetchTrailsRelations
+import com.example.hopla.apiService.postTrailReview
 import com.example.hopla.apiService.rateTrail
 import com.example.hopla.apiService.removeFavoriteTrail
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.TrailFilter
 import com.example.hopla.universalData.TrailRatingRequest
 import com.example.hopla.universalData.TrailUpdate
@@ -125,7 +130,7 @@ fun TrailsScreen(navController: NavController) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var isRouteClicked by remember { mutableStateOf(false) }
     var selectedContentBoxInfo by remember { mutableStateOf<ContentBoxInfo?>(null) }
-    val selectedItems = remember { mutableStateOf(setOf<String>()) }
+    remember { mutableStateOf(setOf<String>()) }
     var showOnlyFavorites by remember { mutableStateOf(false) }
     var trails by remember { mutableStateOf<List<Trail>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
@@ -464,7 +469,7 @@ fun TrailsScreen(navController: NavController) {
                 MapScreen()
             }
         } else {
-            val routesToDisplay = if (showOnlyFavorites) {
+            if (showOnlyFavorites) {
                 trails.filter { it.isFavorite == true }
             } else {
                 trails
@@ -762,6 +767,106 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
     }
 }
 
+@Composable
+fun ReviewDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (Bitmap, String) -> Unit
+) {
+    var message by remember { mutableStateOf("") }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.post_review),
+                    style = headerTextStyleSmall,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                ) {
+                    if (imageBitmap != null) {
+                        Image(
+                            bitmap = imageBitmap!!.asImageBitmap(),
+                            contentDescription = "Selected Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = R.drawable.logo1),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                ImagePicker(
+                    onImageSelected = { bitmap ->
+                        imageBitmap = bitmap
+                    },
+                    text = stringResource(R.string.select_image)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = message,
+                    onValueChange = { message = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp) // Fixed height for the TextField
+                        .verticalScroll(scrollState) // Scroll content inside the TextField
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = onDismiss) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                    Button(onClick = {
+                        imageBitmap?.let { bitmap ->
+                            onConfirm(bitmap, message)
+                        }
+                    }) {
+                        Text(text = stringResource(R.string.confirm))
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Function to display the trail that have been clicked
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -772,6 +877,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     var trailUpdates by remember { mutableStateOf<List<TrailUpdate>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
+    var showGiveReview by remember { mutableStateOf(false) }
 
     val images = contentBoxInfo.imageResource.toList()
 
@@ -950,7 +1056,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
                             .background(MaterialTheme.colorScheme.primary)
-                            .clickable { showMessageBox = true },
+                            .clickable { showGiveReview = true },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = stringResource(R.string.new_updates))
@@ -1056,6 +1162,23 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     if (showMessageBox) {
         TrailUpdates(showMessageBox, trailUpdates, onDismissRequest = { showMessageBox = false })
     }
+
+    if (showGiveReview) {
+        ReviewDialog(
+            onDismiss = { showGiveReview = false },
+            onConfirm = { image, message ->
+                coroutineScope.launch {
+                    try {
+                        val response = postTrailReview(token, image, contentBoxInfo.id, message)
+                        Log.d("postTrailReview", "Response: $response")
+                        showGiveReview = false
+                    } catch (e: Exception) {
+                        Log.e("postTrailReview", "Error posting review", e)
+                    }
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -1144,13 +1267,6 @@ private fun TrailUpdates(
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
-
-                                    Text(
-                                        text = "Rating: ${update.condition}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.padding(top = 4.dp),
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
                                 }
                             }
                         }

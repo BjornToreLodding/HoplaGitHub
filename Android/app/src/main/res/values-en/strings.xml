@@ -173,5 +173,6 @@
     <string name="delete_horse_dialogue">Are you sure you want do delete this horse?</string>
     <string name="filters">Filters</string>
     <string name="apply">Apply</string>
+    <string name="post_review">Post review</string>
 
 </resources>

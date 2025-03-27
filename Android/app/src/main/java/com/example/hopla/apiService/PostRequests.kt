@@ -429,3 +429,40 @@ suspend fun addFavoriteTrail(token: String, trailId: String): String {
     return responseBody
 }
 
+// Add update about trail
+suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, message: String): String {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    val imageBytes = byteArrayOutputStream.toByteArray()
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.post(apiUrl+"trails/review") {
+            header("Authorization", "Bearer $token")
+            setBody(MultiPartFormDataContent(
+                formData {
+                    append("Image", imageBytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"review.jpg\"")
+                    })
+                    append("TrailId", trailId)
+                    append("Message", message)
+                }
+            ))
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    httpClient.close()
+    return responseBody
+}
+
