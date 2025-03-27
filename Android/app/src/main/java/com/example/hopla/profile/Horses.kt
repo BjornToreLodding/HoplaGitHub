@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +48,7 @@ import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.HorseDetail
 import com.example.hopla.R
+import com.example.hopla.apiService.deleteHorse
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchHorseDetails
@@ -54,6 +56,7 @@ import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
+import com.example.hopla.ui.theme.generalTextStyleRed
 import com.example.hopla.ui.theme.headerTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import kotlinx.coroutines.launch
@@ -144,58 +147,79 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                 "Unknown"
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
             ) {
-                // Name
-                Text(
-                    text = horse.name,
-                    style = headerTextStyle
-                )
-
-                // Image with Border & Shadow
-                Box(
-                    modifier = Modifier
-                        .size(220.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
-                        .border(4.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                        .shadow(8.dp, CircleShape)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                item {
+                    // Name
+                    Text(
+                        text = horse.name,
+                        style = headerTextStyle
                     )
-                }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Card with Details
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(6.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    // Image with Border & Shadow
+                    Box(
+                        modifier = Modifier
+                            .size(220.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surface, CircleShape)
+                            .border(4.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                            .shadow(8.dp, CircleShape)
                     ) {
-                        DetailRow(label = stringResource(R.string.breed) + ":", value = horse.breed)
-                        DetailRow(
-                            label = stringResource(R.string.age) + ":",
-                            value = horse.age.toString()
-                        )
-                        DetailRow(
-                            label = stringResource(R.string.date_of_birth) + ":",
-                            value = formattedDob
+                        Image(
+                            painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Card with Details
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(6.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            DetailRow(label = stringResource(R.string.breed) + ":", value = horse.breed)
+                            DetailRow(
+                                label = stringResource(R.string.age) + ":",
+                                value = horse.age.toString()
+                            )
+                            DetailRow(
+                                label = stringResource(R.string.date_of_birth) + ":",
+                                value = formattedDob
+                            )
+                        }
+                    }
+
+                    // Delete Horse Text
+                    Text(
+                        text = stringResource(R.string.delete_horse),
+                        style = generalTextStyleRed,
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .clickable {
+                                coroutineScope.launch {
+                                    try {
+                                        deleteHorse(UserSession.token, horseId)
+                                        navController.popBackStack() // Navigate back after deletion
+                                    } catch (e: Exception) {
+                                        Log.e("HorseDetailScreen", "Error deleting horse", e)
+                                    }
+                                }
+                            }
+                    )
                 }
             }
         }
