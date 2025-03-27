@@ -995,7 +995,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             Row {
                                 repeat(5) { index ->
                                     Icon(
-                                        imageVector = if (index < userRating) Icons.Filled.Star else Icons.TwoTone.Star,
+                                        imageVector = if (index < contentBoxInfo.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
                                         contentDescription = null,
                                         tint = StarColor
                                     )
