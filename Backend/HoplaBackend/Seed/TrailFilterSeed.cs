@@ -159,7 +159,7 @@ public static class TrailFilterSeeder
                 DefaultValue = "ingen",
                 OptionsJson = JsonSerializer.Serialize(new[] { "Ingen rovdyr (trygg familieløype)", "Rykter om hyener", "Løvespor observert", "Quetzalcoatlus luftrom. Svært farlig" }),
                 IsActive = true,
-                Order = 11
+                Order = 12
             }
         };
     }
