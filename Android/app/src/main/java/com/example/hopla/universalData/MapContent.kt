@@ -26,8 +26,13 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import com.example.hopla.apiService.fetchTrailCoordinates
 import com.example.hopla.apiService.fetchTrailsOnMap
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
 
 // Map screen for displaying trails on a map
@@ -153,29 +158,42 @@ fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
 }
 
 @Composable
-fun StartTripMapScreen() {
+fun StartTripMapScreen(trailId: String) {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
-    val zoomLevel = remember { mutableIntStateOf(10) }
+    val zoomLevel = remember { mutableIntStateOf(15) } // Adjusted zoom level for closer view
     val latitude = remember { mutableDoubleStateOf(0.0) }
     val longitude = remember { mutableDoubleStateOf(0.0) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
+    val trailCoordinates = remember { mutableStateOf<List<TrailCoordinate>>(emptyList()) }
 
     AndroidView({ mapView }) {
         mapView.getMapAsync { googleMap ->
             googleMap.uiSettings.isZoomControlsEnabled = true
             enableMyLocation(googleMap, context)
 
-            // Get the phone's location and move the camera to that location
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val locationProvider = LocationManager.GPS_PROVIDER
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                val lastKnownLocation = locationManager.getLastKnownLocation(locationProvider)
-                lastKnownLocation?.let {
-                    val userLocation = LatLng(it.latitude, it.longitude)
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoomLevel.intValue.toFloat()))
+            // Fetch trail coordinates and draw polyline
+            coroutineScope.launch {
+                val trailResponse = fetchTrailCoordinates(trailId, token)
+                trailResponse?.let {
+                    trailCoordinates.value = it.allCoords
+                    val polylineOptions = PolylineOptions().apply {
+                        addAll(it.allCoords.map { coord -> LatLng(coord.lat, coord.long) })
+                        color(Color.Black.toArgb())
+                        width(5f)
+                    }
+                    googleMap.addPolyline(polylineOptions)
+
+                    // Move the camera to the center of the trail coordinates
+                    if (trailCoordinates.value.isNotEmpty()) {
+                        val boundsBuilder = LatLngBounds.Builder()
+                        trailCoordinates.value.forEach { coord ->
+                            boundsBuilder.include(LatLng(coord.lat, coord.long))
+                        }
+                        val bounds = boundsBuilder.build()
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                    }
                 }
             }
 
@@ -185,9 +203,6 @@ fun StartTripMapScreen() {
                 latitude.doubleValue = googleMap.cameraPosition.target.latitude
                 longitude.doubleValue = googleMap.cameraPosition.target.longitude
                 Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
-
-                // Clear all markers
-                googleMap.clear()
             }
         }
     }

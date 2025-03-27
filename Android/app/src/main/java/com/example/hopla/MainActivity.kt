@@ -138,7 +138,10 @@ class MainActivity : ComponentActivity() {
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
                             composable("map_screen") { MapScreen() }
-                            composable("start_trip_map") { StartTripMapScreen() }
+                            composable("start_trip_map/{trailId}") { backStackEntry ->
+                                val trailId = backStackEntry.arguments?.getString("trailId") ?: ""
+                                StartTripMapScreen(trailId)
+                            }
                             composable("my_horses") { MyHorsesScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("user_horses/{userId}") { backStackEntry ->
