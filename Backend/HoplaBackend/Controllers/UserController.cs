@@ -421,53 +421,53 @@ public class UserController : ControllerBase
     // Denne erstatter Get requestene for confirm-email og confirm-new-email
     //
     // 1.2.c2 Trinn to av bytte epostadresse.
-[HttpPost("verify")]
-public async Task<IActionResult> VerifyEmail([FromBody] EmailVerificationRequest request)
-{
-    var verification = await _context.EmailVerifications
-        .FirstOrDefaultAsync(v => v.Token == request.Token && !v.IsUsed && v.ExpiryDate > DateTime.UtcNow);
-
-    if (verification == null)
-        return BadRequest(new { message = "Ugyldig eller utløpt lenke." });
-
-    if (string.IsNullOrEmpty(verification.OldEmail))
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] EmailVerificationRequest request)
     {
-        // --- Ny brukerregistrering
-        bool emailUsed = await _context.Users.AnyAsync(u => u.Email == verification.Email);
-        if (emailUsed)
-            return BadRequest(new { message = "E-postadressen er allerede i bruk." });
+        var verification = await _context.EmailVerifications
+            .FirstOrDefaultAsync(v => v.Token == request.Token && !v.IsUsed && v.ExpiryDate > DateTime.UtcNow);
 
-        // Opprett ny bruker (eller aktiver hvis bruker allerede er opprettet, men ikke aktiv)
-        var user = new User
+        if (verification == null)
+            return BadRequest(new { message = "Ugyldig eller utløpt lenke." });
+
+        if (string.IsNullOrEmpty(verification.OldEmail))
         {
-            Email = verification.Email,
-            PasswordHash = verification.PasswordHash,
-         };
+            // --- Ny brukerregistrering
+            bool emailUsed = await _context.Users.AnyAsync(u => u.Email == verification.Email);
+            if (emailUsed)
+                return BadRequest(new { message = "E-postadressen er allerede i bruk." });
 
-        _context.Users.Add(user);
-        verification.IsUsed = true;
-        await _context.SaveChangesAsync();
+            // Opprett ny bruker (eller aktiver hvis bruker allerede er opprettet, men ikke aktiv)
+            var user = new User
+            {
+                Email = verification.Email,
+                PasswordHash = verification.PasswordHash,
+            };
 
-        return Ok(new { message = "Eposten er verifisert og kontoen er nå aktivert.  Du kan nå gå tilbake til appen og logge inn med epost og passord." });
+            _context.Users.Add(user);
+            verification.IsUsed = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Eposten er verifisert og kontoen er nå aktivert.  Du kan nå gå tilbake til appen og logge inn med epost og passord." });
+        }
+        else
+        {
+            // --- Eksisterende bruker endrer e-post
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.OldEmail);
+            if (user == null)
+                return NotFound(new { message = "Brukeren finnes ikke." });
+
+            bool emailInUse = await _context.Users.AnyAsync(u => u.Email == verification.Email && u.Id != user.Id);
+            if (emailInUse)
+                return BadRequest(new { message = "E-postadressen er allerede i bruk av en annen bruker." });
+
+            user.Email = verification.Email;
+            verification.IsUsed = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "E-postadressen er nå oppdatert. Du kan nå gå tilbake til appen og logge inn med din nye e-postadresse." });
+        }
     }
-    else
-    {
-        // --- Eksisterende bruker endrer e-post
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.OldEmail);
-        if (user == null)
-            return NotFound(new { message = "Brukeren finnes ikke." });
-
-        bool emailInUse = await _context.Users.AnyAsync(u => u.Email == verification.Email && u.Id != user.Id);
-        if (emailInUse)
-            return BadRequest(new { message = "E-postadressen er allerede i bruk av en annen bruker." });
-
-        user.Email = verification.Email;
-        verification.IsUsed = true;
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "E-postadressen er nå oppdatert. Du kan nå gå tilbake til appen og logge inn med din nye e-postadresse." });
-    }
-}
 
 
     // 1.2.d change-password
