@@ -154,8 +154,8 @@ public static class TrailFilterSeeder
             {
                 Id = Guid.Parse("12345678-0000-0000-0101-123456780012"),
                 Name = "Predetors",
-                DisplayName = "Rovryd",
-                Type = TrailFilterType.Int,
+                DisplayName = "Rovdyr",
+                Type = TrailFilterType.Enum,
                 DefaultValue = "ingen",
                 OptionsJson = JsonSerializer.Serialize(new[] { "Ingen rovdyr (trygg familieløype)", "Rykter om hyener", "Løvespor observert", "Quetzalcoatlus luftrom. Svært farlig" }),
                 IsActive = true,
