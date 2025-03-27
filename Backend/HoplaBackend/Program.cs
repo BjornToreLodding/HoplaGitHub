@@ -20,12 +20,19 @@ using Microsoft.EntityFrameworkCore.Internal;
 using System.Reflection;
 
 using Serilog;
+using Serilog.Sinks.Http;
+using System.Net.Http.Headers;
+using Serilog.Formatting.Display;
+
 using System;
 using System.Net.Http;
 using Serilog.Events;
+using static HoplaBackend.Helpers.PutLog;
+using Serilog.Formatting.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // ✅ Legg til støtte for forskjellige miljøer (Development / Production)
 builder.Configuration
@@ -60,9 +67,47 @@ Log.Information("🚀 Forsøker å starte programmet ");
 
 //builder.Host.UseSerilog();
 
-*/
+
 var logtailUrl = "https://s1209901.eu-nbg-2.betterstackdata.com:443/SqQyvVrV6jWshrdibjNdoKkM";
 
+
+var logtailToken = "SqQyvVrV6jWshrdibjNdoKkM"; // bare token
+
+var httpClient = new HttpClient();
+httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", logtailToken);
+httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.Http(
+        requestUri: "https://s1209901.eu-nbg-2.betterstackdata.com",
+        httpClient:new LogtailHttpClient(logtailToken),
+        textFormatter: new Serilog.Formatting.Json.JsonFormatter()
+    )
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+*/
+var logtailToken = "SqQyvVrV6jWshrdibjNdoKkM";
+var logtailEndpoint = "https://s1209901.eu-nbg-2.betterstackdata.com";
+
+// Loggeren
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.Http(
+        requestUri: logtailEndpoint,
+        httpClient: new LogtailHttpClient(logtailToken),
+        textFormatter: new MessageTemplateTextFormatter("{Message}", null)
+    )
+    .CreateLogger();
+
+
+builder.Host.UseSerilog();
+
+/*
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
 
@@ -82,9 +127,16 @@ Log.Logger = new LoggerConfiguration()
 
     .CreateLogger();
 
-builder.Host.UseSerilog();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.Sink(new LogTail(logtailUrl)) // ← direkte uten filter
+    .CreateLogger();
 
+Log.Information("🚀 Dette er en testmelding sendt direkte til Logtail");
 
+Log.CloseAndFlush(); // 🔚 Viktig for å sende bufferet før programmet avsluttes
+*/
 // Prøver å hente database-url fra miljøvariabelen DATABASE_URL
 string? databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
@@ -283,7 +335,14 @@ app.UseAuthentication(); // Aktiver JWT-autentisering
 app.UseAuthorization();  // Aktiver autorisasjon
 
 app.MapControllers();
+var client = new HttpClient();
+client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "SqQyvVrV6jWshrdibjNdoKkM");
+client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+var payload = new StringContent("{\"message\":\"🧪 Test fra ren HttpClient\"}", System.Text.Encoding.UTF8, "application/json");
+
+var response = await client.PostAsync("https://s1209901.eu-nbg-2.betterstackdata.com", payload);
+Console.WriteLine($"Status: {response.StatusCode}");
 app.Run();
 
 //Log.Information("🚀 Programmet startet ");

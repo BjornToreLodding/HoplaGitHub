@@ -11,7 +11,8 @@ public class RequestLoggingService : IActionFilter
 
     public RequestLoggingService()
     {
-        _logger = Log.ForContext("Category", "RequestLogging");
+        _logger = Log.Logger;
+
     }
 
     public void OnActionExecuting(ActionExecutingContext context)
