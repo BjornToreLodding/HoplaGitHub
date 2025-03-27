@@ -21,6 +21,9 @@
         }
       }
     },
+    "Add Following" : {
+
+    },
     "Add Friend" : {
       "localizations" : {
         "nb" : {
@@ -784,6 +787,9 @@
           }
         }
       }
+    },
+    "Search for Users to Follow" : {
+
     },
     "Search friends..." : {
       "localizations" : {

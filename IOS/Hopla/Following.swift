@@ -42,15 +42,8 @@ struct FollowingHeaderView: View {
 
 class FollowingViewModel: ObservableObject {
     @Published var following: [Following] = []
-    @Published var searchText: String = ""
-    
-    var filteredFollowing: [Following] {
-            if searchText.isEmpty {
-                return following
-            } else {
-                return following.filter { $0.name.localizedCaseInsensitiveContains(searchText) || $0.alias.localizedCaseInsensitiveContains(searchText) }
-            }
-        }
+    @Published var allUsers: [User] = []
+    @Published var filteredFollowing: [Following] = []
     
     func fetchFollowing() {
         guard let token = TokenManager.shared.getToken() else {
@@ -81,11 +74,87 @@ class FollowingViewModel: ObservableObject {
                 }
                 DispatchQueue.main.async {
                     self.following = following
+                    self.filteredFollowing = following
                 }
             } catch {
                 print("Error decoding following:", error.localizedDescription)
             }
         }.resume()
+    }
+    func fetchAllUsers() {
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+
+        let url = URL(string: "https://hopla.onrender.com/users/all")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
+                print("Invalid response or status code")
+                return
+            }
+
+            do {
+                let users = try JSONDecoder().decode([User].self, from: data)
+                DispatchQueue.main.async {
+                    self.allUsers = users
+                }
+            } catch {
+                print("Error decoding all users:", error.localizedDescription)
+            }
+        }.resume()
+    }
+    
+    func addFollowing(userId: String) {
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+
+        let url = URL(string: "https://hopla.onrender.com/userrelations/addfollowing")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["followingId": userId]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                return
+            }
+
+            DispatchQueue.main.async {
+                // Update list after adding
+                self.fetchFollowing()
+                self.fetchAllUsers()
+            }
+        }.resume()
+    }
+    
+    private func updateFilteredFollowing() {
+        if searchTextFollowing.isEmpty {
+            filteredFollowing = following
+        } else {
+            filteredFollowing = following.filter { $0.name.localizedCaseInsensitiveContains(searchTextFollowing) }
+        }
+    }
+
+    var searchTextFollowing: String = "" {
+        didSet {
+            updateFilteredFollowing()
+        }
     }
 }
 
@@ -116,6 +185,21 @@ struct FollowingView: View {
                 vm.fetchFollowing()
             }
             CustomBackButton(colorScheme: colorScheme)
+            
+            // Add Following button at the bottom-right corner
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    NavigationLink(destination: AddFollowingPage()) {
+                        Image(systemName: "plus.circle.fill")
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(.green)
+                            .padding()
+                    }
+                }
+            }
         }
     }
 
@@ -124,7 +208,7 @@ struct FollowingView: View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-            TextField("Search following...", text: $vm.searchText)
+            TextField("Search following...", text: $vm.searchTextFollowing)
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
@@ -143,7 +227,6 @@ struct FollowingListView: View {
         ScrollView {
             VStack(spacing: 10) {
                 ForEach(vm.filteredFollowing) { following in
-                    // Pass the correct argument (user or userId) to FollowingDetails
                     NavigationLink(destination: FollowingDetails(userId: following.id)) {
                         FollowingRowView(colorScheme: colorScheme, user: following)
                     }
@@ -192,4 +275,95 @@ struct FollowingRowView: View {
         .shadow(radius: 2)
         .padding(.horizontal)
     }
+}
+
+// MARK: - Add Following Page
+struct AddFollowingPage: View {
+    @State private var searchTextFollowing: String = ""
+    @StateObject private var vm = FollowingViewModel()
+
+    var filteredUsers: [User] {
+        if searchTextFollowing.isEmpty {
+            return vm.allUsers
+        } else {
+            return vm.allUsers.filter { $0.name.localizedCaseInsensitiveContains(searchTextFollowing) }
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("Search for Users to Follow")
+                    .font(.headline)
+                    .padding()
+
+                TextField("Enter username...", text: $searchTextFollowing)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                List(filteredUsers) { user in
+                    NavigationLink(destination: UserDetails(userId: user.id)) {  // Pass user.id here
+                        HStack {
+                            if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
+                                AsyncImage(url: url) { image in
+                                    image.resizable()
+                                        .scaledToFill()
+                                        .frame(width: 60, height: 60)
+                                        .clipShape(Circle())
+                                } placeholder: {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.5))
+                                        .frame(width: 60, height: 60)
+                                }
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.5))
+                                    .frame(width: 60, height: 60)
+                            }
+
+                            Text(user.name)
+                                .font(.headline)
+                                .padding(.leading, 10)
+
+                            Spacer()
+
+                            if user.relationStatus == .following {
+                                Text("Following")
+                                    .padding(8)
+                                    .background(Color.gray)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            } else {
+                                Button(action: {
+                                    vm.addFollowing(userId: user.id)
+                                }) {
+                                    Text("Follow")
+                                        .padding(8)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            .onAppear {
+                vm.fetchAllUsers()
+            }
+            .navigationBarTitle("Add Following", displayMode: .inline)
+        }
+    }
+}
+
+
+
+func addUserToFollowing(_ following: Following) {
+    // API call to either add the user as a friend or follow them
+    // After successful action, update the status and refresh the list
+}
+
+func showUnfollowAlert(for following: Following) {
+    // Show alert to confirm unfriend
+    // If confirmed, make an API call to unfriend and update the UI
 }
