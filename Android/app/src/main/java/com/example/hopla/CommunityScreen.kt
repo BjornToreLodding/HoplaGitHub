@@ -80,6 +80,8 @@ import com.example.hopla.apiService.createStable
 import com.example.hopla.apiService.fetchStableDetails
 import com.example.hopla.apiService.fetchStableMessages
 import com.example.hopla.apiService.fetchStables
+import com.example.hopla.apiService.joinStable
+import com.example.hopla.apiService.leaveStable
 import com.example.hopla.apiService.sendStableMessage
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
@@ -91,6 +93,7 @@ import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.SimpleMapScreen
 import com.example.hopla.universalData.Stable
+import com.example.hopla.universalData.StableActionRequest
 import com.example.hopla.universalData.StableDetails
 import com.example.hopla.universalData.StableMessageRequest
 import com.example.hopla.universalData.StableRequest
@@ -178,7 +181,7 @@ fun CommunityScreen(navController: NavController, token: String) {
                     .padding(top = 1.dp)
             ) {
                 items(stables, key = { it.stableId }) { stable ->
-                    StableCard(stable, navController, likedStables)
+                    StableCard(stable, navController, likedStables, token)
                 }
                 item {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -198,7 +201,7 @@ fun CommunityScreen(navController: NavController, token: String) {
 }
 
 @Composable
-fun StableCard(stable: Stable, navController: NavController, likedStables: MutableList<Stable>) {
+fun StableCard(stable: Stable, navController: NavController, likedStables: MutableList<Stable>, token: String) {
     var isLiked by remember { mutableStateOf(stable.member || likedStables.contains(stable)) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -239,22 +242,15 @@ fun StableCard(stable: Stable, navController: NavController, likedStables: Mutab
             ) {
                 IconButton(
                     onClick = {
-                        isLiked = !isLiked
-                        if (isLiked) {
-                            likedStables.add(stable)
-                        } else {
-                            likedStables.remove(stable)
-                        }
                         coroutineScope.launch {
-                            // Send a new GET request when the heart icon is pressed
-                            val fetchedStables = fetchStables(
-                                token = UserSession.token,
-                                search = "",
-                                userid = if (isLiked) UserSession.userId else "",
-                                latitude = 0.0,
-                                longitude = 0.0,
-                                pageNumber = 1
-                            )
+                            if (isLiked) {
+                                leaveStable(token, StableActionRequest(stable.stableId))
+                                likedStables.remove(stable)
+                            } else {
+                                joinStable(token, StableActionRequest(stable.stableId))
+                                likedStables.add(stable)
+                            }
+                            isLiked = !isLiked
                         }
                     }
                 ) {

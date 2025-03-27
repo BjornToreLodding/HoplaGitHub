@@ -8,6 +8,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import android.util.Log
+import com.example.hopla.universalData.StableActionRequest
+import com.example.hopla.universalData.StableActionResponse
 import com.example.hopla.universalData.UserRelationChangeRequest
 import com.example.hopla.universalData.apiUrl
 
@@ -90,4 +92,28 @@ suspend fun removeFavoriteTrail(token: String, trailId: String): String {
     Log.d("favoriteTrail", "Response: $responseBody")
     client.close()
     return responseBody
+}
+
+//Leave a stable the user is a member of
+suspend fun leaveStable(token: String, stableActionRequest: StableActionRequest): StableActionResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.delete(apiUrl+"stables/leave") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(stableActionRequest)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    client.close()
+    Log.d("stableJoinLeave", "Response Body: $responseBody")
+    return Json.decodeFromString(StableActionResponse.serializer(), responseBody)
 }

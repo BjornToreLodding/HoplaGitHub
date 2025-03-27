@@ -8,6 +8,8 @@ import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.universalData.ResetPasswordRequest
+import com.example.hopla.universalData.StableActionRequest
+import com.example.hopla.universalData.StableActionResponse
 import com.example.hopla.universalData.StableMessageRequest
 import com.example.hopla.universalData.StableMessageResponse
 import com.example.hopla.universalData.StableRequest
@@ -347,6 +349,29 @@ suspend fun sendStableMessage(token: String, stableMessageRequest: StableMessage
     client.close()
     Log.d("stableMessage", "Response Body: $responseBody")
     return Json.decodeFromString(StableMessageResponse.serializer(), responseBody)
+}
+
+suspend fun joinStable(token: String, stableActionRequest: StableActionRequest): StableActionResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.post(apiUrl+"stables/join") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(stableActionRequest)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    client.close()
+    Log.d("stableJoinLeave", "Response Body: $responseBody")
+    return Json.decodeFromString(StableActionResponse.serializer(), responseBody)
 }
 
 //----------------------Post requests for trails ---------------------

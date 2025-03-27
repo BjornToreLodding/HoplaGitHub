@@ -286,6 +286,16 @@ data class StableMessageResponse(
     val message: String
 )
 
+@Serializable
+data class StableActionRequest(
+    val StableId: String
+)
+
+@Serializable
+data class StableActionResponse(
+    val message: String
+)
+
 //---------------- Data classes for login page ----------------
 @Serializable
 data class ResetPasswordRequest(val Email: String)
