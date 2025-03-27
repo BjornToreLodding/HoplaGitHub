@@ -128,6 +128,7 @@ fun TrailsScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var noResults by remember { mutableStateOf(false) }
+    var showFiltersDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
@@ -346,7 +347,7 @@ fun TrailsScreen(navController: NavController) {
                     Column {
                         Box {
                             IconButton(
-                                onClick = { isDropdownExpanded = !isDropdownExpanded },
+                                onClick = { showFiltersDialog = true },
                                 modifier = Modifier
                                     .background(
                                         if (isFiltersClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
@@ -358,33 +359,39 @@ fun TrailsScreen(navController: NavController) {
                                     contentDescription = "Filters"
                                 )
                             }
-                            DropdownMenu(
-                                expanded = isDropdownExpanded,
-                                onDismissRequest = { isDropdownExpanded = false }
-                            ) {
-                                val items = listOf("Parkering", "Lite trafikk", "Asfalt", "Grus")
-                                items.forEach { item ->
-                                    val isSelected = selectedItems.value.contains(item)
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(text = item)
-                                        },
-                                        onClick = {
-                                            if (isSelected) {
-                                                selectedItems.value -= item
-                                            } else {
-                                                selectedItems.value += item
-                                            }
-                                            isDropdownExpanded = false
-                                        }
-                                    )
-                                }
-                            }
                         }
                     }
                 }
             }
         }
+        if (showFiltersDialog) {
+            Dialog(onDismissRequest = { showFiltersDialog = false }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Filters",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+
         if (isRouteClicked) {
             selectedContentBoxInfo?.let { contentBoxInfo ->
                 RouteClicked(

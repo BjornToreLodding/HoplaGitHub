@@ -302,6 +302,16 @@ data class UserHikesResponse(
     val userHikes: List<Hike>
 )
 
+@Serializable
+data class TrailFilter(
+    val id: String,
+    val name: String,
+    val displayName: String,
+    val type: String,
+    val options: List<String>,
+    @Contextual val defaultValue: Any
+)
+
 // Data class for updates about a specified trail
 @Serializable
 data class TrailUpdate(

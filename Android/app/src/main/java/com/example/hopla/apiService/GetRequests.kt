@@ -13,6 +13,7 @@ import com.example.hopla.universalData.Message
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.StableDetails
+import com.example.hopla.universalData.TrailFilter
 import com.example.hopla.universalData.TrailUpdate
 import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.UserHikesResponse
@@ -26,6 +27,8 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import io.ktor.http.HttpHeaders
+import io.ktor.http.ContentType
 
 suspend fun fetchHorses(userId: String, token: String): List<Horse> {
     val httpClient = HttpClient {
@@ -283,6 +286,31 @@ suspend fun fetchTrailUpdates(trailId: String, pageNumber: Int, token: String): 
         }
         response.body()
     }
+}
+
+// Fetch filters available for trails
+suspend fun fetchTrailFilters(token: String): List<TrailFilter> {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.get(apiUrl + "trailfilters/all") {
+        headers {
+            append("Authorization", "Bearer $token")
+            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("fetchTrailFilters", "Response: $responseBody")
+    client.close()
+    return response.body()
 }
 
 //-------------------------------Other users--------------------------------------------------
