@@ -170,5 +170,7 @@
     <string name="stop_following">Slutt å følge</string>
     <string name="delete_horse">Slett hest</string>
     <string name="delete_horse_dialogue">Sikker på at du vil slette denne hesten?</string>
+    <string name="filters">Filtere</string>
+    <string name="apply">Bruk</string>
 
 </resources>

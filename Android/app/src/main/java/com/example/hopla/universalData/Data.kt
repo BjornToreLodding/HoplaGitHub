@@ -3,6 +3,7 @@ package com.example.hopla.universalData
 import android.graphics.Bitmap
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -309,7 +310,7 @@ data class TrailFilter(
     val displayName: String,
     val type: String,
     val options: List<String>,
-    @Contextual val defaultValue: Any
+    val defaultValue: JsonElement
 )
 
 // Data class for updates about a specified trail

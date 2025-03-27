@@ -98,14 +98,20 @@ import java.util.Locale
 import android.Manifest
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import com.example.hopla.apiService.addFavoriteTrail
 import com.example.hopla.apiService.fetchFavoriteTrails
+import com.example.hopla.apiService.fetchTrailFilters
 import com.example.hopla.apiService.fetchTrailUpdates
 import com.example.hopla.apiService.fetchTrailsRelations
 import com.example.hopla.apiService.rateTrail
 import com.example.hopla.apiService.removeFavoriteTrail
+import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.universalData.TrailFilter
 import com.example.hopla.universalData.TrailRatingRequest
 import com.example.hopla.universalData.TrailUpdate
 
@@ -129,6 +135,7 @@ fun TrailsScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var noResults by remember { mutableStateOf(false) }
     var showFiltersDialog by remember { mutableStateOf(false) }
+    var trailFilters by remember { mutableStateOf<List<TrailFilter>>(emptyList()) }
 
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
@@ -347,7 +354,16 @@ fun TrailsScreen(navController: NavController) {
                     Column {
                         Box {
                             IconButton(
-                                onClick = { showFiltersDialog = true },
+                                onClick = {
+                                    showFiltersDialog = true
+                                    coroutineScope.launch {
+                                        try {
+                                            trailFilters = fetchTrailFilters(token)
+                                        } catch (e: Exception) {
+                                            Log.e("fetchTrailFilters", "Error fetching trail filters", e)
+                                        }
+                                    }
+                                },
                                 modifier = Modifier
                                     .background(
                                         if (isFiltersClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
@@ -379,14 +395,54 @@ fun TrailsScreen(navController: NavController) {
                             .padding(16.dp)
                     ) {
                         Text(
-                            text = "Filters",
-                            style = MaterialTheme.typography.titleLarge,
+                            text = stringResource(R.string.filters),
+                            style = headerTextStyleSmall,
                             modifier = Modifier
                                 .padding(8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.primary
                         )
+                        LazyColumn(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            items(trailFilters) { filter ->
+                                Text(
+                                    text = filter.displayName,
+                                    style = underheaderTextStyle,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                                if (filter.options.isEmpty()) {
+                                    Text(
+                                        text = "N/A",
+                                        style = generalTextStyle,
+                                        modifier = Modifier.padding(8.dp)
+                                    )
+                                } else {
+                                    Column {
+                                        filter.options.forEach { option ->
+                                            FilterOptionRow(option = option)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(onClick = { showFiltersDialog = false }) {
+                                Text(text = stringResource(R.string.cancel))
+                            }
+                            Button(onClick = {
+                                // Apply filter logic here
+                                showFiltersDialog = false
+                            }) {
+                                Text(text = stringResource(R.string.apply))
+                            }
+                        }
                     }
                 }
             }
@@ -511,6 +567,25 @@ fun TrailsScreen(navController: NavController) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun FilterOptionRow(option: String) {
+    var isChecked by remember { mutableStateOf(false) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = { isChecked = it }
+        )
+        Text(
+            text = option,
+            style = generalTextStyle
+        )
     }
 }
 

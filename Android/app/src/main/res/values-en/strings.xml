@@ -171,5 +171,7 @@
     <string name="stop_following">Stop following</string>
     <string name="delete_horse">Delete horse</string>
     <string name="delete_horse_dialogue">Are you sure you want do delete this horse?</string>
+    <string name="filters">Filters</string>
+    <string name="apply">Apply</string>
 
 </resources>
