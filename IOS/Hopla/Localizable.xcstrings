@@ -31,6 +31,9 @@
         }
       }
     },
+    "Add Friends" : {
+
+    },
     "Add Horse" : {
       "localizations" : {
         "nb" : {
@@ -193,7 +196,14 @@
       }
     },
     "Description:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beskrivelse:"
+          }
+        }
+      }
     },
     "Display" : {
       "localizations" : {
@@ -405,6 +415,9 @@
         }
       }
     },
+    "Follow" : {
+
+    },
     "Following" : {
       "localizations" : {
         "nb" : {
@@ -425,6 +438,9 @@
         }
       }
     },
+    "Friend" : {
+
+    },
     "Friends" : {
       "localizations" : {
         "nb" : {
@@ -436,7 +452,14 @@
       }
     },
     "Friends: %lld" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venner: %lld"
+          }
+        }
+      }
     },
     "Hi" : {
 
@@ -452,7 +475,14 @@
       }
     },
     "Hikes:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Løyper:"
+          }
+        }
+      }
     },
     "Home" : {
       "comment" : "Home tab",
@@ -486,7 +516,14 @@
       }
     },
     "Horses: %lld" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hester: %lld"
+          }
+        }
+      }
     },
     "Image Selection" : {
       "localizations" : {
@@ -514,6 +551,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Length: %1$@ km | Duration: %2$@ min"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lengde: %1$@ km | Tid: %2$@ min"
           }
         }
       }
@@ -549,7 +592,14 @@
       }
     },
     "Loading..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laster…"
+          }
+        }
+      }
     },
     "Log In" : {
       "localizations" : {
@@ -642,7 +692,14 @@
       }
     },
     "No details available" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen detaljer tilgjengelig"
+          }
+        }
+      }
     },
     "Not a member? Sign up" : {
       "localizations" : {
@@ -673,6 +730,9 @@
           }
         }
       }
+    },
+    "Pending" : {
+
     },
     "Photos" : {
       "localizations" : {

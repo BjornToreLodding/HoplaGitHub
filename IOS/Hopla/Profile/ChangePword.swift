@@ -11,6 +11,7 @@ struct ChangePassword: View {
     var body: some View {
         VStack {
             Text("Change password")
+                .font(.custom("ArialNova", size: 16))
                 .frame(width: 360, height: 30)
                 .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                 .underline(true)

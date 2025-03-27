@@ -24,6 +24,24 @@ struct Friend: Identifiable, Decodable {
     }
 }
 
+// MARK: - User Model (All Users)
+struct User: Identifiable, Decodable {
+    var id: String
+    var name: String
+    var alias: String
+    var profilePictureUrl: String?
+    var relationStatus: PersonStatus?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case alias
+        case profilePictureUrl
+        case relationStatus
+    }
+}
+
+
 
 // MARK: - Post Model / Hikes (userHikes)
 struct Post: Identifiable, Decodable {
@@ -36,10 +54,11 @@ struct Post: Identifiable, Decodable {
 
 // Enum for relation status
 enum PersonStatus: String, Decodable {
-    case friend = "FRIEND"
+    case friend = "FRIENDS" // WITH AN "S"!!!! :(
     case following = "FOLLOWING"
     case none = "NONE"
     case pending = "PENDING"
+    case unknown
 }
 
 
@@ -61,18 +80,8 @@ struct FriendsHeaderView: View {
 
 class FriendViewModel: ObservableObject {
     @Published var friends: [Friend] = []
-    @Published var searchText: String = "" // ✅ Added searchText
-
-    var filteredFriends: [Friend] { // ✅ Moved filteredFriends inside FriendViewModel
-        if searchText.isEmpty {
-            return friends
-        } else {
-            return friends.filter { friend in
-                friend.name.localizedCaseInsensitiveContains(searchText) ||
-                friend.alias.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
+    @Published var allUsers: [User] = []
+    @Published var filteredFriends: [Friend] = []
 
     func fetchFriends() {
         guard let token = TokenManager.shared.getToken() else {
@@ -97,14 +106,11 @@ class FriendViewModel: ObservableObject {
             }
 
             do {
-                // Print the raw JSON data for inspection
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print("Raw JSON Response: \(jsonString)")
-                }
-
                 let friends = try JSONDecoder().decode([Friend].self, from: data)
+                print("Fetched Friends:", friends) // Debugging line
                 DispatchQueue.main.async {
                     self.friends = friends
+                    self.filteredFriends = friends // Ensure filteredFriends is also updated
                 }
             } catch {
                 print("Error decoding friends:", error.localizedDescription)
@@ -112,8 +118,81 @@ class FriendViewModel: ObservableObject {
         }.resume()
     }
 
+    func fetchAllUsers() {
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
 
+        let url = URL(string: "https://hopla.onrender.com/users/all")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
+                print("Invalid response or status code")
+                return
+            }
+
+            do {
+                let users = try JSONDecoder().decode([User].self, from: data)
+                DispatchQueue.main.async {
+                    self.allUsers = users
+                }
+            } catch {
+                print("Error decoding all users:", error.localizedDescription)
+            }
+        }.resume()
+    }
+
+    func addFriend(userId: String) {
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+
+        let url = URL(string: "https://hopla.onrender.com/userrelations/addfriend")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["friendId": userId]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                return
+            }
+
+            DispatchQueue.main.async {
+                // Update list after adding
+                self.fetchFriends()
+                self.fetchAllUsers()
+            }
+        }.resume()
+    }
+    
+    private func updateFilteredFriends() {
+        if searchText.isEmpty {
+            filteredFriends = friends
+        } else {
+            filteredFriends = friends.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
+
+    var searchText: String = "" {
+        didSet {
+            updateFilteredFriends()
+        }
+    }
 }
 
 
@@ -136,7 +215,7 @@ struct Friends: View {
                             .color(for: colorScheme)
                             .edgesIgnoringSafeArea(.all)
                         
-                        FriendListView(vm: vm, colorScheme: colorScheme) // ✅ Pass vm directly
+                        FriendListView(vm: vm, colorScheme: colorScheme)
                     }
                 }
                 .navigationBarBackButtonHidden(true)
@@ -145,6 +224,21 @@ struct Friends: View {
                 vm.fetchFriends()
             }
             CustomBackButton(colorScheme: colorScheme)
+            
+            // Add Friend button at the bottom-right corner
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    NavigationLink(destination: AddFriendPage()) {
+                        Image(systemName: "plus.circle.fill")
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(.green)
+                            .padding()
+                    }
+                }
+            }
         }
     }
 
@@ -160,7 +254,6 @@ struct Friends: View {
         .padding(.horizontal)
     }
 }
-
 
 
 
@@ -182,8 +275,6 @@ struct FriendListView: View {
         }
     }
 }
-
-
 
 
 // MARK: - Friend Row
@@ -226,24 +317,95 @@ struct FriendRowView: View {
 }
 
 
-
 // MARK: - Add Friend Page
 struct AddFriendPage: View {
     @State private var searchText: String = ""
-    
-    var body: some View {
-        VStack {
-            Text("Search for Users to Add")
-                .font(.headline)
-                .padding()
-            
-            TextField("Enter username...", text: $searchText)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Spacer()
+    @StateObject private var vm = FriendViewModel()
+
+    var filteredUsers: [User] {
+        if searchText.isEmpty {
+            return vm.allUsers
+        } else {
+            return vm.allUsers.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
-        .navigationTitle("Add Friend")
     }
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("Search for Users to Add")
+                    .font(.headline)
+                    .padding()
+
+                TextField("Enter username...", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                List(filteredUsers) { user in
+                    NavigationLink(destination: UserDetails(userId: user.id)) {  // Pass user.id here
+                        HStack {
+                            if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
+                                AsyncImage(url: url) { image in
+                                    image.resizable()
+                                        .scaledToFill()
+                                        .frame(width: 60, height: 60)
+                                        .clipShape(Circle())
+                                } placeholder: {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.5))
+                                        .frame(width: 60, height: 60)
+                                }
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.5))
+                                    .frame(width: 60, height: 60)
+                            }
+
+                            Text(user.name)
+                                .font(.headline)
+                                .padding(.leading, 10)
+
+                            Spacer()
+
+                            if user.relationStatus == .friend {
+                                Text("Friend")
+                                    .padding(8)
+                                    .background(Color.gray)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            } else {
+                                Button(action: {
+                                    vm.addFriend(userId: user.id)
+                                }) {
+                                    Text(user.relationStatus == .pending ? "Pending" : "Add Friend")
+                                        .padding(8)
+                                        .background(user.relationStatus == .pending ? Color.orange : Color.green)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            .onAppear {
+                vm.fetchAllUsers()
+            }
+            .navigationBarTitle("Add Friends", displayMode: .inline)
+        }
+    }
+}
+
+
+
+func addUserToFriends(_ friend: Friend) {
+    // API call to either add the user as a friend or follow them
+    // After successful action, update the status and refresh the list
+}
+
+func showUnfriendAlert(for friend: Friend) {
+    // Show alert to confirm unfriend
+    // If confirmed, make an API call to unfriend and update the UI
 }
 

@@ -68,8 +68,6 @@ class HorseDetailsViewModel: ObservableObject {
             }
         }.resume()
     }
-    
-    
 }
 
 

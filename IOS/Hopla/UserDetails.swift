@@ -1,13 +1,13 @@
 //
-//  FriendsDetails.swift
+//  UserDetails.swift
 //  Hopla
 //
-//  Created by Ane Marie Johnsen on 23/03/2025.
+//  Created by Ane Marie Johnsen on 27/03/2025.
 //
 
 import SwiftUI
 
-struct FriendInfo: Identifiable, Decodable {
+struct UserInfo: Identifiable, Decodable {
     var id: String
     var name: String
     var alias: String
@@ -19,7 +19,6 @@ struct FriendInfo: Identifiable, Decodable {
     var userHikes: [Post]?
     var createdAt: String?
     var dob: String? = nil
-
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -36,19 +35,17 @@ struct FriendInfo: Identifiable, Decodable {
     }
 }
 
-
-
-class FriendDetailsViewModel: ObservableObject {
-    @Published var friendDetails: FriendInfo?
+class UserDetailsViewModel: ObservableObject {
+    @Published var userDetails: UserInfo?
     @Published var isLoading = false
     
-    func fetchFriendDetails(friendId: String) {
+    func fetchUserDetails(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
         
-        let url = URL(string: "https://hopla.onrender.com/users/profile?userId=\(friendId)")!
+        let url = URL(string: "https://hopla.onrender.com/users/profile?userId=\(userId)")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -72,34 +69,30 @@ class FriendDetailsViewModel: ObservableObject {
             
             do {
                 let decoder = JSONDecoder()
-                let friendDetails = try decoder.decode(FriendInfo.self, from: data)
+                let userDetails = try decoder.decode(UserInfo.self, from: data)
                 DispatchQueue.main.async {
-                    self.friendDetails = friendDetails
+                    self.userDetails = userDetails
                 }
             } catch {
-                print("Error decoding friend details:", error.localizedDescription)
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print("Received JSON:", jsonString) // Debugging line
-                }
+                print("Error decoding user details:", error.localizedDescription)
             }
-
         }.resume()
     }
-
-    // Future POST request - for later
-    func addFriend(userId: String) {
+    
+    // Future POST requests for following and adding as friend
+    func followUser(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
-        let url = URL(string: "https://hopla.onrender.com/userrelations/friends")!
+        
+        let url = URL(string: "https://hopla.onrender.com/userrelations/follow")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let body: [String: Any] = ["friendId": userId]
+        let body: [String: Any] = ["userId": userId]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         URLSession.shared.dataTask(with: request) { data, response, error in
@@ -107,24 +100,21 @@ class FriendDetailsViewModel: ObservableObject {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
-            DispatchQueue.main.async {
-                self.fetchFriendDetails(friendId: userId) // Refresh details after adding
-            }
+            
+            // Handle after following
         }.resume()
     }
 }
 
-
 // MARK: - Header
-struct FriendsDetailsHeader: View {
-    var friend: FriendInfo?
+struct UserDetailsHeader: View {
+    var user: UserInfo?
     var colorScheme: ColorScheme
     
     var body: some View {
         VStack {
-            if let friend = friend {
-                Text(friend.name)
+            if let user = user {
+                Text(user.name)
                     .font(.title)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
@@ -143,32 +133,36 @@ struct FriendsDetailsHeader: View {
     }
 }
 
-struct FriendsDetails: View {
-    var friendId: String
-    @StateObject private var vm = FriendDetailsViewModel()
+
+struct UserDetails: View {
+    var userId: String
+    @StateObject private var vm = UserDetailsViewModel()
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack {
             if vm.isLoading {
                 ProgressView("Loading...")
-            } else if let friend = vm.friendDetails {
+            } else if let user = vm.userDetails {
                 ZStack {
                     VStack(spacing: 0) {
-                        FriendsDetailsHeader(friend: friend, colorScheme: colorScheme)
+                        UserDetailsHeader(user: user, colorScheme: colorScheme)
                         NavigationStack {
                             ScrollView {
                                 // Profile Picture
-                                profilePictureView(friend: friend)
+                                profilePictureView(user: user)
                                 
-                                // Friend details in a white box
-                                friendDetailsBox(friend: friend)
+                                // User details in a white box
+                                userDetailsBox(user: user)
                                 
                                 // Description
-                                descriptionView(friend: friend)
+                                descriptionView(user: user)
                                 
                                 // Hikes
-                                hikesView(friend: friend)
+                                hikesView(user: user)
+                                
+                                // Action buttons (Follow, Add Friend)
+                                actionButtonsView(user: user)
                             }
                         }
                         .navigationBarBackButtonHidden(true)
@@ -181,12 +175,12 @@ struct FriendsDetails: View {
             }
         }
         .onAppear {
-            vm.fetchFriendDetails(friendId: friendId)
+            vm.fetchUserDetails(userId: userId)
         }
     }
     
-    private func profilePictureView(friend: FriendInfo) -> some View {
-        if let urlString = friend.profilePictureUrl, let url = URL(string: urlString) {
+    private func profilePictureView(user: UserInfo) -> some View {
+        if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
             return AnyView(
                 AsyncImage(url: url) { image in
                     image.resizable()
@@ -206,28 +200,27 @@ struct FriendsDetails: View {
             return AnyView(EmptyView()) // Return empty view if no profile picture
         }
     }
-
-    private func friendDetailsBox(friend: FriendInfo) -> some View {
+    
+    private func userDetailsBox(user: UserInfo) -> some View {
         return VStack(spacing: 0) {
-            Text(friend.name)
+            Text(user.name)
                 .font(.title)
                 .fontWeight(.bold)
             
-            Text(friend.alias)
+            Text(user.alias)
                 .font(.subheadline)
                 .foregroundColor(.gray)
             
             HStack {
-                Text("Friends: \(friend.friendsCount ?? 0)")
-                Text("Horses: \(friend.horseCount ?? 0)")
+                Text("Friends: \(user.friendsCount ?? 0)")
+                Text("Horses: \(user.horseCount ?? 0)")
             }
         }
         .padding()
     }
 
-    
-    private func descriptionView(friend: FriendInfo) -> some View {
-        if let description = friend.description {
+    private func descriptionView(user: UserInfo) -> some View {
+        if let description = user.description {
             return AnyView(
                 VStack(alignment: .leading) {
                     Text("Description:")
@@ -244,8 +237,8 @@ struct FriendsDetails: View {
         }
     }
     
-    private func hikesView(friend: FriendInfo) -> some View {
-        if let hikes = friend.userHikes, !hikes.isEmpty {
+    private func hikesView(user: UserInfo) -> some View {
+        if let hikes = user.userHikes, !hikes.isEmpty {
             return AnyView(
                 VStack(alignment: .leading) {
                     Text("Hikes:")
@@ -272,6 +265,34 @@ struct FriendsDetails: View {
             return AnyView(EmptyView()) // Return empty view if no hikes
         }
     }
+    
+    private func actionButtonsView(user: UserInfo) -> some View {
+        VStack {
+            if user.relationStatus == .pending {
+                Button(action: {
+                    vm.followUser(userId: user.id)
+                }) {
+                    Text("Follow")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(AdaptiveColor(light: .blue, dark: .green).color(for: colorScheme))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .padding()
+            }
+            Button(action: {
+                // Add friend logic
+            }) {
+                Text("Add Friend")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(AdaptiveColor(light: .green, dark: .darkGreen).color(for: colorScheme))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            .padding()
+        }
+    }
 }
-
 

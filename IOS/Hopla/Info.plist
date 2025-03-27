@@ -2,19 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>GMSAPIKey</key>
-    <string>AIzaSyC-2qlkvP8M1pgfnRMG0rr76SlxaI6jzwQ</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Location!</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>The app needs your location to display it on the map.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>The app requires location access to track hikes.</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>This app needs permission to save your profile picture.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs access to your photos to select a profile picture.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>This app wants to use your camera.</string>
+	<key>GMSAPIKey</key>
+	<string>AIzaSyC-2qlkvP8M1pgfnRMG0rr76SlxaI6jzwQ</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>GeorgiaPro-Black.ttf</string>
+		<string>ArialNova.ttf</string>
+		<string>ArialNova-Light.ttf</string>
+	</array>
 </dict>
 </plist>

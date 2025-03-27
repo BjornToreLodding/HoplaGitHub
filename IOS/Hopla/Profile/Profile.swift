@@ -69,6 +69,7 @@ struct Profile: View {
                             vm.showPhotoPicker()
                         } label: {
                             Text("Camera")
+                                .font(.custom("ArialNova", size: 16))
                                 .underline()
                         }
                         Button {
@@ -76,6 +77,7 @@ struct Profile: View {
                             vm.showPhotoPicker()
                         } label: {
                             Text("Photos")
+                                .font(.custom("ArialNova", size: 16))
                                 .underline()
                         }
                     }
@@ -86,6 +88,7 @@ struct Profile: View {
                     HStack(spacing: 10) {
                         NavigationLink(destination: MyHikes()) {
                             Text("My hikes")
+                                .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
                                 .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                                 .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
@@ -93,6 +96,7 @@ struct Profile: View {
                         
                         NavigationLink(destination: MyHorses()) {
                             Text("My horses")
+                                .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
                                 .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                                 .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
@@ -101,6 +105,7 @@ struct Profile: View {
                     HStack(spacing: 10) {
                         NavigationLink(destination: Friends()) {
                             Text("Friends")
+                                .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
                                 .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                                 .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
@@ -108,6 +113,7 @@ struct Profile: View {
                         
                         NavigationLink(destination: FollowingView()) {
                             Text("Following")
+                                .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
                                 .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
                                 .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
@@ -129,10 +135,12 @@ struct Profile: View {
                                 .padding(.top, 10)
                             
                             Text("Username")
+                                .font(.custom("ArialNova", size: 16))
                                 .frame(width: 360, height: 30)
                                 .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                             
                             Text(user.alias)
+                                .font(.custom("ArialNova-Light", size: 16))
                                 .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                                 .frame(width: 360)
                                 .multilineTextAlignment(.center)
@@ -142,10 +150,12 @@ struct Profile: View {
                                 .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
                             
                             Text("Email")
+                                .font(.custom("ArialNova", size: 16))
                                 .frame(width: 360, height: 30)
                                 .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
                             
                             Text(user.email)
+                                .font(.custom("ArialNova-Light", size: 16))
                                 .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                                 .frame(width: 360)
                                 .multilineTextAlignment(.center)
