@@ -13,7 +13,7 @@ export async function render(container, params) {
     `;
 
     try {
-        const response = await fetch(`https://localhost:7128/users/profile/${userId}`, {
+        const response = await fetch(`https://hopla.onrender.com/users/profile/${userId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

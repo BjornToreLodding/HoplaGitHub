@@ -40,7 +40,7 @@ export function render(container) {
         console.log(`Sender forespørsel til API med lat=${latitude}, lon=${longitude}`);
 
         try {
-            const response = await fetch(`https://localhost:7128/trails/list?latitude=${latitude}&longitude=${longitude}`, {
+            const response = await fetch(`https://hopla.onrender.com/trails/list?latitude=${latitude}&longitude=${longitude}`, {
                 method: "GET",
                 headers: { 
                     "Content-Type": "application/json",

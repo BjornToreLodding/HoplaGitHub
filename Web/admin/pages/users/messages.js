@@ -38,8 +38,8 @@ async function loadConversations(userId) {
     conversationList.innerHTML = "<p>Laster samtaler...</p>";
 
     try {
-        //const response = await fetch(`https://localhost:7128/messages/${userId}`);
-        const response = await fetch(`https://localhost:7128/messages/12345678-0000-0000-0001-123456780001`);
+        const response = await fetch(`https://hopla.onrender.com/messages/${userId}`);
+        //const response = await fetch(`https://localhost:7128/messages/12345678-0000-0000-0001-123456780001`);
         if (!response.ok) throw new Error(`Feil ved henting av meldinger: ${response.status}`);
 
         const conversations = await response.json();
@@ -84,8 +84,8 @@ async function loadChat(userId, partnerId, partnerName) {
     chatInputContainer.classList.remove("hidden");
 
     try {
-        //const response = await fetch(`https://localhost:7128/messages/${userId}?id=${partnerId}`);
-        const response = await fetch(`https://localhost:7128/messages/12345678-0000-0000-0001-123456780001?id=12345678-0000-0000-0001-123456780002`);
+        const response = await fetch(`https://hopla.onrender.com/messages/${userId}?id=${partnerId}`);
+        //const response = await fetch(`https://localhost:7128/messages/12345678-0000-0000-0001-123456780001?id=12345678-0000-0000-0001-123456780002`);
         if (!response.ok) throw new Error(`Feil ved henting av meldinger: ${response.status}`);
 
         const messages = await response.json();

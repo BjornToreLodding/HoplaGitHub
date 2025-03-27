@@ -59,7 +59,7 @@ async function changePassword() {
         return;
     }
 
-    const response = await fetch("https://localhost:7128/users/change-password", {
+    const response = await fetch("https://hopla.onrender.com/users/change-password", {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

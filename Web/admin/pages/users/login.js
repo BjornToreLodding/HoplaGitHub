@@ -16,7 +16,7 @@ async function login() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    const response = await fetch("https://localhost:7128/users/login", {
+    const response = await fetch("https://hopla.onrender.com/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
