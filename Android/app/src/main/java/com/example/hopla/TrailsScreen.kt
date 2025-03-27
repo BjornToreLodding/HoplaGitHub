@@ -134,7 +134,7 @@ fun TrailsScreen(navController: NavController) {
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
 
     LaunchedEffect(searchQuery) {
-        pageNumber = 0
+        pageNumber = 1
         if (searchQuery.isEmpty()) {
             trails = emptyList()
             noResults = false
