@@ -25,6 +25,10 @@ public class ChangeEmailRequest
     public string NewEmail { get; set;}
     public string Password { get; set;}
 }
+public class EmailVerificationRequest
+{
+    public string Token { get; set; }
+}
 public class ChangePasswordRequest
 {
     public string OldPassword { get; set; }
