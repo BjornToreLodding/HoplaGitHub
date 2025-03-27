@@ -14,7 +14,7 @@ export async function render(container) {
     console.log("🔍 Henter meldinger for bruker:", userId);
     
     try {
-        const response = await fetch(`https://localhost:7128/messages/${userId}`);
+        const response = await fetch(`https://hopla.onrender.com/messages/${userId}`);
         if (!response.ok) throw new Error(`Feil ved henting av meldinger: ${response.status}`);
 
         const messages = await response.json();
