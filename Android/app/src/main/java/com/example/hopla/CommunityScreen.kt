@@ -80,6 +80,7 @@ import com.example.hopla.apiService.createStable
 import com.example.hopla.apiService.fetchStableDetails
 import com.example.hopla.apiService.fetchStableMessages
 import com.example.hopla.apiService.fetchStables
+import com.example.hopla.apiService.sendStableMessage
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.universalData.AddButton
@@ -91,6 +92,7 @@ import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.SimpleMapScreen
 import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.StableDetails
+import com.example.hopla.universalData.StableMessageRequest
 import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
@@ -481,6 +483,19 @@ fun MessageBox(stableId: String, token: String) {
         }
     }
 
+    // Function to send a new message
+    suspend fun sendMessage(content: String) {
+        val stableMessageRequest = StableMessageRequest(
+            StableId = stableId,
+            Content = content
+        )
+        sendStableMessage(token, stableMessageRequest)
+        // Reload messages after sending
+        messages = listOf()
+        pageNumber = 1
+        loadMessages()
+    }
+
     // Initial load
     LaunchedEffect(Unit) {
         loadMessages()
@@ -545,14 +560,10 @@ fun MessageBox(stableId: String, token: String) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
                 if (newMessage.isNotBlank()) {
-                    val message = Message(
-                        senderId = UserSession.userId,
-                        senderAlias = "Me",
-                        content = newMessage,
-                        timestamp = ZonedDateTime.now().toString()
-                    )
-                    messages = listOf(message) + messages
-                    newMessage = ""
+                    coroutineScope.launch {
+                        sendMessage(newMessage)
+                        newMessage = ""
+                    }
                 }
             }) {
                 Text(text = stringResource(R.string.publish))

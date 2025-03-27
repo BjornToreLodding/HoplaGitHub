@@ -8,6 +8,8 @@ import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.universalData.ResetPasswordRequest
+import com.example.hopla.universalData.StableMessageRequest
+import com.example.hopla.universalData.StableMessageResponse
 import com.example.hopla.universalData.StableRequest
 import com.example.hopla.universalData.TrailRatingRequest
 import com.example.hopla.universalData.TrailRatingResponse
@@ -322,6 +324,29 @@ suspend fun createStable(token: String, stableRequest: StableRequest, context: C
     Log.d("createStable", "Response Headers: ${response.headers}")
     Log.d("createStable", "Response Body: $responseBody")
     return responseBody
+}
+
+suspend fun sendStableMessage(token: String, stableMessageRequest: StableMessageRequest): StableMessageResponse {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val response: HttpResponse = client.post(apiUrl+"stablemessages") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(stableMessageRequest)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    client.close()
+    Log.d("stableMessage", "Response Body: $responseBody")
+    return Json.decodeFromString(StableMessageResponse.serializer(), responseBody)
 }
 
 //----------------------Post requests for trails ---------------------

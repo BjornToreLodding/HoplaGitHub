@@ -275,6 +275,17 @@ data class StableRequest(
     val PrivateGroup: Boolean
 )
 
+@Serializable
+data class StableMessageRequest(
+    val StableId: String,
+    val Content: String
+)
+
+@Serializable
+data class StableMessageResponse(
+    val message: String
+)
+
 //---------------- Data classes for login page ----------------
 @Serializable
 data class ResetPasswordRequest(val Email: String)
