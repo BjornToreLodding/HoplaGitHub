@@ -289,7 +289,7 @@ fun handleLogin(
 }
 
 //----------------------Community Post Request-------------------------
-suspend fun createStable(token: String, stableRequest: StableRequest, context: Context): String {
+suspend fun createStable(token: String, stableRequest: StableRequest): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json()

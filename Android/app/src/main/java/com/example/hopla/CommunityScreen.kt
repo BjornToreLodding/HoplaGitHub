@@ -98,7 +98,6 @@ import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
-import java.time.ZonedDateTime
 
 @Composable
 fun CommunityScreen(navController: NavController, token: String) {
@@ -736,7 +735,7 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                             PrivateGroup = isPrivate
                         )
                         coroutineScope.launch {
-                            val response = createStable(token, stableRequest, context)
+                            val response = createStable(token, stableRequest)
                             Log.d("createStable", "Response: $response")
                             navController.popBackStack()
                         }
