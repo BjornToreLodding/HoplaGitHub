@@ -22,12 +22,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,13 +46,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.hopla.universalData.AddButton
-import com.example.hopla.universalData.Horse
-import com.example.hopla.universalData.HorseDetail
 import com.example.hopla.R
 import com.example.hopla.apiService.deleteHorse
-import com.example.hopla.universalData.ScreenHeader
-import com.example.hopla.universalData.UserSession
 import com.example.hopla.apiService.fetchHorseDetails
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryWhite
@@ -59,6 +56,11 @@ import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.generalTextStyleRed
 import com.example.hopla.ui.theme.headerTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.universalData.AddButton
+import com.example.hopla.universalData.Horse
+import com.example.hopla.universalData.HorseDetail
+import com.example.hopla.universalData.ScreenHeader
+import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
 
 @Composable
@@ -120,6 +122,7 @@ fun MyHorsesScreen(navController: NavController) {
 @Composable
 fun HorseDetailScreen(navController: NavController, horseId: String) {
     var horseDetail by remember { mutableStateOf<HorseDetail?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(horseId) {
@@ -210,14 +213,7 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .clickable {
-                                coroutineScope.launch {
-                                    try {
-                                        deleteHorse(UserSession.token, horseId)
-                                        navController.popBackStack() // Navigate back after deletion
-                                    } catch (e: Exception) {
-                                        Log.e("HorseDetailScreen", "Error deleting horse", e)
-                                    }
-                                }
+                                showDialog = true
                             }
                     )
                 }
@@ -237,6 +233,39 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
+    }
+
+    // Confirmation Dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = stringResource(R.string.delete_horse)) },
+            text = { Text(text = stringResource(R.string.delete_horse_dialogue)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                deleteHorse(UserSession.token, horseId)
+                                navController.popBackStack() // Navigate back after deletion
+                            } catch (e: Exception) {
+                                Log.e("HorseDetailScreen", "Error deleting horse", e)
+                            }
+                        }
+                        showDialog = false
+                    }
+                ) {
+                    Text(text = stringResource(R.string.yes))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text(text = stringResource(R.string.no))
+                }
+            }
+        )
     }
 }
 

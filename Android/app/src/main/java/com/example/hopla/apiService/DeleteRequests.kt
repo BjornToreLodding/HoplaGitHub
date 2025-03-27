@@ -45,7 +45,7 @@ suspend fun deleteHorse(token: String, horseId: String): String {
         }
     }
 
-    var url = "http://hopla.onrender.com/horses/delete/$horseId"
+    val url = "http://hopla.onrender.com/horses/delete/$horseId"
     var response: HttpResponse = client.delete(url) {
         header("Authorization", "Bearer $token")
         contentType(ContentType.Application.Json)
