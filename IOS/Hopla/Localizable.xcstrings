@@ -21,9 +21,6 @@
         }
       }
     },
-    "Add Following" : {
-
-    },
     "Add Friend" : {
       "localizations" : {
         "nb" : {
@@ -33,9 +30,6 @@
           }
         }
       }
-    },
-    "Add Friends" : {
-
     },
     "Add Horse" : {
       "localizations" : {
@@ -238,6 +232,16 @@
         }
       }
     },
+    "Duration: %@ hrs" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tid: %@ min"
+          }
+        }
+      }
+    },
     "Email" : {
       "localizations" : {
         "nb" : {
@@ -358,16 +362,6 @@
         }
       }
     },
-    "Enter username..." : {
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv brukernavn…"
-          }
-        }
-      }
-    },
     "Enter your email" : {
       "localizations" : {
         "nb" : {
@@ -419,7 +413,14 @@
       }
     },
     "Follow" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Følg"
+          }
+        }
+      }
     },
     "Following" : {
       "localizations" : {
@@ -442,7 +443,14 @@
       }
     },
     "Friend" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venn"
+          }
+        }
+      }
     },
     "Friends" : {
       "localizations" : {
@@ -544,6 +552,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bli med nå"
+          }
+        }
+      }
+    },
+    "Length: %@ km" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lengde: %@ km"
           }
         }
       }
@@ -735,7 +753,14 @@
       }
     },
     "Pending" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venter…"
+          }
+        }
+      }
     },
     "Photos" : {
       "localizations" : {
@@ -778,18 +803,25 @@
         }
       }
     },
-    "Search for Users to Add" : {
+    "Search for Users to Add..." : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Søk etter brukere å legge til"
+            "value" : "Søk etter brukere…"
           }
         }
       }
     },
-    "Search for Users to Follow" : {
-
+    "Search for Users to Follow..." : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk etter brukere…"
+          }
+        }
+      }
     },
     "Search friends..." : {
       "localizations" : {

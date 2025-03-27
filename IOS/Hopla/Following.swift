@@ -281,6 +281,7 @@ struct FollowingRowView: View {
 struct AddFollowingPage: View {
     @State private var searchTextFollowing: String = ""
     @StateObject private var vm = FollowingViewModel()
+    @Environment(\.colorScheme) var colorScheme
 
     var filteredUsers: [User] {
         if searchTextFollowing.isEmpty {
@@ -291,70 +292,95 @@ struct AddFollowingPage: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack {
-                Text("Search for Users to Follow")
-                    .font(.headline)
-                    .padding()
+        ZStack {
+            VStack(spacing: 0) {
+                // The custom header
+                FriendsHeaderView(colorScheme: colorScheme)
+                
+                // The search bar
+                searchBar
+                    .frame(maxWidth: .infinity)
+                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
 
-                TextField("Enter username...", text: $searchTextFollowing)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
+                // ScrollView for the list of users
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(filteredUsers) { user in
+                            NavigationLink(destination: UserDetails(userId: user.id)) {
+                                HStack {
+                                    if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
+                                        AsyncImage(url: url) { image in
+                                            image.resizable()
+                                                .scaledToFill()
+                                                .frame(width: 60, height: 60)
+                                                .clipShape(Circle())
+                                        } placeholder: {
+                                            Circle()
+                                                .fill(Color.gray.opacity(0.5))
+                                                .frame(width: 60, height: 60)
+                                        }
+                                    } else {
+                                        Circle()
+                                            .fill(Color.gray.opacity(0.5))
+                                            .frame(width: 60, height: 60)
+                                    }
 
-                List(filteredUsers) { user in
-                    NavigationLink(destination: UserDetails(userId: user.id)) {  // Pass user.id here
-                        HStack {
-                            if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
-                                AsyncImage(url: url) { image in
-                                    image.resizable()
-                                        .scaledToFill()
-                                        .frame(width: 60, height: 60)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.5))
-                                        .frame(width: 60, height: 60)
+                                    Text(user.name)
+                                        .font(.headline)
+                                        .padding(.leading, 10)
+
+                                    Spacer()
+
+                                    if user.relationStatus == .following {
+                                        Text("Following")
+                                            .padding(8)
+                                            .background(Color.gray)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(8)
+                                    } else {
+                                        Button(action: {
+                                            vm.addFollowing(userId: user.id)
+                                        }) {
+                                            Text("Follow")
+                                                .padding(8)
+                                                .background(Color.green)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(8)
+                                        }
+                                    }
                                 }
-                            } else {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.5))
-                                    .frame(width: 60, height: 60)
-                            }
-
-                            Text(user.name)
-                                .font(.headline)
-                                .padding(.leading, 10)
-
-                            Spacer()
-
-                            if user.relationStatus == .following {
-                                Text("Following")
-                                    .padding(8)
-                                    .background(Color.gray)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(8)
-                            } else {
-                                Button(action: {
-                                    vm.addFollowing(userId: user.id)
-                                }) {
-                                    Text("Follow")
-                                        .padding(8)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(8)
-                                }
+                                .padding()
+                                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+                                .shadow(radius: 2)
                             }
                         }
-                        .padding()
                     }
+                    .padding(.horizontal)
                 }
             }
             .onAppear {
                 vm.fetchAllUsers()
             }
-            .navigationBarTitle("Add Following", displayMode: .inline)
+
+            // Custom back button
+            CustomBackButton(colorScheme: colorScheme)
         }
+        .navigationBarBackButtonHidden(true) // Hides the default back button
+    }
+
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+            TextField("Search for Users to Follow...", text: $searchTextFollowing)
+                .textFieldStyle(PlainTextFieldStyle())
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+        }
+        .padding(.horizontal)
     }
 }
+
 
 
 
