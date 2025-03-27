@@ -57,6 +57,11 @@ public class UserController : ControllerBase
             return BadRequest("E-postadressen er allerede registrert."); //Endres til noe annet for å ikke avsløre at epostadressen finnes.
 
         var existingVerification = await _context.EmailVerifications.AnyAsync(ev => ev.Email == request.Email && !ev.IsUsed && ev.ExpiryDate < DateTime.UtcNow);
+        var existingVerification2 = await _context.EmailVerifications.FirstOrDefaultAsync(ev => ev.Email == request.Email);
+        Console.WriteLine(existingVerification2.Email);
+        Console.WriteLine(existingVerification2.IsUsed);
+        Console.WriteLine(existingVerification2.ExpiryDate);
+        Console.WriteLine(DateTime.UtcNow);
         if (existingVerification)
             return BadRequest("En verifikasjonsprosess er allerede i gang. Sjekk e-posten din og evt søppelpost.");
 

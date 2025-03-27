@@ -18,11 +18,12 @@ using HoplaBackend.Helpers;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Reflection;
-/*
+
 using Serilog;
 using System;
 using System.Net.Http;
-*/
+using Serilog.Events;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,32 @@ Log.Information("🚀 Forsøker å starte programmet ");
 //builder.Host.UseSerilog();
 
 */
+var logtailUrl = "https://s1209901.eu-nbg-2.betterstackdata.com:443/SqQyvVrV6jWshrdibjNdoKkM";
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+
+    // ⬇️ Vis kun Warnings+ fra system
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+
+    // ⬇️ Console får alt
+    .WriteTo.Console()
+
+    // ⬇️ Logtail får bare RequestLogging
+    .WriteTo.Logger(lc => lc
+    .Filter.ByIncludingOnly(logEvent =>
+        logEvent.Properties.ContainsKey("Category") &&
+        logEvent.Properties["Category"].ToString() == "\"RequestLogging\"")
+    .WriteTo.Sink(new PutLog.LogTail(logtailUrl))
+)
+
+
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
 
 // Prøver å hente database-url fra miljøvariabelen DATABASE_URL
 string? databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -202,7 +229,12 @@ builder.Services.AddScoped<TrailFavoriteService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<EntityService>();
 builder.Services.AddScoped<ImageUploadService>();
+builder.Services.AddScoped<RequestLoggingService>(); // Registrer tjenesten
 
+builder.Services.AddControllers(options =>
+{
+    options.Filters.AddService<RequestLoggingService>(); // Aktiver som globalt filter
+});
 
 
 

@@ -21,7 +21,7 @@ public class TrailFilterDefinition
     public int Order { get; set; }
 }
     
-    /*
+/*
 public class TrailFilterDefinition
 {
     public Guid Id { get; set; } = Guid.NewGuid(); // Bruker Guid
