@@ -345,6 +345,19 @@ data class TrailUpdate(
     val alias: String
 )
 
+@Serializable
+data class TrailCoordinate(
+    val lat: Double,
+    val long: Double
+)
+
+@Serializable
+data class TrailResponse(
+    val id: String,
+    val distance: Double,
+    val allCoords: List<TrailCoordinate>
+)
+
 //---------------------Data classes for relations-----------
 // A request from another user of becoming friends
 @Serializable

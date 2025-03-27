@@ -14,6 +14,7 @@ import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.Stable
 import com.example.hopla.universalData.StableDetails
 import com.example.hopla.universalData.TrailFilter
+import com.example.hopla.universalData.TrailResponse
 import com.example.hopla.universalData.TrailUpdate
 import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.UserHikesResponse
@@ -311,6 +312,38 @@ suspend fun fetchTrailFilters(token: String): List<TrailFilter> {
     Log.d("fetchTrailFilters", "Response: $responseBody")
     client.close()
     return response.body()
+}
+
+// Fetch all coordinates for the specified trail
+suspend fun fetchTrailCoordinates(trailId: String, token: String): TrailResponse? {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
+    val url = (apiUrl+"trails/prepare?trailId=$trailId")
+    Log.d("fetchTrailDetails", "Request URL: $url")
+
+    return try {
+        httpClient.use { client ->
+            val response: HttpResponse = client.get(url) {
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
+            }
+
+            val responseBody: String = response.bodyAsText()
+            Log.d("fetchTrailDetails", "Response Body: $responseBody")
+
+            response.body()
+        }
+    } catch (e: Exception) {
+        Log.e("fetchTrailDetails", "Error fetching trail details", e)
+        null
+    }
 }
 
 //-------------------------------Other users--------------------------------------------------

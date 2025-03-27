@@ -938,7 +938,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.3f)
                             .background(MaterialTheme.colorScheme.primary)
-                            .clickable { navController.navigate("map_screen") },
+                            .clickable { navController.navigate("start_trip_map") },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = stringResource(R.string.start_trip))

@@ -151,3 +151,44 @@ fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
         }
     }
 }
+
+@Composable
+fun StartTripMapScreen() {
+    val mapView = rememberMapViewWithLifecycle()
+    val context = LocalContext.current
+    val zoomLevel = remember { mutableIntStateOf(10) }
+    val latitude = remember { mutableDoubleStateOf(0.0) }
+    val longitude = remember { mutableDoubleStateOf(0.0) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
+
+    AndroidView({ mapView }) {
+        mapView.getMapAsync { googleMap ->
+            googleMap.uiSettings.isZoomControlsEnabled = true
+            enableMyLocation(googleMap, context)
+
+            // Get the phone's location and move the camera to that location
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val locationProvider = LocationManager.GPS_PROVIDER
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                val lastKnownLocation = locationManager.getLastKnownLocation(locationProvider)
+                lastKnownLocation?.let {
+                    val userLocation = LatLng(it.latitude, it.longitude)
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoomLevel.intValue.toFloat()))
+                }
+            }
+
+            // Update zoom level and center coordinates when the camera changes
+            googleMap.setOnCameraIdleListener {
+                zoomLevel.intValue = googleMap.cameraPosition.zoom.toInt()
+                latitude.doubleValue = googleMap.cameraPosition.target.latitude
+                longitude.doubleValue = googleMap.cameraPosition.target.longitude
+                Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
+
+                // Clear all markers
+                googleMap.clear()
+            }
+        }
+    }
+}

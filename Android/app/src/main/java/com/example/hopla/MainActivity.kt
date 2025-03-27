@@ -73,6 +73,7 @@ import com.example.hopla.ui.theme.ThemeViewModel
 import com.example.hopla.universalData.DeleteUserRequest
 import com.example.hopla.universalData.DeleteUserResponse
 import com.example.hopla.universalData.MapScreen
+import com.example.hopla.universalData.StartTripMapScreen
 import com.example.hopla.universalData.UserSession
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -137,6 +138,7 @@ class MainActivity : ComponentActivity() {
                             composable("settings") { SettingsScreen(languageViewModel, themeViewModel, userViewModel, navController) }
                             composable("my_trips") { MyTripsScreen(navController) }
                             composable("map_screen") { MapScreen() }
+                            composable("start_trip_map") { StartTripMapScreen() }
                             composable("my_horses") { MyHorsesScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
                             composable("user_horses/{userId}") { backStackEntry ->
