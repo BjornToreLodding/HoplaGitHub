@@ -65,6 +65,16 @@ class StableViewModel: ObservableObject {
                     do {
                         let decodedResponse = try JSONDecoder().decode([Stable].self, from: data)
                         self.stables = decodedResponse
+                        
+                        // Print out the details for every stable
+                        for stable in decodedResponse {
+                            print("Stable ID: \(stable.stableId)")
+                            print("Stable Name: \(stable.stableName)")
+                            print("Distance: \(stable.distance)")
+                            print("Member: \(stable.member)")
+                            print("Picture URL: \(stable.pictureUrl)")
+                            print("-------------------------")
+                        }
                     } catch {
                         print("Decoding error: \(error)")
                     }
@@ -165,7 +175,7 @@ struct StableCard: View {
     var body: some View {
         NavigationLink(destination: CommunityChat(stable: stable)) {
             VStack {
-                ZStack(alignment: .topLeading) {
+                ZStack(alignment: .topTrailing) { // Align items to the top-right
                     AsyncImage(url: URL(string: stable.pictureUrl)) { image in
                         image.resizable()
                     } placeholder: {
@@ -174,9 +184,18 @@ struct StableCard: View {
                     .scaledToFill()
                     .frame(width: 370, height: 150)
                     .clipped()
-                    
+                
+                    // Dark overlay for better text visibility
                     Color.black.opacity(0.4)
                         .frame(width: 370, height: 150)
+                    
+                    // Heart icon
+                    Image(systemName: stable.member ? "heart.fill" : "heart")
+                        .font(.system(size: 20))
+                        .foregroundColor(stable.member ? .red : .white)
+                        .padding(10) // Padding for positioning
+                        .padding([.top, .trailing], 10) // Adjust position
+                    
                     
                     VStack {
                         Spacer()
@@ -195,4 +214,5 @@ struct StableCard: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+
 
