@@ -188,7 +188,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                             context = context,
                             coroutineScope = coroutineScope,
                             onLogin = {
-                                saveLoginState(context, username, password)
+                                saveLoginState(context, username, password) // Save login state
                                 onLogin()
                                 navController.navigate("profile")
                             },
@@ -565,12 +565,12 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit) {
     }
 }
 
-fun saveLoginState(context: Context, username: String? = null, password: String? = null, isLoggedIn: Boolean = false) {
+fun saveLoginState(context: Context, username: String, password: String) {
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
     editor.putString("username", username)
     editor.putString("password", password)
-    editor.putBoolean("isLoggedIn", isLoggedIn)
+    editor.putBoolean("isLoggedIn", true)
     editor.apply()
 }
 

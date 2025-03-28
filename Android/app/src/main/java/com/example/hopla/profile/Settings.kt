@@ -136,7 +136,7 @@ fun SettingsScreen(
             message = stringResource(R.string.confirm_logout),
             onConfirm = {
                 userViewModel.logOut()
-                saveLoginState(context = context) // Reset login state
+                saveLoginState(context = context, "", "") // Reset login state
                 showLogOutDialog = false
             },
             onDismiss = { showLogOutDialog = false }
@@ -151,7 +151,7 @@ fun SettingsScreen(
             onPasswordChange = { password = it },
             onConfirm = { password ->
                 userViewModel.deleteUser(UserSession.token, password)
-                saveLoginState(context = context) // Reset login state
+                saveLoginState(context = context, "", "") // Reset login state
                 showDeleteDialog = false
             },
             onDismiss = { showDeleteDialog = false }
