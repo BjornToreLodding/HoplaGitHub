@@ -130,7 +130,6 @@ fun TrailsScreen(navController: NavController) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var isRouteClicked by remember { mutableStateOf(false) }
     var selectedContentBoxInfo by remember { mutableStateOf<ContentBoxInfo?>(null) }
-    remember { mutableStateOf(setOf<String>()) }
     var showOnlyFavorites by remember { mutableStateOf(false) }
     var trails by remember { mutableStateOf<List<Trail>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()

@@ -116,6 +116,10 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val isLoggedIn by userViewModel.isLoggedIn
 
+                CheckLoginState(navController = navController, onLogin = {
+                    userViewModel.logIn(navController)
+                })
+
                 if (isLoggedIn) {
                     Scaffold(
                         topBar = { TopBar() },

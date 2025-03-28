@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,6 +43,10 @@ import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleBig
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.launch
+import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit) {
@@ -52,24 +57,21 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var isCheckingLoginState by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        // REMOVE BEFORE FINISHING -> auto login
-        Button(
-            onClick = {
-                username = "test@test.no"
-                password = "Hopla2025!"
+    LaunchedEffect(Unit) {
+        delay(3000) // Add a delay to simulate loading time
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        if (isLoggedIn) {
+            val savedUsername = sharedPreferences.getString("username", "")
+            val savedPassword = sharedPreferences.getString("password", "")
+            if (!savedUsername.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {
                 handleLogin(
-                    username = username,
-                    password = password,
+                    username = savedUsername,
+                    password = savedPassword,
                     context = context,
                     coroutineScope = coroutineScope,
                     onLogin = {
@@ -80,59 +82,40 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                     setShowErrorDialog = { showErrorDialog = it },
                     setIsLoading = { isLoading = it }
                 )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-        ) {
-            Text(
-                text = "Auto-Fill and Login",
-                style = buttonTextStyle
-            )
+            }
         }
+        isCheckingLoginState = false
+    }
 
-        Image(
-            painter = painterResource(id = R.drawable.logo1),
-            contentDescription = "App Logo",
+    if (isCheckingLoginState) {
+        Column(
             modifier = Modifier
-                .fillMaxHeight(0.3f)
-        )
-        Text(
-            text = "Hopla",
-            style = headerTextStyle
-        )
-        TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },
-            singleLine = true,
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo1),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .fillMaxHeight(0.3f)
+            )
+            CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+        }
+    } else {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-        )
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
-            visualTransformation = PasswordVisualTransformation(),
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-        )
-        Text(
-            text = stringResource(R.string.forgot_password),
-            style = underlinedTextStyleSmall,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .clickable { showForgottenPasswordDialog = true }
-        )
-
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-        } else {
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // REMOVE BEFORE FINISHING -> auto login
             Button(
                 onClick = {
+                    username = "test@test.no"
+                    password = "Hopla2025!"
                     handleLogin(
                         username = username,
                         password = password,
@@ -152,36 +135,104 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                     .padding(horizontal = 32.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.log_in),
+                    text = "Auto-Fill and Login",
                     style = buttonTextStyle
                 )
             }
+
+            Image(
+                painter = painterResource(id = R.drawable.logo1),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .fillMaxHeight(0.3f)
+            )
+            Text(
+                text = "Hopla",
+                style = headerTextStyle
+            )
+            TextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 8.dp)
+            )
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
+                visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 8.dp)
+            )
+            Text(
+                text = stringResource(R.string.forgot_password),
+                style = underlinedTextStyleSmall,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .clickable { showForgottenPasswordDialog = true }
+            )
+
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+            } else {
+                Button(
+                    onClick = {
+                        handleLogin(
+                            username = username,
+                            password = password,
+                            context = context,
+                            coroutineScope = coroutineScope,
+                            onLogin = {
+                                saveLoginState(context, username, password)
+                                onLogin()
+                                navController.navigate("profile")
+                            },
+                            setErrorMessage = { errorMessage = it },
+                            setShowErrorDialog = { showErrorDialog = it },
+                            setIsLoading = { isLoading = it }
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.log_in),
+                        style = buttonTextStyle
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.create_user),
+                style = underlinedTextStyleBig,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .clickable { showCreateUserDialogue = true }
+            )
         }
 
-        Text(
-            text = stringResource(R.string.create_user),
-            style = underlinedTextStyleBig,
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .clickable { showCreateUserDialogue = true }
-        )
-    }
+        if (showCreateUserDialogue) {
+            CreateUserDialog(
+                onDismiss = { showCreateUserDialogue = false },
+                onCreateUser = { email, password ->
+                    onCreateUser()
+                }
+            )
+        }
 
-    if (showCreateUserDialogue) {
-        CreateUserDialog(
-            onDismiss = { showCreateUserDialogue = false },
-            onCreateUser = { email, password ->
-                onCreateUser()
-            }
-        )
-    }
+        if (showForgottenPasswordDialog) {
+            ForgottenPasswordDialog(onDismiss = { showForgottenPasswordDialog = false })
+        }
 
-    if (showForgottenPasswordDialog) {
-        ForgottenPasswordDialog(onDismiss = { showForgottenPasswordDialog = false })
-    }
-
-    if (showErrorDialog) {
-        ErrorDialog(errorMessage = errorMessage, onDismiss = { showErrorDialog = false })
+        if (showErrorDialog) {
+            ErrorDialog(errorMessage = errorMessage, onDismiss = { showErrorDialog = false })
+        }
     }
 }
 
@@ -509,6 +560,54 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit) {
                         style = buttonTextStyle
                     )
                 }
+            }
+        }
+    }
+}
+
+fun saveLoginState(context: Context, username: String, password: String) {
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("username", username)
+    editor.putString("password", password)
+    editor.putBoolean("isLoggedIn", true)
+    editor.apply()
+}
+
+@Composable
+fun CheckLoginState(navController: NavController, onLogin: () -> Unit) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        Log.d("LoginState", "Checking login state")
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", true)
+        Log.d("LoginState", "isLoggedIn: $isLoggedIn")
+        if (isLoggedIn) {
+            val username = sharedPreferences.getString("username", "")
+            val password = sharedPreferences.getString("password", "")
+            Log.d("LoginState", "username: $username, password: $password")
+            if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
+                handleLogin(
+                    username = username,
+                    password = password,
+                    context = context,
+                    coroutineScope = coroutineScope,
+                    onLogin = {
+                        onLogin()
+                        navController.navigate("profile")
+                    },
+                    setErrorMessage = { errorMessage ->
+                        Log.e("LoginState", "Login error: $errorMessage")
+                    },
+                    setShowErrorDialog = { showErrorDialog ->
+                        Log.e("LoginState", "Show error dialog: $showErrorDialog")
+                    },
+                    setIsLoading = { isLoading ->
+                        Log.d("LoginState", "Loading state: $isLoading")
+                    }
+                )
             }
         }
     }

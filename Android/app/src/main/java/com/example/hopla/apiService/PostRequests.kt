@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.hopla.R
+import com.example.hopla.saveLoginState
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
@@ -230,6 +231,7 @@ fun handleLogin(
     val trimmedPassword = password.trim()
 
     if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
+        Log.d("LoginState", "Input fields cannot be empty")
         setErrorMessage(context.getString(R.string.input_fields_cannot_be_empty))
         setShowErrorDialog(true)
     } else {
@@ -245,10 +247,14 @@ fun handleLogin(
                 }
             }
             try {
+                Log.d("LoginState", "Attempting login for username: $trimmedUsername")
                 val response: HttpResponse = client.post(apiUrl + "users/login/") {
                     contentType(ContentType.Application.Json)
                     setBody(LoginRequest(email = trimmedUsername, password = trimmedPassword))
                 }
+                Log.d("LoginState", "Response Status: ${response.status}")
+                Log.d("LoginState", "Response Body: ${response.bodyAsText()}")
+
                 when (response.status) {
                     HttpStatusCode.OK -> {
                         val loginResponse = response.body<User>()
@@ -262,24 +268,24 @@ fun handleLogin(
                         UserSession.description = loginResponse.description
                         UserSession.dob = loginResponse.dob
                         UserSession.redirect = loginResponse.redirect
+                        Log.d("LoginState", "Login successful for username: $trimmedUsername")
+                        saveLoginState(context, trimmedUsername, trimmedPassword)
                         onLogin()
                     }
                     HttpStatusCode.Unauthorized -> {
                         val errorResponse = response.body<ErrorResponse>()
+                        Log.e("LoginState", "Unauthorized: ${errorResponse.message}")
                         setErrorMessage(errorResponse.message)
                         setShowErrorDialog(true)
                     }
                     else -> {
-                        Log.e(
-                            "LoginError",
-                            "Status: ${response.status}, Body: ${response.bodyAsText()}"
-                        )
+                        Log.e("LoginState", "Status: ${response.status}, Body: ${response.bodyAsText()}")
                         setErrorMessage(context.getString(R.string.not_available_right_now))
                         setShowErrorDialog(true)
                     }
                 }
             } catch (e: Exception) {
-                Log.e("LoginError", "Exception: ${e.message}")
+                Log.e("LoginState", "Exception: ${e.message}")
                 setErrorMessage(context.getString(R.string.not_available_right_now))
                 setShowErrorDialog(true)
             } finally {
