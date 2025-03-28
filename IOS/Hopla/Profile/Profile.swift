@@ -9,6 +9,61 @@ import SwiftUI
 import PhotosUI // To select photos
 import UIKit
 
+
+class ProfileViewModel: ObservableObject {
+    @Published var selectedImage: UIImage?
+    
+    func uploadProfileImage(image: UIImage, entityId: String, table: String, token: String) async {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            print("Kunne ikke konvertere bildet til Data")
+            return
+        }
+
+        let url = URL(string: "https://hopla.onrender.com/upload")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+
+        // Legg til bilde
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n".data(using: .utf8)!)
+
+        // Legg til `table`
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"table\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(table)\r\n".data(using: .utf8)!)
+
+        // Legg til `entityId`
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"entityId\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(entityId)\r\n".data(using: .utf8)!)
+
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                let responseString = String(data: data, encoding: .utf8)
+                print("Upload successful: \(responseString ?? "No response")")
+            } else {
+                print("Upload failed: \(response)")
+            }
+        } catch {
+            print("Error uploading image: \(error.localizedDescription)")
+        }
+    }
+}
+
+
 struct Profile: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var vm: ViewModel

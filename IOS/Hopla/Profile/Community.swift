@@ -1,14 +1,83 @@
+
 import SwiftUI
+import Foundation
+
 
 // MARK: - Hike Model
-struct Group: Identifiable {
-    let id = UUID()
-    let name: String
-    let filters: [HikeFilter]
-    var isFavorite: Bool
-    let imageName: String
-    let description: String
+struct Stable: Identifiable, Decodable {
+    let stableId: String
+    let stableName: String
+    let distance: Double
+    let member: Bool
+    let pictureUrl: String
+    
+    // Conforming to Identifiable protocol
+    var id: String {
+        return stableId
+    }
 }
+
+
+
+
+class StableViewModel: ObservableObject {
+    @Published var stables: [Stable] = []
+    
+    func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int? = nil, pageNumber: Int? = nil) {
+        let baseURL = "https://hopla.onrender.com/stables/all"
+        var urlComponents = URLComponents(string: baseURL)!
+        
+        var queryItems: [URLQueryItem] = [
+            URLQueryItem(name: "latitude", value: "\(latitude)"),
+            URLQueryItem(name: "longitude", value: "\(longitude)")
+        ]
+        
+        // Add optional parameters if they are provided
+        if let search = search, !search.isEmpty {
+            queryItems.append(URLQueryItem(name: "search", value: search))
+        }
+        if let pageSize = pageSize {
+            queryItems.append(URLQueryItem(name: "pagesize", value: "\(pageSize)"))
+        }
+        if let pageNumber = pageNumber {
+            queryItems.append(URLQueryItem(name: "pagenumber", value: "\(pageNumber)"))
+        }
+        
+        // Set query items
+        urlComponents.queryItems = queryItems
+        
+        guard let url = urlComponents.url else { return }
+        
+        // Debugging: print the final URL
+        print("Request URL: \(url)")
+        
+        // Make the API call
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let httpResponse = response as? HTTPURLResponse {
+                print("HTTP Status Code: \(httpResponse.statusCode)")
+            }
+            
+            if let data = data, !data.isEmpty {
+                DispatchQueue.main.async {
+                    do {
+                        let decodedResponse = try JSONDecoder().decode([Stable].self, from: data)
+                        self.stables = decodedResponse
+                    } catch {
+                        print("Decoding error: \(error)")
+                    }
+                }
+            } else {
+                print("Received empty or invalid data")
+            }
+        }.resume()
+    }
+}
+
+
+
 
 // MARK: - Filter bar Options
 enum FilterCommunity: String, CaseIterable, Identifiable {
@@ -30,58 +99,38 @@ struct Community: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedFilter: FilterCommunity = .location
     @State private var searchText: String = ""
+    @StateObject private var viewModel = StableViewModel()
     
-    @State private var groups: [Group] = [
-        Group(name: "Stall Tønneberg", filters: [.asphalt, .forest, .gravel, .parking], isFavorite: false, imageName: "Group", description: "An easy trail through a beautiful forest. There is parking available at the start and end of the trail."),
-        Group(name: "Rogaland Rideklubb", filters: [.mountain, .forest], isFavorite: false, imageName: "Group2", description: "A challenging trail with stunning mountain views. There is no parking available at the start and end of the trail."),
-        Group(name: "Barthun stall", filters: [.forest, .gravel, .parking], isFavorite: true, imageName: "Group3", description: "This hike is a paradise for nature lovers. It tends to get very busy during peak season, so it is best to go early in the morning or late in the afternoon."),
-        Group(name: "Gjøvik Gård", filters: [.asphalt, .gravel], isFavorite: false, imageName: "Gjøvik", description: "A difficult trail with beautiful views of the valley. It is best to go in the summer when the weather is good.")
-    ]
-    
-    //
-    private var filteredGroups: [Group] {
+    var filteredStables: [Stable] {
         let lowercasedSearchText = searchText.lowercased()
-        return groups.filter { group in
-            (selectedFilter == .heart ? group.isFavorite : true) &&
-            (searchText.isEmpty || group.name.lowercased().contains(lowercasedSearchText))
+        return viewModel.stables.filter { stable in
+            (selectedFilter == .heart ? stable.member : true) &&
+            (searchText.isEmpty || stable.stableName.lowercased().contains(lowercasedSearchText))
         }
     }
     
     var body: some View {
-        VStack() {
+        VStack {
             filterBar
             searchBar
-        }
-        .frame(maxWidth: .infinity)
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-        ZStack {
             NavigationView {
                 ScrollView {
                     VStack(spacing: 10) {
-                        ForEach(filteredGroups, id: \ .id) { group in
-                            GroupCard(group: binding(for: group))
+                        ForEach(filteredStables) { stable in
+                            StableCard(stable: stable)
                         }
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
                     }
                     .padding(.horizontal)
                 }
                 .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-                
             }
-            .navigationBarBackButtonHidden(true) // Hides the default back button
+            .navigationBarBackButtonHidden(true)
         }
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-        .edgesIgnoringSafeArea(.top) // Ensures it can be placed above navigation elements
+        .onAppear {
+            viewModel.fetchStables(latitude: 60.8, longitude: 10.7)
+        }
     }
     
-    private func binding(for group: Group) -> Binding<Group> {
-        guard let index = groups.firstIndex(where: { $0.id == group.id }) else {
-            fatalError("Group not found in list")
-        }
-        return $groups[index]
-    }
-    
-    // MARK: - Filter Bar
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
@@ -90,18 +139,15 @@ struct Community: View {
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
-            
         }
-        //.frame(height: 60) LEGG TIL
         .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
     }
     
-    // MARK: - Search Bar
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-            TextField("Search groups...", text: $searchText)
+            TextField("Search stables...", text: $searchText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
@@ -110,52 +156,43 @@ struct Community: View {
     }
 }
 
-// MARK: - Hike Card
 
-struct GroupCard: View {
-    @Binding var group: Group
+
+// MARK: - Stable Card
+struct StableCard: View {
+    let stable: Stable
     
     var body: some View {
-        NavigationLink(destination: CommunityChat(group: group)) {
+        NavigationLink(destination: CommunityChat(stable: stable)) {
             VStack {
                 ZStack(alignment: .topLeading) {
-                    Image(group.imageName)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 370, height: 150)
-                        .clipped()
+                    AsyncImage(url: URL(string: stable.pictureUrl)) { image in
+                        image.resizable()
+                    } placeholder: {
+                        Color.gray
+                    }
+                    .scaledToFill()
+                    .frame(width: 370, height: 150)
+                    .clipped()
                     
                     Color.black.opacity(0.4)
                         .frame(width: 370, height: 150)
-                        .frame(maxWidth: .infinity)
-                    
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            group.isFavorite.toggle()
-                        }) {
-                            Image(systemName: group.isFavorite ? "heart.fill" : "heart")
-                                .foregroundColor(group.isFavorite ? .red : .white)
-                                .padding()
-                        }
-                    }
                     
                     VStack {
                         Spacer()
                         HStack {
-                            Text(group.name)
+                            Text(stable.stableName)
                                 .foregroundStyle(.white)
                                 .padding(.leading, 10)
                             Spacer()
                         }
                     }
-                    
                 }
-                
             }
             .clipShape(Rectangle())
             .shadow(radius: 3)
         }
-        .buttonStyle(PlainButtonStyle()) // Removes default navigation link styling
+        .buttonStyle(PlainButtonStyle())
     }
 }
+

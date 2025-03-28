@@ -847,6 +847,7 @@
       }
     },
     "Search groups..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -865,6 +866,9 @@
           }
         }
       }
+    },
+    "Search stables..." : {
+
     },
     "Select Image" : {
       "localizations" : {

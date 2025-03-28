@@ -11,7 +11,7 @@ struct CommunityChat: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     
-    let group: Group
+    let stable: Stable
     @State private var messages: [Message] = [
         Message(id: UUID(), sender: "Alice", text: "Hello everyone!", time: "10:30", date: "27/02/2025"),
         Message(id: UUID(), sender: "Bob", text: "Hey Alice!", time: "10:32", date: "27/02/2025")
@@ -24,7 +24,7 @@ struct CommunityChat: View {
             VStack(spacing: 0) { // Removes white space
                 // Group Name Header
                 
-                Text(group.name)
+                Text(stable.stableName)
                     .font(.title)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right

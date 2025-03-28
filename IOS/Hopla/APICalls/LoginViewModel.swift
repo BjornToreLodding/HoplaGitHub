@@ -21,6 +21,15 @@ class LoginViewModel: ObservableObject {
         let password: String
     }
     
+    struct DOB: Codable {
+        let year: Int
+        let month: Int
+        let day: Int
+        let dayOfWeek: Int
+        let dayOfYear: Int
+        let dayNumber: Int
+    }
+
     struct LoginResponse: Codable {
         let token: String
         let userId: String
@@ -29,7 +38,7 @@ class LoginViewModel: ObservableObject {
         let pictureUrl: String?
         let telephone: String?
         let description: String?
-        let dob: String?
+        let dob: DOB?  // Changed from String? to DOB
         let redirect: String?
     }
 
@@ -40,8 +49,9 @@ class LoginViewModel: ObservableObject {
         let pictureUrl: String?
         let telephone: String?
         let description: String?
-        let dob: String?
+        let dob: DOB?  // Changed from String? to DOB
     }
+
 
     func login(email: String, password: String) {
         guard let url = URL(string: apiUrl) else {
