@@ -51,6 +51,9 @@
         }
       }
     },
+    "Are you sure you want to delete %@?" : {
+
+    },
     "Are you sure you want to delete your user?" : {
       "localizations" : {
         "nb" : {
@@ -182,6 +185,12 @@
         }
       }
     },
+    "Delete" : {
+
+    },
+    "Delete Horse" : {
+
+    },
     "Delete User" : {
       "localizations" : {
         "nb" : {
@@ -233,6 +242,7 @@
       }
     },
     "Duration: %@ hrs" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -241,6 +251,9 @@
           }
         }
       }
+    },
+    "Duration: %@ min" : {
+
     },
     "Email" : {
       "localizations" : {

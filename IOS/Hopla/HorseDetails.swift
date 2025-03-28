@@ -85,8 +85,7 @@ struct HorseDetails: View {
                     .fontWeight(.bold)
                 
                 // Horse Image
-                if let horsePictureUrl = horse.horsePictureUrl,
-                   let url = URL(string: horsePictureUrl) {
+                if !horse.horsePictureUrl.isEmpty, let url = URL(string: horse.horsePictureUrl) {
                     AsyncImage(url: url) { image in
                         image
                             .resizable()
@@ -95,6 +94,12 @@ struct HorseDetails: View {
                     } placeholder: {
                         ProgressView()
                     }
+                } else {
+                    // Fallback image or placeholder if the URL is empty
+                    Image(systemName: "photo") // Example placeholder
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
                 }
                 
                 // Breed
