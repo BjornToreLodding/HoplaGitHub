@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
@@ -45,6 +46,7 @@ import com.example.hopla.R
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.UserViewModel
+import com.example.hopla.saveLoginState
 import com.example.hopla.ui.theme.ThemeViewModel
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
@@ -128,23 +130,28 @@ fun SettingsScreen(
         )
     }
     if (showLogOutDialog) {
+        val context = LocalContext.current
         ConfirmDialog(
             title = stringResource(R.string.log_out),
             message = stringResource(R.string.confirm_logout),
             onConfirm = {
                 userViewModel.logOut()
+                saveLoginState(context = context) // Reset login state
                 showLogOutDialog = false
             },
             onDismiss = { showLogOutDialog = false }
         )
     }
     if (showDeleteDialog) {
+        val context = LocalContext.current
+
         PasswordConfirmDialog(
             token = UserSession.token,
             password = password,
             onPasswordChange = { password = it },
             onConfirm = { password ->
                 userViewModel.deleteUser(UserSession.token, password)
+                saveLoginState(context = context) // Reset login state
                 showDeleteDialog = false
             },
             onDismiss = { showDeleteDialog = false }

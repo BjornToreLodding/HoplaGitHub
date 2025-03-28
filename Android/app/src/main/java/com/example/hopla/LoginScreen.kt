@@ -565,12 +565,12 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit) {
     }
 }
 
-fun saveLoginState(context: Context, username: String, password: String) {
+fun saveLoginState(context: Context, username: String? = null, password: String? = null, isLoggedIn: Boolean = false) {
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
     editor.putString("username", username)
     editor.putString("password", password)
-    editor.putBoolean("isLoggedIn", true)
+    editor.putBoolean("isLoggedIn", isLoggedIn)
     editor.apply()
 }
 
