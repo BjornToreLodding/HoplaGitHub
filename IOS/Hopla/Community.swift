@@ -1,6 +1,8 @@
 
 import SwiftUI
 import Foundation
+import CoreLocation
+
 
 
 // MARK: - Hike Model
@@ -8,7 +10,7 @@ struct Stable: Identifiable, Decodable {
     let stableId: String
     let stableName: String
     let distance: Double?
-    let member: Bool
+    var member: Bool
     let pictureUrl: String?
     
     // Conforming to Identifiable protocol
@@ -20,6 +22,124 @@ struct Stable: Identifiable, Decodable {
 
 class StableViewModel: ObservableObject {
     @Published var stables: [Stable] = []
+    private var locationManager: LocationManager
+    
+    init(locationManager: LocationManager) {
+        self.locationManager = locationManager
+        NotificationCenter.default.addObserver(self, selector: #selector(handleLocationUpdate(_:)), name: .didUpdateLocation, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .didUpdateLocation, object: nil)
+    }
+    
+    @objc private func handleLocationUpdate(_ notification: Notification) {
+        guard let location = notification.object as? CLLocation else { return }
+        fetchStables(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+    }
+    
+    func toggleMembership(for stable: Stable) {
+        if let index = stables.firstIndex(where: { $0.id == stable.id }) {
+            stables[index].member.toggle() // Optimistically update UI
+            
+            let isJoining = stables[index].member
+            
+            let completion: (Bool) -> Void = { success in
+                if success {
+                    DispatchQueue.main.async {
+                        if let userLocation = self.locationManager.userLocation {
+                            self.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+                        } else {
+                            print("User location not available, using default coordinates.")
+                            self.fetchStables(latitude: 60.8, longitude: 10.7)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.stables[index].member.toggle() // Revert optimistic toggle
+                        print("Failed to update membership status on server.")
+                    }
+                }
+            }
+            
+            if isJoining {
+                joinStableOnServer(for: stables[index], completion: completion)
+            } else {
+                leaveStableOnServer(for: stables[index], completion: completion)
+            }
+        }
+    }
+    
+    
+    private func joinStableOnServer(for stable: Stable, completion: @escaping (Bool) -> Void) {
+        let url = URL(string: "https://hopla.onrender.com/stables/join")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: Any] = ["stableId": stable.stableId]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            print("Failed to serialize data: \(error)")
+            completion(false)
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error joining stable:", error.localizedDescription)
+                completion(false)
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Join HTTP Status Code:", httpResponse.statusCode)
+                completion((200...299).contains(httpResponse.statusCode))
+            } else {
+                completion(false)
+            }
+        }.resume()
+    }
+    
+    
+    
+    private func leaveStableOnServer(for stable: Stable, completion: @escaping (Bool) -> Void) {
+        let url = URL(string: "https://hopla.onrender.com/stables/leave")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: Any] = ["stableId": stable.stableId]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            print("Failed to serialize data: \(error)")
+            completion(false)
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error leaving stable:", error.localizedDescription)
+                completion(false)
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Leave HTTP Status Code:", httpResponse.statusCode)
+                completion((200...299).contains(httpResponse.statusCode))
+            } else {
+                completion(false)
+            }
+        }.resume()
+    }
+    
+    
+    
+    
     
     func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int? = 50, pageNumber: Int? = 1) {
         let baseURL = "https://hopla.onrender.com/stables/all"
@@ -67,8 +187,6 @@ class StableViewModel: ObservableObject {
                         let decodedResponse = try JSONDecoder().decode([Stable].self, from: data)
                         self.stables = decodedResponse
                         
-                        print("Fetched stables: \(self.stables)")
-                        
                         // Print out the details for every stable
                         for stable in decodedResponse {
                             print("Stable ID: \(stable.stableId)")
@@ -87,7 +205,7 @@ class StableViewModel: ObservableObject {
             }
         }.resume()
     }
-
+    
     
     func createStable(formData: [String: Any], completion: @escaping () -> Void) {
         let url = URL(string: "https://hopla.onrender.com/stables/create")!
@@ -122,7 +240,7 @@ class StableViewModel: ObservableObject {
             if let httpResponse = response as? HTTPURLResponse {
                 print("HTTP Status Code: \(httpResponse.statusCode)")
             }
-
+            
             if let data = data {
                 let responseString = String(data: data, encoding: .utf8) ?? "Invalid response"
                 print("Raw Response: \(responseString)")
@@ -177,8 +295,9 @@ struct Community: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedFilter: FilterCommunity = .location
     @State private var searchText: String = ""
-    @StateObject private var viewModel = StableViewModel()
+    @StateObject private var viewModel = StableViewModel(locationManager: LocationManager())
     @State private var isShowingAddStableSheet = false // State to control modal sheet
+    @StateObject private var locationManager = LocationManager()
     
     var filteredStables: [Stable] {
         let lowercasedSearchText = searchText.lowercased()
@@ -189,45 +308,56 @@ struct Community: View {
     }
     
     var body: some View {
-        VStack {
-            filterBar
-            searchBar
-            NavigationView {
-                ScrollView {
-                    VStack(spacing: 10) {
-                        ForEach(filteredStables) { stable in
-                            StableCard(stable: stable)
+        ZStack {
+            VStack {
+                filterBar
+                searchBar
+                NavigationView {
+                    ScrollView {
+                        VStack(spacing: 10) {
+                            ForEach(filteredStables) { stable in
+                                StableCard(viewModel: viewModel, stable: stable)
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
+                    .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
                 }
-                .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
+                .navigationBarBackButtonHidden(true)
             }
-            .navigationBarBackButtonHidden(true)
+            .onAppear {
+                if let userLocation = locationManager.userLocation {
+                    viewModel.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+                } else {
+                    print("User location not available, using default coordinates.")
+                    viewModel.fetchStables(latitude: 59.9139, longitude: 10.7522) // Default coordinates, Oslo
+                }
+            }
             
-            // Add Stable Button
-            Button(action: {
-                isShowingAddStableSheet.toggle()
-            }) {
-                Image(systemName: "plus")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-                    .shadow(radius: 10)
+            // Floating Add Stable button
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isShowingAddStableSheet.toggle()
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(.green)
+                            .padding()
+                    }
+                    .sheet(isPresented: $isShowingAddStableSheet) {
+                        AddStableView(viewModel: viewModel)
+                    }
+                }
+                .padding()
             }
-            .padding()
-            .sheet(isPresented: $isShowingAddStableSheet) {
-                AddStableView(viewModel: viewModel)
-            }
-        }
-        .onAppear {
-            viewModel.fetchStables(latitude: 60.8, longitude: 10.7)
         }
     }
+    
+    
     
     // Filter bar
     private var filterBar: some View {
@@ -258,6 +388,8 @@ struct Community: View {
 struct AddStableView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: StableViewModel
+    @StateObject private var locationManager = LocationManager()
+    
     
     @State private var name: String = ""
     @State private var description: String = ""
@@ -314,15 +446,16 @@ struct AddStableView: View {
     }
     
     private func addStable() {
-        guard let latitudeValue = Double(latitude), let longitudeValue = Double(longitude) else {
+        guard let userLocation = locationManager.userLocation else {
+            print("User location not available")
             return
         }
         
         var formData: [String: Any] = [
             "Name": name,
             "Description": description,
-            "Latitude": latitudeValue,
-            "Longitude": longitudeValue,
+            "Latitude": userLocation.coordinate.latitude,
+            "Longitude": userLocation.coordinate.longitude,
             "PrivateGroup": isPrivateGroup
         ]
         
@@ -333,24 +466,24 @@ struct AddStableView: View {
         
         // Create the stable on the backend
         viewModel.createStable(formData: formData) {
-            // Reload the stables after creating the new stable
-            viewModel.fetchStables(latitude: 60.8, longitude: 10.7)
+            viewModel.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
             dismiss() // Close the sheet when stable is added
         }
     }
-
 }
 
 
 
 // MARK: - Stable Card
 struct StableCard: View {
+    @ObservedObject var viewModel: StableViewModel // Add this line to observe changes in ViewModel
     let stable: Stable
     
     var body: some View {
+        // NavigationLink for entire card navigation
         NavigationLink(destination: CommunityChat(stable: stable)) {
             VStack {
-                ZStack(alignment: .topTrailing) { // Align items to the top-right
+                ZStack(alignment: .topTrailing) {
                     AsyncImage(url: URL(string: stable.pictureUrl ?? "https://example.com/default-image.jpg")) { image in
                         image.resizable()
                     } placeholder: {
@@ -364,12 +497,16 @@ struct StableCard: View {
                     Color.black.opacity(0.4)
                         .frame(width: 370, height: 150)
                     
-                    // Heart icon
-                    Image(systemName: stable.member ? "heart.fill" : "heart")
-                        .font(.system(size: 20))
-                        .foregroundColor(stable.member ? .red : .white)
-                        .padding(10) // Padding for positioning
-                        .padding([.top, .trailing], 10) // Adjust position
+                    // Heart icon - tap to toggle membership
+                    Button(action: {
+                        viewModel.toggleMembership(for: stable)
+                    }) {
+                        Image(systemName: stable.member ? "heart.fill" : "heart")
+                            .font(.system(size: 20))
+                            .foregroundColor(stable.member ? .red : .white)
+                            .padding(10)
+                            .padding([.top, .trailing], 10)
+                    }
                     
                     VStack {
                         Spacer()
@@ -382,11 +519,12 @@ struct StableCard: View {
                     }
                 }
             }
+            // Ensure the whole card is tappable for navigation
+            .contentShape(Rectangle())
             .clipShape(Rectangle())
             .shadow(radius: 3)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(PlainButtonStyle()) // Prevent default button styling on NavigationLink
     }
 }
-
 

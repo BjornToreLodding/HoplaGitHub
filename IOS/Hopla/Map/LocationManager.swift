@@ -21,7 +21,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
 
-        // Check if authorization is already granted
         checkLocationAuthorization()
         print("Authorization status: \(locationManager.authorizationStatus.rawValue)")
     }
@@ -30,37 +29,62 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            switch self.locationManager.authorizationStatus {
-            case .authorizedWhenInUse, .authorizedAlways:
-                self.locationManager.startUpdatingLocation()
-                print("✅ Location access granted!")
-            case .denied, .restricted:
-                print("❌ Location access denied.")
-            case .notDetermined:
-                print("📍 Location permission not asked yet. Requesting now...")
-                self.locationManager.requestWhenInUseAuthorization() // Ensure it's called on main thread
-            @unknown default:
-                print("⚠️ Unknown location authorization status.")
+            if #available(iOS 14.0, *) {
+                switch self.locationManager.authorizationStatus {
+                case .authorizedWhenInUse, .authorizedAlways:
+                    self.locationManager.startUpdatingLocation()
+                    print("✅ Location access granted!")
+                case .denied, .restricted:
+                    print("❌ Location access denied.")
+                    NotificationCenter.default.post(name: .locationAccessDenied, object: nil)
+                case .notDetermined:
+                    print("📍 Location permission not asked yet. Requesting now...")
+                    self.locationManager.requestWhenInUseAuthorization()
+                @unknown default:
+                    print("⚠️ Unknown location authorization status.")
+                }
+            } else {
+                switch CLLocationManager.authorizationStatus() {
+                case .authorizedWhenInUse, .authorizedAlways:
+                    self.locationManager.startUpdatingLocation()
+                    print("✅ Location access granted!")
+                case .denied, .restricted:
+                    print("❌ Location access denied.")
+                    NotificationCenter.default.post(name: .locationAccessDenied, object: nil)
+                case .notDetermined:
+                    print("📍 Location permission not asked yet. Requesting now...")
+                    self.locationManager.requestWhenInUseAuthorization()
+                @unknown default:
+                    print("⚠️ Unknown location authorization status.")
+                }
             }
         }
     }
 
-
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        checkLocationAuthorization() // Check again when permission changes
+        checkLocationAuthorization()
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        userLocation = location
-        latitude = location.coordinate.latitude
-        longitude = location.coordinate.longitude
-        print("Latitude: \(latitude ?? 0), Longitude: \(longitude ?? 0)")
-        print("Updated location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+        DispatchQueue.main.async {
+            self.userLocation = location
+            self.latitude = location.coordinate.latitude
+            self.longitude = location.coordinate.longitude
+            print("Latitude: \(self.latitude ?? 0), Longitude: \(self.longitude ?? 0)")
+            print("Updated location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+        }
+        NotificationCenter.default.post(name: .didUpdateLocation, object: location)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to get location: \(error.localizedDescription)")
     }
+    
+    
 }
 
+extension Notification.Name {
+        static let didUpdateLocation = Notification.Name("didUpdateLocation")
+        static let locationAccessDenied = Notification.Name("locationAccessDenied")
+    }
