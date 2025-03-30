@@ -7,9 +7,9 @@ import Foundation
 struct Stable: Identifiable, Decodable {
     let stableId: String
     let stableName: String
-    let distance: Double
+    let distance: Double?
     let member: Bool
-    let pictureUrl: String
+    let pictureUrl: String?
     
     // Conforming to Identifiable protocol
     var id: String {
@@ -18,12 +18,10 @@ struct Stable: Identifiable, Decodable {
 }
 
 
-
-
 class StableViewModel: ObservableObject {
     @Published var stables: [Stable] = []
     
-    func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int? = nil, pageNumber: Int? = nil) {
+    func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int? = 50, pageNumber: Int? = 1) {
         let baseURL = "https://hopla.onrender.com/stables/all"
         var urlComponents = URLComponents(string: baseURL)!
         
@@ -32,10 +30,12 @@ class StableViewModel: ObservableObject {
             URLQueryItem(name: "longitude", value: "\(longitude)")
         ]
         
-        // Add optional parameters if they are provided
+        // Add search query if provided
         if let search = search, !search.isEmpty {
             queryItems.append(URLQueryItem(name: "search", value: search))
         }
+        
+        // Add pageSize and pageNumber if provided
         if let pageSize = pageSize {
             queryItems.append(URLQueryItem(name: "pagesize", value: "\(pageSize)"))
         }
@@ -55,6 +55,7 @@ class StableViewModel: ObservableObject {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let httpResponse = response as? HTTPURLResponse {
                 print("HTTP Status Code: \(httpResponse.statusCode)")
@@ -66,13 +67,15 @@ class StableViewModel: ObservableObject {
                         let decodedResponse = try JSONDecoder().decode([Stable].self, from: data)
                         self.stables = decodedResponse
                         
+                        print("Fetched stables: \(self.stables)")
+                        
                         // Print out the details for every stable
                         for stable in decodedResponse {
                             print("Stable ID: \(stable.stableId)")
                             print("Stable Name: \(stable.stableName)")
-                            print("Distance: \(stable.distance)")
+                            print("Distance: \(stable.distance ?? 0.0)")
                             print("Member: \(stable.member)")
-                            print("Picture URL: \(stable.pictureUrl)")
+                            print("Picture URL: \(stable.pictureUrl ?? "")")
                             print("-------------------------")
                         }
                     } catch {
@@ -84,8 +87,73 @@ class StableViewModel: ObservableObject {
             }
         }.resume()
     }
-}
 
+    
+    func createStable(formData: [String: Any], completion: @escaping () -> Void) {
+        let url = URL(string: "https://hopla.onrender.com/stables/create")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        var body = Data()
+        
+        for (key, value) in formData {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            
+            if key == "Image", let imageData = value as? Data {
+                body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"stall.jpg\"\r\n".data(using: .utf8)!)
+                body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+                body.append(imageData)
+                body.append("\r\n".data(using: .utf8)!)
+            } else {
+                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                body.append("\(value)\r\n".data(using: .utf8)!)
+            }
+        }
+        
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let httpResponse = response as? HTTPURLResponse {
+                print("HTTP Status Code: \(httpResponse.statusCode)")
+            }
+
+            if let data = data {
+                let responseString = String(data: data, encoding: .utf8) ?? "Invalid response"
+                print("Raw Response: \(responseString)")
+                
+                DispatchQueue.main.async {
+                    do {
+                        let decodedResponse = try JSONDecoder().decode([String: String].self, from: data)
+                        if let stableId = decodedResponse["stableId"], let message = decodedResponse["message"] {
+                            print(message) // Success message
+                            
+                            // Create a new stable object and add it to the list
+                            let newStable = Stable(
+                                stableId: stableId,
+                                stableName: formData["Name"] as? String ?? "Unknown",
+                                distance: nil, // Now allowed
+                                member: false,
+                                pictureUrl: nil // Now allowed
+                            )
+                            self.stables.append(newStable) // Update the UI immediately
+                            completion()
+                        }
+                    } catch {
+                        print("Error decoding response: \(error)")
+                    }
+                }
+            } else if let error = error {
+                print("Request failed with error: \(error)")
+            }
+        }.resume()
+    }
+}
 
 
 
@@ -110,6 +178,7 @@ struct Community: View {
     @State private var selectedFilter: FilterCommunity = .location
     @State private var searchText: String = ""
     @StateObject private var viewModel = StableViewModel()
+    @State private var isShowingAddStableSheet = false // State to control modal sheet
     
     var filteredStables: [Stable] {
         let lowercasedSearchText = searchText.lowercased()
@@ -135,12 +204,32 @@ struct Community: View {
                 .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
             }
             .navigationBarBackButtonHidden(true)
+            
+            // Add Stable Button
+            Button(action: {
+                isShowingAddStableSheet.toggle()
+            }) {
+                Image(systemName: "plus")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .clipShape(Circle())
+                    .shadow(radius: 10)
+            }
+            .padding()
+            .sheet(isPresented: $isShowingAddStableSheet) {
+                AddStableView(viewModel: viewModel)
+            }
         }
         .onAppear {
             viewModel.fetchStables(latitude: 60.8, longitude: 10.7)
         }
     }
     
+    // Filter bar
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
@@ -166,6 +255,92 @@ struct Community: View {
     }
 }
 
+struct AddStableView: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var viewModel: StableViewModel
+    
+    @State private var name: String = ""
+    @State private var description: String = ""
+    @State private var latitude: String = ""
+    @State private var longitude: String = ""
+    @State private var isPrivateGroup: Bool = false
+    @State private var selectedImage: UIImage? // Store the selected image
+    @State private var showImagePicker = false // Controls the image picker
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Stable Details")) {
+                    TextField("Name", text: $name)
+                    TextField("Description", text: $description)
+                    TextField("Latitude", text: $latitude)
+                        .keyboardType(.decimalPad)
+                    TextField("Longitude", text: $longitude)
+                        .keyboardType(.decimalPad)
+                    Toggle(isOn: $isPrivateGroup) {
+                        Text("Private Group")
+                    }
+                }
+                
+                Section(header: Text("Image Selection")) {
+                    Button(action: { showImagePicker = true }) {
+                        Text("Select Image")
+                    }
+                    
+                    if let image = selectedImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 100)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                }
+                
+                Section {
+                    Button("Save") {
+                        addStable()
+                    }
+                    .disabled(name.isEmpty || description.isEmpty || latitude.isEmpty || longitude.isEmpty || selectedImage == nil)
+                }
+            }
+            .navigationTitle("Add Stable")
+            .navigationBarItems(trailing: Button("Cancel") {
+                dismiss()
+            })
+            .sheet(isPresented: $showImagePicker) {
+                ImagePicker(sourceType: .photoLibrary, selectedImage: $selectedImage)
+            }
+        }
+    }
+    
+    private func addStable() {
+        guard let latitudeValue = Double(latitude), let longitudeValue = Double(longitude) else {
+            return
+        }
+        
+        var formData: [String: Any] = [
+            "Name": name,
+            "Description": description,
+            "Latitude": latitudeValue,
+            "Longitude": longitudeValue,
+            "PrivateGroup": isPrivateGroup
+        ]
+        
+        // Convert UIImage to Data
+        if let imageData = selectedImage?.jpegData(compressionQuality: 0.8) {
+            formData["Image"] = imageData
+        }
+        
+        // Create the stable on the backend
+        viewModel.createStable(formData: formData) {
+            // Reload the stables after creating the new stable
+            viewModel.fetchStables(latitude: 60.8, longitude: 10.7)
+            dismiss() // Close the sheet when stable is added
+        }
+    }
+
+}
+
 
 
 // MARK: - Stable Card
@@ -176,7 +351,7 @@ struct StableCard: View {
         NavigationLink(destination: CommunityChat(stable: stable)) {
             VStack {
                 ZStack(alignment: .topTrailing) { // Align items to the top-right
-                    AsyncImage(url: URL(string: stable.pictureUrl)) { image in
+                    AsyncImage(url: URL(string: stable.pictureUrl ?? "https://example.com/default-image.jpg")) { image in
                         image.resizable()
                     } placeholder: {
                         Color.gray
@@ -184,7 +359,7 @@ struct StableCard: View {
                     .scaledToFill()
                     .frame(width: 370, height: 150)
                     .clipped()
-                
+                    
                     // Dark overlay for better text visibility
                     Color.black.opacity(0.4)
                         .frame(width: 370, height: 150)
@@ -195,7 +370,6 @@ struct StableCard: View {
                         .foregroundColor(stable.member ? .red : .white)
                         .padding(10) // Padding for positioning
                         .padding([.top, .trailing], 10) // Adjust position
-                    
                     
                     VStack {
                         Spacer()

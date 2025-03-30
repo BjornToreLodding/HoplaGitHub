@@ -67,7 +67,9 @@ class HikeService {
     @Published var hikes: [Hike] = []
     
     private let baseURL = "https://hopla.onrender.com/trails/all"
+    private let locationBaseURL = "https://hopla.onrender.com/trails/list"
     
+    // Function to fetch hikes based on page number
     func fetchHikes(page: Int, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found")
@@ -114,7 +116,56 @@ class HikeService {
             }
         }.resume()
     }
+    
+    // New function to fetch hikes based on user's location (latitude and longitude)
+    func fetchHikesByLocation(latitude: Double, longitude: Double, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
+        guard let token = TokenManager.shared.getToken() else {
+            print("❌ No token found")
+            completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unauthorized - No Token"])))
+            return
+        }
+        
+        let urlString = "\(locationBaseURL)?latitude=\(latitude)&longitude=\(longitude)"
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Request error:", error.localizedDescription)
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+            
+            do {
+                // Print the raw JSON data to inspect it
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("📜 Raw JSON Data:\n", jsonString)
+                }
+                
+                // Decode the response into TrailsResponse
+                let decodedResponse = try JSONDecoder().decode(HikeResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(decodedResponse)) // Pass the decoded response to the completion handler
+                }
+            } catch {
+                print("❌ Error decoding hikes: \(error.localizedDescription)")
+                completion(.failure(error)) // Pass error if decoding fails
+            }
+        }.resume()
+    }
 }
+
 
 // MARK: - Main View
 struct Hikes: View {
@@ -128,6 +179,7 @@ struct Hikes: View {
     @State private var likedHikes: [String] = []
     @State private var userLocation: CLLocation? = nil
     @StateObject private var locationManager = LocationManager()
+    
     
     var body: some View {
         VStack(spacing: 0) {
@@ -165,28 +217,90 @@ struct Hikes: View {
         .navigationBarHidden(true)
     }
     
+    
     private func fetchHikes() {
         guard !isLoading else { return }  // Prevent multiple requests
         isLoading = true
-        
+
         // Fetch hikes based on selected filter
-        if selectedFilter == .heart {
-            // No need to fetch hikes again, just filter them for favorites
-            filterFavoriteHikes()
+        if selectedFilter == .location, let userLocation = userLocation {
+            // Fetch hikes based on the user's location
+            HikeService.shared.fetchHikesByLocation(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let hikeResponse):
+                        // Successfully fetched hikes based on location
+                        self.hikes = hikeResponse.trails
+                    case .failure(let error):
+                        // Handle error
+                        print("Error fetching hikes by location:", error)
+                    }
+                    self.isLoading = false
+                }
+            }
         } else {
-            // Fetch all hikes
-            fetchAllHikes(page: currentPage)
+            // Fetch all hikes or apply other filters
+            HikeService.shared.fetchHikes(page: currentPage) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let hikeResponse):
+                        // Successfully fetched hikes
+                        self.hikes.append(contentsOf: hikeResponse.trails)
+                        self.currentPage += 1
+                    case .failure(let error):
+                        // Handle error
+                        print("Error fetching all hikes:", error)
+                    }
+                    self.isLoading = false
+                }
+            }
         }
     }
+
+    private func fetchAllHikesIfNeeded() {
+        guard !isLoading else { return } // Prevent reloading if already fetching
+        isLoading = true
+        
+        // Ensure we load all hikes through pagination if needed
+        var page = 1
+        var allHikes = [Hike]()
+        
+        func loadNextPage() {
+            HikeService.shared.fetchHikes(page: page) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let response):
+                        if response.trails.isEmpty {
+                            canLoadMore = false // No more data available
+                        } else {
+                            allHikes.append(contentsOf: response.trails)
+                            self.hikes = allHikes // Update hikes array with all loaded hikes
+                            page += 1
+                        }
+                    case .failure(let error):
+                        print("❌ Error fetching hikes: \(error.localizedDescription)")
+                    }
+                    self.isLoading = false
+                }
+            }
+        }
+        
+        loadNextPage() // Start loading
+    }
+
     
     private func fetchAllHikes(page: Int) {
+        if isLoading {
+            return // Prevent reloading if already fetching
+        }
         isLoading = true
+
         HikeService.shared.fetchHikes(page: page) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
                     if response.trails.isEmpty {
-                        canLoadMore = false  // No more data available
+                        canLoadMore = false // No more data available
                     } else {
                         // Append hikes from the response
                         hikes.append(contentsOf: response.trails)
@@ -206,9 +320,10 @@ struct Hikes: View {
     }
     
     private func loadMoreHikes() {
-        if canLoadMore {
-            fetchHikes()
+        if isLoading || !canLoadMore {
+            return
         }
+        fetchHikes()  // Load more hikes if it's safe to do so
     }
     
     private var filterBar: some View {
@@ -239,58 +354,54 @@ struct Hikes: View {
     // Function to search through hikes
     private func filteredHikes() -> [Hike] {
         var filtered = hikes
-        
+
         // Apply search filter
         if !searchText.isEmpty {
             filtered = filtered.filter {
                 $0.name.lowercased().contains(searchText.lowercased())
             }
         }
-        
+
         // Apply filter based on selected filter option
         switch selectedFilter {
-        case .map:
-            // Show hikes with most stars first and newest added
-            filtered.sort {
-                if $0.averageRating == $1.averageRating {
-                    return $0.id > $1.id  // Sort by ID for newest first
-                }
-                return $0.averageRating > $1.averageRating
-            }
         case .location:
-            // Sort hikes based on proximity
             if let userLocation = userLocation {
-                filtered = filtered.filter { hike in
-                    guard let latitude = hike.latitude, let longitude = hike.longitude else {
-                        return false
+                // Only update hikes if not already fetched
+                if hikes.isEmpty {
+                    HikeService.shared.fetchHikesByLocation(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude) { result in
+                        switch result {
+                        case .success(let hikeResponse):
+                            // Set the filtered hikes from the response
+                            filtered = hikeResponse.trails
+                            DispatchQueue.main.async {
+                                self.hikes = filtered
+                            }
+
+                        case .failure(let error):
+                            print("Failed to fetch hikes by location:", error)
+                        }
                     }
-                    return true
-                }
-                
-                filtered.sort {
-                    if let latitude1 = $0.latitude, let longitude1 = $1.longitude,
-                       let latitude2 = $1.latitude, let longitude2 = $1.longitude {
-                        let location1 = CLLocation(latitude: latitude1, longitude: longitude1)
-                        let location2 = CLLocation(latitude: latitude2, longitude: longitude2)
-                        
-                        let distance1 = userLocation.distance(from: location1)
-                        let distance2 = userLocation.distance(from: location2)
-                        
-                        return distance1 < distance2
-                    }
-                    return false
                 }
             }
-
+            
         case .heart:
-            // Already filtered when the heart filter is selected
-            break
+                // Ensure all hikes are loaded first before applying favourite filter
+                if hikes.isEmpty {
+                    fetchAllHikesIfNeeded() // Fetch all hikes if none are loaded
+                } else {
+                    // Filter for favourite hikes only once all hikes are loaded
+                    filtered = hikes.filter { $0.isFavorite }
+                }
+
         default:
             break
         }
-        
+
         return filtered
     }
+
+
+
 }
 
 
@@ -316,8 +427,8 @@ struct HikeCard: View {
             Button(action: {
                 toggleFavorite(for: hike)
             }) {
-                Image(systemName: likedHikes.contains(hike.id) ? "heart.fill" : "heart")
-                    .foregroundColor(likedHikes.contains(hike.id) ? .red : .gray)
+                Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
+                    .foregroundColor(hike.isFavorite ? .red : .gray)
                     .padding(10)
             }
             .frame(width: 30, height: 30)
@@ -333,23 +444,19 @@ struct HikeCard: View {
                     StarRating(rating: .constant(hike.averageRating))
                         .frame(width: 100)
                 }
-                .padding()
             }
         }
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 3)
     }
     
-    // Function to like hikes
     private func toggleFavorite(for hike: Hike) {
         if let index = likedHikes.firstIndex(of: hike.id) {
-            likedHikes.remove(at: index) // Remove from liked hikes if already liked
+            likedHikes.remove(at: index)
         } else {
-            likedHikes.append(hike.id) // Add to liked hikes if not already liked
+            likedHikes.append(hike.id)
         }
     }
 }
+
 
 
 // MARK: - Star Rating With Tap Gesture

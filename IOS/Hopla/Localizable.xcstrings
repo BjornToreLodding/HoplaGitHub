@@ -41,6 +41,9 @@
         }
       }
     },
+    "Add Stable" : {
+
+    },
     "Age: %lld years old" : {
       "localizations" : {
         "nb" : {
@@ -200,6 +203,9 @@
           }
         }
       }
+    },
+    "Description" : {
+
     },
     "Description:" : {
       "localizations" : {
@@ -569,6 +575,9 @@
         }
       }
     },
+    "Latitude" : {
+
+    },
     "Length: %@ km" : {
       "localizations" : {
         "nb" : {
@@ -665,6 +674,9 @@
         }
       }
     },
+    "Longitude" : {
+
+    },
     "My friends" : {
       "localizations" : {
         "nb" : {
@@ -704,6 +716,9 @@
           }
         }
       }
+    },
+    "Name" : {
+
     },
     "New Hike" : {
       "localizations" : {
@@ -788,6 +803,9 @@
         }
       }
     },
+    "Private Group" : {
+
+    },
     "Profile" : {
       "comment" : "Profile tab",
       "localizations" : {
@@ -808,6 +826,9 @@
           }
         }
       }
+    },
+    "Save" : {
+
     },
     "Search following..." : {
       "localizations" : {
@@ -912,6 +933,9 @@
           }
         }
       }
+    },
+    "Stable Details" : {
+
     },
     "Start" : {
       "localizations" : {
