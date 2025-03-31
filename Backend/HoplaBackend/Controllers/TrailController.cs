@@ -618,7 +618,7 @@ public class TrailController : ControllerBase
     }
     [Authorize]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateTrail([FromBody] CreateTrailDto dto)
+    public async Task<IActionResult> CreateTrail([FromForm] CreateTrailForm request)
     {
         Console.WriteLine("trails create start");
         var userId = _authentication.GetUserIdFromToken(User);
@@ -627,11 +627,23 @@ public class TrailController : ControllerBase
         if (!userExists)
             return Unauthorized(new { message = "Bruker ikke funnet" });
 
-        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId);
+        var dto = JsonSerializer.Deserialize<CreateTrailDto>(request.dataJson);
+
+        if (dto == null)
+        return BadRequest("Ugyldig JSON");
+
+        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId); //Rødt under UserHikeId
         var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
 
         if (hike == null || hikeDetails == null)
             return BadRequest("Tur eller detaljer ikke funnet");
+        string? pictureUrl = null;
+
+        if (request.Image != null)
+        {
+            var fileName = await _imageUploadService.UploadImageAsync(request.Image);
+            pictureUrl = fileName;
+        }
 
         var trail = new Trail
         {
@@ -640,7 +652,7 @@ public class TrailController : ControllerBase
             LatMean = hikeDetails.LatMean,
             LongMean = hikeDetails.LongMean,
             Distance = hike.Distance,
-            PictureUrl = dto.PictureUrl,
+            PictureUrl = pictureUrl,
             Visibility = TrailVisibility.Public,
             UserId = userId,
         };
@@ -649,6 +661,7 @@ public class TrailController : ControllerBase
         var parsed = CoordinateHelper.ParseLatLngOnly(hikeDetails.CoordinatesCsv);
         var reduced = CoordinateHelper.DownsampleCoordinates(parsed, 50);
         var reducedCsv = CoordinateHelper.ToCsv(reduced);
+
 
         var trailDetails = new TrailDetail
         {

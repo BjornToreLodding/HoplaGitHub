@@ -28,11 +28,11 @@ public class CreateUserHikeDto
     public List<CoordinateInput> Coordinates { get; set; } = new();
 }
 
-public class UpdateUserHikeDto
+public class UpdateUserHikeForm
 {
     public string? Title { get; set; }
     public string? Description { get; set; }
-    public string? PictureUrl { get; set; } // Du kan utvide til å støtte bildeopplasting senere
+    public IFormFile Image { get; set; } // Du kan utvide til å støtte bildeopplasting senere
     //public int? Rating { get; set; }
     public Guid? TrailId { get; set; } //lage søkefunksjon for å finne matching Trail. 
     // f.eks utgangspunkt i lat/longMean og sammenligne rutas koordinater.

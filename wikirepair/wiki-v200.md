@@ -1820,7 +1820,7 @@ Hvis public så gjøres denne om til en løype også.
 **BT**
 
 For å lage tur, burde vi bruke trails/create. Har laget eget endpoint om dette under PUT.  
-Kan vi bruke isShared eller isPrivate etc. for å skjule denne i oppdateringer under hjem?
+Kan vi bruke isShared eller isPrivate etc. for å skjule denne i oppdateringer under hjem?  
 Jeg tror det er bedre å bruke trailId for å sjekke om denne turen har fulgt en løype?
 Hvis UserHike har registrert TrailId, så betyr det at man ikke skal kunne lage en tur av den?
 

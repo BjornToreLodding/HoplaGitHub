@@ -24,12 +24,13 @@ public class UserHikeController : ControllerBase
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
     private readonly UserHikeService _userHikeService;
-
-    public UserHikeController(Authentication authentication, AppDbContext context, UserHikeService userHikeService)
+    private readonly ImageUploadService _imageUploadService;
+    public UserHikeController(Authentication authentication, AppDbContext context, UserHikeService userHikeService, ImageUploadService imageUploadService)
     {
         _authentication = authentication;
         _context = context;
         _userHikeService = userHikeService;
+        _imageUploadService = imageUploadService;
     }
 
     [Authorize]
@@ -125,7 +126,7 @@ public class UserHikeController : ControllerBase
 
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUserHike(Guid id, [FromBody] UpdateUserHikeDto dto)
+    public async Task<IActionResult> UpdateUserHike(Guid id, [FromForm] UpdateUserHikeForm request)
     {
         
         var userId = _authentication.GetUserIdFromToken(User);
@@ -143,14 +144,23 @@ public class UserHikeController : ControllerBase
         var hikeDetail = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == id);
         if (hike == null || hikeDetail == null)
             return NotFound("Fant ikke turen.");
+
+        string? pictureUrl = null;
+
+        if (request.Image != null)
+        {
+            var fileName = await _imageUploadService.UploadImageAsync(request.Image);
+            pictureUrl = fileName;
+        }
+
         
         // Sjekk at brukeren eier turen
         if (hike.UserId != userId)
             return Unauthorized(new {message = "Du kan ikke endre andre sine turer"});
 
-        hike.Title = dto.Title ?? hike.Title;
-        hike.PictureUrl = dto.PictureUrl ?? hike.PictureUrl;
-        hikeDetail.Description = dto.Description ?? hikeDetail.Description;
+        hike.Title = request.Title ?? hike.Title;
+        hike.PictureUrl = pictureUrl ?? pictureUrl;
+        hikeDetail.Description = request.Description ?? hikeDetail.Description;
 
         await _context.SaveChangesAsync();
         return Ok(new { Message = "Turen er oppdatert." });
