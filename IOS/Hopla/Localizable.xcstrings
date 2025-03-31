@@ -11,6 +11,9 @@
         }
       }
     },
+    "%lld" : {
+
+    },
     "Add a Horse" : {
       "localizations" : {
         "nb" : {
@@ -188,6 +191,12 @@
         }
       }
     },
+    "Date of Birth" : {
+
+    },
+    "Day" : {
+
+    },
     "Delete" : {
 
     },
@@ -292,6 +301,7 @@
       }
     },
     "Enter age" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -677,6 +687,9 @@
     "Longitude" : {
 
     },
+    "Month" : {
+
+    },
     "My friends" : {
       "localizations" : {
         "nb" : {
@@ -749,6 +762,9 @@
           }
         }
       }
+    },
+    "No image selected" : {
+
     },
     "No messages yet." : {
 
@@ -1016,6 +1032,9 @@
           }
         }
       }
+    },
+    "Year" : {
+
     },
     "You will be logged out of your account." : {
       "localizations" : {

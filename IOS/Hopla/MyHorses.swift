@@ -7,8 +7,7 @@
 
 import SwiftUI
 import Combine
-import KeychainAccess
-import KeychainSwift
+import UIKit
 import Foundation
 
 
@@ -55,89 +54,63 @@ class HorseViewModel: ObservableObject {
             print("No token found")
             return
         }
-        
+
         let url = URL(string: "https://hopla.onrender.com/horses/create")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        // Generate boundary string
+
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
+
         var body = Data()
-        
-        // Append text fields
-        let parameters: [String: String?] = [
-            "name": name,
-            "breed": breed,
-            "age": age != nil ? String(age!) : nil,
-            "dob": dob
+        let parameters: [String: String] = [
+            "Name": name,
+            "Breed": breed ?? "",
+            "Year": dob?.components(separatedBy: "-").first ?? "",
+            "Month": dob?.components(separatedBy: "-")[1] ?? "",
+            "Day": dob?.components(separatedBy: "-").last ?? ""
         ]
-        
+
         for (key, value) in parameters {
-            if let value = value {
-                body.append("--\(boundary)\r\n".data(using: .utf8)!)
-                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-                body.append("\(value)\r\n".data(using: .utf8)!)
-            }
-        }
-        
-        // Append image (if available)
-        // Check if the image is valid and append it to the request body
-        if let image = horsePicture, let imageData = image.jpegData(compressionQuality: 0.8) {
-            let filename = "horse_image.jpg"
-            let mimeType = "image/jpeg"
-            
             body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"horsePicture\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
-            body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(value)\r\n".data(using: .utf8)!)
+        }
+
+        if let image = horsePicture, let imageData = image.jpegData(compressionQuality: 0.8) {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"Image\"; filename=\"horse_image.jpg\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
             body.append(imageData)
             body.append("\r\n".data(using: .utf8)!)
-        } else {
-            print("Image not selected or invalid.")
         }
-        
-        
-        // Closing boundary
+
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
         request.httpBody = body
-        
-        // Perform request
-        URLSession.shared.dataTask(with: request) { data, response, error in
+
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                print("Response status code:", httpResponse.statusCode)
-                
-                // Handle response code more flexibly (200 or 201 for success)
-                if httpResponse.statusCode == 200 || httpResponse.statusCode == 201 {
-                    print("Horse added successfully.")
-                } else {
-                    if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                        print("Server response:", responseString)
-                    }
-                    print("Failed to add horse.")
-                    return
+
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 || httpResponse.statusCode == 201 {
+                print("Horse added successfully.")
+
+                // Refresh the horse list after successful addition
+                DispatchQueue.main.async {
+                    self?.fetchHorses()
                 }
-            }
-            
-            if let data = data {
-                do {
-                    let addedHorse = try JSONDecoder().decode(Horse.self, from: data)
-                    DispatchQueue.main.async {
-                        self.horses.append(addedHorse)
-                    }
-                } catch {
-                    print("Error decoding added horse:", error.localizedDescription)
+            } else {
+                if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Server response:", responseString)
                 }
+                print("Failed to add horse.")
             }
         }.resume()
     }
+
     
     
     func deleteHorse(horseId: String) {
@@ -178,7 +151,7 @@ struct Horse: Identifiable, Decodable {
     var name: String
     var breed: String?
     var age: Int?
-    let horsePictureUrl: String
+    let horsePictureUrl: String?
     var dob: DateOfBirth?
     
     enum CodingKeys: String, CodingKey {
@@ -201,8 +174,9 @@ struct Horse: Identifiable, Decodable {
     
     // Optional computed property to get the image from the URL
     var horseImage: UIImage? {
-        guard !horsePictureUrl.isEmpty,
-              let url = URL(string: horsePictureUrl),
+        guard let urlString = horsePictureUrl, // Unwrap the optional
+              !urlString.isEmpty, // Check if the unwrapped value is not empty
+              let url = URL(string: urlString), // Create URL from unwrapped string
               let data = try? Data(contentsOf: url) else {
             return nil
         }
@@ -296,7 +270,7 @@ struct HorseRowView: View {
             // NavigationLink wraps only the main row content
             NavigationLink(destination: HorseDetails(horseId: horse.id ?? UUID().uuidString)) {
                 HStack {
-                    if !horse.horsePictureUrl.isEmpty, let url = URL(string: horse.horsePictureUrl) {
+                    if let urlString = horse.horsePictureUrl, !urlString.isEmpty, let url = URL(string: urlString) {
                         AsyncImage(url: url) { image in
                             image.resizable()
                                 .scaledToFill()
@@ -312,10 +286,9 @@ struct HorseRowView: View {
                             .fill(Color.gray.opacity(0.5))
                             .frame(width: 80, height: 80)
                     }
-
                     Text(horse.name)
                         .font(.headline)
-
+                    
                     Spacer()
                 }
                 .padding(.vertical, 10)
@@ -405,19 +378,52 @@ struct AddHorseView: View {
     @State private var horseName = ""
     @State private var selectedImage: UIImage?
     @State private var horseBreed = ""
-    @State private var horseAge = ""
+    
+    // Date of birth state variables
+    @State private var selectedYear = Calendar.current.component(.year, from: Date())
+    @State private var selectedMonth = 1
+    @State private var selectedDay = 1
     
     @State private var showImagePicker = false
     @Environment(\.presentationMode) var presentationMode
-    
+
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Horse Details")) {
                     TextField("Enter horse name", text: $horseName)
                     TextField("Enter breed", text: $horseBreed)
-                    TextField("Enter age", text: $horseAge)
-                        .keyboardType(.numberPad)
+                }
+                
+                Section(header: Text("Date of Birth")) {
+                    HStack {
+                        // Year Picker
+                        SwiftUI.Picker("Year", selection: $selectedYear) {
+                            ForEach((1900...Calendar.current.component(.year, from: Date())).reversed(), id: \.self) { year in
+                                Text("\(year)").tag(year)
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                        .frame(maxWidth: .infinity)
+                        
+                        // Month Picker
+                        SwiftUI.Picker("Month", selection: $selectedMonth) {
+                            ForEach(1...12, id: \.self) { month in
+                                Text(DateFormatter().monthSymbols[month - 1]).tag(month)
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                        .frame(maxWidth: .infinity)
+                        
+                        // Day Picker
+                        SwiftUI.Picker("Day", selection: $selectedDay) {
+                            ForEach(1...daysInMonth(year: selectedYear, month: selectedMonth), id: \.self) { day in
+                                Text("\(day)").tag(day)
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                        .frame(maxWidth: .infinity)
+                    }
                 }
                 
                 Section(header: Text("Image Selection")) {
@@ -431,26 +437,27 @@ struct AddHorseView: View {
                             .scaledToFit()
                             .frame(height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
+                    } else {
+                        Text("No image selected")
                     }
                 }
                 
                 Section {
                     Button(action: {
-                        if let ageInt = Int(horseAge) {
-                            vm.addHorse(
-                                name: horseName,
-                                breed: horseBreed,
-                                age: ageInt,
-                                horsePicture: selectedImage, // Now passing UIImage directly
-                                dob: nil
-                            )
-                            presentationMode.wrappedValue.dismiss()
-                        }
+                        let dob = "\(selectedYear)-\(String(format: "%02d", selectedMonth))-\(String(format: "%02d", selectedDay))"
+                        vm.addHorse(
+                            name: horseName,
+                            breed: horseBreed,
+                            age: nil, // No need for age since we have DOB
+                            horsePicture: selectedImage,
+                            dob: dob
+                        )
+                        presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Add Horse")
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .disabled(horseName.isEmpty || horseBreed.isEmpty || horseAge.isEmpty || selectedImage == nil)
+                    .disabled(horseName.isEmpty || horseBreed.isEmpty || selectedImage == nil)
                 }
             }
             .navigationTitle("Add a Horse")
@@ -466,6 +473,12 @@ struct AddHorseView: View {
             }
         }
     }
+    
+    // Helper function to determine the number of days in a given month
+    private func daysInMonth(year: Int, month: Int) -> Int {
+        let dateComponents = DateComponents(year: year, month: month)
+        let calendar = Calendar.current
+        let date = calendar.date(from: dateComponents)!
+        return calendar.range(of: .day, in: .month, for: date)!.count
+    }
 }
-
-
