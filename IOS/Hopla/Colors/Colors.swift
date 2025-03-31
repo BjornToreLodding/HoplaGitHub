@@ -120,5 +120,3 @@ func setupTabBarAppearance(for colorScheme: ColorScheme) {
     }
 
 
-// Send mail betalinginfo - ikke legg inn ennå! Mail til it!
-// Legg inn bilder

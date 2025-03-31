@@ -11,6 +11,9 @@
         }
       }
     },
+    "%@: Me" : {
+
+    },
     "%lld" : {
 
     },
@@ -764,9 +767,6 @@
       }
     },
     "No image selected" : {
-
-    },
-    "No messages yet." : {
 
     },
     "Not a member? Sign up" : {

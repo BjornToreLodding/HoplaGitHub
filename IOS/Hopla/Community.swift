@@ -23,7 +23,6 @@ struct Stable: Identifiable, Decodable, Equatable {
     
 }
 
-
 class StableViewModel: ObservableObject {
     @Published var stables: [Stable] = []
     private var locationManager: LocationManager
@@ -544,7 +543,7 @@ struct StableCard: View {
     
     var body: some View {
         // NavigationLink for entire card navigation
-        NavigationLink(destination: CommunityChat(stable: stable)) {
+        NavigationLink(destination: CommunityChat(stable: stable, scrollToBottom: true)) {
             VStack {
                 ZStack(alignment: .topTrailing) {
                     AsyncImage(url: URL(string: stable.pictureUrl ?? "https://example.com/default-image.jpg")) { image in

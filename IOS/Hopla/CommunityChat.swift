@@ -43,139 +43,112 @@ struct CommunityChat: View {
     @Environment(\.presentationMode) var presentationMode
     
     let stable: Stable
-    @State private var messages: [Message] = [] // Start with an empty array for messages
+    var scrollToBottom: Bool
+    
+    @State private var messages: [Message] = []
     @State private var newMessage: String = ""
-    @State private var scrollToBottom = UUID() // Track last message for scrolling
+    @State private var shouldScroll = false  // Track when to scroll
     
     var body: some View {
         ZStack {
-            VStack(spacing: 0) { // Removes white space
-                // Group Name Header
-                Text(stable.stableName)
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right
-                    .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    .foregroundColor(.white)
-                
+            VStack(spacing: 0) {
                 // Messages Section
-                ZStack {
-                    (colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-                        .edgesIgnoringSafeArea(.all)
-                    
-                    NavigationView {
-                        ScrollViewReader { scrollView in
-                            ScrollView {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    if messages.isEmpty {
-                                        Text("No messages yet.")
-                                            .foregroundColor(.gray)
-                                            .italic()
-                                    } else {
-                                        ForEach(messages, id: \.id) { message in
-                                            VStack {
-                                                // Show Date in Center
-                                                if shouldShowDate(for: message) {
-                                                    Text(message.date)
-                                                        .font(.footnote)
+                ScrollViewReader { scrollViewProxy in
+                    VStack(spacing: 0) {
+                        // Group Name Header
+                        Text(stable.stableName)
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(height: 40)
+                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .foregroundColor(.white)
+
+                        // Messages Section
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 10) {
+                                ForEach(messages, id: \.id) { message in
+                                    VStack {
+                                        if shouldShowDate(for: message) {
+                                            Text(message.date)
+                                                .font(.footnote)
+                                                .foregroundColor(.gray)
+                                                .frame(maxWidth: .infinity, alignment: .center)
+                                                .padding(.vertical, 5)
+                                        }
+
+                                        HStack {
+                                            if message.sender == "Me" {
+                                                Spacer()
+                                                VStack(alignment: .trailing) {
+                                                    Text("\(message.time): Me")
+                                                        .font(.caption2)
                                                         .foregroundColor(.gray)
-                                                        .frame(maxWidth: .infinity, alignment: .center)
-                                                        .padding(.vertical, 5)
+                                                    Text(message.text)
+                                                        .padding()
+                                                        .background(Color.green.opacity(0.8))
+                                                        .cornerRadius(10)
+                                                        .foregroundColor(.white)
                                                 }
-                                                
-                                                HStack {
-                                                    if message.sender == "Me" {
-                                                        Spacer()
-                                                        VStack(alignment: .trailing) {
-                                                            Text("\(message.time): \(message.sender)")
-                                                                .font(.caption2)
-                                                                .foregroundColor(.gray)
-                                                            
-                                                            Text(message.text)
-                                                                .padding()
-                                                                .background(Color.green.opacity(0.8))
-                                                                .cornerRadius(10)
-                                                                .foregroundColor(.white)
-                                                        }
-                                                    } else {
-                                                        VStack(alignment: .leading) {
-                                                            Text("\(message.time): \(message.sender)")
-                                                                .font(.caption2)
-                                                                .foregroundColor(.gray)
-                                                            
-                                                            Text(message.text)
-                                                                .padding()
-                                                                .background(Color.gray.opacity(0.3))
-                                                                .cornerRadius(10)
-                                                                .foregroundColor(.black)
-                                                        }
-                                                        Spacer()
-                                                    }
+                                            } else {
+                                                VStack(alignment: .leading) {
+                                                    Text("\(message.time): \(message.sender)")
+                                                        .font(.caption2)
+                                                        .foregroundColor(.gray)
+                                                    Text(message.text)
+                                                        .padding()
+                                                        .background(Color.gray.opacity(0.3))
+                                                        .cornerRadius(10)
+                                                        .foregroundColor(.black)
                                                 }
+                                                Spacer()
                                             }
-                                            .id(message.id) // Assign ID for scrolling
                                         }
                                     }
-                                    
-                                    
+                                    .id(message.id) // Assign ID for scrolling
                                 }
-                                .padding()
                             }
-                            // Background
-                            .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                            .onChange(of: messages.count) { _ in
-                                if let lastMessage = messages.last {
-                                    DispatchQueue.main.async {
-                                        scrollView.scrollTo(lastMessage.id, anchor: .bottom)
-                                    }
-                                }
+                            .padding()
+                        }
+
+                        // Message Input Field
+                        HStack {
+                            TextField("Type a message...", text: $newMessage)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding(8)
+
+                            Button(action: {
+                                sendMessage(scrollViewProxy: scrollViewProxy) // Scroll after sending
+                            }) {
+                                Image(systemName: "paperplane.fill")
+                                    .foregroundColor(newMessage.isEmpty ? .gray : .green)
+                                    .padding()
+                            }
+                            .disabled(newMessage.isEmpty)
+                        }
+                        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    }
+                    .onAppear {
+                        fetchMessages(scrollViewProxy: scrollViewProxy)
+
+                        // Scroll to bottom after messages load
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            if let lastMessage = messages.last {
+                                scrollViewProxy.scrollTo(lastMessage.id, anchor: .bottom)
                             }
                         }
                     }
-                    .navigationBarBackButtonHidden(true) // Hides the default back button
-                }
-                .edgesIgnoringSafeArea(.top)
-                
-                // Message Input Field
-                HStack {
-                    TextField("Type a message...", text: $newMessage)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(8)
-                    
-                    Button(action: sendMessage) {
-                        Image(systemName: "paperplane.fill")
-                            .foregroundColor(newMessage.isEmpty ? .gray : .green)
-                            .padding()
+                    .onChange(of: messages.count) { _ in
+                        DispatchQueue.main.async {
+                            if let lastMessage = messages.last {
+                                scrollViewProxy.scrollTo(lastMessage.id, anchor: .bottom)
+                            }
+                        }
                     }
-                    .disabled(newMessage.isEmpty)
                 }
-                .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-            }
-            .onAppear {
-                fetchMessages() // Fetch messages when the view appears
-            }
-            
-            // MARK: - Custom Back Button
-            VStack {
-                HStack {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Image(systemName: "arrow.left")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                    }
-                    .padding()
-                    .foregroundStyle(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
-                    .position(x: 25, y: 20) // Adjust for exact placement
-                    
-                    Spacer()
-                }
-                Spacer()
             }
         }
+
     }
     
     
@@ -187,53 +160,68 @@ struct CommunityChat: View {
         return true
     }
     
-    private func fetchMessages() {
+    private func fetchMessages(scrollViewProxy: ScrollViewProxy) {
         let baseUrl = "https://hopla.onrender.com/stablemessages"
         guard let url = URL(string: "\(baseUrl)/\(stable.stableId)?pagesize=10&pagenumber=1") else {
             print("Invalid URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error fetching messages:", error.localizedDescription)
                 return
             }
-
+            
             guard let data = data, !data.isEmpty else {
                 print("No data received or response body is empty")
                 return
             }
-
+            
             do {
                 let decodedResponse = try JSONDecoder().decode([ServerMessage].self, from: data)
-
+                
+                guard let currentUserId = TokenManager.shared.getUserId() else {
+                    print("Could not retrieve user ID")
+                    return
+                }
+                
                 let fetchedMessages = decodedResponse.compactMap { serverMessage -> Message? in
                     let formatter = ISO8601DateFormatter()
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
+                    
                     guard let date = formatter.date(from: serverMessage.timestamp) else {
                         print("Invalid timestamp:", serverMessage.timestamp)
                         return nil
                     }
-
+                    
+                    let isCurrentUser = serverMessage.senderId == currentUserId
+                    let senderDisplayName = isCurrentUser ? "Me" : serverMessage.senderAlias
+                    
                     return Message(
                         id: UUID(),
-                        sender: serverMessage.senderAlias,  // Show sender alias instead of sender ID
+                        sender: senderDisplayName,
                         text: serverMessage.content,
                         time: formatTime(from: serverMessage.timestamp),
                         date: formatDate(from: serverMessage.timestamp),
-                        dateObject: date // Store the actual Date object
+                        dateObject: date
                     )
                 }
-
+                
                 DispatchQueue.main.async {
                     self.messages = fetchedMessages.sorted { $0.dateObject < $1.dateObject }
                     print("Messages updated in UI.")
+
+                    // 🛠 Delay to ensure UI updates before scrolling
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        if let lastMessage = self.messages.last {
+                            scrollViewProxy.scrollTo(lastMessage.id, anchor: .bottom)
+                        }
+                    }
                 }
             } catch {
                 print("Decoding error:", error.localizedDescription)
@@ -244,8 +232,9 @@ struct CommunityChat: View {
     
     
     
+    
     // Send message function
-    private func sendMessage() {
+    private func sendMessage(scrollViewProxy: ScrollViewProxy) {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         let currentTime = formatter.string(from: Date())
@@ -256,8 +245,9 @@ struct CommunityChat: View {
         // Prepare the new message locally
         let newMsg = Message(id: UUID(), sender: "Me", text: newMessage, time: currentTime, date: currentDate, dateObject: Date())
         messages.append(newMsg)
-        messages.sort { $0.time < $1.time } // Keep messages in chronological order
-
+        
+        // Correct sorting by `dateObject`
+        messages.sort { $0.dateObject < $1.dateObject }
         
         // Clear the input field
         newMessage = ""
@@ -302,9 +292,15 @@ struct CommunityChat: View {
                 }
             }
             
-            // Handle response if necessary
+            // Scroll to the bottom of the chat after sending
+            DispatchQueue.main.async {
+                if let lastMessage = messages.last {
+                    scrollViewProxy.scrollTo(lastMessage.id, anchor: .bottom)
+                }
+            }
         }.resume()
     }
+    
 }
 
 

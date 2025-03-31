@@ -21,8 +21,11 @@ class TokenManager {
 
     // Retrieve the stored token
     func getToken() -> String? {
-        return keychain.get(tokenKey)
+        let token = keychain.get(tokenKey)
+        print("Retrieved Token:", token ?? "nil")
+        return token
     }
+
 
     // Delete the stored token
     func deleteToken() {
@@ -36,20 +39,65 @@ class TokenManager {
 
     // Decode the JWT token and extract user data
     func decodeToken() -> [String: Any]? {
-        guard let token = getToken() else { return nil }
+        guard let token = getToken() else {
+            print("No token found in keychain")
+            return nil
+        }
+
         let segments = token.split(separator: ".")
 
-        guard segments.count == 3,
-              let base64String = String(segments[1]).removingPercentEncoding,
-              let data = Data(base64Encoded: base64String) else {
+        guard segments.count == 3 else {
+            print("JWT format incorrect:", token)
+            return nil
+        }
+
+        var base64String = String(segments[1])
+        
+        base64String = base64String.replacingOccurrences(of: "-", with: "+")
+                                   .replacingOccurrences(of: "_", with: "/")
+
+        while base64String.count % 4 != 0 {
+            base64String.append("=")
+        }
+
+        guard let data = Data(base64Encoded: base64String) else {
+            print("Base64 decoding failed")
             return nil
         }
 
         do {
             let json = try JSONSerialization.jsonObject(with: data, options: [])
+            print("Decoded Token Payload:", json)
             return json as? [String: Any]
         } catch {
+            print("JWT Decoding Error:", error)
             return nil
         }
     }
+
+
+
+    // Get the userId from the decoded token
+    func getUserId() -> String? {
+        guard let decodedToken = decodeToken() else {
+            print("Decoded token is nil")
+            return nil
+        }
+
+        print("Decoded Token Dictionary:", decodedToken)
+
+        // Try different possible keys for user ID
+        let userIdKeys = ["userId", "sub", "id", "nameid"]
+        for key in userIdKeys {
+            if let userId = decodedToken[key] as? String {
+                print("Extracted User ID using key '\(key)':", userId)
+                return userId
+            }
+        }
+
+        print("User ID not found in token")
+        return nil
+    }
 }
+
+
