@@ -6,7 +6,7 @@ import CoreLocation
 
 
 // MARK: - Hike Model
-struct Stable: Identifiable, Decodable {
+struct Stable: Identifiable, Decodable, Equatable {
     let stableId: String
     let stableName: String
     let distance: Double?
@@ -17,12 +17,36 @@ struct Stable: Identifiable, Decodable {
     var id: String {
         return stableId
     }
+    static func == (lhs: Stable, rhs: Stable) -> Bool {
+        return lhs.stableId == rhs.stableId
+    }
+    
 }
 
 
 class StableViewModel: ObservableObject {
     @Published var stables: [Stable] = []
     private var locationManager: LocationManager
+    private var currentPage = 1
+    private var isLastPage = false
+    @Published var isLoading = false // Track loading state
+    
+    
+    func loadMoreStablesIfNeeded(search: String? = nil, latitude: Double, longitude: Double) {
+        guard !isLastPage else { return } // Stop fetching if already on the last page
+        
+        fetchStables(search: search, latitude: latitude, longitude: longitude, pageNumber: currentPage) { [weak self] in
+            guard let self = self else { return }
+            
+            // If fewer than the requested number of stables are returned, assume it's the last page
+            if self.stables.count < (self.currentPage * 20) { // Assuming pageSize is 20
+                self.isLastPage = true
+            } else {
+                self.currentPage += 1
+            }
+        }
+    }
+    
     
     init(locationManager: LocationManager) {
         self.locationManager = locationManager
@@ -39,29 +63,34 @@ class StableViewModel: ObservableObject {
     }
     
     func toggleMembership(for stable: Stable) {
-        if let index = stables.firstIndex(where: { $0.id == stable.id }) {
+        if let index = stables.firstIndex(where: { $0.stableId == stable.stableId }) {
             stables[index].member.toggle() // Optimistically update UI
             
             let isJoining = stables[index].member
             
+            // Define a completion handler
             let completion: (Bool) -> Void = { success in
-                if success {
-                    DispatchQueue.main.async {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    if success {
+                        // Use user location dynamically instead of hardcoded data
                         if let userLocation = self.locationManager.userLocation {
-                            self.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+                            self.fetchStables(
+                                latitude: userLocation.coordinate.latitude,
+                                longitude: userLocation.coordinate.longitude
+                            )
                         } else {
-                            print("User location not available, using default coordinates.")
-                            self.fetchStables(latitude: 60.8, longitude: 10.7)
+                            print("User location not available.")
                         }
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.stables[index].member.toggle() // Revert optimistic toggle
+                    } else {
+                        // Revert the toggle if the operation fails
+                        self.stables[index].member.toggle()
                         print("Failed to update membership status on server.")
                     }
                 }
             }
             
+            // Call the appropriate server method based on membership status
             if isJoining {
                 joinStableOnServer(for: stables[index], completion: completion)
             } else {
@@ -69,6 +98,7 @@ class StableViewModel: ObservableObject {
             }
         }
     }
+
     
     
     private func joinStableOnServer(for stable: Stable, completion: @escaping (Bool) -> Void) {
@@ -138,73 +168,66 @@ class StableViewModel: ObservableObject {
     }
     
     
-    
-    
-    
-    func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int? = 50, pageNumber: Int? = 1) {
+    func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int = 20, pageNumber: Int = 1, completion: (() -> Void)? = nil) {
+        guard !isLoading else { return } // Prevent duplicate fetches
+        isLoading = true // Set loading to true
+        
         let baseURL = "https://hopla.onrender.com/stables/all"
         var urlComponents = URLComponents(string: baseURL)!
         
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "latitude", value: "\(latitude)"),
-            URLQueryItem(name: "longitude", value: "\(longitude)")
+            URLQueryItem(name: "longitude", value: "\(longitude)"),
+            URLQueryItem(name: "pagesize", value: "\(pageSize)"),
+            URLQueryItem(name: "pagenumber", value: "\(pageNumber)")
         ]
         
-        // Add search query if provided
         if let search = search, !search.isEmpty {
             queryItems.append(URLQueryItem(name: "search", value: search))
         }
         
-        // Add pageSize and pageNumber if provided
-        if let pageSize = pageSize {
-            queryItems.append(URLQueryItem(name: "pagesize", value: "\(pageSize)"))
-        }
-        if let pageNumber = pageNumber {
-            queryItems.append(URLQueryItem(name: "pagenumber", value: "\(pageNumber)"))
-        }
-        
-        // Set query items
         urlComponents.queryItems = queryItems
         
         guard let url = urlComponents.url else { return }
         
-        // Debugging: print the final URL
-        print("Request URL: \(url)")
-        
-        // Make the API call
         var request = URLRequest(url: url)
         request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let httpResponse = response as? HTTPURLResponse {
-                print("HTTP Status Code: \(httpResponse.statusCode)")
-            }
-            
-            if let data = data, !data.isEmpty {
-                DispatchQueue.main.async {
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                self?.isLoading = false // Set loading to false when the fetch is done
+                
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("HTTP Status Code: \(httpResponse.statusCode)")
+                }
+                
+                if let data = data, !data.isEmpty {
                     do {
                         let decodedResponse = try JSONDecoder().decode([Stable].self, from: data)
-                        self.stables = decodedResponse
                         
-                        // Print out the details for every stable
-                        for stable in decodedResponse {
-                            print("Stable ID: \(stable.stableId)")
-                            print("Stable Name: \(stable.stableName)")
-                            print("Distance: \(stable.distance ?? 0.0)")
-                            print("Member: \(stable.member)")
-                            print("Picture URL: \(stable.pictureUrl ?? "")")
-                            print("-------------------------")
+                        // Safely unwrap self
+                        guard let self = self else { return }
+                        
+                        // Filter out duplicates based on stableId before appending
+                        let newStables = decodedResponse.filter { stable in
+                            !self.stables.contains(where: { $0.stableId == stable.stableId })
                         }
+                        self.stables += newStables
+                        
+                        // Invoke the completion closure if provided
+                        completion?()
                     } catch {
                         print("Decoding error: \(error)")
                     }
+                } else {
+                    print("Received empty or invalid data")
                 }
-            } else {
-                print("Received empty or invalid data")
             }
         }.resume()
     }
+    
+    
     
     
     func createStable(formData: [String: Any], completion: @escaping () -> Void) {
@@ -309,56 +332,96 @@ struct Community: View {
     
     var body: some View {
         ZStack {
-            VStack {
-                filterBar
-                searchBar
-                NavigationView {
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(filteredStables) { stable in
-                                StableCard(viewModel: viewModel, stable: stable)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                    .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
-                }
-                .navigationBarBackButtonHidden(true)
-            }
-            .onAppear {
-                if let userLocation = locationManager.userLocation {
-                    viewModel.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
-                } else {
-                    print("User location not available, using default coordinates.")
-                    viewModel.fetchStables(latitude: 59.9139, longitude: 10.7522) // Default coordinates, Oslo
-                }
-            }
+            mainContent
+            floatingButton
+        }
+    }
+    
+    private var mainContent: some View {
+        VStack {
+            filterBar
+            searchBar
+            navigationContent
             
-            // Floating Add Stable button
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        isShowingAddStableSheet.toggle()
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                            .foregroundColor(.green)
-                            .padding()
+            // Show loading indicator when stables are being fetched
+            if viewModel.isLoading {
+                ProgressView("Loading...")
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+            }
+        }
+        .onAppear(perform: fetchInitialStables)
+    }
+
+    
+    private var navigationContent: some View {
+        NavigationView {
+            ScrollView {
+                stableList
+                    .padding(.horizontal)
+            }
+            .background(colorScheme == .dark ? Color.mainDarkBackground : Color.mainLightBackground)
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+    
+    private var stableList: some View {
+        VStack(spacing: 10) {
+            ForEach(filteredStables) { stable in
+                StableCard(viewModel: viewModel, stable: stable)
+                    .onAppear {
+                        handleInfiniteScroll(for: stable)
                     }
-                    .sheet(isPresented: $isShowingAddStableSheet) {
-                        AddStableView(viewModel: viewModel)
-                    }
-                }
-                .padding()
             }
         }
     }
     
+    private var floatingButton: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button(action: {
+                    isShowingAddStableSheet.toggle()
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.green)
+                        .padding()
+                }
+                .sheet(isPresented: $isShowingAddStableSheet) {
+                    AddStableView(viewModel: viewModel)
+                }
+            }
+            .padding()
+        }
+    }
     
+    private func fetchInitialStables() {
+        if let userLocation = locationManager.userLocation {
+            viewModel.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+        } else {
+            print("User location not available, using default coordinates.")
+            viewModel.fetchStables(latitude: 59.9139, longitude: 10.7522) // Default coordinates, Oslo
+        }
+    }
     
+    private func handleInfiniteScroll(for stable: Stable) {
+        if stable == filteredStables.last {
+            if let userLocation = locationManager.userLocation {
+                viewModel.loadMoreStablesIfNeeded(
+                    search: searchText,
+                    latitude: userLocation.coordinate.latitude,
+                    longitude: userLocation.coordinate.longitude
+                )
+            }
+        }
+    }
+    
+
     // Filter bar
     private var filterBar: some View {
         HStack {
