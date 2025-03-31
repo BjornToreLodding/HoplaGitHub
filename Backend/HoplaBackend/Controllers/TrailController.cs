@@ -665,6 +665,7 @@ public class TrailController : ControllerBase
 
         var trailDetails = new TrailDetail
         {
+            Id = trail.Id,
             Description = hikeDetails.Description,
             LatMin = hikeDetails.LatMin,
             LatMax = hikeDetails.LatMax,
@@ -675,12 +676,17 @@ public class TrailController : ControllerBase
 
         var trailAllCoordinates = new TrailAllCoordinate
         {
+            Id = trail.Id,
             CoordinatesCsv = hikeDetails.CoordinatesCsv // full csv med offset beholdes
         };
 
+
+
+        trail.TrailDetails = trailDetails;
+        trail.TrailAllCoordinates = trailAllCoordinates;
         _context.Trails.Add(trail);
-        _context.TrailDetails.Add(trailDetails);
-        _context.TrailAllCoordinates.Add(trailAllCoordinates);
+        //_context.TrailDetails.Add(trailDetails);
+        //_context.TrailAllCoordinates.Add(trailAllCoordinates);
 
         // Legg til TrailFilterValues
         foreach (var filter in dto.Filters)

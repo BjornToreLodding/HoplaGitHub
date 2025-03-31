@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HoplaBackend.Models;
 public class TrailAllCoordinate
 {
-    [Key, ForeignKey("Trail")]
+     [Key, ForeignKey(nameof(Trail))]
     public Guid Id { get; set; }
 
     public Trail Trail { get; set; } = null!;

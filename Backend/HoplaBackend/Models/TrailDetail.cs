@@ -11,8 +11,7 @@ namespace HoplaBackend.Models;
 
 public class TrailDetail
 {
-    [Key]
-    [ForeignKey("Trail")]
+    [Key, ForeignKey(nameof(Trail))]
     public Guid Id { get; set; }
 
     public Trail Trail { get; set; } = null!;

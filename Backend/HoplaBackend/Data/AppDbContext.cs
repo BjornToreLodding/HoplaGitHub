@@ -163,7 +163,16 @@ public class AppDbContext : DbContext
         // Trail
         //
 
-
+        modelBuilder.Entity<Trail>()
+            .HasOne(t => t.TrailDetails)
+            .WithOne(td => td.Trail)
+            .HasForeignKey<TrailDetail>(td => td.Id)
+            .IsRequired();
+        modelBuilder.Entity<Trail>()
+            .HasOne(t => t.TrailAllCoordinates)
+            .WithOne(ac => ac.Trail)
+            .HasForeignKey<TrailAllCoordinate>(ac => ac.Id)
+            .IsRequired();
         modelBuilder.Entity<TrailDetail>()
             .HasOne(td => td.Trail)
             .WithOne(t => t.TrailDetails)
