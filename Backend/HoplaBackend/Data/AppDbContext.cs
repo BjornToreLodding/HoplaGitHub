@@ -40,6 +40,7 @@ public class AppDbContext : DbContext
     public DbSet<TrailReview> TrailReviews { get; set; }
     public DbSet<TrailRating> TrailRatings { get; set; }
     public DbSet<UserHike> UserHikes { get; set; }
+    public DbSet<UserHikeDetail> UserHikeDetails { get; set; }
     public DbSet<SubscriptionOrder> SubscriptionOrders { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<EntityImage> EntityImages { get; set; }
@@ -174,9 +175,12 @@ public class AppDbContext : DbContext
             .WithOne(t => t.TrailAllCoordinates)
             .HasForeignKey<TrailAllCoordinate>(tc => tc.Id)
             .OnDelete(DeleteBehavior.Cascade);
-            
-        modelBuilder.Entity<TrailDetail>()
-            .OwnsMany(t => t.Coordinates50);
+        modelBuilder.Entity<UserHike>()
+            .HasOne(h => h.UserHikeDetail)
+            .WithOne(d => d.Hike)
+            .HasForeignKey<UserHikeDetail>(d => d.UserHikeId)
+            .IsRequired(); // 👈 Sikrer at FK ikke er nullable            
+
 
 
 
@@ -186,12 +190,13 @@ public class AppDbContext : DbContext
             .HasForeignKey(tr => tr.TrailId)
             .OnDelete(DeleteBehavior.Cascade);
 
+/*
         modelBuilder.Entity<TrailCoordinate>()
             .HasOne(tc => tc.TrailAllCoordinates)
             .WithMany(tac => tac.Coordinates)
             .HasForeignKey(tc => tc.TrailAllCoordinatesId)
             .OnDelete(DeleteBehavior.Cascade);
-
+*/
         // Sikrer at hvis en kommentar slettes, slettes også svarene
         modelBuilder.Entity<EntityComment>()
             .HasOne(c => c.ParentComment)

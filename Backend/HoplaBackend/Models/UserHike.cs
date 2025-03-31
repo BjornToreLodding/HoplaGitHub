@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HoplaBackend.Models;
 
+
 public class UserHike
 {
     public Guid Id { get; set; }
@@ -10,7 +11,8 @@ public class UserHike
 
     [ForeignKey("UserId")]    
     public User User { get; set; }
-    public double? Length { get; set; }
+    public string? Title { get; set; }
+    public double Distance { get; set; }
     public double Duration { get; set; }
     public Guid? HorseId { get; set; }
 
@@ -23,6 +25,8 @@ public class UserHike
     public Trail? Trail { get; set; }
     public string? PictureUrl  { get; set; }
     public string? Comment { get; set; }
-    public bool Secret { get;  set; } = false;
+    public bool Secret { get;  set; } = false; //publiseres ikke
+    public DateTime StartedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public UserHikeDetail UserHikeDetail { get; set; } = null;
 }

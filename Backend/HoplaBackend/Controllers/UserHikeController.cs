@@ -13,6 +13,7 @@ using HoplaBackend.Helpers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
+using Org.BouncyCastle.Bcpg;
 
 namespace HoplaBackend.Controllers;
 
@@ -74,4 +75,85 @@ public class UserHikeController : ControllerBase
         }
         
     }
+
+    [Authorize]
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateUserHike([FromBody] CreateUserHikeDto dto)
+    {
+        var userId = _authentication.GetUserIdFromToken(User);
+
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+        var hikeId = Guid.NewGuid();
+        var startMs = new DateTimeOffset(dto.StartedAt).ToUnixTimeMilliseconds();
+
+        var convertedCoords = dto.Coordinates.Select(c =>
+        {
+            var offset = (int)((c.Timestamp - startMs) / 100); // 1/10 sekunder
+            return (offset, c.Lat, c.Lng);
+        }).ToList();
+
+        var details = new UserHikeDetail
+        {
+            UserHikeId = hikeId,
+            Description = dto.Description,
+            Coordinates = convertedCoords
+        };
+
+        var hike = new UserHike
+        {
+            Id = hikeId,
+            UserId = userId,
+            TrailId = dto.TrailId,
+            HorseId = dto.HorseId,
+            StartedAt = dto.StartedAt,
+            CreatedAt = DateTime.UtcNow, 
+            Distance = dto.Distance,
+            Duration = dto.Duration
+        };
+
+        _context.UserHikes.Add(hike);
+        _context.UserHikeDetails.Add(details);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { hike.Id });
+    }
+
+
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUserHike(Guid id, [FromBody] UpdateUserHikeDto dto)
+    {
+        
+        var userId = _authentication.GetUserIdFromToken(User);
+
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+        
+
+        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == id);
+
+
+        var hikeDetail = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == id);
+        if (hike == null || hikeDetail == null)
+            return NotFound("Fant ikke turen.");
+        
+        // Sjekk at brukeren eier turen
+        if (hike.UserId != userId)
+            return Unauthorized(new {message = "Du kan ikke endre andre sine turer"});
+
+        hike.Title = dto.Title ?? hike.Title;
+        hike.PictureUrl = dto.PictureUrl ?? hike.PictureUrl;
+        hikeDetail.Description = dto.Description ?? hikeDetail.Description;
+
+        await _context.SaveChangesAsync();
+        return Ok(new { Message = "Turen er oppdatert." });
+    }
+
 }

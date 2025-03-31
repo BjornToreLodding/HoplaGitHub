@@ -16,6 +16,7 @@ using System.Text.Json;
 using Microsoft.VisualBasic;
 using HoplaBackend.Models.DTOs;
 using System.Formats.Tar;
+using System.Drawing.Drawing2D;
 
 namespace HoplaBackend.Controllers;
 
@@ -615,61 +616,139 @@ public class TrailController : ControllerBase
 
         return Ok(response);
     }
-
+    [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> CreateTrail([FromBody] CreateTrailDto dto)
     {
-        Console.WriteLine("trails/mock start");
-        //var allCoords = MockHelper.GenerateCircularTrail(dto.LatMean, dto.LongMean, dto.Distance);
-        //var reducedCoords = TrailCoordinatesTrim.ReduceTo50Coordinates(allCoords.Select(c => new TrailCoordinateDto { Lat = c.Lat, Long = c.Long }).ToList());
+        Console.WriteLine("trails create start");
+        var userId = _authentication.GetUserIdFromToken(User);
 
-        /*var convertedCoords = reducedCoords
-            .Select(c => new TrailCoordinate50 { Lat = c.Lat, Long = c.Long })
-            .ToList();
-        var latMin = allCoords.Min(c => c.Lat);
-        var latMax = allCoords.Max(c => c.Lat);
-        var longMin = allCoords.Min(c => c.Long);
-        var longMax = allCoords.Max(c => c.Long);
-        Console.WriteLine(latMin);
-        */
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId);
+        var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
+
+        if (hike == null || hikeDetails == null)
+            return BadRequest("Tur eller detaljer ikke funnet");
+
         var trail = new Trail
         {
             Id = Guid.NewGuid(),
             Name = dto.Name,
-            LatMean = 60, //dto.LatMean,
-            LongMean = 10, //dto.LongMean,
-            Distance = dto.Distance,
-            PictureUrl = null,
+            LatMean = hikeDetails.LatMean,
+            LongMean = hikeDetails.LongMean,
+            Distance = hike.Distance,
+            PictureUrl = dto.PictureUrl,
             Visibility = TrailVisibility.Public,
-            UserId = null, // evt. UserId fra innlogget bruker?
-            /*
-            TrailDetails = new TrailDetail
-            {
-                //Description = "Auto-generert mock-løype",
-                //Coordinates50 = convertedCoords, //Rødt strek under reducedCoords
-                //LatMin = latMin,
-                //LatMax = latMax,
-                //LongMin = longMin,
-                //LongMax = longMax,
-            },
-            TrailAllCoordinates = new TrailAllCoordinate
-            {
-                Coordinates = allCoords
-                    .Select(c => new TrailCoordinate
-                    {
-                        Lat = c.Lat,
-                        Long = c.Long
-                    }).ToList()
-            }
-            */
+            UserId = userId,
+        };
+
+        // Hent koordinater og lag 50 punkter
+        var parsed = CoordinateHelper.ParseLatLngOnly(hikeDetails.CoordinatesCsv);
+        var reduced = CoordinateHelper.DownsampleCoordinates(parsed, 50);
+        var reducedCsv = CoordinateHelper.ToCsv(reduced);
+
+        var trailDetails = new TrailDetail
+        {
+            Description = hikeDetails.Description,
+            LatMin = hikeDetails.LatMin,
+            LatMax = hikeDetails.LatMax,
+            LongMin = hikeDetails.LongMin,
+            LongMax = hikeDetails.LongMax,
+            PreviewCoordinatesCsv = reducedCsv //50koordinater
+        };
+
+        var trailAllCoordinates = new TrailAllCoordinate
+        {
+            CoordinatesCsv = hikeDetails.CoordinatesCsv // full csv med offset beholdes
         };
 
         _context.Trails.Add(trail);
+        _context.TrailDetails.Add(trailDetails);
+        _context.TrailAllCoordinates.Add(trailAllCoordinates);
+
+        // Legg til TrailFilterValues
+        foreach (var filter in dto.Filters)
+        {
+            var definitionExists = await _context.TrailFilterDefinitions
+                .AnyAsync(d => d.Id == filter.FilterDefinitionId);
+
+            if (!definitionExists)
+                continue; // hopp over ukjente filterDefinisjoner
+
+            var value = new TrailFilterValue
+            {
+                Id = Guid.NewGuid(),
+                TrailId = trail.Id,
+                FilterDefinitionId = filter.FilterDefinitionId,
+                Value = filter.Value
+            };
+
+            _context.TrailFilterValues.Add(value);
+        }
         await _context.SaveChangesAsync();
 
-        return Ok(new { trail.Id, Message = "Mock trail created" });
+        return Ok(new { trail.Id, Message = "Trail created" });
     }
 
+/*
+    [Authorize]
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateTrail([FromBody] CreateTrailDto dto)
+    {
+        Console.WriteLine("trails create start");
+         var userId = _authentication.GetUserIdFromToken(User);
+
+        // Sjekk at brukeren finnes
+        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return Unauthorized(new { message = "Bruker ikke funnet" });
+
+
+        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId);
+        var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
+        var trail = new Trail
+        {
+            Id = Guid.NewGuid(),
+
+            Name = dto.Name,
+            LatMean = hikeDetails.LatMean, //dto.LatMean,
+            LongMean = hikeDetails.LongMean, //10, //dto.LongMean,
+            Distance = hike.Distance,
+            PictureUrl = dto.PictureUrl,
+            Visibility = TrailVisibility.Public,
+            UserId = userId, // evt. UserId fra innlogget bruker?
+        };
+
+        // Lag liste med 50 coordinater som cvs-format.
+        var coordinates = hikeDetails.CoordinatesCsv;
+        var coordinates50 = hikeDetails.CoordinatesCsv;
+        var trailDetails = new TrailDetail
+        {
+            Description = hikeDetails.Description,
+            LatMin = hikeDetails.LatMin,
+            LatMax = hikeDetails.LatMax,
+            LongMin = hikeDetails.LongMin,
+            LongMax = hikeDetails.LongMax,
+            PreviewCoordinatesCsv = coordinates50, //Rødt strek under reducedCoords
+            
+        };
+
+        var trailAllCoordinates = new TrailAllCoordinate
+        {
+            CoordinatesCsv = coordinates
+        };
+
+        _context.Trails.Add(trail);
+        _context.TrailDetails.Add(trailDetails);
+        _context.TrailAllCoordinates.Add(trailAllCoordinates);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { trail.Id, Message = "Trail created" });
+    }
+*/
     [Authorize]
     [HttpPost("favorite")]
     public async Task<IActionResult> CreateTrailFavorite([FromBody] TrailFavoriteDto dto)
@@ -735,7 +814,113 @@ public class TrailController : ControllerBase
         return Ok(new { message = "Favoritt fjernet" });
     }
 
+    [HttpPost("mock")]
+    public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)
+    {
+        Console.WriteLine("trails/mock start");
 
+        // Generer full liste med koordinater
+        var allCoords = MockHelper.GenerateCircularTrail(dto.LatMean, dto.LongMean, dto.Distance);
+
+        // Reduser til 50 for preview
+        var reducedCoords = CoordinateHelper.DownsampleCoordinates(allCoords, 50);
+
+        // Statistikk
+        var latMin = allCoords.Min(c => c.Lat);
+        var latMax = allCoords.Max(c => c.Lat);
+        var longMin = allCoords.Min(c => c.Lng);
+        var longMax = allCoords.Max(c => c.Lng);
+
+        var trail = new Trail
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            LatMean = dto.LatMean,
+            LongMean = dto.LongMean,
+            Distance = dto.Distance,
+            PictureUrl = null,
+            Visibility = TrailVisibility.Private,
+            UserId = null,
+            TrailDetails = new TrailDetail
+            {
+                Description = "Auto-generert mock-løype",
+                LatMin = latMin,
+                LatMax = latMax,
+                LongMin = longMin,
+                LongMax = longMax,
+                PreviewCoordinatesCsv = CoordinateHelper.ToCsv(reducedCoords)
+            },
+            TrailAllCoordinates = new TrailAllCoordinate
+            {
+                CoordinatesCsv = CoordinateHelper.ToCsv(allCoords)
+            }
+        };
+
+        _context.Trails.Add(trail);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { trail.Id, Message = "Mock trail created" });
+    }
+
+    /*
+    [HttpPost("mock")]
+    public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)
+    {
+        Console.WriteLine("trails/mock start");
+
+        // Genererer full liste med koordinater
+        var allCoords = MockHelper.GenerateCircularTrail(dto.LatMean, dto.LongMean, dto.Distance);
+
+        // Reduserer til 50 punkter for forhåndsvisning
+        var reducedCoords = TrailCoordinatesTrim.ReduceTo50Coordinates(
+            allCoords.Select(c => new TrailCoordinateDto { Lat = c.Lat, Long = c.Long }).ToList()
+        );
+
+        // Utregner statistikk
+        var latMin = allCoords.Min(c => c.Lat);
+        var latMax = allCoords.Max(c => c.Lat);
+        var longMin = allCoords.Min(c => c.Long);
+        var longMax = allCoords.Max(c => c.Long);
+
+        // Lager mock-trail
+        var trail = new Trail
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            LatMean = dto.LatMean,
+            LongMean = dto.LongMean,
+            Distance = dto.Distance,
+            PictureUrl = null,
+            Visibility = TrailVisibility.Private,
+            UserId = null,
+            TrailDetails = new TrailDetail
+            {
+                Description = "Auto-generert mock-løype",
+                LatMin = latMin,
+                LatMax = latMax,
+                LongMin = longMin,
+                LongMax = longMax,
+                // Bred modell for preview-koordinater
+                PreviewCoordinatesCsv = string.Join(";", reducedCoords.Select(c => $"{c.Lat},{c.Long}"))
+            },
+            TrailAllCoordinates = new TrailAllCoordinate
+            {
+                // Bred modell for alle koordinater
+                CoordinatesCsv = string.Join(";", allCoords.Select(c => $"{c.Lat},{c.Long}"))
+            }
+        };
+
+        _context.Trails.Add(trail);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { trail.Id, Message = "Mock trail created" });
+    }
+    */
+
+}
+
+/*
+    //Gammel høy modell
     [HttpPost("mock")]
     public async Task<IActionResult> CreateMockTrail([FromBody] CreateMockTrailDto dto)
     {
@@ -773,10 +958,10 @@ public class TrailController : ControllerBase
             TrailAllCoordinates = new TrailAllCoordinate
             {
                 Coordinates = allCoords
-                    .Select(c => new TrailCoordinate
+                    .Select(c => new TrailAllCoordinate
                     {
                         Lat = c.Lat,
-                        Long = c.Long
+                        Lng = c.Long
                     }).ToList()
             }
         };
@@ -787,7 +972,7 @@ public class TrailController : ControllerBase
         return Ok(new { trail.Id, Message = "Mock trail created" });
     }
 }
-    /*
+    
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
         [FromQuery] double latitude, 

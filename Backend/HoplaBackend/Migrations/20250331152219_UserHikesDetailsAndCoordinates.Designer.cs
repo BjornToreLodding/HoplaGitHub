@@ -3,6 +3,7 @@ using System;
 using HoplaBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331152219_UserHikesDetailsAndCoordinates")]
+    partial class UserHikesDetailsAndCoordinates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1010,6 +1013,7 @@ namespace HoplaBackend.Migrations
             modelBuilder.Entity("UserHikeDetail", b =>
                 {
                     b.Property<Guid>("UserHikeId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("CoordinatesCsv")
@@ -1037,7 +1041,12 @@ namespace HoplaBackend.Migrations
                     b.Property<double>("LongMin")
                         .HasColumnType("double precision");
 
+                    b.Property<Guid>("UserHikeId1")
+                        .HasColumnType("uuid");
+
                     b.HasKey("UserHikeId");
+
+                    b.HasIndex("UserHikeId1");
 
                     b.ToTable("UserHikeDetails", "public");
                 });
@@ -1342,13 +1351,13 @@ namespace HoplaBackend.Migrations
 
             modelBuilder.Entity("UserHikeDetail", b =>
                 {
-                    b.HasOne("HoplaBackend.Models.UserHike", "Hike")
-                        .WithOne("UserHikeDetail")
-                        .HasForeignKey("UserHikeDetail", "UserHikeId")
+                    b.HasOne("HoplaBackend.Models.UserHike", "UserHike")
+                        .WithMany()
+                        .HasForeignKey("UserHikeId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Hike");
+                    b.Navigation("UserHike");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Stable", b =>
@@ -1379,12 +1388,6 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Horses");
 
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.UserHike", b =>
-                {
-                    b.Navigation("UserHikeDetail")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

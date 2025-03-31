@@ -15,12 +15,18 @@ public class TrailDto
 public class CreateTrailDto
 {
     public string Name { get; set; }
+    public Guid UserHikeId { get; set; }
     public string? PictureUrl { get; set; }
-    public string Coordinates { get; set; }
-    public double Distance { get; set; }
-
-
+    public List<FilterInputDto> Filters { get; set; } = new();
 }
+
+
+public class FilterInputDto
+{
+    public Guid FilterDefinitionId { get; set; }
+    public string Value { get; set; } = string.Empty;
+}
+
 public class TrailFavoriteDto
 {
     public Guid TrailId { get; set; }
