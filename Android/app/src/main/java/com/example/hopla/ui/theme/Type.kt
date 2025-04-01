@@ -30,7 +30,6 @@ val customFontFamilyHeader = FontFamily(
 val headerTextStyle = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 48.sp,
-    color = PrimaryBlack,
     fontStyle = FontStyle.Italic,
     fontWeight = FontWeight.Bold
 )
@@ -97,7 +96,6 @@ val underlinedTextStyleSmall = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 12.sp,
     fontWeight = FontWeight.Normal,
-    color = PrimaryBlack,
     textDecoration = TextDecoration.Underline
 )
 
@@ -106,7 +104,6 @@ val underlinedTextStyleBig = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 24.sp,
     fontWeight = FontWeight.Normal,
-    color = PrimaryBlack,
     textDecoration = TextDecoration.Underline
 )
 

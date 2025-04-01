@@ -45,11 +45,15 @@ import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.launch
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hopla.ui.theme.ThemeViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit) {
+fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit, themeViewModel: ThemeViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showCreateUserDialogue by remember { mutableStateOf(false) }
@@ -87,6 +91,9 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         isCheckingLoginState = false
     }
 
+    val isDarkTheme by themeViewModel.isDarkTheme.observeAsState(false)
+    val logoResource = if (isDarkTheme) R.drawable.logo_white else R.drawable.logo1
+
     if (isCheckingLoginState) {
         Column(
             modifier = Modifier
@@ -96,7 +103,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo1),
+                painter = painterResource(id = logoResource),
                 contentDescription = "App Logo",
                 modifier = Modifier
                     .fillMaxHeight(0.3f)
@@ -141,14 +148,15 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
             }
 
             Image(
-                painter = painterResource(id = R.drawable.logo1),
+                painter = painterResource(id = logoResource),
                 contentDescription = "App Logo",
                 modifier = Modifier
                     .fillMaxHeight(0.3f)
             )
             Text(
                 text = "Hopla",
-                style = headerTextStyle
+                style = headerTextStyle,
+                color = MaterialTheme.colorScheme.secondary
             )
             TextField(
                 value = username,
@@ -172,6 +180,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
             Text(
                 text = stringResource(R.string.forgot_password),
                 style = underlinedTextStyleSmall,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .clickable { showForgottenPasswordDialog = true }
@@ -211,6 +220,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
             Text(
                 text = stringResource(R.string.create_user),
                 style = underlinedTextStyleBig,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .clickable { showCreateUserDialogue = true }
@@ -252,9 +262,10 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
                 Text(
                     text = stringResource(R.string.error),
                     style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Text(text = errorMessage)
+                Text(text = errorMessage, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                 Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
                     Text(
                         text = stringResource(R.string.ok),
@@ -302,9 +313,10 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                     Text(
                         text = stringResource(R.string.forgot_password),
                         style = underheaderTextStyle,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    Text(text = stringResource(R.string.forgotten_password_description))
+                    Text(text = stringResource(R.string.forgotten_password_description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                     TextField(
                         value = email,
                         onValueChange = { email = it },
@@ -374,9 +386,10 @@ fun ResponseDialog(message: String, onDismiss: () -> Unit) {
                 Text(
                     text = stringResource(R.string.forgot_password),
                     style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Text(text = message)
+                Text(text = message, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                 Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
                     Text(
                         text = stringResource(R.string.close),
@@ -404,6 +417,7 @@ fun InfoDialog(onDismiss: () -> Unit) {
                 Text(
                     text = stringResource(R.string.verification_explanation),
                     style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Button(onClick = onDismiss) {
@@ -448,12 +462,13 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                     Text(
                         text = stringResource(R.string.create_user),
                         style = underheaderTextStyle,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                     TextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle) },
+                        label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary )},
                         singleLine = true,
                         isError = showError && email.isEmpty(),
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -461,7 +476,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                     TextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
+                        label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
                         isError = showError && password.isEmpty(),
@@ -470,7 +485,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                     TextField(
                         value = confirmedPassword,
                         onValueChange = { confirmedPassword = it },
-                        label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
+                        label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary )},
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
                         isError = showError && (confirmedPassword.isEmpty() || password != confirmedPassword),
@@ -551,6 +566,7 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit) {
                 Text(
                     text = stringResource(R.string.success),
                     style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Text(text = message)
