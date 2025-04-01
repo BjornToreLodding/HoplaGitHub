@@ -13,20 +13,22 @@ import androidx.lifecycle.ViewModel
 
 // Colors for the dark theme of the app
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF0B3D2B),        // Green
-    secondary = Color(0xFF282624),      // Brown
-    tertiary = Color(0xFFCFBFAF),       // light beige
+    primary = Color(0xFF2F463E),        // Green
     background = Color(0xFF161818),     // Dark grey
-    tertiaryContainer = Color(0xFFFFFFFF),   // White
+    tertiary = Color(0xFF493B2F),       // light beige
+    onBackground = Color(0xFF303030),   // light beige
+    onPrimary = Color(0xFFFFFFFF),       // light beige
+    secondary = Color(0xFFFFFFFF)       // light beige
 )
 
 // Colors for the light theme of the app
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF456559),        // Green
-    secondary = Color(0xFF745E4D),      // Brown
-    tertiary = Color(0xFF745E4D),       // light beige
     background = Color(0xFFEAE6E1),     // light beige
-    tertiaryContainer = Color(0xFFFFFFFF),   // White
+    tertiary = Color(0xFF745E4D),       // light beige
+    onBackground = Color(0xFFFFFFFF),   // light beige
+    onPrimary = Color(0xFFFFFFFF),       // light beige
+    secondary = Color(0xFF000000)       // light beige
 )
 
 // ViewModel to manage the theme state

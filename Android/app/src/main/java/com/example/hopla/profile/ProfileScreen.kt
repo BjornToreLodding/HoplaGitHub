@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -103,7 +104,8 @@ fun ProfileScreen(navController: NavController) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
-                        contentDescription = stringResource(R.string.notifications)
+                        contentDescription = stringResource(R.string.notifications),
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
                 IconButton(
@@ -112,7 +114,8 @@ fun ProfileScreen(navController: NavController) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.settings)
+                        contentDescription = stringResource(R.string.settings),
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -136,7 +139,7 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
         modifier = Modifier
             .size(200.dp)
             .clip(CircleShape)
-            .border(5.dp, PrimaryWhite, CircleShape)
+            .border(5.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
     ) {
         Box(
             modifier = Modifier
@@ -200,10 +203,10 @@ fun ProfileButtons(navController: NavController) {
                     .height(50.dp),
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryWhite
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.my_trips), color = PrimaryBlack)
+                Text(text = stringResource(R.string.my_trips), color = MaterialTheme.colorScheme.onPrimary)
             }
             Button(
                 onClick = { navController.navigate("my_horses") },
@@ -213,10 +216,10 @@ fun ProfileButtons(navController: NavController) {
                     .height(50.dp),
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryWhite
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.my_horses), color = PrimaryBlack)
+                Text(text = stringResource(R.string.my_horses), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
         Row(
@@ -231,10 +234,10 @@ fun ProfileButtons(navController: NavController) {
                     .height(50.dp),
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryWhite
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.friends), color = PrimaryBlack)
+                Text(text = stringResource(R.string.friends), color = MaterialTheme.colorScheme.onPrimary)
             }
             Button(
                 onClick = { navController.navigate("following") },
@@ -244,10 +247,10 @@ fun ProfileButtons(navController: NavController) {
                     .height(50.dp),
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryWhite
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.following), color = PrimaryBlack)
+                Text(text = stringResource(R.string.following), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }
@@ -308,7 +311,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -316,7 +319,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.tertiary)
             Spacer(modifier = Modifier.height(8.dp))
 
             // Username
@@ -332,7 +335,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     }
                     responseMessage = message
                     showResponseDialog = true
-                }
+                },
             )
 
             // Email

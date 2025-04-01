@@ -24,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,7 +80,7 @@ fun SettingsScreen(
                 .padding(paddingValues)
         ) {
             item {
-                SettingsCategory(title = "General")
+                SettingsCategory(title = stringResource(R.string.general))
                 SettingsItem(
                     icon = Icons.Default.LocationOn,
                     title = stringResource(R.string.language),
@@ -167,7 +168,8 @@ fun SettingsCategory(title: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
-        style = generalTextStyleBold
+        style = generalTextStyleBold,
+        color = MaterialTheme.colorScheme.secondary
     )
 }
 
@@ -180,7 +182,7 @@ fun SettingsItem(icon: ImageVector, title: String, trailingContent: @Composable 
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
+        Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary)
         Text(text = title, style = generalTextStyle, modifier = Modifier.weight(1f).padding(start = 16.dp))
         trailingContent()
     }
@@ -196,8 +198,8 @@ fun SettingsClickableItem(icon: ImageVector, title: String, onClick: () -> Unit)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp))
-        Text(text = title, style = generalTextStyle, modifier = Modifier.weight(1f).padding(start = 16.dp))
+        Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary)
+        Text(text = title, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.weight(1f).padding(start = 16.dp))
     }
 }
 
@@ -290,6 +292,7 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
             Text(
                 text = "Norsk",
                 style = generalTextStyle,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("Norwegian") }
@@ -297,6 +300,7 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
             Text(
                 text = "English",
                 style = generalTextStyle,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { languageViewModel.setLanguage("English") }
@@ -315,6 +319,7 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
             Text(
                 text = stringResource(R.string.light),
                 style = generalTextStyle,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { themeViewModel.setDarkTheme(false) }
@@ -322,6 +327,7 @@ fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
             Text(
                 text = stringResource(R.string.dark),
                 style = generalTextStyle,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .clickable { themeViewModel.setDarkTheme(true) }

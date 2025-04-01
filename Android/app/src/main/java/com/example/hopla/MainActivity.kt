@@ -70,6 +70,7 @@ import com.example.hopla.profile.UserHorsesScreen
 import com.example.hopla.profile.UsersProfileScreen
 import com.example.hopla.ui.theme.HoplaTheme
 import com.example.hopla.ui.theme.ThemeViewModel
+import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.DeleteUserRequest
 import com.example.hopla.universalData.DeleteUserResponse
 import com.example.hopla.universalData.MapScreen
@@ -225,7 +226,7 @@ fun TopBar() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo1), // Load the image
+                    painter = painterResource(id = R.drawable.logo_white), // Load the image
                     contentDescription = "App Logo",
                     modifier = Modifier
                         .height(40.dp) // Adjust size
@@ -262,14 +263,14 @@ fun BottomNavigationBar(navController: NavHostController) {
             BottomNavigationItem(
                 icon = {
                     when(screen) {
-                        Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null)
-                        Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null)
-                        Screen.NewTrip -> Icon(Icons.Outlined.Add, contentDescription = null)
-                        Screen.Trails -> Icon(Icons.Outlined.LocationOn, contentDescription = null)
-                        Screen.Community -> Icon(Icons.Outlined.Face, contentDescription = null)
+                        Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Screen.NewTrip -> Icon(Icons.Outlined.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Screen.Trails -> Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Screen.Community -> Icon(Icons.Outlined.Face, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
-                label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1) },
+                label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1, style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     val currentTime = System.currentTimeMillis()

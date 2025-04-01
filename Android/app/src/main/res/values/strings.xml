@@ -173,5 +173,6 @@
     <string name="filters">Filtere</string>
     <string name="apply">Bruk</string>
     <string name="post_review">Legg til vurdering</string>
+    <string name="general">Generelt</string>
 
 </resources>

@@ -174,5 +174,6 @@
     <string name="filters">Filters</string>
     <string name="apply">Apply</string>
     <string name="post_review">Post review</string>
+    <string name="general">General</string>
 
 </resources>

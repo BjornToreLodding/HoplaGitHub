@@ -1,5 +1,6 @@
 package com.example.hopla.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -37,7 +38,6 @@ val headerTextStyle = TextStyle(
 val headerTextStyleSmall = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 32.sp,
-    color = PrimaryBlack,
     fontStyle = FontStyle.Italic,
     fontWeight = FontWeight.Bold
 )
@@ -51,7 +51,6 @@ val underheaderTextStyle = TextStyle(
     fontFamily = customFontFamilyUnderHeader,
     fontSize = 24.sp,
     fontWeight = FontWeight.Medium,
-    color = PrimaryBlack
 )
 
 //---------------Custom text style for "normal" text------------------
@@ -63,8 +62,7 @@ val customFontFamilyText = FontFamily(
 val generalTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 12.sp,
-    fontWeight = FontWeight.Normal,
-    color = PrimaryBlack
+    fontWeight = FontWeight.Normal
 )
 
 val generalTextStyleRed = TextStyle(
@@ -77,24 +75,21 @@ val generalTextStyleRed = TextStyle(
 val generalTextStyleBold = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 14.sp,
-    fontWeight = FontWeight.Bold,
-    color = PrimaryBlack
+    fontWeight = FontWeight.Bold
 )
 
 // Custom text style for buttons
 val buttonTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 16.sp,
-    fontWeight = FontWeight.Normal,
-    color = PrimaryWhite
+    fontWeight = FontWeight.Normal
 )
 
 // Custom text style for TextField labels
 val textFieldLabelTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 14.sp,
-    fontWeight = FontWeight.Normal,
-    color = PrimaryBlack
+    fontWeight = FontWeight.Normal
 )
 
 // Custom text style for underlined text (small)

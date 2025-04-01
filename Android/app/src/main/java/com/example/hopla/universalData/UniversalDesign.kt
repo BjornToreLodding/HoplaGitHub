@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -110,9 +111,10 @@ fun AddButton(onClick: () -> Unit) {
         FloatingActionButton(
             onClick = onClick,
             modifier = Modifier
-                .size(45.dp)
+                .size(45.dp),
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add", tint = MaterialTheme.colorScheme.onPrimary)
         }
 
     }
@@ -137,6 +139,7 @@ fun ScreenHeader(navController: NavController, headerText: String) {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     contentDescription = stringResource(R.string.back)
                 )
             }
@@ -147,7 +150,8 @@ fun ScreenHeader(navController: NavController, headerText: String) {
         ) {
             Text(
                 text = headerText,
-                style = headerTextStyleSmall
+                style = headerTextStyleSmall,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -266,12 +270,12 @@ fun ReportDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.send_a_report), style = underheaderTextStyle) },
+        title = { Text(stringResource(R.string.send_a_report), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
         text = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp) // Set a fixed height for the report box
+                    .height(300.dp)
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -281,14 +285,14 @@ fun ReportDialog(
                             androidx.compose.material.TextField(
                                 value = reportTitle,
                                 onValueChange = { reportTitle = it },
-                                label = { Text(text = stringResource(R.string.title), style = textFieldLabelTextStyle) },
+                                label = { Text(text = stringResource(R.string.title), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             androidx.compose.material.TextField(
                                 value = reportText,
                                 onValueChange = { reportText = it },
-                                label = { Text(text = stringResource(R.string.report), style = textFieldLabelTextStyle) },
+                                label = { Text(text = stringResource(R.string.report), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp) // Set a fixed height for the text field
@@ -311,12 +315,12 @@ fun ReportDialog(
                     onDismiss()
                 }
             }) {
-                Text(text = stringResource(R.string.send), style = buttonTextStyle)
+                Text(text = stringResource(R.string.send), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     )
@@ -330,9 +334,10 @@ fun CustomButton(text: String, onClick: () -> Unit) {
         modifier = Modifier
             .height(40.dp)
             .width(100.dp),
-        shape = RectangleShape
+        shape = RectangleShape,
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
-        Text(text = text, style = buttonTextStyle)
+        Text(text = text, style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
         Icon(
             imageVector = Icons.Default.KeyboardArrowDown,
             contentDescription = null,
@@ -373,7 +378,9 @@ fun DateOfBirthPicker(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
     ) {
         // Day Dropdown
         DropdownMenuBox(
@@ -464,7 +471,7 @@ fun EditableTextField(
     var showResponseDialog by remember { mutableStateOf(false) }
 
     Column {
-        Text(text = label)
+        Text(text = label, color = MaterialTheme.colorScheme.secondary)
         androidx.compose.material.TextField(
             value = value,
             onValueChange = { newValue ->
@@ -479,6 +486,7 @@ fun EditableTextField(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = stringResource(R.string.save),
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.clickable {
                         coroutineScope.launch {
                             onSave()
@@ -488,7 +496,7 @@ fun EditableTextField(
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
-        HorizontalDivider(thickness = 2.dp, color = PrimaryGray)
+        HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.tertiary)
         Spacer(modifier = Modifier.height(8.dp))
     }
 

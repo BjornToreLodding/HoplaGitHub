@@ -8,6 +8,8 @@ import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -749,42 +751,73 @@ fun AddCommunityScreen(navController: NavController, token: String) {
 
 fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    val locationProvider = LocationManager.GPS_PROVIDER
+    val hasFineLocationPermission = ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
 
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-        ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-        val lastKnownLocation: Location? = locationManager.getLastKnownLocation(locationProvider)
-        if (lastKnownLocation != null) {
-            Log.d("CommunityScreen", "Location found: ${lastKnownLocation.latitude}, ${lastKnownLocation.longitude}")
-            val userLocation = LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude)
-            onLocationReceived(userLocation)
-        } else {
-            Log.d("CommunityScreen", "No last known location available, requesting location update")
-            val locationListener = object : android.location.LocationListener {
-                override fun onLocationChanged(location: Location) {
-                    Log.d("CommunityScreen", "Location update received: ${location.latitude}, ${location.longitude}")
-                    val userLocation = LatLng(location.latitude, location.longitude)
-                    onLocationReceived(userLocation)
-                    locationManager.removeUpdates(this)
-                }
+    val hasCoarseLocationPermission = ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
 
-                @Deprecated("Deprecated in Java")
-                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-                override fun onProviderEnabled(provider: String) {}
-                override fun onProviderDisabled(provider: String) {}
-            }
-            locationManager.requestSingleUpdate(locationProvider, locationListener, null)
-
-            // Add a timeout to handle cases where the location update is not received
-            val handler = android.os.Handler(context.mainLooper)
-            handler.postDelayed({
-                Log.d("CommunityScreen", "Location update timeout")
-                locationManager.removeUpdates(locationListener)
-                // Handle the timeout case, e.g., show a message to the user
-            }, 60000) // 10 seconds timeout
-        }
-    } else {
+    if (!hasFineLocationPermission && !hasCoarseLocationPermission) {
         Log.d("CommunityScreen", "Location permissions not granted")
-        // Handle the case where permissions are not granted
+        return
+    }
+
+    val gpsProvider = LocationManager.GPS_PROVIDER
+    val networkProvider = LocationManager.NETWORK_PROVIDER
+
+    val gpsLocation: Location? = locationManager.getLastKnownLocation(gpsProvider)
+    val networkLocation: Location? = locationManager.getLastKnownLocation(networkProvider)
+
+    val bestLocation = when {
+        gpsLocation != null -> gpsLocation
+        networkLocation != null -> networkLocation
+        else -> null
+    }
+
+    if (bestLocation != null) {
+        Log.d("CommunityScreen", "Using last known location: ${bestLocation.latitude}, ${bestLocation.longitude}")
+        onLocationReceived(LatLng(bestLocation.latitude, bestLocation.longitude))
+    } else {
+        Log.d("CommunityScreen", "No last known location, requesting updates")
+
+        val locationListener = object : android.location.LocationListener {
+            override fun onLocationChanged(location: Location) {
+                Log.d("CommunityScreen", "Received new location: ${location.latitude}, ${location.longitude}")
+                onLocationReceived(LatLng(location.latitude, location.longitude))
+                locationManager.removeUpdates(this) // Stop updates after first success
+            }
+
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {}
+
+            @Deprecated("Deprecated in Java")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        }
+
+        // Request updates from GPS and Network Providers
+        locationManager.requestLocationUpdates(
+            gpsProvider,
+            2000L, // Min time in milliseconds between updates
+            0f,    // Min distance in meters
+            locationListener
+        )
+
+        locationManager.requestLocationUpdates(
+            networkProvider,
+            2000L,
+            0f,
+            locationListener
+        )
+
+        // Timeout if no location is found within 10 seconds
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            Log.d("CommunityScreen", "Location update timeout")
+            locationManager.removeUpdates(locationListener)
+        }, 10_000) // 10 seconds timeout
     }
 }
