@@ -23,6 +23,7 @@ public class UserHikeService
             {
                 Id = u.Id,
                 TrailName = u.Trail.Name,
+                TrailId = (Guid)u.TrailId,
                 Length = u.Distance,
                 Duration = u.Duration,
                 PictureUrl = u.PictureUrl
