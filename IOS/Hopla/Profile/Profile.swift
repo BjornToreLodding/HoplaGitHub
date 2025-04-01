@@ -15,11 +15,16 @@ class ProfileViewModel: ObservableObject {
     
     func uploadProfileImage(image: UIImage, entityId: String, table: String, token: String) async {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            print("Kunne ikke konvertere bildet til Data")
+            print("Could not convert image to Data")
             return
         }
 
-        let url = URL(string: "https://hopla.onrender.com/upload")!
+        guard !table.isEmpty, !entityId.isEmpty, !token.isEmpty else {
+            print("Invalid inputs: table, entityId, or token cannot be empty")
+            return
+        }
+
+        let url = URL(string: "https://hopla.onrender.com/users/upload")!
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -29,33 +34,43 @@ class ProfileViewModel: ObservableObject {
 
         var body = Data()
 
-        // Legg til bilde
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"image\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
         body.append(imageData)
         body.append("\r\n".data(using: .utf8)!)
 
-        // Legg til `table`
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"table\"\r\n\r\n".data(using: .utf8)!)
         body.append("\(table)\r\n".data(using: .utf8)!)
 
-        // Legg til `entityId`
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"entityId\"\r\n\r\n".data(using: .utf8)!)
         body.append("\(entityId)\r\n".data(using: .utf8)!)
 
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
         request.httpBody = body
 
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                let responseString = String(data: data, encoding: .utf8)
-                print("Upload successful: \(responseString ?? "No response")")
-            } else {
-                print("Upload failed: \(response)")
+            if let httpResponse = response as? HTTPURLResponse {
+                if (200...299).contains(httpResponse.statusCode) {
+                    struct UploadResponse: Decodable {
+                        let filePath: String
+                    }
+
+                    do {
+                        let uploadResponse = try JSONDecoder().decode(UploadResponse.self, from: data)
+                        print("Uploaded file saved at: \(uploadResponse.filePath)")
+                    } catch {
+                        print("Failed to decode server response: \(error.localizedDescription)")
+                    }
+                } else {
+                    let responseString = String(data: data, encoding: .utf8)
+                    print("Upload failed with status code \(httpResponse.statusCode)")
+                    print("Response Body: \(responseString ?? "No response body")")
+                }
             }
         } catch {
             print("Error uploading image: \(error.localizedDescription)")
@@ -94,7 +109,7 @@ struct Profile: View {
                     ZStack {
                         Circle()
                             .frame(width: 200, height: 200)
-                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                             .padding(.top, 10)
                         
                         if let pictureUrl = user.pictureUrl, let url = URL(string: pictureUrl) {
@@ -145,16 +160,18 @@ struct Profile: View {
                             Text("My hikes")
                                 .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
-                                .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                                .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                                
                         }
                         
                         NavigationLink(destination: MyHorses()) {
                             Text("My horses")
                                 .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
-                                .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                                .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                                
                         }
                     }
                     HStack(spacing: 10) {
@@ -162,16 +179,18 @@ struct Profile: View {
                             Text("Friends")
                                 .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
-                                .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                                .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                                
                         }
                         
                         NavigationLink(destination: FollowingView()) {
                             Text("Following")
                                 .font(.custom("ArialNova", size: 20))
                                 .frame(width: 180, height: 50)
-                                .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                                .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                                
                         }
                     }
                     
@@ -180,19 +199,19 @@ struct Profile: View {
                     ZStack {
                         Rectangle()
                             .frame(width: 380, height: 240)
-                            .foregroundColor(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                             .padding(.top, 20)
                         
                         VStack {
                             Rectangle()
                                 .frame(width: 360, height: 3)
-                                .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
                                 .padding(.top, 10)
                             
                             Text("Username")
                                 .font(.custom("ArialNova", size: 16))
                                 .frame(width: 360, height: 30)
-                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                             
                             Text(user.alias)
                                 .font(.custom("ArialNova-Light", size: 16))
@@ -202,12 +221,12 @@ struct Profile: View {
                             
                             Rectangle()
                                 .frame(width: 360, height: 3)
-                                .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
                             
                             Text("Email")
                                 .font(.custom("ArialNova", size: 16))
                                 .frame(width: 360, height: 30)
-                                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                             
                             Text(user.email)
                                 .font(.custom("ArialNova-Light", size: 16))
@@ -217,7 +236,7 @@ struct Profile: View {
                             
                             Rectangle()
                                 .frame(width: 360, height: 3)
-                                .foregroundColor(AdaptiveColor(light: .darkBeige, dark: .darkBrown).color(for: colorScheme))
+                                .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
                             
                             ChangePassword()
                         }
@@ -242,7 +261,7 @@ struct Profile: View {
                     Image(systemName: "gearshape")
                         .font(.system(size: 24))
                         .padding()
-                        .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 }
                 .padding(.trailing, 20)
                 .padding(.top, 20)

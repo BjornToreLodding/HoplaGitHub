@@ -38,7 +38,7 @@ struct HoplaApp: App {
                                 .padding(.bottom, 5)
                         }
                         .frame(maxWidth: .infinity)
-                        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     }
                     
                     if isLoggedIn {
@@ -114,7 +114,7 @@ struct MainTabView: View {
             }
         }
         .tint(colorScheme == .dark ? .white : .black)
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
     }
 }
 

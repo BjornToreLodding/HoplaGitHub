@@ -20,7 +20,7 @@ struct HikesDetails: View {
                     }
                     .padding()
                 }
-                //.background(AdaptiveColor(light: .white, dark: .black, colorScheme: colorScheme))
+                //.background(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen, colorScheme: colorScheme))
             }
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)

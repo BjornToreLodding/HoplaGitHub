@@ -235,7 +235,7 @@ struct HeaderView: View {
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .frame(height: 40)
-            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
             .foregroundColor(.white)
     }
 }
@@ -315,7 +315,7 @@ struct HorseRowView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
-        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
     }
 }
 
@@ -332,11 +332,11 @@ struct AddHorseButton: View {
                 .resizable()
                 .scaledToFill()
                 .frame(width: 30, height: 30)
-                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 .padding(20)
                 .background(
                     Circle()
-                        .fill(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        .fill(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                         .frame(width: 60, height: 60)
                         .shadow(radius: 3)
                 )
@@ -361,7 +361,7 @@ struct CustomBackButton: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 30)
-                        .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                 }
                 .position(x: 25, y: 20)
                 Spacer()

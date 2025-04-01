@@ -129,14 +129,14 @@ struct FriendsDetailsHeader: View {
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     .foregroundColor(.white)
             } else {
                 Text("Loading...")
                     .font(.title)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     .foregroundColor(.white)
             }
         }
@@ -263,7 +263,7 @@ struct FriendsDetails: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                     }
                 }
                 .padding()

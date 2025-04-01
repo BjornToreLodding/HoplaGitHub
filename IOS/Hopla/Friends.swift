@@ -72,7 +72,7 @@ struct FriendsHeaderView: View {
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .frame(height: 40)
-            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
             .foregroundColor(.white)
     }
 }
@@ -234,7 +234,8 @@ struct Friends: View {
                         Image(systemName: "plus.circle.fill")
                             .resizable()
                             .frame(width: 60, height: 60)
-                            .foregroundColor(.green)
+                        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                            .color(for: colorScheme)
                             .padding()
                     }
                 }
@@ -249,7 +250,8 @@ struct Friends: View {
             TextField("Search friends...", text: $vm.searchText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.gray.opacity(0.2)))
         }
         .padding(.horizontal)
     }
@@ -343,68 +345,21 @@ struct AddFriendPage: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(filteredUsers) { user in
-                            NavigationLink(destination: UserDetails(userId: user.id)) {
-                                HStack {
-                                    if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
-                                        AsyncImage(url: url) { image in
-                                            image.resizable()
-                                                .scaledToFill()
-                                                .frame(width: 60, height: 60)
-                                                .clipShape(Circle())
-                                        } placeholder: {
-                                            Circle()
-                                                .fill(Color.gray.opacity(0.5))
-                                                .frame(width: 60, height: 60)
-                                        }
-                                    } else {
-                                        Circle()
-                                            .fill(Color.gray.opacity(0.5))
-                                            .frame(width: 60, height: 60)
-                                    }
-
-                                    Text(user.name)
-                                        .font(.headline)
-                                        .padding(.leading, 10)
-
-                                    Spacer()
-
-                                    if user.relationStatus == .friend {
-                                        Text("Friend")
-                                            .padding(8)
-                                            .background(Color.gray)
-                                            .foregroundColor(.white)
-                                            .cornerRadius(8)
-                                    } else {
-                                        Button(action: {
-                                            vm.addFriend(userId: user.id)
-                                        }) {
-                                            Text(user.relationStatus == .pending ? "Pending" : "Add Friend")
-                                                .padding(8)
-                                                .background(user.relationStatus == .pending ? Color.orange : Color.green)
-                                                .foregroundColor(.white)
-                                                .cornerRadius(8)
-                                        }
-                                    }
-                                }
-                                .padding()  // Padding around the item
-                                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))  // Background color for each item
-                                .shadow(radius: 2)
-                            }
+                            UserRowView(user: user, colorScheme: colorScheme)
                         }
                     }
-                    .padding(.horizontal)  // Padding for the entire ScrollView content
+                    .padding(.horizontal)
                 }
-
             }
             .onAppear {
                 vm.fetchAllUsers()
             }
 
             CustomBackButton(colorScheme: colorScheme)  // Custom back button
-
         }
-        .navigationBarBackButtonHidden(true)  // Hides the default back button
+        .navigationBarBackButtonHidden(true)
     }
+
 
     private var searchBar: some View {
         HStack {
@@ -417,6 +372,72 @@ struct AddFriendPage: View {
         }
         .padding(.horizontal)
     }
+    
+    struct UserRowView: View {
+        let user: User
+        let colorScheme: ColorScheme
+        @StateObject private var vm = FriendViewModel()
+
+        var body: some View {
+            NavigationLink(destination: UserDetails(userId: user.id)) {
+                HStack {
+                    ProfileImageView(urlString: user.profilePictureUrl)
+
+                    Text(user.name)
+                        .font(.headline)
+                        .padding(.leading, 10)
+
+                    Spacer()
+
+                    if user.relationStatus == .friend {
+                        Text("Friend")
+                            .padding(8)
+                            .background(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                            .cornerRadius(8)
+                    } else {
+                        Button(action: {
+                            vm.addFriend(userId: user.id)
+                        }) {
+                            Text(user.relationStatus == .pending ? "Pending" : "Add Friend")
+                                .padding(8)
+                                .background(user.relationStatus == .pending ? Color.orange : Color.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding()
+                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+                .shadow(radius: 2)
+            }
+        }
+    }
+
+    struct ProfileImageView: View {
+        let urlString: String?
+
+        var body: some View {
+            if let urlString = urlString, let url = URL(string: urlString) {
+                AsyncImage(url: url) { image in
+                    image.resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Circle()
+                        .fill(Color.gray.opacity(0.5))
+                        .frame(width: 60, height: 60)
+                }
+            } else {
+                Circle()
+                    .fill(Color.gray.opacity(0.5))
+                    .frame(width: 60, height: 60)
+            }
+        }
+    }
+
+    
 }
 
 

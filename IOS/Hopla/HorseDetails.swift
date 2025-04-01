@@ -73,6 +73,7 @@ class HorseDetailsViewModel: ObservableObject {
 
 
 struct HorseDetails: View {
+    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var vm = HorseDetailsViewModel()
     var horseId: String
     
@@ -101,12 +102,12 @@ struct HorseDetails: View {
                 // Breed
                 Text("Breed: \(horse.breed ?? "Unknown")")
                     .font(.title2)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 
                 // Age
                 Text("Age: \(horse.age ?? 0) years old")
                     .font(.title3)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             }  else {
                 ProgressView()
             }

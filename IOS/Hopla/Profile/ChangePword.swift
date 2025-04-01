@@ -13,7 +13,7 @@ struct ChangePassword: View {
             Text("Change password")
                 .font(.custom("ArialNova", size: 16))
                 .frame(width: 360, height: 30)
-                .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 .underline(true)
                 .padding(.top, 10)
                 .onTapGesture { // When clicking on change password

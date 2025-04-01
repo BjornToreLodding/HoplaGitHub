@@ -12,7 +12,14 @@
       }
     },
     "%@: Me" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: Meg"
+          }
+        }
+      }
     },
     "%lld" : {
 
@@ -48,7 +55,14 @@
       }
     },
     "Add Stable" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny Stall"
+          }
+        }
+      }
     },
     "Age: %lld years old" : {
       "localizations" : {
@@ -61,7 +75,14 @@
       }
     },
     "Are you sure you want to delete %@?" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sikker på at du vil slette %@?"
+          }
+        }
+      }
     },
     "Are you sure you want to delete your user?" : {
       "localizations" : {
@@ -195,16 +216,44 @@
       }
     },
     "Date of Birth" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fødselsdag"
+          }
+        }
+      }
     },
     "Day" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dag"
+          }
+        }
+      }
     },
     "Delete" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett"
+          }
+        }
+      }
     },
     "Delete Horse" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett Hest"
+          }
+        }
+      }
     },
     "Delete User" : {
       "localizations" : {
@@ -217,7 +266,14 @@
       }
     },
     "Description" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beskrivelse"
+          }
+        }
+      }
     },
     "Description:" : {
       "localizations" : {
@@ -259,19 +315,15 @@
         }
       }
     },
-    "Duration: %@ hrs" : {
-      "extractionState" : "stale",
+    "Duration: %@ min" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tid: %@ min"
+            "value" : "Varighet: %@ min"
           }
         }
       }
-    },
-    "Duration: %@ min" : {
-
     },
     "Email" : {
       "localizations" : {
@@ -299,17 +351,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skriv et passord"
-          }
-        }
-      }
-    },
-    "Enter age" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv inn alder"
           }
         }
       }
@@ -691,7 +732,14 @@
 
     },
     "Month" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Måned"
+          }
+        }
+      }
     },
     "My friends" : {
       "localizations" : {
@@ -734,7 +782,14 @@
       }
     },
     "Name" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navn"
+          }
+        }
+      }
     },
     "New Hike" : {
       "localizations" : {
@@ -767,7 +822,14 @@
       }
     },
     "No image selected" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen bilde valgt"
+          }
+        }
+      }
     },
     "Not a member? Sign up" : {
       "localizations" : {
@@ -820,7 +882,14 @@
       }
     },
     "Private Group" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privat gruppe"
+          }
+        }
+      }
     },
     "Profile" : {
       "comment" : "Profile tab",
@@ -844,7 +913,14 @@
       }
     },
     "Save" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lagre"
+          }
+        }
+      }
     },
     "Search following..." : {
       "localizations" : {
@@ -886,17 +962,6 @@
         }
       }
     },
-    "Search groups..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Søk etter grupper…"
-          }
-        }
-      }
-    },
     "Search hikes..." : {
       "localizations" : {
         "nb" : {
@@ -908,7 +973,14 @@
       }
     },
     "Search stables..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Søk etter stall"
+          }
+        }
+      }
     },
     "Select Image" : {
       "localizations" : {
@@ -951,7 +1023,14 @@
       }
     },
     "Stable Details" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stalldetaljer"
+          }
+        }
+      }
     },
     "Start" : {
       "localizations" : {
@@ -1034,7 +1113,14 @@
       }
     },
     "Year" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "År"
+          }
+        }
+      }
     },
     "You will be logged out of your account." : {
       "localizations" : {

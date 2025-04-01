@@ -59,24 +59,24 @@ struct Login: View {
                     
                     // Username Label & TextField
                     Text("Email")
-                        .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         .padding(.top, 10)
                     
                     TextField("Enter your email", text: $email)
                         .padding()
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                         .cornerRadius(8)
                         .frame(width: 300)
                         .multilineTextAlignment(.center)
                     
                     // Password Label & SecureField
                     Text("Password")
-                        .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         .padding(.top, 20)
                     
                     SecureField("Enter your password", text: $password)
                         .padding()
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                         .cornerRadius(8)
                         .frame(width: 300)
                         .multilineTextAlignment(.center)
@@ -86,7 +86,7 @@ struct Login: View {
                     VStack {
                         Text("Forgotten password?")
                             .frame(width: 360, height: 30)
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                             .underline(true)
                             .padding(.top, 10)
                             .onTapGesture { // When clicking on change password
@@ -140,7 +140,7 @@ struct Login: View {
                             .foregroundColor(.white)
                             .padding()
                             .frame(width: 200, height: 50)
-                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                             .cornerRadius(8)
                     }
                     
@@ -159,7 +159,7 @@ struct Login: View {
                     VStack {
                         Text("Not a member? Sign up")
                             .frame(width: 360, height: 30)
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                             .underline(true)
                             .padding(.top, 10)
                             .onTapGesture {
@@ -222,7 +222,7 @@ struct Login: View {
                                         .foregroundColor(.white)
                                         .padding()
                                         .frame(width: 200, height: 50)
-                                        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                                         .cornerRadius(8)
                                 }
                                 

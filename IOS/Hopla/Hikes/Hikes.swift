@@ -336,7 +336,7 @@ struct Hikes: View {
             .pickerStyle(SegmentedPickerStyle())
         }
         .frame(height: 30)
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
     }
     
     private var searchBar: some View {
@@ -346,7 +346,12 @@ struct Hikes: View {
             TextField("Search hikes...", text: $searchText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .fill(
+                        AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme)
+                            .opacity(0.2)
+                    )
+                )
         }
         .padding(.horizontal)
     }

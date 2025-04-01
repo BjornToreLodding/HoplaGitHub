@@ -61,7 +61,7 @@ struct CommunityChat: View {
                             .fontWeight(.bold)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .frame(height: 40)
-                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                             .foregroundColor(.white)
 
                         // Messages Section
@@ -72,7 +72,7 @@ struct CommunityChat: View {
                                         if shouldShowDate(for: message) {
                                             Text(message.date)
                                                 .font(.footnote)
-                                                .foregroundColor(.gray)
+                                                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                                                 .frame(maxWidth: .infinity, alignment: .center)
                                                 .padding(.vertical, 5)
                                         }
@@ -83,10 +83,13 @@ struct CommunityChat: View {
                                                 VStack(alignment: .trailing) {
                                                     Text("\(message.time): Me")
                                                         .font(.caption2)
-                                                        .foregroundColor(.gray)
+                                                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                                                     Text(message.text)
                                                         .padding()
-                                                        .background(Color.green.opacity(0.8))
+                                                        .background(
+                                                            AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme)
+                                                                .opacity(0.8)
+                                                        )
                                                         .cornerRadius(10)
                                                         .foregroundColor(.white)
                                                 }
@@ -94,12 +97,12 @@ struct CommunityChat: View {
                                                 VStack(alignment: .leading) {
                                                     Text("\(message.time): \(message.sender)")
                                                         .font(.caption2)
-                                                        .foregroundColor(.gray)
+                                                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                                                     Text(message.text)
                                                         .padding()
-                                                        .background(Color.gray.opacity(0.3))
+                                                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                                                         .cornerRadius(10)
-                                                        .foregroundColor(.black)
+                                                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                                                 }
                                                 Spacer()
                                             }
@@ -121,12 +124,12 @@ struct CommunityChat: View {
                                 sendMessage(scrollViewProxy: scrollViewProxy) // Scroll after sending
                             }) {
                                 Image(systemName: "paperplane.fill")
-                                    .foregroundColor(newMessage.isEmpty ? .gray : .green)
+                                    .foregroundColor(newMessage.isEmpty ? .white : .green)
                                     .padding()
                             }
                             .disabled(newMessage.isEmpty)
                         }
-                        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     }
                     .onAppear {
                         fetchMessages(scrollViewProxy: scrollViewProxy)
@@ -146,6 +149,7 @@ struct CommunityChat: View {
                         }
                     }
                 }
+                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
             }
         }
 
@@ -231,8 +235,6 @@ struct CommunityChat: View {
 
     
     
-    
-    
     // Send message function
     private func sendMessage(scrollViewProxy: ScrollViewProxy) {
         let formatter = DateFormatter()
@@ -285,7 +287,7 @@ struct CommunityChat: View {
             }
             
             if let httpResponse = response as? HTTPURLResponse {
-                print("HTTP Status Code:", httpResponse.statusCode)
+                //print("HTTP Status Code:", httpResponse.statusCode)
                 if !(200...299).contains(httpResponse.statusCode) {
                     print("Failed to send message.")
                     return

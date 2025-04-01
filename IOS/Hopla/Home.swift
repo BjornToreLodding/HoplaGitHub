@@ -24,7 +24,7 @@ struct Home: View {
                     .fill(AdaptiveColor.background.color(for: colorScheme))
                     .ignoresSafeArea()
 
-                VStack(spacing: 0) { // **Spacing set to 0**
+                VStack(spacing: 0) {
                     filterBar
 
                     ScrollView {
@@ -34,7 +34,7 @@ struct Home: View {
                             }
                         }
                     }
-                    .padding(.top, 0) // **Remove unnecessary padding**
+                    .padding(.top, 0)
                 }
             }
         }
@@ -52,7 +52,7 @@ struct Home: View {
             .pickerStyle(SegmentedPickerStyle())
         }
         
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
     }
 }
 
@@ -64,7 +64,7 @@ struct PostContainer: View {
     var body: some View {
         ZStack {
             Rectangle()
-                .fill(AdaptiveColor(light: .white, dark: .darkPostBackground).color(for: colorScheme))
+                .fill(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                 .ignoresSafeArea()
 
             VStack {
@@ -77,7 +77,7 @@ struct PostContainer: View {
                 Text(comment)
                     .padding(.top, 10) 
                     .font(.body)
-                    .adaptiveTextColor(light: .black, dark: .white)
+                    .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
             }
             .frame(width: 370, height: 320)
             .padding()

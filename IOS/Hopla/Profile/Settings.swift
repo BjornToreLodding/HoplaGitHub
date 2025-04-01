@@ -35,7 +35,7 @@ struct Settings: View {
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     .foregroundColor(.white)
                 
                 NavigationView {
@@ -126,9 +126,9 @@ struct Settings: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 30, height: 30)
-                            .foregroundColor(AdaptiveColor(light: .black, dark: .white).color(for: colorScheme))
+                            .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                     }
-                    .position(x: 25, y: 20) // Adjust for exact placement
+                    .position(x: 25, y: 20)
                     
                     Spacer()
                 }
@@ -262,11 +262,3 @@ struct Settings: View {
     }
 }
 
-#Preview("English") {
-    ContentView()
-}
-
-#Preview("Norsk") {
-    ContentView()
-        .environment(\.locale, Locale(identifier: "nb_NO"))
-}

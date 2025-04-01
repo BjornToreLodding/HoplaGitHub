@@ -119,14 +119,14 @@ struct UserDetailsHeader: View {
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     .foregroundColor(.white)
             } else {
                 Text("Loading...")
                     .font(.title)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     .foregroundColor(.white)
             }
         }
@@ -252,11 +252,11 @@ struct UserDetails: View {
                             
                             Text("Length: \(String(format: "%.2f", hike.length)) km | Duration: \(String(format: "%.2f", hike.duration)) min")
                                 .font(.caption)
-                                .foregroundColor(.gray)
+                                .foregroundStyle(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                     }
                 }
                 .padding()
@@ -287,7 +287,7 @@ struct UserDetails: View {
                 Text("Add Friend")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(AdaptiveColor(light: .green, dark: .darkGreen).color(for: colorScheme))
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }

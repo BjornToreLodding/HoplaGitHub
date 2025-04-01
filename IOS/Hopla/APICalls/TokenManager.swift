@@ -22,7 +22,7 @@ class TokenManager {
     // Retrieve the stored token
     func getToken() -> String? {
         let token = keychain.get(tokenKey)
-        print("Retrieved Token:", token ?? "nil")
+        //print("Retrieved Token:", token ?? "nil")
         return token
     }
 

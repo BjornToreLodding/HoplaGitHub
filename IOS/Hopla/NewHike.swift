@@ -28,7 +28,7 @@ struct NewHike: View {
                         Text("Start")
                             .foregroundColor(.white)
                             .frame(width: 70, height: 70)
-                            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+                            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                             .clipShape(Circle())
                             .overlay(Circle().stroke(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme), lineWidth: 4))
                     }
@@ -42,7 +42,7 @@ struct NewHike: View {
                 .frame(height: 75)
                 .background(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
             }
-            .toolbarBackground(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme), for: .navigationBar)
+            .toolbarBackground(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme), for: .navigationBar)
             .toolbarColorScheme(.light, for: .navigationBar)
         }
     }

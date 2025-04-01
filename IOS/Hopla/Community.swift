@@ -346,7 +346,7 @@ struct Community: View {
             if viewModel.isLoading {
                 ProgressView("Loading...")
                     .padding()
-                    .background(Color(.systemBackground))
+                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                     .cornerRadius(10)
                     .shadow(radius: 5)
             }
@@ -388,7 +388,7 @@ struct Community: View {
                     Image(systemName: "plus.circle.fill")
                         .resizable()
                         .frame(width: 60, height: 60)
-                        .foregroundColor(.green)
+                        .foregroundStyle(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                         .padding()
                 }
                 .sheet(isPresented: $isShowingAddStableSheet) {
@@ -431,7 +431,7 @@ struct Community: View {
             }
             .pickerStyle(SegmentedPickerStyle())
         }
-        .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
     }
     
     private var searchBar: some View {
@@ -441,7 +441,11 @@ struct Community: View {
             TextField("Search stables...", text: $searchText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .fill(
+                        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme)
+                            .opacity(0.2))
+                )
         }
         .padding(.horizontal)
     }
@@ -538,6 +542,7 @@ struct AddStableView: View {
 
 // MARK: - Stable Card
 struct StableCard: View {
+    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var viewModel: StableViewModel // Add this line to observe changes in ViewModel
     let stable: Stable
     
@@ -574,7 +579,7 @@ struct StableCard: View {
                         Spacer()
                         HStack {
                             Text(stable.stableName)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                                 .padding(.leading, 10)
                             Spacer()
                         }

@@ -35,7 +35,7 @@ struct FollowingHeaderView: View {
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .frame(height: 40)
-            .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
+            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
             .foregroundColor(.white)
     }
 }
@@ -195,7 +195,7 @@ struct FollowingView: View {
                         Image(systemName: "plus.circle.fill")
                             .resizable()
                             .frame(width: 60, height: 60)
-                            .foregroundColor(.green)
+                            .foregroundStyle(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                             .padding()
                     }
                 }
@@ -335,7 +335,7 @@ struct AddFollowingPage: View {
                                         Text("Following")
                                             .padding(8)
                                             .background(Color.gray)
-                                            .foregroundColor(.white)
+                                            .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                                             .cornerRadius(8)
                                     } else {
                                         Button(action: {
@@ -343,8 +343,8 @@ struct AddFollowingPage: View {
                                         }) {
                                             Text("Follow")
                                                 .padding(8)
-                                                .background(Color.green)
-                                                .foregroundColor(.white)
+                                                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                                .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                                                 .cornerRadius(8)
                                         }
                                     }

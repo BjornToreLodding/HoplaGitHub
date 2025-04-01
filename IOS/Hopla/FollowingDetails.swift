@@ -42,15 +42,15 @@ struct FollowingDetailsHeader: View {
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    .foregroundColor(.white)
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                    .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
             } else {
                 Text("Loading...")
                     .font(.title)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
-                    .background(AdaptiveColor(light: .lighterGreen, dark: .darkGreen).color(for: colorScheme))
-                    .foregroundColor(.white)
+                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                    .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
             }
         }
     }
@@ -193,7 +193,7 @@ struct FollowingDetails: View {
                     Text(description)
                         .padding()
                         .frame(width: 370)
-                        .background(Color.white)
+                        .foregroundStyle(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                 }
             )
         } else {
@@ -220,7 +220,7 @@ struct FollowingDetails: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AdaptiveColor(light: .white, dark: .black).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                     }
                 }
                 .padding()
