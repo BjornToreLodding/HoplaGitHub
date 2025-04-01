@@ -39,7 +39,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import com.example.hopla.ui.theme.PrimaryWhite
+import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.UserSession
 
@@ -91,8 +93,7 @@ fun TopTextColumn() {
                     Icon(
                         imageVector = item,
                         contentDescription = null,
-                        tint = if (selectedItem == item) MaterialTheme.colorScheme.onSecondary
-                        else MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -127,7 +128,7 @@ fun PostItem(imageRes: Int, text: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
     ) {
         Column(
@@ -145,13 +146,13 @@ fun PostItem(imageRes: Int, text: String) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(MaterialTheme.colorScheme.onBackground)
                     .height(40.dp),
             ) {
                 Text(
                     text = text,
-                    fontSize = 16.sp,
-                    color = PrimaryBlack
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -171,7 +172,7 @@ fun PostItem(imageRes: Int, text: String) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More options",
-                        tint = PrimaryWhite
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 DropdownMenu(
@@ -179,7 +180,7 @@ fun PostItem(imageRes: Int, text: String) {
                     onDismissRequest = { isDropdownExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Report") },
+                        text = { stringResource(R.string.report) },
                         onClick = {
                             isDropdownExpanded = false
                             showReportDialog = true

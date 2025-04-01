@@ -218,6 +218,7 @@ fun TrailsScreen(navController: NavController) {
                     ) {
                         Icon(
                             imageVector = if (isMapClicked) Icons.AutoMirrored.Outlined.List else Icons.Outlined.Home,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
                     }
@@ -274,6 +275,7 @@ fun TrailsScreen(navController: NavController) {
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.LocationOn,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
                     }
@@ -313,6 +315,7 @@ fun TrailsScreen(navController: NavController) {
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.FavoriteBorder,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
                     }
@@ -351,6 +354,7 @@ fun TrailsScreen(navController: NavController) {
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
                     }
@@ -376,6 +380,7 @@ fun TrailsScreen(navController: NavController) {
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.KeyboardArrowDown,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
                                     contentDescription = "Filters"
                                 )
                             }
@@ -389,13 +394,13 @@ fun TrailsScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
+                        .background(MaterialTheme.colorScheme.onBackground)
                         .padding(16.dp)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
                             .padding(16.dp)
                     ) {
                         Text(
@@ -405,7 +410,7 @@ fun TrailsScreen(navController: NavController) {
                                 .padding(8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                         LazyColumn(
                             modifier = Modifier.weight(1f)
@@ -414,14 +419,44 @@ fun TrailsScreen(navController: NavController) {
                                 Text(
                                     text = filter.displayName,
                                     style = underheaderTextStyle,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.padding(8.dp)
                                 )
                                 if (filter.options.isEmpty()) {
-                                    Text(
-                                        text = "N/A",
-                                        style = generalTextStyle,
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.padding(8.dp)
-                                    )
+                                    ) {
+                                        var isYesChecked by remember { mutableStateOf(false) }
+                                        var isNoChecked by remember { mutableStateOf(false) }
+
+                                        Checkbox(
+                                            checked = isYesChecked,
+                                            onCheckedChange = {
+                                                isYesChecked = it
+                                                if (it) isNoChecked = false
+                                            }
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.yes),
+                                            style = generalTextStyle,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.padding(end = 8.dp)
+                                        )
+
+                                        Checkbox(
+                                            checked = isNoChecked,
+                                            onCheckedChange = {
+                                                isNoChecked = it
+                                                if (it) isYesChecked = false
+                                            }
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.no),
+                                            style = generalTextStyle,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
                                 } else {
                                     Column {
                                         filter.options.forEach { option ->
@@ -588,7 +623,8 @@ fun FilterOptionRow(option: String) {
         )
         Text(
             text = option,
-            style = generalTextStyle
+            style = generalTextStyle,
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }
