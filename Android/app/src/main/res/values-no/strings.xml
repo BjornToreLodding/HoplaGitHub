@@ -179,5 +179,7 @@
     <string name="allow_usage">TIllatt samling av statistikk</string>
     <string name="statistics_info">Appen er fortsatt under utvikling, og i den sammenheng må alle brukere godta at appen samler inn statistikk for forbedring av appens potensiale. Dete vil ved seinere tid bli mulig å ikke godta.</string>
     <string name="server_error_message">Det har skjedd en feil, prøv igjen senere</string>
+    <string name="edit_trip">Rediger tur</string>
+    <string name="share_trip">Del tur</string>
 
 </resources>

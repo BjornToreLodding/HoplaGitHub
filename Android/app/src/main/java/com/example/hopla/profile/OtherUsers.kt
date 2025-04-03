@@ -346,8 +346,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 color = MaterialTheme.colorScheme.secondary,
             )
             profile.userHikes.forEach { hike ->
-                HikeItem(hike)
-            }
+                HikeItem(hike = hike, onEditTrip = { /* Handle edit trip */ }, isMyTripsScreen = false)            }
             if (userHikes.isNotEmpty() || profile.userHikes.isNotEmpty())  {
                 Box(
                     modifier = Modifier
