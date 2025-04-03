@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -58,6 +59,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.hopla.R
@@ -547,4 +549,38 @@ fun formatDateTime(dateTimeString: String): Pair<String, String> {
     val formattedTime = zonedDateTime.format(timeFormatter)
 
     return Pair(formattedDate, formattedTime)
+}
+
+@Composable
+fun ServerErrorDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.error),
+                    style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(
+                    text = stringResource(R.string.server_error_message),
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
+                    Text(
+                        text = stringResource(R.string.ok),
+                        style = buttonTextStyle
+                    )
+                }
+            }
+        }
+    }
 }

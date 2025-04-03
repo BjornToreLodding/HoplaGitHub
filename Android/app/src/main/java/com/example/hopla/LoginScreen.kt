@@ -58,6 +58,7 @@ import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleBig
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
+import com.example.hopla.universalData.ServerErrorDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -472,9 +473,8 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
     var isChecked by remember { mutableStateOf(false) }
     var showInfoDialogCU by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var confirmpasswordVisible by remember { mutableStateOf(false) }
-    var confirmConfirmPasswordVisible by remember { mutableStateOf(false) }
+    var showServerErrorDialog by remember { mutableStateOf(false) }
 
     val allFieldsRequiredMessage = stringResource(R.string.all_fields_are_required)
     val passwordsDoNotMatchMessage = stringResource(R.string.passwords_do_not_match)
@@ -592,6 +592,9 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                                         if (code == 200) {
                                             responseMessage = result
                                             showSuccessDialog = true
+                                            onCreateUser(trimmedEmail, trimmedPassword)
+                                        } else if (code == 500) {
+                                            showServerErrorDialog = true
                                         } else {
                                             responseMessage = result
                                         }
@@ -609,6 +612,10 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                 }
             }
         }
+    }
+
+    if (showServerErrorDialog) {
+        ServerErrorDialog(onDismiss = { showServerErrorDialog = false })
     }
 
     if (showInfoDialogCU) {
