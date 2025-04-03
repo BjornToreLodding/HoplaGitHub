@@ -92,11 +92,13 @@ public class UserHikeController : ControllerBase
 
         var hikeId = Guid.NewGuid();
         var startMs = new DateTimeOffset(request.StartedAt).ToUnixTimeMilliseconds();
+        var coordinateList = JsonSerializer.Deserialize<List<CoordinateInput>>(request.Coordinates);
 
-        var convertedCoords = request.Coordinates.Select(c =>
+
+        var convertedCoords = coordinateList.Select(c =>
         {
             var offset = (int)((c.Timestamp - startMs) / 100); // 1/10 sekunder
-            return (offset, c.Lat, c.Lng);
+            return (offset, c.Lat, c.Long);
         }).ToList();
 
         var details = new UserHikeDetail

@@ -13,7 +13,7 @@ public class CoordinateInput
 {
     public long Timestamp { get; set; } // Unix-tid i ms
     public double Lat { get; set; }
-    public double Lng { get; set; }
+    public double Long { get; set; }
 }
 
 public class CreateUserHikeForm
@@ -28,7 +28,8 @@ public class CreateUserHikeForm
     public double Distance { get; set; } 
     public double Duration { get; set; } 
 
-    public List<CoordinateInput> Coordinates { get; set; } = new();
+    public string Coordinates { get; set; }
+    //public List<CoordinateInput> Coordinates { get; set; } = new();
 }
 
 public class UpdateUserHikeForm
