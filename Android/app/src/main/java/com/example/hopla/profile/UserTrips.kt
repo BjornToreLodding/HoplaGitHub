@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,13 +18,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,7 +53,6 @@ import com.example.hopla.apiService.fetchUserHikes
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
-import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.Hike
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.ScreenHeader
@@ -109,7 +106,7 @@ fun MyTripsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(userHikes) { hike ->
-                        HikeItem(hike = hike, onEditTrip = { /* Handle edit trip */ }, isMyTripsScreen = true)
+                        HikeItem(hike = hike, isMyTripsScreen = true)
                     }
                     item {
                         Button(
@@ -128,14 +125,14 @@ fun MyTripsScreen(navController: NavController) {
 }
 
 @Composable
-fun HikeItem(hike: Hike, onEditTrip: (Hike) -> Unit, isMyTripsScreen: Boolean) {
+fun HikeItem(hike: Hike, isMyTripsScreen: Boolean) {
     var showEditDialog by remember { mutableStateOf(false) }
 
     if (showEditDialog) {
         EditTripDialog(
             hike = hike,
             onDismiss = { showEditDialog = false },
-            onSave = { name, description, imageBitmap ->
+            onSave = { _, _, _ ->
                 // Handle save logic here
                 showEditDialog = false
             }
