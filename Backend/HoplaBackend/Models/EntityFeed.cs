@@ -18,10 +18,6 @@ public class EntityFeed
     public int LikesCount { get; set; } = 0;
     public int CommentsCount { get; set; } = 0;
 
-    public static implicit operator EntityFeed(EntityFeed v)
-    {
-        throw new NotImplementedException();
-    }
 }
 public enum EntityType
 {

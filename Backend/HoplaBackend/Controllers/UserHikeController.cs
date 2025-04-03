@@ -60,7 +60,9 @@ public class UserHikeController : ControllerBase
             {
                 userHikes,
                 page,
-                size
+                size,
+                
+                
             }); 
         }
         else // Hvis userid er spesifisert i query
@@ -79,7 +81,7 @@ public class UserHikeController : ControllerBase
 
     [Authorize]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateUserHike([FromBody] CreateUserHikeDto dto)
+    public async Task<IActionResult> CreateUserHike([FromForm] CreateUserHikeForm request)
     {
         var userId = _authentication.GetUserIdFromToken(User);
 
@@ -89,9 +91,9 @@ public class UserHikeController : ControllerBase
             return Unauthorized(new { message = "Bruker ikke funnet" });
 
         var hikeId = Guid.NewGuid();
-        var startMs = new DateTimeOffset(dto.StartedAt).ToUnixTimeMilliseconds();
+        var startMs = new DateTimeOffset(request.StartedAt).ToUnixTimeMilliseconds();
 
-        var convertedCoords = dto.Coordinates.Select(c =>
+        var convertedCoords = request.Coordinates.Select(c =>
         {
             var offset = (int)((c.Timestamp - startMs) / 100); // 1/10 sekunder
             return (offset, c.Lat, c.Lng);
@@ -100,7 +102,7 @@ public class UserHikeController : ControllerBase
         var details = new UserHikeDetail
         {
             UserHikeId = hikeId,
-            Description = dto.Description,
+            Description = request.Description,
             Coordinates = convertedCoords
         };
 
@@ -108,12 +110,12 @@ public class UserHikeController : ControllerBase
         {
             Id = hikeId,
             UserId = userId,
-            TrailId = dto.TrailId,
-            HorseId = dto.HorseId,
-            StartedAt = dto.StartedAt,
+            TrailId = request.TrailId,
+            HorseId = request.HorseId,
+            StartedAt = request.StartedAt,
             CreatedAt = DateTime.UtcNow, 
-            Distance = dto.Distance,
-            Duration = dto.Duration
+            Distance = request.Distance,
+            Duration = request.Duration
         };
 
         _context.UserHikes.Add(hike);
@@ -174,6 +176,8 @@ public class UserHikeController : ControllerBase
         hike.Title = request.Title ?? hike.Title;
         hike.PictureUrl = pictureUrl ?? pictureUrl;
         hikeDetail.Description = request.Description ?? hikeDetail.Description;
+        hike.HorseId = request.HorseId;
+        hike.TrailId = request.TrailId;
 
         await _context.SaveChangesAsync();
         return Ok(new { Message = "Turen er oppdatert." });

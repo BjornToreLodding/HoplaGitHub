@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Models;
 
-namespace YourProject.EventHandlers
+namespace HoplaBackend.EventHandlers
 {
     public class EntityDeletedEventHandler : INotificationHandler<EntityDeletedEvent>
     {

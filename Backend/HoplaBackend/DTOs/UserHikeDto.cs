@@ -7,8 +7,7 @@ public class UserHikeDto
     public double? Length { get ; set; }
     public double Duration { get; set; }
     public string? PictureUrl { get; set; }
-
-
+    public bool TrailButton { get; set; }
 }
 public class CoordinateInput
 {
@@ -17,11 +16,14 @@ public class CoordinateInput
     public double Lng { get; set; }
 }
 
-public class CreateUserHikeDto
+public class CreateUserHikeForm
 {
     public Guid? TrailId { get; set; }
-    public Guid HorseId { get; set; }
+    public IFormFile? Image { get; set; } 
+
+    public Guid? HorseId { get; set; }
     public DateTime StartedAt { get; set; }
+    public string? Title { get; set; }
     public string? Description { get; set; }  
     public double Distance { get; set; } 
     public double Duration { get; set; } 
@@ -31,12 +33,12 @@ public class CreateUserHikeDto
 
 public class UpdateUserHikeForm
 {
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public IFormFile Image { get; set; } // Du kan utvide til å støtte bildeopplasting senere
-    //public int? Rating { get; set; }
     public Guid? TrailId { get; set; } //lage søkefunksjon for å finne matching Trail. 
     // f.eks utgangspunkt i lat/longMean og sammenligne rutas koordinater.
+    public IFormFile Image { get; set; } 
+    public string? Title { get; set; }
+    public string? Description { get; set; }
+    //public int? Rating { get; set; }
     
     public Guid HorseId { get; set; }
 }

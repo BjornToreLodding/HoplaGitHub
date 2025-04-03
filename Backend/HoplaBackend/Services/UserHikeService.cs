@@ -26,7 +26,8 @@ public class UserHikeService
                 TrailId = (Guid)u.TrailId,
                 Length = u.Distance,
                 Duration = u.Duration,
-                PictureUrl = u.PictureUrl
+                PictureUrl = u.PictureUrl,
+                TrailButton = !u.TrailId.HasValue ? true : false
             })
             .ToListAsync();
     }
