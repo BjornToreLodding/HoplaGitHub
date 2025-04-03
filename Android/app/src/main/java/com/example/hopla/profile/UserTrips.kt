@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
@@ -33,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,6 +56,7 @@ import com.example.hopla.apiService.fetchTrailFilters
 import com.example.hopla.apiService.fetchUserHikes
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.Hike
 import com.example.hopla.universalData.ImagePicker
@@ -106,7 +111,7 @@ fun MyTripsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(userHikes) { hike ->
-                        HikeItem(hike = hike, isMyTripsScreen = true)
+                        HikeItem(hike = hike, filters = filters, isMyTripsScreen = true)
                     }
                     item {
                         Button(
@@ -125,12 +130,13 @@ fun MyTripsScreen(navController: NavController) {
 }
 
 @Composable
-fun HikeItem(hike: Hike, isMyTripsScreen: Boolean) {
+fun HikeItem(hike: Hike, filters: List<TrailFilter> = emptyList(), isMyTripsScreen: Boolean) {
     var showEditDialog by remember { mutableStateOf(false) }
 
     if (showEditDialog) {
         EditTripDialog(
             hike = hike,
+            filters = filters,
             onDismiss = { showEditDialog = false },
             onSave = { _, _, _ ->
                 // Handle save logic here
@@ -195,12 +201,15 @@ fun HikeItem(hike: Hike, isMyTripsScreen: Boolean) {
 @Composable
 fun EditTripDialog(
     hike: Hike,
+    filters: List<TrailFilter>,
     onDismiss: () -> Unit,
     onSave: (String, String, Bitmap?) -> Unit
 ) {
     var name by remember { mutableStateOf(hike.trailName) }
     var description by remember { mutableStateOf("") }
+    var selectedFilter by remember { mutableStateOf(filters.firstOrNull()?.name ?: "") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    val selectedOptions = remember { mutableStateMapOf<String, MutableSet<String>>() }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -214,22 +223,61 @@ fun EditTripDialog(
             ) {
                 Text(
                     text = stringResource(R.string.edit_trip),
-                    style = underheaderTextStyle,
+                    style = headerTextStyleSmall,
                     color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 5.dp)
                 )
                 TextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(text = stringResource(R.string.name)) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.name), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
                 )
                 TextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(text = stringResource(R.string.description)) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .verticalScroll(rememberScrollState())
+                        .padding(vertical = 2.dp)
                 )
+                Box(modifier = Modifier.height(150.dp)) {
+                    LazyColumn {
+                        items(filters) { filter ->
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Text(
+                                    text = filter.displayName,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    filter.options.forEach { option ->
+                                        val isSelected = selectedOptions[filter.name]?.contains(option) == true
+                                        Text(
+                                            text = option,
+                                            style = generalTextStyle,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier
+                                                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
+                                                .clickable {
+                                                selectedOptions[filter.name] = selectedOptions[filter.name]?.toMutableSet()?.apply {
+                                                    if (isSelected) remove(option) else add(option)
+                                                } ?: mutableSetOf(option)
+                                            }
+
+                                                .padding(8.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 if (imageBitmap != null) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -255,19 +303,24 @@ fun EditTripDialog(
                     text = stringResource(R.string.add_image)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = {
-                    onSave(name, description, imageBitmap)
-                }) {
-                    Text(
-                        text = stringResource(R.string.save),
-                        style = buttonTextStyle
-                    )
-                }
-                Button(onClick = onDismiss) {
-                    Text(
-                        text = stringResource(R.string.cancel),
-                        style = buttonTextStyle
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = {
+                        onSave(name, description, imageBitmap)
+                    }) {
+                        Text(
+                            text = stringResource(R.string.save),
+                            style = buttonTextStyle
+                        )
+                    }
+                    Button(onClick = onDismiss) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = buttonTextStyle
+                        )
+                    }
                 }
             }
         }
