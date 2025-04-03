@@ -20,7 +20,7 @@ namespace HoplaBackend.EventHandlers
             var entityFeed = new EntityFeed
             {
                 EntityId = notification.EntityId,
-                EntityName = notification.EntityType,
+                EntityName = Enum.Parse<EntityType>(notification.EntityType),
                 CreatedAt = DateTime.UtcNow,
                 UserId = notification.UserId,
                 ActionType = notification.ActionType

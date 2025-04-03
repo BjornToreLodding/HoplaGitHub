@@ -666,7 +666,21 @@ public class TrailController : ControllerBase
 
         _context.TrailReviews.Add(review);
         await _context.SaveChangesAsync();
-
+        // Lag feed-innslag
+        /*
+        var feedHelper = new EntityFeed 
+        {
+            //(_context);
+        //await feedHelper.AddFeedEntryAsync(
+            entityId = Guid.NewGuid();
+            //entityId: review.Id,
+            entityType: EntityType.TrailReview,
+            actionType: "opprettet ny løype",
+            userId: review.UserId,
+            entityTitle: review.User.Alias,
+            pictureUrl: review.PictureUrl // hvis du har det
+        };
+        */
         return Ok("Review opprettet");
             }
 

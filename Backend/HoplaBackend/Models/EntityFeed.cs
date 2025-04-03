@@ -4,7 +4,9 @@ public class EntityFeed
 {
     public Guid Id { get; set; }
     public Guid EntityId { get; set; }
-    public string EntityName { get; set; }
+    //public string EntityName { get; set; }
+    public EntityType EntityName { get; set; }
+
     public string? EntityTitle { get; set; }  // Felt for å lagre navn på hesten/turen
     public string? EntityObject { get ; set; } //Felt for å lagre navn på den/det som ble brukt på Entity
     public string? PictureUrl { get; set; }
@@ -15,4 +17,18 @@ public class EntityFeed
     // Teller for likes og kommentarer
     public int LikesCount { get; set; } = 0;
     public int CommentsCount { get; set; } = 0;
+
+    public static implicit operator EntityFeed(EntityFeed v)
+    {
+        throw new NotImplementedException();
+    }
+}
+public enum EntityType
+{
+    UserHike,
+    Trail,
+    TrailReview,
+    Horse,
+    UserRelation,
+    Stable
 }

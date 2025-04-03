@@ -118,6 +118,19 @@ public class UserHikeController : ControllerBase
 
         _context.UserHikes.Add(hike);
         _context.UserHikeDetails.Add(details);
+
+        //Opprette Feed
+        /*
+        var feedHelper = new EntityFeedHelper(_context);
+        await feedHelper.AddFeedEntryAsync(
+            entityType: EntityType.TrailReview,
+            actionType: "opprettet ny løype",
+            userId: review.UserId,
+            entityTitle: review.User.Alias,
+            pictureUrl: review.PictureUrl // hvis du har det
+    );
+    */
+
         await _context.SaveChangesAsync();
 
         return Ok(new { hike.Id });

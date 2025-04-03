@@ -4,54 +4,115 @@ using HoplaBackend.Data;
 using HoplaBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HoplaBackend.DTOs;
 
+namespace HoplaBackend.Controllers;
 [ApiController]
 [Route("feed")]
-public class TrailController : ControllerBase
+
+public class EntityFeedController : ControllerBase
 {
     private readonly AppDbContext _context;
 
-    public TrailController(AppDbContext context)
+    public EntityFeedController(AppDbContext context)
     {
         _context = context;
     }
 
-    [HttpGet("trackall")]
-    public async Task<IActionResult> GetUserFeed()
+    [HttpGet("all")]
+    public async Task<IActionResult> GetFeed()
     {
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine($"Hentet bruker-ID fra token: {userIdString}");
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
-        {
-            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
-        }
-        var userId = parsedUserId;
-        var feed = await _context.Trails
-            //.Where(f => f.UserId == userId)
-            .Select(t => new
-            {
-                t.Id,
-                t.Name,
-                PictureUrl = !string.IsNullOrEmpty(t.PictureUrl) 
-                    ? $"{t.PictureUrl}?h=64&w=64&fit=crop"
-                    : "",
-                t.TrailDetails.Description,
-                t.CreatedAt
-            })
-            .OrderByDescending(t => t.CreatedAt)
+        var feedEntries = await _context.EntityFeeds
+            .OrderByDescending(f => f.CreatedAt)
+            .Take(50)
             .ToListAsync();
-        return Ok(feed);
+
+        var result = new List<FeedItemDto>();
+
+        foreach (var entry in feedEntries)
+        {
+            var dto = entry.EntityName switch
+            {
+                EntityType.Trail => await BuildTrailDto(entry),
+                EntityType.UserHike => await BuildUserHikeDto(entry),
+                EntityType.TrailReview => await BuildTrailReviewDto(entry),
+                _ => null
+            };
+
+            if (dto != null)
+                result.Add(dto);
+        }
+
+        return Ok(result);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteFeedItem(Guid id)
+    private async Task<FeedItemDto?> BuildTrailDto(EntityFeed entry)
     {
-        var feedItem = await _context.EntityFeeds.FindAsync(id);
-        if (feedItem == null)
-            return NotFound();
+        var trail = await _context.Trails
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Id == entry.EntityId);
 
-        _context.EntityFeeds.Remove(feedItem);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        if (trail == null) return null;
+
+        return new FeedItemDto
+        {
+            EntityId = trail.Id,
+            EntityName = "Trail",
+            Title = trail.Name,
+            Description = trail.TrailDetails.Description,
+            PictureUrl = entry.PictureUrl,
+            ActionType = entry.ActionType,
+            CreatedAt = entry.CreatedAt,
+            UserId = trail.UserId ?? Guid.Empty,
+            UserAlias = trail.User?.Alias
+        };
+    }
+
+    private async Task<FeedItemDto?> BuildUserHikeDto(EntityFeed entry)
+    {
+        var hike = await _context.UserHikes
+            .Include(h => h.User)
+            .Include(h => h.Trail)
+            .FirstOrDefaultAsync(h => h.Id == entry.EntityId);
+
+        if (hike == null) return null;
+
+        return new FeedItemDto
+        {
+            EntityId = hike.Id,
+            EntityName = "UserHike",
+            Title = hike.Trail?.Name ?? "Tur",
+            Description = $"Red en tur: {hike.Trail?.TrailDetails.Description}",
+            PictureUrl = entry.PictureUrl,
+            ActionType = entry.ActionType,
+            CreatedAt = entry.CreatedAt,
+            UserId = hike.UserId,
+            UserAlias = hike.User?.Alias,
+            Duration = hike.Duration
+        };
+    }
+
+    private async Task<FeedItemDto?> BuildTrailReviewDto(EntityFeed entry)
+    {
+        var review = await _context.TrailReviews
+            .Include(r => r.User)
+            .Include(r => r.Trail)
+            .FirstOrDefaultAsync(r => r.Id == entry.EntityId);
+
+        if (review == null) return null;
+
+        return new FeedItemDto
+        {
+            EntityId = review.Id,
+            EntityName = "TrailReview",
+            Title = review.Trail?.Name ?? "Anmeldelse",
+            Description = review.Comment,
+            PictureUrl = review.PictureUrl ?? entry.PictureUrl,
+            ActionType = entry.ActionType,
+            CreatedAt = entry.CreatedAt,
+            UserId = review.UserId,
+            UserAlias = review.User?.Alias
+        };
     }
 }
+
