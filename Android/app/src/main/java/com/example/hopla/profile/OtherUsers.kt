@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,7 +60,6 @@ import com.example.hopla.apiService.fetchUserFriends
 import com.example.hopla.apiService.sendUserRelationRequest
 import com.example.hopla.apiService.sendUserRelationRequestDelete
 import com.example.hopla.apiService.sendUserRelationRequestPut
-import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.dropdownMenuTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
@@ -138,14 +136,15 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 ) {
                     Text(
                         text = profile.alias,
-                        style = headerTextStyleSmall
+                        style = headerTextStyleSmall,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
                 IconButton(
                     onClick = { expanded = true },
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More options")
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.secondary)
                 }
                 DropdownMenu(
                     expanded = expanded,
@@ -153,11 +152,11 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.block_user), style = dropdownMenuTextStyle) },
+                        text = { Text(text = stringResource(R.string.block_user), style = dropdownMenuTextStyle, color = MaterialTheme.colorScheme.secondary) },
                         onClick = { showBlockConfirmationDialog = true }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.report_user), style = dropdownMenuTextStyle) },
+                        text = { Text(text = stringResource(R.string.report_user), style = dropdownMenuTextStyle, color = MaterialTheme.colorScheme.secondary) },
                         onClick = { showReportDialog = true }
                     )
                 }
@@ -214,16 +213,17 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     modifier = Modifier
                         .size(150.dp)
                         .clip(CircleShape)
-                        .border(5.dp, PrimaryWhite, CircleShape)
+                        .border(5.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = profile.name, style = underheaderTextStyle)
+                    Text(text = profile.name, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
                     if (profile.relationStatus == PersonStatus.FRIENDS.name) {
                         Text(
                             text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
                             style = underlinedTextStyleSmall,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.clickable {
                                 navController.navigate("friends_list/${profile.id}")
                             }
@@ -231,12 +231,12 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         Text(
                             text = stringResource(R.string.horses) + ": ${profile.horseCount}",
                             style = underlinedTextStyleSmall,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.clickable {
                                 navController.navigate("user_horses/$userId")
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        CustomButton(text = stringResource(R.string.friends)) { /*Handle button click*/ }
                     }
                     profile.relationStatus?.let { Text(text = it, style = underheaderTextStyle) }
                     if (profile.relationStatus == PersonStatus.PENDING.name)  {
@@ -316,7 +316,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.onBackground)
                     .padding(8.dp)
                     .animateContentSize() // Animate size changes
             ) {
@@ -324,6 +324,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     Text(
                         text = if (profile.description.isNullOrEmpty()) "N/A" else if (showFullDescription) profile.description else profile.description.take(100).plus("..."),
                         style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary,
                         maxLines = if (showFullDescription) Int.MAX_VALUE else 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -331,7 +332,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         IconButton(onClick = { showFullDescription = !showFullDescription }) {
                             Icon(
                                 imageVector = if (showFullDescription) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                contentDescription = if (showFullDescription) "Show less" else "Show more"
+                                contentDescription = if (showFullDescription) "Show less" else "Show more",
+                                tint = MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
@@ -340,7 +342,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.trips),
-                style = underheaderTextStyle
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary,
             )
             profile.userHikes.forEach { hike ->
                 HikeItem(hike)
@@ -356,7 +359,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 ) {
                     Text(
                         text = stringResource(R.string.load_more),
-                        style = buttonTextStyle
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -367,6 +371,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 Text(
                     text = "Created at: $formattedDate",
                     style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
                 )
             }
@@ -470,6 +475,7 @@ fun UserListScreen(
                 Text(
                     text = stringResource(R.string.no_matches),
                     style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             } else {
@@ -510,7 +516,7 @@ fun UserItemComposable(userItem: UserItem, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
             .clickable {
                 navController.navigate("friend_profile/${userItem.id}")
@@ -526,8 +532,8 @@ fun UserItemComposable(userItem: UserItem, navController: NavController) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = userItem.name, style = headerTextStyleSmall)
-            Text(text = userItem.alias, style = underheaderTextStyle)
+            Text(text = userItem.name, style = headerTextStyleSmall, color = MaterialTheme.colorScheme.secondary)
+            Text(text = userItem.alias, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }
@@ -538,7 +544,7 @@ fun UserItemComposable(user: OtherUsers, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
             .clickable { navController.navigate("friend_profile/${user.id}") }
     ) {
@@ -550,8 +556,8 @@ fun UserItemComposable(user: OtherUsers, navController: NavController) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = user.name ?: "Unknown", style = MaterialTheme.typography.bodyLarge)
-            Text(text = user.alias ?: "Unknown", style = MaterialTheme.typography.bodySmall)
+            Text(text = user.name ?: "Unknown", style = headerTextStyleSmall, color = MaterialTheme.colorScheme.secondary)
+            Text(text = user.alias ?: "Unknown", style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }

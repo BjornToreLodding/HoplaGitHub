@@ -43,6 +43,7 @@ import com.example.hopla.R
 import com.example.hopla.apiService.fetchUserRelationRequests
 import com.example.hopla.apiService.sendUserRelationRequestDelete
 import com.example.hopla.apiService.sendUserRelationRequestPut
+import com.example.hopla.ui.theme.AcceptColor
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
@@ -77,6 +78,7 @@ fun NotificationsScreen(navController: NavController) {
         Text(
             text = stringResource(R.string.friend_requests),
             style = headerTextStyleSmall,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -114,7 +116,7 @@ fun NotificationItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.onBackground)
             .clickable {
                 navController.navigate("friend_profile/${request.fromUserId}")
             },
@@ -128,7 +130,7 @@ fun NotificationItem(
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "User Avatar",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -136,11 +138,13 @@ fun NotificationItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "${request.fromUserName} (@${request.fromUserAlias})",
-                    style = generalTextStyleBold
+                    style = generalTextStyleBold,
+                    color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
                     text = stringResource(R.string.sent_a_friend_request),
-                    style = generalTextStyle
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -167,7 +171,7 @@ fun NotificationItem(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Accept",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = AcceptColor
                     )
                 }
                 IconButton(

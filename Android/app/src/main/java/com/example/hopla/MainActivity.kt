@@ -166,14 +166,10 @@ class MainActivity : ComponentActivity() {
                                 AddCommunityScreen(navController, UserSession.token)
                             }
                             composable("addFriendScreen") {
-                                AddNewType(navController, "Friend") { name, imageBitmap, friendType, friendAge, _, _ ->
-                                    // Handle adding a new friend
-                                }
+                                AddNewType(navController, "Friend")
                             }
                             composable("addHorseScreen") {
-                                AddNewType(navController, "Horse") { name, imageBitmap, breed, year, month, day ->
-                                    // Handle adding a new horse
-                                }
+                                AddNewType(navController, "Horse")
                             }
                             composable("update_screen") { UpdateScreen(navController) }
                             composable(

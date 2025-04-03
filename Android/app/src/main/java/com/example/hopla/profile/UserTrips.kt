@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,7 +38,6 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.R
 import com.example.hopla.apiService.fetchUserHikes
-import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
@@ -90,7 +90,7 @@ fun MyTripsScreen(navController: NavController) {
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Text(text = stringResource(R.string.load_more), style = buttonTextStyle)
+                            Text(text = stringResource(R.string.load_more), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                 }
@@ -105,7 +105,7 @@ fun HikeItem(hike: Hike) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
             .clickable {
                 // Handle item click
@@ -121,11 +121,12 @@ fun HikeItem(hike: Hike) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = hike.trailName, style = underheaderTextStyle)
-            Text(text = stringResource(R.string.length)+": ${hike.length} km", style = generalTextStyle)
+            Text(text = hike.trailName, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.length)+": ${hike.length} km", style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
             Text(
                 text = stringResource(R.string.duration) +": ${hike.duration} min",
-                style = generalTextStyle
+                style = generalTextStyle,
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }

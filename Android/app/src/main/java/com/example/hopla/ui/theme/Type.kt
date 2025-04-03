@@ -112,5 +112,4 @@ val dropdownMenuTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 12.sp,
     fontWeight = FontWeight.ExtraBold,
-    color = PrimaryBlack
 )

@@ -37,7 +37,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,8 +63,6 @@ import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.apiService.updateUserInfo
 import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.HeartColor
-import com.example.hopla.ui.theme.PrimaryBlack
-import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
@@ -523,8 +520,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
 @Composable
 fun AddNewType(
     navController: NavController,
-    type: String,
-    onAdd: (String, Bitmap?, String, Int, Int, Int) -> Unit
+    type: String
 ) {
     var name by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }

@@ -1,5 +1,6 @@
 package com.example.hopla.universalData
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -23,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -52,6 +52,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -62,7 +63,6 @@ import com.example.hopla.R
 import com.example.hopla.apiService.changeEmail
 import com.example.hopla.apiService.createUserReport
 import com.example.hopla.profile.PasswordConfirmationDialog
-import com.example.hopla.ui.theme.PrimaryGray
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleSmall
@@ -219,7 +219,8 @@ fun ImagePicker(
         modifier = Modifier
             .padding(top = 8.dp)
             .clickable { showDialog.value = true },
-        style = underlinedTextStyleSmall
+        style = underlinedTextStyleSmall,
+        color = MaterialTheme.colorScheme.secondary
     )
 
     // Dialog to confirm taking a picture
@@ -346,14 +347,15 @@ fun CustomButton(text: String, onClick: () -> Unit) {
     }
 }
 
-//--------------------- For dropdown menue for date --------------------------------------
+//--------------------- For dropdown menu for date --------------------------------------
 @Composable
 fun DateOfBirthPicker(
     selectedDay: Int,
     selectedMonth: Int,
     selectedYear: Int,
     onDateSelected: (Int, Int, Int) -> Unit,
-    onSave: suspend () -> Unit
+    onSave: suspend () -> Unit,
+    textColor: Color = MaterialTheme.colorScheme.secondary // Add textColor parameter
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -386,7 +388,8 @@ fun DateOfBirthPicker(
         DropdownMenuBox(
             items = days,
             selectedItem = selectedDay,
-            onItemSelected = { day -> onDateSelected(day, selectedMonth, selectedYear) }
+            onItemSelected = { day -> onDateSelected(day, selectedMonth, selectedYear) },
+            textColor = textColor // Pass textColor parameter
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -399,7 +402,8 @@ fun DateOfBirthPicker(
             onItemSelected = { month ->
                 val index = months.indexOf(month) + 1
                 onDateSelected(selectedDay, index, selectedYear)
-            }
+            },
+            textColor = textColor // Pass textColor parameter
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -408,7 +412,8 @@ fun DateOfBirthPicker(
         DropdownMenuBox(
             items = years,
             selectedItem = selectedYear,
-            onItemSelected = { year -> onDateSelected(selectedDay, selectedMonth, year) }
+            onItemSelected = { year -> onDateSelected(selectedDay, selectedMonth, year) },
+            textColor = textColor // Pass textColor parameter
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -417,6 +422,7 @@ fun DateOfBirthPicker(
         Icon(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = stringResource(R.string.save),
+            tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.clickable {
                 coroutineScope.launch {
                     onSave()
@@ -431,7 +437,8 @@ fun <T> DropdownMenuBox(
     items: List<T>,
     selectedItem: T,
     onItemSelected: (T) -> Unit,
-    displayText: String = selectedItem.toString()
+    displayText: String = selectedItem.toString(),
+    textColor: Color = MaterialTheme.colorScheme.onBackground // Add textColor parameter
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -439,7 +446,7 @@ fun <T> DropdownMenuBox(
             onClick = { expanded = true },
             modifier = Modifier.width(90.dp)
         ) {
-            Text(text = displayText)
+            Text(text = displayText, color = textColor) // Apply textColor
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             items.forEach { item ->
@@ -447,7 +454,7 @@ fun <T> DropdownMenuBox(
                     onItemSelected(item)
                     expanded = false
                 }) {
-                    Text(text = item.toString())
+                    Text(text = item.toString(), color = textColor) // Apply textColor
                 }
             }
         }
@@ -463,7 +470,8 @@ fun EditableTextField(
     onSave: suspend () -> Unit,
     isPhone: Boolean = false,
     singleLine: Boolean = true,
-    maxLines: Int = 1
+    maxLines: Int = 1,
+    textColor: Color = MaterialTheme.colorScheme.secondary // Add textColor parameter
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showPasswordDialog by remember { mutableStateOf(false) }
@@ -481,6 +489,7 @@ fun EditableTextField(
             },
             singleLine = singleLine,
             maxLines = maxLines,
+            textStyle = MaterialTheme.typography.bodySmall.copy(color = textColor), // Apply textColor
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 Icon(

@@ -50,7 +50,6 @@ import com.example.hopla.R
 import com.example.hopla.apiService.deleteHorse
 import com.example.hopla.apiService.fetchHorseDetails
 import com.example.hopla.apiService.fetchHorses
-import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.generalTextStyleRed
@@ -159,7 +158,8 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                     // Name
                     Text(
                         text = horse.name,
-                        style = headerTextStyle
+                        style = headerTextStyle,
+                        color = MaterialTheme.colorScheme.secondary,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -168,8 +168,8 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                         modifier = Modifier
                             .size(220.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface, CircleShape)
-                            .border(4.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                            .background(MaterialTheme.colorScheme.onBackground, CircleShape)
+                            .border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
                             .shadow(8.dp, CircleShape)
                     ) {
                         Image(
@@ -186,6 +186,7 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(6.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground), // Set the desired color
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
@@ -275,7 +276,7 @@ fun HorseItem(horse: Horse, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
             .clickable {
                 navController.navigate("horse_detail/${horse.id}")
@@ -290,7 +291,7 @@ fun HorseItem(horse: Horse, navController: NavController) {
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = horse.name, style = underheaderTextStyle)
+        Text(text = horse.name, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
     }
 }
 
@@ -302,8 +303,9 @@ fun DetailRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            style = generalTextStyleBold
+            style = generalTextStyleBold,
+            color = MaterialTheme.colorScheme.secondary
         )
-        Text(text = value, style = generalTextStyle)
+        Text(text = value, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
     }
 }
