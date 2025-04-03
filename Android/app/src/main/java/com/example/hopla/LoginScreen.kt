@@ -1,9 +1,12 @@
 package com.example.hopla
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,30 +14,43 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.apiService.handleLogin
 import com.example.hopla.apiService.registerUser
 import com.example.hopla.apiService.resetPassword
+import com.example.hopla.ui.theme.ThemeViewModel
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyle
@@ -42,15 +58,8 @@ import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleBig
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
-import kotlinx.coroutines.launch
-import android.content.Context
-import android.util.Log
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hopla.ui.theme.ThemeViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit, themeViewModel: ThemeViewModel = viewModel()) {
@@ -167,12 +176,31 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 8.dp)
             )
+            var passwordVisible by remember { mutableStateOf(false) }
+
             TextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle) },
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 singleLine = true,
+                trailingIcon = {
+                    val image = if (passwordVisible) Icons.Default.Lock else Icons.Default.Lock
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible },
+                        modifier = Modifier.pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    passwordVisible = true
+                                    tryAwaitRelease()
+                                    passwordVisible = false
+                                }
+                            )
+                        }
+                    ) {
+                        Icon(imageVector = image, contentDescription = null)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -441,6 +469,12 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
     var errorMessage by remember { mutableStateOf("") }
     var responseMessage by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(false) }
+    var showInfoDialogCU by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var confirmpasswordVisible by remember { mutableStateOf(false) }
+    var confirmConfirmPasswordVisible by remember { mutableStateOf(false) }
 
     val allFieldsRequiredMessage = stringResource(R.string.all_fields_are_required)
     val passwordsDoNotMatchMessage = stringResource(R.string.passwords_do_not_match)
@@ -477,8 +511,14 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                         value = password,
                         onValueChange = { password = it },
                         label = { Text(text = stringResource(R.string.password), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         singleLine = true,
+                        trailingIcon = {
+                            val image = if (passwordVisible) Icons.Default.Lock else Icons.Default.Lock
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, contentDescription = null)
+                            }
+                        },
                         isError = showError && password.isEmpty(),
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                     )
@@ -486,9 +526,15 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                         value = confirmedPassword,
                         onValueChange = { confirmedPassword = it },
                         label = { Text(text = stringResource(R.string.confirm_password), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary )},
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (confirmpasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         singleLine = true,
-                        isError = showError && (confirmedPassword.isEmpty() || password != confirmedPassword),
+                        trailingIcon = {
+                            val image = if (confirmpasswordVisible) Icons.Default.Lock else Icons.Default.Lock
+                            IconButton(onClick = { confirmpasswordVisible = !confirmpasswordVisible }) {
+                                Icon(imageVector = image, contentDescription = null)
+                            }
+                        },
+                        isError = showError && password.isEmpty(),
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                     )
                     if (showError) {
@@ -506,6 +552,19 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                         )
                     }
                     Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked,
+                            onCheckedChange = { isChecked = it }
+                        )
+                        Text(text = stringResource(R.string.allow_usage), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
+                        IconButton(onClick = { showInfoDialogCU = true }) {
+                            Icon(imageVector = Icons.Default.Info, contentDescription = "Info", tint = MaterialTheme.colorScheme.secondary)
+                        }
+                    }
+                    Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
@@ -515,29 +574,32 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                                 style = buttonTextStyle
                             )
                         }
-                        Button(onClick = {
-                            val trimmedEmail = email.trim()
-                            val trimmedPassword = password.trim()
-                            val trimmedConfirmedPassword = confirmedPassword.trim()
+                        Button(
+                            onClick = {
+                                val trimmedEmail = email.trim()
+                                val trimmedPassword = password.trim()
+                                val trimmedConfirmedPassword = confirmedPassword.trim()
 
-                            if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty() || trimmedConfirmedPassword.isEmpty()) {
-                                errorMessage = allFieldsRequiredMessage
-                                showError = true
-                            } else if (trimmedPassword != trimmedConfirmedPassword) {
-                                errorMessage = passwordsDoNotMatchMessage
-                                showError = true
-                            } else {
-                                coroutineScope.launch {
-                                    val (result, code) = registerUser(trimmedEmail, trimmedPassword)
-                                    if (code == 200) {
-                                        responseMessage = result
-                                        showSuccessDialog = true
-                                    } else {
-                                        responseMessage = result
+                                if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty() || trimmedConfirmedPassword.isEmpty()) {
+                                    errorMessage = allFieldsRequiredMessage
+                                    showError = true
+                                } else if (trimmedPassword != trimmedConfirmedPassword) {
+                                    errorMessage = passwordsDoNotMatchMessage
+                                    showError = true
+                                } else {
+                                    coroutineScope.launch {
+                                        val (result, code) = registerUser(trimmedEmail, trimmedPassword)
+                                        if (code == 200) {
+                                            responseMessage = result
+                                            showSuccessDialog = true
+                                        } else {
+                                            responseMessage = result
+                                        }
                                     }
                                 }
-                            }
-                        }) {
+                            },
+                            enabled = isChecked
+                        ) {
                             Text(
                                 text = stringResource(R.string.create_user),
                                 style = buttonTextStyle
@@ -545,6 +607,41 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                         }
                     }
                 }
+            }
+        }
+    }
+
+    if (showInfoDialogCU) {
+        InfoDialogCU(onDismiss = { showInfoDialogCU = false })
+    }
+}
+
+@Composable
+fun InfoDialogCU(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.secondary)
+                    }
+                }
+                Text(
+                    text = stringResource(R.string.statistics_info),
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
             }
         }
     }
@@ -569,11 +666,12 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit) {
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Text(text = message)
+                Text(text = message, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                 Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
                     Text(
                         text = stringResource(R.string.ok),
-                        style = buttonTextStyle
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

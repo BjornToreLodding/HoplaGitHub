@@ -175,5 +175,8 @@
     <string name="apply">Bruk</string>
     <string name="post_review">Legg til vurdering</string>
     <string name="general">Generelt</string>
+    <string name="missing_information">Manglende informasjon</string>
+    <string name="allow_usage">TIllatt samling av statistikk</string>
+    <string name="statistics_info">Appen er fortsatt under utvikling, og i den sammenheng må alle brukere godta at appen samler inn statistikk for forbedring av appens potensiale. Dete vil ved seinere tid bli mulig å ikke godta.</string>
 
 </resources>

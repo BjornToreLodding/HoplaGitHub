@@ -64,7 +64,9 @@ import com.example.hopla.apiService.updateUserInfo
 import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryWhite
+import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.DateOfBirth
 import com.example.hopla.universalData.DateOfBirthPicker
@@ -81,6 +83,58 @@ import java.time.temporal.ChronoField
 // Main profile function
 @Composable
 fun ProfileScreen(navController: NavController) {
+    var showDialog by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf(UserSession.name ?: "") }
+    var username by remember { mutableStateOf(UserSession.alias ?: "") }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Checks if the user is missing name and/or username and requires them to be set
+    LaunchedEffect(Unit) {
+        if (name.isEmpty() || username.isEmpty()) {
+            showDialog = true
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { /* Prevent dismissing */ },
+            title = { Text(text = stringResource(R.string.missing_information), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
+            text = {
+                Column {
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text(text = stringResource(R.string.name), style = generalTextStyleBold, color = MaterialTheme.colorScheme.secondary) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text(text = stringResource(R.string.username), style = generalTextStyleBold, color = MaterialTheme.colorScheme.secondary) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    coroutineScope.launch {
+                        val (statusCode, _) = updateUserInfo(UserSession.token, username, name)
+                        if (statusCode == 200) {
+                            UserSession.name = name
+                            UserSession.alias = username
+                            showDialog = false
+                            navController.navigate("profile") { popUpTo("profile") { inclusive = true } }
+                        } else {
+                            // Handle error
+                        }
+                    }
+                }) {
+                    Text(text = stringResource(R.string.save))
+                }
+            }
+        )
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier

@@ -175,5 +175,8 @@
     <string name="apply">Apply</string>
     <string name="post_review">Post review</string>
     <string name="general">General</string>
+    <string name="missing_information">Missing information</string>
+    <string name="allow_usage">Allow collection of statistics</string>
+    <string name="statistics_info">"This app is still under development, and in that relation all users must accept that the app collects statistics for improvement of the apps potential. This will at a later stage be optional. "</string>
 
 </resources>
