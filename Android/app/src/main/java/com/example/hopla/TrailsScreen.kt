@@ -113,6 +113,7 @@ import com.example.hopla.apiService.postTrailReview
 import com.example.hopla.apiService.rateTrail
 import com.example.hopla.apiService.removeFavoriteTrail
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.ImagePicker
@@ -739,8 +740,8 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                 // Trip Title
                 Text(
                     text = info.title,
-                    color = PrimaryWhite,
-                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = underheaderTextStyle,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(5.dp)
@@ -751,7 +752,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.onBackground)
                     .padding(vertical = 5.dp, horizontal = 10.dp)
             ) {
                 val scrollState = rememberScrollState()
@@ -764,16 +765,14 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     info.filters.filterStrings.forEach { filter ->
                         Box(
                             modifier = Modifier
-                                .border(1.dp, Color.Gray)
-                                .background(Color.LightGray)
-                                .padding(2.dp)
-                                .height(18.dp)
+                                .border(1.dp, MaterialTheme.colorScheme.primary)
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(horizontal = 4.dp, vertical = 2.dp) // Adjust padding
                         ) {
                             Text(
                                 text = filter.replaceFirstChar { it.uppercaseChar() },
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
+                                style = generalTextStyleBold,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -782,9 +781,8 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     info.filters.difficulty?.let { it ->
                         Text(
                             text = it.name.lowercase().replaceFirstChar { it.uppercaseChar() },
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 12.sp
+                            style = generalTextStyleBold,
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -927,7 +925,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                 .height(60.dp)
-                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             // Inner box header
             Box(
@@ -947,12 +945,15 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     // Text in the header
                     Text(
                         text = contentBoxInfo.title,
+                        style = headerTextStyleSmall,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
                     Spacer(modifier = Modifier.width(48.dp))
@@ -973,7 +974,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                         .height(250.dp)
-                        .background(MaterialTheme.colorScheme.background)
+                        .background(MaterialTheme.colorScheme.onBackground)
                 ) {
                     // Column for the picture
                     Column {
@@ -982,7 +983,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                                 .height(190.dp)
-                                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .background(MaterialTheme.colorScheme.onBackground)
                         ) {
                             // Display the images
                             val painter = when (val imageResource = images[currentImageIndex]) {
@@ -1010,7 +1011,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
                                     contentDescription = "Left Arrow",
-                                    tint = PrimaryBlack
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                             // Make the icons in the pictures buttons
@@ -1026,7 +1027,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                                     contentDescription = "Right Arrow",
-                                    tint = PrimaryBlack
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         }
@@ -1036,7 +1037,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
                                 .height(50.dp)
-                                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .background(MaterialTheme.colorScheme.onBackground)
                         ) {
                             FlowRow(
                                 modifier = Modifier.padding(8.dp),
@@ -1046,16 +1047,15 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 contentBoxInfo.filters.filterStrings.forEach { filter ->
                                     Box(
                                         modifier = Modifier
-                                            .border(1.dp, Color.Gray)
-                                            .background(Color.LightGray)
+                                            .border(2.dp, MaterialTheme.colorScheme.primary)
+                                            .background(MaterialTheme.colorScheme.primary)
                                             .padding(2.dp)
                                             .height(18.dp)
                                     ) {
                                         Text(
                                             text = filter.replaceFirstChar { it.uppercaseChar() },
-                                            color = Color.Black,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp
+                                            style = generalTextStyleBold,
+                                            color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
                                 }
@@ -1078,11 +1078,11 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.3f)
-                            .background(MaterialTheme.colorScheme.primary)
+                            .background(MaterialTheme.colorScheme.onBackground)
                             .clickable { navController.navigate("start_trip_map/${contentBoxInfo.id}") },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = stringResource(R.string.start_trip))
+                        Text(text = stringResource(R.string.start_trip), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     // New updates clickable box
@@ -1090,11 +1090,11 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
-                            .background(MaterialTheme.colorScheme.primary)
+                            .background(MaterialTheme.colorScheme.onBackground)
                             .clickable { showGiveReview = true },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = stringResource(R.string.new_updates))
+                        Text(text = stringResource(R.string.new_updates), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
                     }
 
                 }
@@ -1112,17 +1112,17 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .wrapContentHeight()
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.tertiaryContainer),
+                            .background(MaterialTheme.colorScheme.onBackground),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        Text(text = contentBoxInfo.description, modifier = Modifier.padding(start = 8.dp))
+                        Text(text = contentBoxInfo.description, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(start = 8.dp))
                     }
                     // Assessment box with star rating set
                     Box(
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.tertiaryContainer),
+                            .background(MaterialTheme.colorScheme.onBackground),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -1132,7 +1132,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = stringResource(R.string.assessment))
+                            Text(text = stringResource(R.string.assessment), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                             Row {
                                 repeat(5) { index ->
                                     Icon(
@@ -1149,7 +1149,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.tertiaryContainer),
+                            .background(MaterialTheme.colorScheme.onBackground),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -1159,7 +1159,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = stringResource(R.string.my_assessment))
+                            Text(text = stringResource(R.string.my_assessment), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                             StarRating(trailId = contentBoxInfo.id, rating = userRating, onRatingChanged = { userRating = it })
                         }
                     }
@@ -1168,7 +1168,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.tertiaryContainer),
+                            .background(MaterialTheme.colorScheme.onBackground),
                         contentAlignment = Alignment.Center
                     ) {
                         // Inner, clickable box for latest update
@@ -1177,7 +1177,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .height(30.dp)
                                 .fillMaxWidth()
                                 .padding(4.dp)
-                                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .background(MaterialTheme.colorScheme.onBackground)
                                 .clickable {
                                     showMessageBox = true
                                     coroutineScope.launch {
@@ -1186,7 +1186,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = stringResource(R.string.latest_update_about_the_route))
+                            Text(text = stringResource(R.string.latest_update_about_the_route), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
                         }
                     }
                 }
@@ -1233,17 +1233,17 @@ private fun TrailUpdates(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                        .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.latest_update_about_the_route),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = headerTextStyleSmall,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .padding(8.dp)
                             .fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.primary
                     )
 
                     LazyColumn(
@@ -1254,7 +1254,7 @@ private fun TrailUpdates(
                             Card(
                                 shape = RoundedCornerShape(12.dp),
                                 elevation = CardDefaults.cardElevation(4.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(
@@ -1264,11 +1264,11 @@ private fun TrailUpdates(
                                 ) {
                                     Text(
                                         text = update.comment,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold
+                                        style = generalTextStyle,
+                                        color = MaterialTheme.colorScheme.secondary,
                                     )
 
-                                    update.pictureUrl?.let { imageUrl ->
+                                    update.pictureUrl.let { imageUrl ->
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Image(
                                             painter = rememberAsyncImagePainter(model = imageUrl),
@@ -1288,8 +1288,8 @@ private fun TrailUpdates(
                                     ) {
                                         Text(
                                             text = "User: ${update.alias}",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            style = generalTextStyleBold,
+                                            color = MaterialTheme.colorScheme.secondary
                                         )
                                         Text(
                                             text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
@@ -1298,8 +1298,8 @@ private fun TrailUpdates(
                                                     Locale.getDefault()
                                                 ).parse(update.createdAt)
                                             ),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            style = generalTextStyleBold,
+                                            color = MaterialTheme.colorScheme.secondary
                                         )
                                     }
                                 }
