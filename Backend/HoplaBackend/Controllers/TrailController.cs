@@ -27,13 +27,19 @@ public class TrailController : ControllerBase
     private readonly AppDbContext _context;
     private readonly Authentication _authentication;
     private readonly TrailFavoriteService _trailFavoriteService;
+    private readonly ITrailFilterService _trailFilterService;
     private readonly ImageUploadService _imageUploadService;
-            public TrailController(Authentication authentication, AppDbContext context, TrailFavoriteService trailFavoriteService, ImageUploadService imageUploadService)
+    public TrailController(Authentication authentication, 
+                            AppDbContext context, 
+                                TrailFavoriteService trailFavoriteService, 
+                                ImageUploadService imageUploadService,
+                                ITrailFilterService trailFilterService)
     {
         _authentication = authentication;
         _context = context;
         _trailFavoriteService = trailFavoriteService;
         _imageUploadService = imageUploadService;
+         _trailFilterService = trailFilterService;
     }
 
     [Authorize]
@@ -84,71 +90,137 @@ public class TrailController : ControllerBase
         return Ok(results);
     }
 
+   
     [Authorize]
     [HttpGet("all")]
     public async Task<IActionResult> GetAllTrails(
-        [FromQuery] string? search, 
-        [FromQuery] string? sort, 
-        [FromQuery] int? pageNumber = 1, 
+        [FromQuery] string? search,
+        [FromQuery] string? sort,
+        [FromQuery] string? filter,
+        [FromQuery] double? distMin,
+        [FromQuery] double? distMax,
+        [FromQuery] int? pageNumber = 1,
         [FromQuery] int? pageSize = 10)
     {
         int page = pageNumber ?? 1;
         int size = pageSize ?? 10;
 
+        // Hent bruker-ID fra token
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
         {
             return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
         }
 
-        var query = _context.Trails.AsQueryable();
+        // Start query med filterverdier inkludert
+        var query = _context.Trails
+            .Include(t => t.TrailFilterValues)
+            .AsQueryable();
 
+        // Søk
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));  
+            query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));
         }
 
-        // Hent ALLE favoritt-trail IDs for brukeren i ett kall, isteden for hente for å sjekke hver tur
-        var favoriteTrailIds = await _context.TrailFavorites
-        .Where(tf => tf.UserId == parsedUserId)
-        .Select(tf => tf.TrailId)
-        .ToListAsync();
+        // Lengdefilter
+        if (distMin.HasValue)
+        {
+            query = query.Where(t => t.Distance >= distMin.Value);
+        }
 
-        var trails = await query
-            .OrderByDescending(t => Math.Round(t.AverageRating ?? 0))
-            .ThenByDescending(t => t.CreatedAt)
+        if (distMax.HasValue)
+        {
+            query = query.Where(t => t.Distance <= distMax.Value);
+        }
+
+        // Dynamiske filtre
+        var parsedFilters = TrailFilterHelper.ParseFilterQuery(filter);
+        query = _trailFilterService.ApplyDynamicFilters(query, parsedFilters);
+
+        // Sortering
+        switch (sort?.ToLower())
+        {
+            case "newest":
+                query = query.OrderByDescending(t => t.CreatedAt);
+                break;
+            case "oldest":
+                query = query.OrderBy(t => t.CreatedAt);
+                break;
+            case "rating":
+            default:
+                query = query
+                    .OrderByDescending(t => Math.Round(t.AverageRating ?? 0))
+                    .ThenByDescending(t => t.CreatedAt);
+                break;
+        }
+
+        // Hent favoritter for brukeren
+        var favoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => tf.UserId == parsedUserId)
+            .Select(tf => tf.TrailId)
+            .ToListAsync();
+
+        // Paging
+        var pagedTrails = await query
             .Skip((page - 1) * size)
             .Take(size)
             .ToListAsync();
-        /*
-        //Gammel metode, erstattet med metoden under
-        var trailDtos = new List<TrailDto>();
 
-        foreach (var trail in trails)
+        var trailIds = pagedTrails.Select(t => t.Id).ToList();
+
+        // Hent alle aktive definisjoner
+        var definitions = await _context.TrailFilterDefinitions
+            .Where(d => d.IsActive)
+            .OrderBy(d => d.Order)
+            .ToListAsync();
+
+        // Hent alle filterverdier for løypene
+        var values = await _context.TrailFilterValues
+            .Where(v => trailIds.Contains(v.TrailId))
+            .ToListAsync();
+
+        // DTO-projeksjon
+        var trailDtos = pagedTrails.Select(trail =>
         {
-            bool isFavorite = await _trailFavoriteService.IsTrailFavoriteAsync(parsedUserId, trail.Id);
-            
-            trailDtos.Add(new TrailDto
+            var trailFilterValues = values.Where(v => v.TrailId == trail.Id).ToList();
+
+            var filters = definitions.Select(def =>
+            {
+                var val = trailFilterValues.FirstOrDefault(v => v.TrailFilterDefinitionId == def.Id);
+                    if (val == null || string.IsNullOrWhiteSpace(val.Value))
+                        return null; // Hopp over filtre uten verdi
+
+                return new
+                {
+                    def.Id,
+                    def.Name,
+                    def.DisplayName,
+                    Type = def.Type.ToString(),
+                    Options = string.IsNullOrEmpty(def.OptionsJson)
+                        ? new List<string>()
+                        : JsonSerializer.Deserialize<List<string>>(def.OptionsJson!),
+                    Value = val?.Value,
+                    DefaultValue = def.DefaultValue
+                };
+            })
+            .Where(r => r != null)
+            .ToList();
+
+            return new TrailDto
             {
                 Id = trail.Id,
                 Name = trail.Name,
+                //Description = trail.TrailDetails.Description, //Denne burde kanskje ikke være med på trails/all?
                 PictureUrl = trail.PictureUrl + "?h=140&fit=crop",
                 AverageRating = trail.AverageRating ?? 0,
-                IsFavorite = isFavorite
-            });
-        }
-        */
-
-        var trailDtos = trails.Select(trail => new TrailDto
-        {
-            Id = trail.Id,
-            Name = trail.Name,
-            PictureUrl = trail.PictureUrl + "?h=140&fit=crop",
-            AverageRating = trail.AverageRating ?? 0,
-            IsFavorite = favoriteTrailIds.Contains(trail.Id) // Effektiv sjekk
+                IsFavorite = favoriteTrailIds.Contains(trail.Id),
+                Filters = filters
+            };
         }).ToList();
-        var response = new 
+
+        // Svar med paging
+        var response = new
         {
             Trails = trailDtos,
             PageNumber = page,
@@ -157,6 +229,7 @@ public class TrailController : ControllerBase
 
         return Ok(response);
     }
+
 
     
 
@@ -701,7 +774,7 @@ public class TrailController : ControllerBase
             {
                 Id = Guid.NewGuid(),
                 TrailId = trail.Id,
-                FilterDefinitionId = filter.FilterDefinitionId,
+                TrailFilterDefinitionId = filter.FilterDefinitionId,
                 Value = filter.Value
             };
 

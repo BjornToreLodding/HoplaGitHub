@@ -94,7 +94,7 @@ public static class TrailFilterMock
 
 
                 var exists = await context.TrailFilterValues.AnyAsync(v =>
-                    v.TrailId == trailId && v.FilterDefinitionId == definition.Id);
+                    v.TrailId == trailId && v.TrailFilterDefinitionId == definition.Id);
 
                 if (!exists)
                 {
@@ -103,7 +103,7 @@ public static class TrailFilterMock
                     {
                         Id = Guid.NewGuid(),
                         TrailId = trailId,
-                        FilterDefinitionId = definition.Id,
+                        TrailFilterDefinitionId = definition.Id,
                         Value = value
                     });
                 }

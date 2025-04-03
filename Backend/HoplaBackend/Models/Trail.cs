@@ -24,7 +24,7 @@ public class Trail
     public TrailVisibility Visibility { get; set; } = 0; // Enum, lenger ned
 
     [InverseProperty(nameof(TrailFilterValue.Trail))]
-    public ICollection<TrailFilterValue> TrailFilters { get; set; } = new List<TrailFilterValue>();
+    public virtual ICollection<TrailFilterValue> TrailFilterValues { get; set; } = new List<TrailFilterValue>();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public TrailDetail TrailDetails { get; set; } = null!;
     public TrailAllCoordinate TrailAllCoordinates { get; set; } = null!;

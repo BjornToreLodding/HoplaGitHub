@@ -275,6 +275,7 @@ builder.Services.AddScoped<UserRelationService>();
 builder.Services.AddScoped<TrailService>();
 builder.Services.AddScoped<UserHikeService>();
 builder.Services.AddScoped<TrailFavoriteService>();
+builder.Services.AddScoped<ITrailFilterService, TrailFilterService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<EntityService>();
 builder.Services.AddScoped<ImageUploadService>();

@@ -7,9 +7,12 @@ public class TrailDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+    public string Description { get; set; }
     public string PictureUrl { get; set; }
     public double AverageRating { get; set; }
     public bool IsFavorite { get; set; }
+
+    public IEnumerable<object> Filters { get; set; } = new List<object>();
 }
 
 public class CreateTrailForm
