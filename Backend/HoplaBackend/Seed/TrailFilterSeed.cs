@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Models;
-using HoplaBackend.Data; // <-- Endre til ditt namespace
+using HoplaBackend.Data; 
 
 public static class TrailFilterSeeder
 {

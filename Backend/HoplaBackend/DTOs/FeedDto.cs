@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using HoplaBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,10 @@ public class FeedItemDto
 
     public Guid UserId { get; set; }
     public string? UserAlias { get; set; }
+    [JsonIgnore]
+    public double? Latitude { get; set; } // 🌍
+    [JsonIgnore]
+    public double? Longitude { get; set; } // 🌍
 
     public Double Duration { get; set; } // Kun relevant for UserHike
 }

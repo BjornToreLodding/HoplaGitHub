@@ -24,7 +24,9 @@ public enum EntityType
     UserHike,
     Trail,
     TrailReview,
+    TrailRating,
     Horse,
     UserRelation,
-    Stable
+    Stable,
+    StableMessage
 }

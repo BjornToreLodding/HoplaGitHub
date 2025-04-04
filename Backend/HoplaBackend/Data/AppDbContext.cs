@@ -80,9 +80,11 @@ private async Task PublishEntityEvents()
 {
     Console.WriteLine("PublishEntityEvents() started");
 
-    //await PublishEventsForEntity<Horse>("Horse");
+    await PublishEventsForEntity<Horse>("Horse");
     await PublishEventsForEntity<Trail>("Trail");
-    //await PublishEventsForEntity<UserHike>("UserHike");
+    await PublishEventsForEntity<UserHike>("UserHike");
+    await PublishEventsForEntity<TrailReview>("TrailReview");
+    await PublishEventsForEntity<StableMessage>("StableMessage");
     // ... legg til flere etter behov
 
     Console.WriteLine("PublishEntityEvents() completed");

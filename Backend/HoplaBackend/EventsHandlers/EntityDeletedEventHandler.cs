@@ -20,7 +20,12 @@ namespace HoplaBackend.EventHandlers
 
         public async Task Handle(EntityDeletedEvent notification, CancellationToken cancellationToken)
         {
-            var entityType = Enum.Parse<EntityType>(notification.EntityType);
+            if (!Enum.TryParse<EntityType>(notification.EntityType, out var entityType))
+            {
+                Console.WriteLine($"Ukjent EntityType: {notification.EntityType} - hopper over.");
+                return; // Hopper over feilaktige eventer
+            }
+
 
             var entityFeeds = _context.EntityFeeds
                 .Where(f => f.EntityId == notification.EntityId && f.EntityName == entityType);

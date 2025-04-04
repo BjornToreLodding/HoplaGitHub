@@ -94,12 +94,13 @@ public class MockController : ControllerBase
         _context.Horses.AddRange(horses);
         await _context.SaveChangesAsync();
 
+        /*
             // Publiser event for hver ny hest i feeden
         foreach (var horse in horses)
         {
             await _mediator.Publish(new EntityCreatedEvent(horse.Id, "Horse", horse.UserId)); //Rød strek under IMediator.Publish
         }
-    
+        */
         return Created("", new { message = "Hester opprettet!", horses });
         //return Created(nameof(GetHorseById), new { message = "Hester opprettet!", horses });
     
@@ -443,7 +444,7 @@ public class MockController : ControllerBase
         
         _context.SystemSettings.RemoveRange(_context.SystemSettings); //ingen rød strek her
         _context.TrailFavorites.RemoveRange(_context.TrailFavorites);
-        _context.Users.RemoveRange(_context.Users); //ingen rød strek her
+        //_context.Users.RemoveRange(_context.Users); //ingen rød strek her
         _context.Horses.RemoveRange(_context.Horses);//ingen rød strek her
         _context.UserRelations.RemoveRange(_context.UserRelations); //ingen rød strek her
         _context.Messages.RemoveRange(_context.Messages);
@@ -465,7 +466,7 @@ public class MockController : ControllerBase
         // Da blir det feil når Mock skal opprettes for StableMessages og Trails, da Id refererer til noe som ikke eksisterer
         //Det er ikke nødvendig og kjøre dette på Users og Horses, men de er med da det virker mest logisk.
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"TrailFavorites\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
+        //await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Users\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Horses\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"UserRelations\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Messages\" RESTART IDENTITY CASCADE");
@@ -489,7 +490,7 @@ public class MockController : ControllerBase
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
         await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
 
-        return Ok("Database cleared and IDs reset.");    
+        return Ok("Database cleared, except Users, and IDs reset.");    
         }
 
     // Fyller opp tabellen systemSettings med systemSettingsMock.cs

@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace HoplaBackend.Events;
 public abstract class EntityEvent : INotification
