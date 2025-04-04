@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using HoplaBackend.DTOs;
 using HoplaBackend.Helpers;
 using HoplaBackend.Models.DTOs;
+using System.Linq;
 
 namespace HoplaBackend.Controllers;
 [ApiController]
@@ -45,12 +46,12 @@ public class EntityFeedController : ControllerBase
         var query = _context.EntityFeeds.AsQueryable();
         var userId = _authentication.GetUserIdFromToken(User);
 
-        // Sjekk at brukeren finnes
+        // 🔒 Sjekk at brukeren finnes
         var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
             return Unauthorized(new { message = "Bruker ikke funnet" });
 
-        // 🔍 Søk Eventuelt til senere bruk.
+        // 🔍 Søk
         if (!string.IsNullOrWhiteSpace(options.Search))
         {
             query = query.Where(f =>
@@ -59,33 +60,28 @@ public class EntityFeedController : ControllerBase
             );
         }
 
-        // 📆 Siste 30 dager
-        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+        // 📆 Begrens til siste 30 dager
+        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-200);
         query = query.Where(f => f.CreatedAt >= thirtyDaysAgo);
 
         // 🔎 EntityType-filter
         if (!string.IsNullOrWhiteSpace(options.Show))
         {
             var allowedTypes = options.Show.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Trim().ToLower())
+                .Select(s => EntityTypeMapper.MapStringToEntityType(s))
+                .Where(t => t.HasValue)
+                .Select(t => t.Value)
                 .ToList();
 
-            query = query.Where(f =>
-                (allowedTypes.Contains("trails") && f.EntityName == EntityType.Trail) ||
-                (allowedTypes.Contains("userhikes") && f.EntityName == EntityType.UserHike) ||
-                (allowedTypes.Contains("trailreviews") && f.EntityName == EntityType.TrailReview) ||
-                (allowedTypes.Contains("horses") && f.EntityName == EntityType.Horse) ||
-                (allowedTypes.Contains("stables") && f.EntityName == EntityType.Stable) ||
-                (allowedTypes.Contains("stablemessages") && f.EntityName == EntityType.StableMessage)
-            );
+            query = query.Where(f => allowedTypes.Contains(f.EntityName));
         }
 
-        // 🧍‍♂️ Venner/følgere
+        // 🧍‍♂️ Venner/følgere-filter
         if (options.OnlyFriendsAndFollowing)
         {
             var friendsAndFollowingIds = await _context.UserRelations
                 .Where(r => (r.FromUserId == userId || r.ToUserId == userId) &&
-                            (r.Status == "FRIENDS" || r.Status == "FOLLOWING")) //Dette blir feil iforhold til å følge
+                            (r.Status == "FRIENDS" || r.Status == "FOLLOWING"))
                 .Select(r => r.FromUserId == userId ? r.ToUserId : r.FromUserId)
                 .ToListAsync();
 
@@ -104,23 +100,20 @@ public class EntityFeedController : ControllerBase
         }
 
         // 🔀 Sortering
-        query = options.Sort.ToLower() switch
+        query = options.Sort?.ToLower() switch
         {
-            "likes" => query.OrderByDescending(f => f.LikesCount),
-            "asc" => query.OrderBy(f => f.CreatedAt),
+            "likes" => query.OrderByDescending(f => f.LikesCount)
+                            .ThenByDescending(f => f.CreatedAt),
             _ => query.OrderByDescending(f => f.CreatedAt)
         };
 
-        // 📄 Paging
-        var totalCount = await query.CountAsync();
+        // 📈 Begrens antall rader som hentes fra DB
+        query = query.Take(1000); // F.eks. maks 500 for effektivitet
 
-        query = query
-            .Skip((options.PageNumber - 1) * options.PageSize)
-            .Take(options.PageSize);
-
+        // 🚀 Hent alle relevante poster
         var feedEntries = await query.ToListAsync();
 
-        // 🌍 Nå bygges feeden og GeoFilter brukes i C#
+        // 🌍 Bygg Feed DTOs og filtrer på radius
         var result = new List<FeedItemDto>();
 
         foreach (var entry in feedEntries)
@@ -130,6 +123,7 @@ public class EntityFeedController : ControllerBase
                 EntityType.Trail => await BuildTrailDto(entry),
                 EntityType.UserHike => await BuildUserHikeDto(entry),
                 EntityType.TrailReview => await BuildTrailReviewDto(entry),
+                EntityType.TrailRating => await BuildTrailRatingDto(entry),
                 EntityType.Horse => await BuildHorseDto(entry),
                 EntityType.Stable => await BuildStableDto(entry),
                 EntityType.StableMessage => await BuildStableMessageDto(entry),
@@ -139,28 +133,42 @@ public class EntityFeedController : ControllerBase
             if (dto == null)
                 continue;
 
-            if (options.UserLatitude.HasValue && options.UserLongitude.HasValue && options.RadiusKm.HasValue)
+            // 🌍 Radiusfilter
+            if (options.Lat.HasValue && options.Long.HasValue && options.Radius.HasValue)
             {
-                if (dto.Latitude.HasValue && dto.Longitude.HasValue)
-                {
-                    double distance = DistanceCalc.ImprovedPytagoras(options.UserLatitude.Value, options.UserLongitude.Value, dto.Latitude.Value, dto.Longitude.Value);
-                    if (distance > options.RadiusKm.Value)
-                        continue;
-                }
+                if (!dto.Latitude.HasValue || !dto.Longitude.HasValue)
+                    continue;
+
+                double distance = DistanceCalc.ImprovedPytagoras(
+                    options.Lat.Value,
+                    options.Long.Value,
+                    dto.Latitude.Value,
+                    dto.Longitude.Value
+                );
+
+                if (distance > options.Radius.Value)
+                    continue;
             }
 
             result.Add(dto);
         }
 
+        // 📄 Manuell Paging
+        var pagedResult = result
+            .Skip((options.PageNumber - 1) * options.PageSize)
+            .Take(options.PageSize)
+            .ToList();
+
         return Ok(new
         {
-            totalCount,
+            totalCount = result.Count, // filtrerte resultater
             options.PageNumber,
             options.PageSize,
-            hasNextPage = (options.PageNumber * options.PageSize) < totalCount,
-            items = result
+            hasNextPage = (options.PageNumber * options.PageSize) < result.Count,
+            items = pagedResult
         });
     }
+
 
 
     /*
@@ -252,13 +260,15 @@ public class EntityFeedController : ControllerBase
         {
             EntityId = trail.Id,
             EntityName = "Trail",
-            //Title = trail.Name,
+            Title = trail.Name,
             Description = trail.TrailDetails?.Description != null
-                ? $"Opprettet løype: {trail.Name}"
-                : "Opprettet en løype" ,
+                ? trail.TrailDetails.Description
+                : $"{trail.User.Alias} opprettet ny løype: {trail.Name}",
             PictureUrl = entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
+            Latitude = trail.LatMean,
+            Longitude = trail.LongMean,
             UserId = trail.UserId,
             UserAlias = trail.User?.Alias
         };
@@ -276,7 +286,7 @@ public class EntityFeedController : ControllerBase
         double? latitude = null;
         double? longitude = null;
 
-        if (hike.Trail != null)
+        if (hike.TrailId != null)
         {
             latitude = hike.Trail.LatMean;
             longitude = hike.Trail.LongMean;
@@ -286,14 +296,14 @@ public class EntityFeedController : ControllerBase
             latitude = hike.UserHikeDetail.LatMean;
             longitude = hike.UserHikeDetail.LongMean;
         }
-
+        var entityName = "UserHikePicture";
         return new FeedItemDto
         {
             EntityId = hike.Id,
             EntityName = "UserHike",
             Title = hike.Trail?.Name ?? "Tur",
-            Description = $"Red en tur: {hike.Trail?.TrailDetails.Description}",
-            PictureUrl = entry.PictureUrl,
+            Description = $"{hike.User.Alias} red en tur i løypen: {hike.Trail.Name}",
+            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, entityName),
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = hike.UserId,
@@ -347,12 +357,38 @@ public class EntityFeedController : ControllerBase
             EntityId = review.Id,
             EntityName = "TrailReview",
             Title = review.Trail?.Name ?? "Anmeldelse",
-            Description = review.Comment,
+            Description = $"{review.User.Alias} skrev en anmeldelse av {review.Trail.Name}",
             PictureUrl = review.PictureUrl ?? entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = review.UserId,
+            Latitude = review.Trail.LatMean,
+            Longitude = review.Trail.LongMean,
             UserAlias = review.User?.Alias
+        };
+    }
+    private async Task<FeedItemDto?> BuildTrailRatingDto(EntityFeed entry)
+    {
+        var rating = await _context.TrailRatings
+            .Include(r => r.User)
+            .Include(r => r.Trail)
+            .FirstOrDefaultAsync(r => r.Id == entry.EntityId);
+
+        if (rating == null) return null;
+
+        return new FeedItemDto
+        {
+            EntityId = rating.Id,
+            EntityName = "TrailReview",
+            Title = rating.Trail?.Name ?? "Anmeldelse",
+            Description = $"{rating.User.Alias} Vurderte {rating.Trail.Name} til {rating.Rating} stjerner",
+            PictureUrl = null,
+            ActionType = entry.ActionType,
+            CreatedAt = entry.CreatedAt,
+            UserId = rating.UserId,
+            Latitude = rating.Trail.LatMean,
+            Longitude = rating.Trail.LongMean,
+            UserAlias = rating.User?.Alias
         };
     }
     private async Task<FeedItemDto?> BuildHorseDto(EntityFeed entry)
@@ -368,7 +404,7 @@ public class EntityFeedController : ControllerBase
             EntityId = horse.Id,
             EntityName = "Horse",
             Title = horse.Name ?? "Hest",
-            Description = $"En ny hest: {horse.Name}",
+            Description = $"{horse.User.Alias} Registrerte en ny hest: {horse.Name}",
             PictureUrl = horse.PictureUrl ?? entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,

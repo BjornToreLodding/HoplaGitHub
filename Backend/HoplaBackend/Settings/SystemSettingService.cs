@@ -3,7 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using HoplaBackend.Models;
-using HoplaBackend.Data; // Husk å endre til riktig namespace
+using HoplaBackend.Data;
+using HoplaBackend.Helpers; // Husk å endre til riktig namespace
 
 public class SystemSettingService
 {
@@ -65,4 +66,13 @@ public class SystemSettingService
             throw new Exception($"Feil ved konvertering av '{value}' til '{typeof(T).Name}': {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Refresher SystemSettingsCache fra databasen.
+    /// </summary>
+    public async Task RefreshCacheAsync()
+    {
+        await SystemSettingsCache.ReloadAsync(_context);
+    }
 }
+

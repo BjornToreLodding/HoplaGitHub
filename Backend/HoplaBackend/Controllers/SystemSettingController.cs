@@ -12,13 +12,13 @@ public class SettingsController : ControllerBase
     private readonly SystemSettingService _settingService;
     private readonly AppDbContext _context;
 
-     public SettingsController(SystemSettingService settingService, AppDbContext context)
+    public SettingsController(SystemSettingService settingService, AppDbContext context)
     {
         _settingService = settingService;
         _context = context;
     }
-    // Endpoint som returnerer alt som registrerer alle registrerte data i settingstabellen.
 
+    // Endpoint som henter alle systeminnstillinger
     [HttpGet("all")]
     public async Task<ActionResult<List<ListSettings>>> GetAllSystemSettings()
     {
@@ -28,8 +28,7 @@ public class SettingsController : ControllerBase
         }
 
         var systemSettings = await _context.SystemSettings
-            //.OrderBy(s => s.Id) //For sortering på Id
-            .OrderBy(s => s.Key) //For sortering på Key
+            .OrderBy(s => s.Key) 
             .Select(s => new ListSettings
             {
                 Key = s.Key,
@@ -40,9 +39,8 @@ public class SettingsController : ControllerBase
 
         return Ok(systemSettings);
     }
-    
 
-    // Endpoint som sjekker verdien på en innstilling. Brukes til opplasting av adminportalen.
+    // Endpoint som henter én setting
     [HttpGet("{key}")]
     public IActionResult GetSetting(string key)
     {
@@ -58,10 +56,17 @@ public class SettingsController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+    
+    [HttpPost("refresh-cache")]
+    public async Task<IActionResult> RefreshSettingsCache()
+    {
+        await _settingService.RefreshCacheAsync();
+        return Ok(new { message = "SystemSettings cache refreshed." });
+    }
 
-    // Endpoint som endrer en lagret innstilling, hvis dette skal endres i adminportalen.
+    // Endpoint som oppdaterer en setting
     [HttpPut("{key}")]
-    public IActionResult UpdateSetting(string key, [FromBody] UpdateSettingRequest request)
+    public async Task<IActionResult> UpdateSetting(string key, [FromBody] UpdateSettingRequest request)
     {
         try
         {
@@ -69,18 +74,15 @@ public class SettingsController : ControllerBase
                 return BadRequest("Verdien kan ikke være tom.");
 
             _settingService.UpdateSetting(key, request.Value);
-            return Ok(new { message = "Innstilling oppdatert", key, value = request.Value });
+
+            // 🚀 Refresh cachen ETTER oppdatering
+            await _settingService.RefreshCacheAsync();
+
+            return Ok(new { message = "Innstilling oppdatert og cache refreshed", key, value = request.Value });
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
     }
-
-
-
-}
-
-public class SystemSettingDto
-{
 }

@@ -458,6 +458,7 @@ public class MockController : ControllerBase
         //_context.TrailReviews.RemoveRange(_context.TrailReviews);
         //_context.TrailFilters(_context.TrailFilters);
         _context.UserHikes.RemoveRange(_context.UserHikes);
+        _context.EntityFeeds.RemoveRange(_context.EntityFeeds);
 
 
         await _context.SaveChangesAsync();

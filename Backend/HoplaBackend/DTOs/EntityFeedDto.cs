@@ -9,7 +9,7 @@ public class FeedQueryOptions
     public string? Show { get; set; } // "trails,userhikes,trailreviews,horses"
     public bool OnlyFriendsAndFollowing { get; set; } = false;
     public bool OnlyLikedTrails { get; set; } = false;
-    public double? UserLatitude { get; set; }
-    public double? UserLongitude { get; set; }
-    public double? RadiusKm { get; set; }
+    public double? Lat { get; set; }
+    public double? Long { get; set; }
+    public double? Radius { get; set; }
 }

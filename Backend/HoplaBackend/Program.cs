@@ -313,7 +313,10 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await TrailFilterSeeder.SyncDefinitionsAsync(context);
+    await SystemSettingsCache.InitializeAsync(context);
 }
+
+
 
 
 app.UseHttpsRedirection();

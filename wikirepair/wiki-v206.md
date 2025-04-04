@@ -1072,8 +1072,8 @@ Response: Se feed alt
 **BT**  
 
 API:
-```http https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&onlyLikedTrails=true
-GET
+```http 
+GET https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&onlyLikedTrails=true
 ```
 
 Response: Se feed alt
