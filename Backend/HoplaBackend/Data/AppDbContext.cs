@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using MediatR;
 using HoplaBackend.Events;
+using HoplaBackend.Interfaces;
 
 namespace HoplaBackend.Data;
 
@@ -75,6 +76,44 @@ public class AppDbContext : DbContext
         return await base.SaveChangesAsync(cancellationToken);
     }
 
+private async Task PublishEntityEvents()
+{
+    Console.WriteLine("PublishEntityEvents() started");
+
+    //await PublishEventsForEntity<Horse>("Horse");
+    await PublishEventsForEntity<Trail>("Trail");
+    //await PublishEventsForEntity<UserHike>("UserHike");
+    // ... legg til flere etter behov
+
+    Console.WriteLine("PublishEntityEvents() completed");
+}
+
+private async Task PublishEventsForEntity<T>(string entityTypeName) where T : class, IEntityWithUser
+{
+    var addedEntities = ChangeTracker.Entries<T>()
+        .Where(e => e.State == EntityState.Added)
+        .Select(e => e.Entity)
+        .ToList();
+
+    foreach (var entity in addedEntities)
+    {
+        await _mediator.Publish(new EntityCreatedEvent(entity.Id, entityTypeName, entity.UserId));
+    }
+
+    var deletedEntities = ChangeTracker.Entries<T>()
+        .Where(e => e.State == EntityState.Deleted)
+        .Select(e => e.Entity)
+        .ToList();
+
+    foreach (var entity in deletedEntities)
+    {
+        await _mediator.Publish(new EntityDeletedEvent(entity.Id, entityTypeName, entity.UserId));
+    }
+}
+
+
+
+/*
     private async Task PublishEntityEvents()
     {
         // Forsøke å skrive om denne til å gjelde for alle Entities
@@ -108,7 +147,7 @@ public class AppDbContext : DbContext
         
         Console.WriteLine("PublishEntityEvents() completed");
     }
-
+*/
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     
@@ -116,9 +155,15 @@ public class AppDbContext : DbContext
         modelBuilder.HasDefaultSchema("public"); // Sikrer at EF bruker public schema
         
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<EntityFeed>()
+            .Property(e => e.EntityName)
+            .HasConversion<string>();
+                
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<EmailVerification>()
                 .HasIndex(e => new { e.Email, e.Token })
                 .IsUnique();
+        
         // Relasjon: En bruker kan ha mange hester
         // ?Dette er ikke nødvendig, da EF forstår dette automatisk, men må brukes hvis man bruker Fluent API
         modelBuilder.Entity<Horse>()

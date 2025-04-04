@@ -1,11 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HoplaBackend.Interfaces;
 //using HoplaBackend.Models;
 
 namespace HoplaBackend.Models;
 
-public class StableMessage
+public class StableMessage : IEntityWithUser
 {
     [Key]
     public Guid Id { get; set; }

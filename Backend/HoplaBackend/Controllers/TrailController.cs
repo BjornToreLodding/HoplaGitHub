@@ -946,7 +946,7 @@ public class TrailController : ControllerBase
             Distance = dto.Distance,
             PictureUrl = null,
             Visibility = TrailVisibility.Private,
-            UserId = null,
+            UserId = new Guid("12345678-0000-0000-0001-123456780001"),
             TrailDetails = new TrailDetail
             {
                 Description = "Auto-generert mock-løype",

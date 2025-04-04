@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HoplaBackend.Interfaces;
 //using HoplaBackend.Models;
 
 namespace HoplaBackend.Models;
-public class TrailReview
+public class TrailReview : IEntityWithUser
 {
     public Guid Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)
 

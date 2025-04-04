@@ -7,13 +7,31 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class DevProdSync : Migration
+    public partial class InitialCreateAfterOutOfSync : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "public");
+
+            migrationBuilder.CreateTable(
+                name: "EmailVerifications",
+                schema: "public",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    OldEmail = table.Column<string>(type: "text", nullable: true),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsUsed = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailVerifications", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "EntityFeeds",
@@ -55,13 +73,33 @@ namespace HoplaBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PasswordResets",
+                schema: "public",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsUsed = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordResets", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Stables",
                 schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: true),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false),
+                    Longitude = table.Column<double>(type: "double precision", nullable: false),
+                    PictureUrl = table.Column<string>(type: "text", nullable: false),
                     PrivateGroup = table.Column<bool>(type: "boolean", nullable: false),
                     ModeratedMessages = table.Column<bool>(type: "boolean", nullable: false),
                     SecretGroup = table.Column<bool>(type: "boolean", nullable: false),
@@ -97,7 +135,12 @@ namespace HoplaBackend.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    DataType = table.Column<string>(type: "text", nullable: false)
+                    DisplayName = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    DefaultValue = table.Column<string>(type: "text", nullable: true),
+                    OptionsJson = table.Column<string>(type: "text", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,12 +162,15 @@ namespace HoplaBackend.Migrations
                     Description = table.Column<string>(type: "text", nullable: true),
                     LikesCount = table.Column<int>(type: "integer", nullable: false),
                     CommentsCount = table.Column<int>(type: "integer", nullable: false),
+                    FriendsCount = table.Column<int>(type: "integer", nullable: false),
+                    HorseCount = table.Column<int>(type: "integer", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Admin = table.Column<bool>(type: "boolean", nullable: false),
                     Premium = table.Column<bool>(type: "boolean", nullable: false),
                     VerifiedTrail = table.Column<bool>(type: "boolean", nullable: false),
                     SubscriptionEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Dob = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    Dob = table.Column<DateOnly>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,6 +184,7 @@ namespace HoplaBackend.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DarkMode = table.Column<bool>(type: "boolean", nullable: false),
+                    Language = table.Column<string>(type: "text", nullable: false),
                     HideFeedFriendNewFriends = table.Column<bool>(type: "boolean", nullable: false),
                     HideFeedHorse = table.Column<bool>(type: "boolean", nullable: false),
                     HideFeedFriendHikes = table.Column<bool>(type: "boolean", nullable: false),
@@ -217,7 +264,7 @@ namespace HoplaBackend.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Breed = table.Column<string>(type: "text", nullable: true),
                     PictureUrl = table.Column<string>(type: "text", nullable: true),
-                    Dob = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Dob = table.Column<DateOnly>(type: "date", nullable: true),
                     LikesCount = table.Column<int>(type: "integer", nullable: false),
                     CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -364,7 +411,7 @@ namespace HoplaBackend.Migrations
                     Distance = table.Column<double>(type: "double precision", nullable: false),
                     LatMean = table.Column<double>(type: "double precision", nullable: false),
                     LongMean = table.Column<double>(type: "double precision", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LikesCount = table.Column<int>(type: "integer", nullable: false),
                     CommentsCount = table.Column<int>(type: "integer", nullable: false),
                     PictureUrl = table.Column<string>(type: "text", nullable: true),
@@ -380,7 +427,8 @@ namespace HoplaBackend.Migrations
                         column: x => x.UserId,
                         principalSchema: "public",
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -423,9 +471,15 @@ namespace HoplaBackend.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     EntityName = table.Column<string>(type: "text", nullable: false),
                     Message = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    FeedBack = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    InProgress = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Resolved = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Closed = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -444,7 +498,8 @@ namespace HoplaBackend.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CoordinatesCsv = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -464,12 +519,12 @@ namespace HoplaBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    LatMin = table.Column<double>(type: "double precision", nullable: true),
-                    LongMin = table.Column<double>(type: "double precision", nullable: true),
-                    LatMax = table.Column<double>(type: "double precision", nullable: true),
-                    LongMax = table.Column<double>(type: "double precision", nullable: true),
-                    JsonCoordinates50 = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    LatMin = table.Column<double>(type: "double precision", nullable: false),
+                    LatMax = table.Column<double>(type: "double precision", nullable: false),
+                    LongMin = table.Column<double>(type: "double precision", nullable: false),
+                    LongMax = table.Column<double>(type: "double precision", nullable: false),
+                    PreviewCoordinatesCsv = table.Column<string>(type: "text", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -545,9 +600,8 @@ namespace HoplaBackend.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TrailId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FilterDefinitionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Value = table.Column<string>(type: "text", nullable: false),
-                    TrailFilterDefinitionId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TrailFilterDefinitionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -606,9 +660,9 @@ namespace HoplaBackend.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TrailId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Rating = table.Column<int>(type: "integer", nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: false),
                     PictureUrl = table.Column<string>(type: "text", nullable: false),
+                    Condition = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -637,13 +691,15 @@ namespace HoplaBackend.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Length = table.Column<double>(type: "double precision", nullable: true),
+                    Title = table.Column<string>(type: "text", nullable: true),
+                    Distance = table.Column<double>(type: "double precision", nullable: false),
                     Duration = table.Column<double>(type: "double precision", nullable: false),
                     HorseId = table.Column<Guid>(type: "uuid", nullable: true),
                     TrailId = table.Column<Guid>(type: "uuid", nullable: true),
                     PictureUrl = table.Column<string>(type: "text", nullable: true),
                     Comment = table.Column<string>(type: "text", nullable: true),
                     Secret = table.Column<bool>(type: "boolean", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -666,29 +722,6 @@ namespace HoplaBackend.Migrations
                         column: x => x.UserId,
                         principalSchema: "public",
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TrailCoordinate",
-                schema: "public",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TrailAllCoordinatesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Lat = table.Column<double>(type: "double precision", nullable: false),
-                    Long = table.Column<double>(type: "double precision", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TrailCoordinate", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TrailCoordinate_TrailAllCoordinates_TrailAllCoordinatesId",
-                        column: x => x.TrailAllCoordinatesId,
-                        principalSchema: "public",
-                        principalTable: "TrailAllCoordinates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -729,6 +762,40 @@ namespace HoplaBackend.Migrations
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "UserHikeDetails",
+                schema: "public",
+                columns: table => new
+                {
+                    UserHikeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LatMin = table.Column<double>(type: "double precision", nullable: false),
+                    LatMax = table.Column<double>(type: "double precision", nullable: false),
+                    LatMean = table.Column<double>(type: "double precision", nullable: false),
+                    LongMin = table.Column<double>(type: "double precision", nullable: false),
+                    LongMax = table.Column<double>(type: "double precision", nullable: false),
+                    LongMean = table.Column<double>(type: "double precision", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CoordinatesCsv = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserHikeDetails", x => x.UserHikeId);
+                    table.ForeignKey(
+                        name: "FK_UserHikeDetails_UserHikes_UserHikeId",
+                        column: x => x.UserHikeId,
+                        principalSchema: "public",
+                        principalTable: "UserHikes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailVerifications_Email_Token",
+                schema: "public",
+                table: "EmailVerifications",
+                columns: new[] { "Email", "Token" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EntityComments_ParentCommentId",
@@ -814,12 +881,6 @@ namespace HoplaBackend.Migrations
                 schema: "public",
                 table: "SubscriptionOrders",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TrailCoordinate_TrailAllCoordinatesId",
-                schema: "public",
-                table: "TrailCoordinate",
-                column: "TrailAllCoordinatesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrailFavorites_TrailId",
@@ -916,6 +977,10 @@ namespace HoplaBackend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "EmailVerifications",
+                schema: "public");
+
+            migrationBuilder.DropTable(
                 name: "EntityComments",
                 schema: "public");
 
@@ -936,6 +1001,10 @@ namespace HoplaBackend.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
+                name: "PasswordResets",
+                schema: "public");
+
+            migrationBuilder.DropTable(
                 name: "StableMessages",
                 schema: "public");
 
@@ -952,7 +1021,7 @@ namespace HoplaBackend.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "TrailCoordinate",
+                name: "TrailAllCoordinates",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -976,7 +1045,7 @@ namespace HoplaBackend.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "UserHikes",
+                name: "UserHikeDetails",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -1004,11 +1073,11 @@ namespace HoplaBackend.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "TrailAllCoordinates",
+                name: "TrailFilterDefinitions",
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "TrailFilterDefinitions",
+                name: "UserHikes",
                 schema: "public");
 
             migrationBuilder.DropTable(

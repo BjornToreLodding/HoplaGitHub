@@ -63,7 +63,7 @@ public class EntityFeedController : ControllerBase
             PictureUrl = entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
-            UserId = trail.UserId ?? Guid.Empty,
+            UserId = trail.UserId,
             UserAlias = trail.User?.Alias
         };
     }

@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using HoplaBackend.Interfaces;
 
 //using HoplaBackend.Models;
 
 namespace HoplaBackend.Models;
 
-public partial class Horse
+public partial class Horse :IEntityWithUser
 {
     [Key]
     public Guid Id { get; set; }

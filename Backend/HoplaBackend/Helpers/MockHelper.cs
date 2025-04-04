@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HoplaBackend.Migrations;
 using HoplaBackend.Models; // Husk riktig namespace
 
 namespace HoplaBackend.Helpers;

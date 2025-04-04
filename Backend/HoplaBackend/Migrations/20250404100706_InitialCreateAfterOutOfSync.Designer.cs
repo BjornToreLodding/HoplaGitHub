@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HoplaBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250318175122_UserReports_CategoryAndStatusfieldOptional")]
-    partial class UserReports_CategoryAndStatusfieldOptional
+    [Migration("20250404100706_InitialCreateAfterOutOfSync")]
+    partial class InitialCreateAfterOutOfSync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,9 @@ namespace HoplaBackend.Migrations
 
                     b.Property<bool>("IsUsed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("OldEmail")
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -224,8 +227,8 @@ namespace HoplaBackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("Dob")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("Dob")
+                        .HasColumnType("date");
 
                     b.Property<int>("LikesCount")
                         .HasColumnType("integer");
@@ -487,7 +490,7 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Visibility")
@@ -505,33 +508,13 @@ namespace HoplaBackend.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CoordinatesCsv")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("TrailAllCoordinates", "public");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.TrailCoordinate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("Lat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Long")
-                        .HasColumnType("double precision");
-
-                    b.Property<Guid>("TrailAllCoordinatesId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TrailAllCoordinatesId");
-
-                    b.ToTable("TrailCoordinate", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailDetail", b =>
@@ -540,24 +523,26 @@ namespace HoplaBackend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("JsonCoordinates50")
-                        .HasColumnType("text");
-
-                    b.Property<double?>("LatMax")
+                    b.Property<double>("LatMax")
                         .HasColumnType("double precision");
 
-                    b.Property<double?>("LatMin")
+                    b.Property<double>("LatMin")
                         .HasColumnType("double precision");
 
-                    b.Property<double?>("LongMax")
+                    b.Property<double>("LongMax")
                         .HasColumnType("double precision");
 
-                    b.Property<double?>("LongMin")
+                    b.Property<double>("LongMin")
                         .HasColumnType("double precision");
 
                     b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreviewCoordinatesCsv")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -657,15 +642,15 @@ namespace HoplaBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Condition")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PictureUrl")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
 
                     b.Property<Guid>("TrailId")
                         .HasColumnType("uuid");
@@ -703,8 +688,8 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("Dob")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("Dob")
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -715,6 +700,9 @@ namespace HoplaBackend.Migrations
 
                     b.Property<int>("HorseCount")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("LikesCount")
                         .HasColumnType("integer");
@@ -757,20 +745,26 @@ namespace HoplaBackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<double>("Distance")
+                        .HasColumnType("double precision");
+
                     b.Property<double>("Duration")
                         .HasColumnType("double precision");
 
                     b.Property<Guid?>("HorseId")
                         .HasColumnType("uuid");
 
-                    b.Property<double?>("Length")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
                     b.Property<bool>("Secret")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("TrailId")
                         .HasColumnType("uuid");
@@ -830,6 +824,7 @@ namespace HoplaBackend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Category")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("Closed")
@@ -860,6 +855,7 @@ namespace HoplaBackend.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
@@ -895,6 +891,10 @@ namespace HoplaBackend.Migrations
 
                     b.Property<bool>("HideReactionFriendNewFriends")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -957,13 +957,28 @@ namespace HoplaBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DataType")
+                    b.Property<string>("DefaultValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("OptionsJson")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -974,9 +989,6 @@ namespace HoplaBackend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("FilterDefinitionId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("TrailFilterDefinitionId")
@@ -996,6 +1008,41 @@ namespace HoplaBackend.Migrations
                     b.HasIndex("TrailId");
 
                     b.ToTable("TrailFilterValues", "public");
+                });
+
+            modelBuilder.Entity("UserHikeDetail", b =>
+                {
+                    b.Property<Guid>("UserHikeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CoordinatesCsv")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<double>("LatMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("LatMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("LatMin")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("LongMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("LongMean")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("LongMin")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("UserHikeId");
+
+                    b.ToTable("UserHikeDetails", "public");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.EntityComment", b =>
@@ -1098,7 +1145,7 @@ namespace HoplaBackend.Migrations
             modelBuilder.Entity("HoplaBackend.Models.StableUser", b =>
                 {
                     b.HasOne("HoplaBackend.Models.Stable", "Stable")
-                        .WithMany()
+                        .WithMany("StableUsers")
                         .HasForeignKey("StableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1129,7 +1176,9 @@ namespace HoplaBackend.Migrations
                 {
                     b.HasOne("HoplaBackend.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -1143,17 +1192,6 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("Trail");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.TrailCoordinate", b =>
-                {
-                    b.HasOne("HoplaBackend.Models.TrailAllCoordinate", "TrailAllCoordinates")
-                        .WithMany("Coordinates")
-                        .HasForeignKey("TrailAllCoordinatesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TrailAllCoordinates");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailDetail", b =>
@@ -1297,7 +1335,7 @@ namespace HoplaBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("HoplaBackend.Models.Trail", "Trail")
-                        .WithMany("TrailFilters")
+                        .WithMany("TrailFilterValues")
                         .HasForeignKey("TrailId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1305,6 +1343,22 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Trail");
 
                     b.Navigation("TrailFilterDefinition");
+                });
+
+            modelBuilder.Entity("UserHikeDetail", b =>
+                {
+                    b.HasOne("HoplaBackend.Models.UserHike", "Hike")
+                        .WithOne("UserHikeDetail")
+                        .HasForeignKey("UserHikeDetail", "UserHikeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hike");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.Stable", b =>
+                {
+                    b.Navigation("StableUsers");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.Trail", b =>
@@ -1315,14 +1369,9 @@ namespace HoplaBackend.Migrations
                     b.Navigation("TrailDetails")
                         .IsRequired();
 
-                    b.Navigation("TrailFilters");
+                    b.Navigation("TrailFilterValues");
 
                     b.Navigation("TrailReviews");
-                });
-
-            modelBuilder.Entity("HoplaBackend.Models.TrailAllCoordinate", b =>
-                {
-                    b.Navigation("Coordinates");
                 });
 
             modelBuilder.Entity("HoplaBackend.Models.TrailDetail", b =>
@@ -1335,6 +1384,12 @@ namespace HoplaBackend.Migrations
                     b.Navigation("Horses");
 
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("HoplaBackend.Models.UserHike", b =>
+                {
+                    b.Navigation("UserHikeDetail")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

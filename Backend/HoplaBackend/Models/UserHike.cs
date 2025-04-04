@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HoplaBackend.Interfaces;
 
 namespace HoplaBackend.Models;
 
 
-public class UserHike
+public class UserHike : IEntityWithUser
 {
     public Guid Id { get; set; }
 

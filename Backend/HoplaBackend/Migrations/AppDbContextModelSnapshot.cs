@@ -487,7 +487,7 @@ namespace HoplaBackend.Migrations
                     b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Visibility")
@@ -1173,7 +1173,9 @@ namespace HoplaBackend.Migrations
                 {
                     b.HasOne("HoplaBackend.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
