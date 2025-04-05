@@ -128,6 +128,8 @@ function loadSideMenu(section) {
                 { name: "SystemSettings", action: "loadContent('admin', 'systemsettings')" },
                 { name: "Filter Løyper", action: "loadContent('admin', 'trailfilters')" },
             ];
+            break;
+
         case "reports":
             menuItems = [
                 { name: "Ubehandlet", action: "loadContent('admin', 'new')" },
@@ -148,7 +150,6 @@ function loadSideMenu(section) {
             ];
             break;
     
-
         case "experimental":
             menuItems = [
                 { name: "Vis Alle Brukere", action: "loadContent('users', 'users_all')" },
