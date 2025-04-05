@@ -38,7 +38,6 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Favorite
@@ -103,8 +102,6 @@ import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.ContentBoxInfo
-import com.example.hopla.universalData.Difficulty
-import com.example.hopla.universalData.Filters
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.MapScreen
 import com.example.hopla.universalData.ReportDialog
@@ -1020,7 +1017,13 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-
+                                contentBoxInfo.filters.forEach { filter ->
+                                    Text(
+                                        text = filter,
+                                        style = generalTextStyle,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
                             }
                         }
                     }
