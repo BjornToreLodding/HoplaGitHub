@@ -17,6 +17,7 @@ body {
     font-family: 'ArialNovaLight', sans-serif;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: #f8f9fa;
@@ -63,7 +64,7 @@ nav ul li a.active {
 /* --- LAYOUT --- */
 .container {
     display: flex;
-    height: 100vh;
+    flex-grow: 1;
 }
 
 /* --- SIDEMENY --- */
