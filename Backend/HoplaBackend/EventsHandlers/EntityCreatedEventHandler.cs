@@ -94,6 +94,15 @@ public class EntityCreatedEventHandler : INotificationHandler<EntityCreatedEvent
                     entityFeed.CreatedAt = trailReview.CreatedAt;
                 }
                 break;
+            case EntityType.TrailRating:
+                var trailRating = await _context.TrailRatings.FindAsync(notification.EntityId);
+                if (trailRating != null)
+                {
+                    entityFeed.EntityTitle = "Vurderte " + trailRating.Trail.Name + " til " + trailRating.Rating + " stjerner";
+                    //entityFeed.PictureUrl = trailRating.PictureUrl; // hvis du har bilde
+                    entityFeed.CreatedAt = trailRating.CreatedAt;
+                }
+                break;
 
         }
 

@@ -31,7 +31,7 @@ public class MockController : ControllerBase
     {
         _context.SystemSettings.RemoveRange(_context.SystemSettings); //rød strek under _context.SystemSettings
         await _context.SaveChangesAsync();
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
+        //await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
         return Ok("Database cleared and IDs reset.");    
     }
 
@@ -200,6 +200,7 @@ public class MockController : ControllerBase
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableMessages\" RESTART IDENTITY CASCADE");
         return Ok("StableMessages table content cleared and IDs reset.");    
     }
+
     [HttpPost("createstablemessages")]
     public async Task<IActionResult> CreateStableMessages()
     {
@@ -234,12 +235,13 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", rides });
     }
     */
+
     [HttpPost("cleartrails")]
     public async Task<IActionResult> ClearTrails()
     {
         _context.Trails.RemoveRange(_context.Trails); 
         await _context.SaveChangesAsync();
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE"); //Jeg tror denne er unødvendig fordi jeg har gått over til Guid?
         return Ok("Database cleared and IDs reset.");    
     }
     
@@ -260,6 +262,7 @@ public class MockController : ControllerBase
         return Created("", new { message = "opprettet!", trails });
 
     }
+
     [HttpPost("cleartrailfiltervalues")]
     public async Task<IActionResult> ClearTrailfilters()
     {
@@ -331,6 +334,75 @@ public class MockController : ControllerBase
 
         return Created("", new { message = "Success!" }); // Hvis URL ikke trengs
     
+    }
+
+    [HttpPost("cleartrailreviews")]
+    public async Task<IActionResult> ClearTrailReviews()
+    {
+        _context.TrailReviews.RemoveRange(_context.TrailReviews);
+        await _context.SaveChangesAsync();
+        return Ok("TrailReviews cleared.");
+    }
+
+    [HttpPost("createtrailreviews")]
+    public async Task<IActionResult> CreateTrailReviews()
+    {
+        if (_context.TrailReviews.Any())
+        {
+            return NoContent();
+        }
+
+        var trailReviews = TrailReviewMock.CreateTrailReviewMock();
+        _context.TrailReviews.AddRange(trailReviews);
+        await _context.SaveChangesAsync();
+
+        return Created("", new { message = "TrailReviews created!", trailReviews });
+    }
+
+    [HttpPost("cleartrailratings")]
+    public async Task<IActionResult> ClearTrailRatings()
+    {
+        _context.TrailRatings.RemoveRange(_context.TrailRatings);
+        await _context.SaveChangesAsync();
+        return Ok("TrailRatings cleared.");
+    }
+
+    [HttpPost("createtrailratings")]
+    public async Task<IActionResult> CreateTrailRatings()
+    {
+        if (_context.TrailRatings.Any())
+        {
+            return NoContent();
+        }
+
+        var trailRatings = TrailRatingMock.CreateTrailRatingMock();
+        _context.TrailRatings.AddRange(trailRatings);
+        await _context.SaveChangesAsync();
+
+        return Created("", new { message = "TrailRatings created!", trailRatings });
+    }
+
+    [HttpPost("clearuserreports")]
+    public async Task<IActionResult> ClearUserReports()
+    {
+        _context.UserReports.RemoveRange(_context.UserReports);
+        await _context.SaveChangesAsync();
+        return Ok("UserReports cleared.");
+    }
+
+    [HttpPost("createuserreports")]
+    public async Task<IActionResult> CreateUserReports()
+    {
+        if (_context.UserReports.Any())
+        {
+            return NoContent();
+        }
+
+        var userReports = UserReportMock.CreateUserReportMock();
+        _context.UserReports.AddRange(userReports);
+        await _context.SaveChangesAsync();
+
+        return Created("", new { message = "UserReports created!", userReports });
     }
 
 
@@ -426,6 +498,21 @@ public class MockController : ControllerBase
         //await CreateTrailReviews();
         //await CreateTrailFilters;
     stopwatch.Restart();
+    Console.WriteLine("Creating Trail Reviews");
+    await CreateTrailReviews();
+    Console.WriteLine($"Trail Reviews created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating Trail Ratings");
+    await CreateTrailRatings();
+    Console.WriteLine($"Trail Ratings created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
+    Console.WriteLine("Creating User Reports");
+    await CreateUserReports();
+    Console.WriteLine($"User Reports created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
+
+    stopwatch.Restart();
     Console.WriteLine("Creating SystemSettings");
     await CreateSystemSettings();
     Console.WriteLine($"SystemSettings created in {stopwatch.Elapsed.TotalSeconds:F2} seconds\n");
@@ -454,8 +541,9 @@ public class MockController : ControllerBase
         //_context.Rides.RemoveRange(_context.Rides); 
         //_context.RideDetails.RemoveRange(_context.RideDetails);
         //_context.RideReviews.RemoveRange(_context.RideReviews);
+        _context.TrailReviews.RemoveRange(_context.TrailReviews);
+        _context.TrailRatings.RemoveRange(_context.TrailRatings);
         _context.Trails.RemoveRange(_context.Trails);
-        //_context.TrailReviews.RemoveRange(_context.TrailReviews);
         //_context.TrailFilters(_context.TrailFilters);
         _context.UserHikes.RemoveRange(_context.UserHikes);
         _context.EntityFeeds.RemoveRange(_context.EntityFeeds);
@@ -476,7 +564,7 @@ public class MockController : ControllerBase
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"StableUsers\" RESTART IDENTITY CASCADE");
         //await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Rides\" RESTART IDENTITY CASCADE");
         await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Trails\" RESTART IDENTITY CASCADE");
-        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
+        //await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"SystemSettings\" RESTART IDENTITY CASCADE");
 
         // Nullstill sekvensene manuelt (i tilfelle PostgreSQL ikke gjør det automatisk, noe som desverre skjer)
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Trenger ikke denne lenger da den er bygget om fra int til Guid
@@ -489,7 +577,7 @@ public class MockController : ControllerBase
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Users_Id_seq\" RESTART WITH 1"); //Denne skulle sikkert hete noe annet?
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Rides_Id_seq\" RESTART WITH 1");
         //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"Trails_Id_seq\" RESTART WITH 1");
-        await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
+        //await _context.Database.ExecuteSqlRawAsync("ALTER SEQUENCE \"SystemSettings_Id_seq\" RESTART WITH 1");
 
         return Ok("Database cleared, except Users, and IDs reset.");    
         }

@@ -34,7 +34,7 @@ public static class SystemSettingMock
             new SystemSetting { Key = "StablePicture", Value = "300,300,crop", Type = "csv" },
             new SystemSetting { Key = "StableMessagePicture", Value = "300,300,crop", Type = "csv" },
             new SystemSetting { Key = "UserHikePicture", Value = "400,300,crop", Type = "csv" },
-
+            new SystemSetting { Key = "FeedPicture", Value = "538,391,crop", Type = "csv" },
             
             //new SystemSetting { Key = "MaxAPICallsPerMinute", Value = "100", Type = "int" },
             //new SystemSetting { Key = "CacheDuration", Value = "300", Type = "int" },

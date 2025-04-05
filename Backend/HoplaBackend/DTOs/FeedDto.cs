@@ -16,6 +16,7 @@ public class FeedItemDto
 
     public Guid UserId { get; set; }
     public string? UserAlias { get; set; }
+    public string? UserProfilePicture { get; set; }
     [JsonIgnore]
     public double? Latitude { get; set; } // 🌍
     [JsonIgnore]

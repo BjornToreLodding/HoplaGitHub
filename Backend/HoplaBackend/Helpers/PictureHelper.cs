@@ -8,15 +8,20 @@ namespace HoplaBackend.Helpers
 
         public static string BuildPictureUrl(string? pictureUrl, string context)
         {
-            if (string.IsNullOrEmpty(pictureUrl))
-                return "";
-
-            if (pictureUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                return pictureUrl;
-
             var (width, height, fit) = SystemSettingsCache.GetPictureSettings(context);
+            if (string.IsNullOrEmpty(pictureUrl))
+            {
+                Console.WriteLine("Skal ikke gå ann å komme hit" + context + " - ");
+                return $"{BaseUrl}{pictureUrl}?w={width}&h={height}&fit={fit}";
+            }
+            else if (pictureUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                return $"{pictureUrl}?w={width}&h={height}&fit={fit}";
 
-            return $"{BaseUrl}{pictureUrl}?w={width}&h={height}&fit={fit}";
+            //var (width, height, fit) = SystemSettingsCache.GetPictureSettings(context);
+            else 
+            {
+                return $"{BaseUrl}{pictureUrl}?w={width}&h={height}&fit={fit}";
+            }
         }
 
     }

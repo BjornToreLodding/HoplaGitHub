@@ -264,13 +264,15 @@ public class EntityFeedController : ControllerBase
             Description = trail.TrailDetails?.Description != null
                 ? trail.TrailDetails.Description
                 : $"{trail.User.Alias} opprettet ny løype: {trail.Name}",
-            PictureUrl = entry.PictureUrl,
+            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             Latitude = trail.LatMean,
             Longitude = trail.LongMean,
             UserId = trail.UserId,
-            UserAlias = trail.User?.Alias
+            UserAlias = trail.User?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(trail.User.PictureUrl, "UserProfilePictureList"),
+
         };
     }
     private async Task<FeedItemDto?> BuildUserHikeDto(EntityFeed entry)
@@ -303,11 +305,12 @@ public class EntityFeedController : ControllerBase
             EntityName = "UserHike",
             Title = hike.Trail?.Name ?? "Tur",
             Description = $"{hike.User.Alias} red en tur i løypen: {hike.Trail.Name}",
-            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, entityName),
+            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = hike.UserId,
             UserAlias = hike.User?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(hike.User.PictureUrl, "UserProfilePictureList"),
             Latitude = latitude,
             Longitude = longitude,
             Duration = hike.Duration
@@ -358,13 +361,16 @@ public class EntityFeedController : ControllerBase
             EntityName = "TrailReview",
             Title = review.Trail?.Name ?? "Anmeldelse",
             Description = $"{review.User.Alias} skrev en anmeldelse av {review.Trail.Name}",
-            PictureUrl = review.PictureUrl ?? entry.PictureUrl,
+            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
+            //PictureUrl = review.PictureUrl ?? entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = review.UserId,
             Latitude = review.Trail.LatMean,
             Longitude = review.Trail.LongMean,
-            UserAlias = review.User?.Alias
+            UserAlias = review.User?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(review.User.PictureUrl, "UserProfilePictureList"),
+
         };
     }
     private async Task<FeedItemDto?> BuildTrailRatingDto(EntityFeed entry)
@@ -379,7 +385,7 @@ public class EntityFeedController : ControllerBase
         return new FeedItemDto
         {
             EntityId = rating.Id,
-            EntityName = "TrailReview",
+            EntityName = "TrailRating",
             Title = rating.Trail?.Name ?? "Anmeldelse",
             Description = $"{rating.User.Alias} Vurderte {rating.Trail.Name} til {rating.Rating} stjerner",
             PictureUrl = null,
@@ -388,7 +394,9 @@ public class EntityFeedController : ControllerBase
             UserId = rating.UserId,
             Latitude = rating.Trail.LatMean,
             Longitude = rating.Trail.LongMean,
-            UserAlias = rating.User?.Alias
+            UserAlias = rating.User?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(rating.User.PictureUrl, "UserProfilePictureList"),
+
         };
     }
     private async Task<FeedItemDto?> BuildHorseDto(EntityFeed entry)
@@ -405,11 +413,14 @@ public class EntityFeedController : ControllerBase
             EntityName = "Horse",
             Title = horse.Name ?? "Hest",
             Description = $"{horse.User.Alias} Registrerte en ny hest: {horse.Name}",
-            PictureUrl = horse.PictureUrl ?? entry.PictureUrl,
+            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
+            //PictureUrl = horse.PictureUrl ?? entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = horse.UserId,
-            UserAlias = horse.User?.Alias
+            UserAlias = horse.User?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(horse.User.PictureUrl, "UserProfilePictureList"),
+
         };
     }
     private async Task<FeedItemDto?> BuildStableDto(EntityFeed entry)
@@ -431,11 +442,14 @@ public class EntityFeedController : ControllerBase
             EntityName = "Stable",
             Title = stable.Name ?? "Stall",
             Description = stable.Description ?? "En ny stall er registrert.",
-            PictureUrl = stable.PictureUrl ?? entry.PictureUrl,
+            PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
+            //PictureUrl = stable.PictureUrl ?? entry.PictureUrl,
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = owner?.Id ?? Guid.Empty, // 👈 bruker eieren hvis finnes
-            UserAlias = owner?.Alias
+            UserAlias = owner?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(owner.PictureUrl, "UserProfilePictureList"),
+
         };
     }
 
@@ -458,7 +472,9 @@ public class EntityFeedController : ControllerBase
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,
             UserId = stableMessage.UserId,
-            UserAlias = stableMessage.User?.Alias
+            UserAlias = stableMessage.User?.Alias,
+            UserProfilePicture = PictureHelper.BuildPictureUrl(stableMessage.User.PictureUrl, "UserProfilePictureList"),
+
         };
     }
 

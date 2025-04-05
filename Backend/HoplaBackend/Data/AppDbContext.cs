@@ -84,6 +84,7 @@ private async Task PublishEntityEvents()
     await PublishEventsForEntity<Trail>("Trail");
     await PublishEventsForEntity<UserHike>("UserHike");
     await PublishEventsForEntity<TrailReview>("TrailReview");
+    await PublishEventsForEntity<TrailRating>("TrailRating");
     await PublishEventsForEntity<StableMessage>("StableMessage");
     // ... legg til flere etter behov
 

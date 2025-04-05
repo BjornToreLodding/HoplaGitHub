@@ -1,5 +1,7 @@
+using HoplaBackend.Interfaces;
+
 namespace HoplaBackend.Models;
-public class TrailRating
+public class TrailRating : IEntityWithUser
 {
     public Guid Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)
 
