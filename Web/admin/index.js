@@ -123,12 +123,12 @@ function loadSideMenu(section) {
     let menuItems = [];
 
     switch (section) {
-        case "Tools":
+        case "tools":
             menuItems = [
                 { name: "SystemSettings", action: "loadContent('admin', 'systemsettings')" },
                 { name: "Filter Løyper", action: "loadContent('admin', 'trailfilters')" },
             ];
-        case "Reports":
+        case "reports":
             menuItems = [
                 { name: "Ubehandlet", action: "loadContent('admin', 'new')" },
                 { name: "Under Behandlig", action: "loadContent('admin', 'inprogress')" },
@@ -138,7 +138,7 @@ function loadSideMenu(section) {
             ];
             break;
         
-        case "Stats":
+        case "stats":
             menuItems = [
                 { name: "Fakta", action: "loadContent('stats', 'fakta')" },
                 { name: "Nye brukere", action: "loadContent('stats', 'newusers')" },
@@ -149,7 +149,7 @@ function loadSideMenu(section) {
             break;
     
 
-        case "Experimental":
+        case "experimental":
             menuItems = [
                 { name: "Vis Alle Brukere", action: "loadContent('users', 'users_all')" },
                 { name: "Vis BrukerRapporter", action: "loadContent('admin', 'userreports')" },
@@ -157,7 +157,7 @@ function loadSideMenu(section) {
             ];
             break;
 
-        case "Users":
+        case "users":
             menuItems = [
                 { name: "Login", action: "loadContent('users', 'login')" },
                 { name: "Glemt Passord", action: "loadContent('users', 'glemtpassord')" },
@@ -174,7 +174,7 @@ function loadSideMenu(section) {
             ];
             break;
 
-        case "Stables":
+        case "stables":
             menuItems = [
                 { name: "Vis Staller", action: "loadContent('stables', 'velgstallen')" },
                 { name: "Vis Medlemmer", action: "loadContent('stables', 'velgstallen')" },
@@ -182,7 +182,7 @@ function loadSideMenu(section) {
             ];
             break;
 
-        case "Trails":
+        case "trails":
             menuItems = [
                 { name: "Vis nærmeste løyper", action: "loadContent('turer', 'list')" },
                 { name: "Søk etter løype", action: "loadContent('turer', 'list')" }
