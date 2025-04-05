@@ -31,6 +31,10 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import io.ktor.http.HttpHeaders
 import io.ktor.http.ContentType
+import io.ktor.http.URLBuilder
+import io.ktor.http.path
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 suspend fun fetchHorses(userId: String, token: String): List<Horse> {
     val httpClient = HttpClient {
@@ -163,7 +167,14 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): Tr
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl + "trails/all?search=$searchQuery&pageNumber=$pageNumber") {
+        val url = URLBuilder(apiUrl).apply {
+            path("trails", "all")
+            parameters.append("search", searchQuery)
+            parameters.append("pageNumber", pageNumber.toString())
+        }.buildString()
+
+        Log.d("fetchTrails", "Request URL: $url")
+        val response: HttpResponse = client.get(url) {
             headers {
                 append("Authorization", "Bearer $token")
             }

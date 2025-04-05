@@ -49,17 +49,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.fetchFeed
-import com.example.hopla.profile.UsersProfileScreen
+import com.example.hopla.apiService.fetchTrails
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.FeedItem
 import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Unit) {
@@ -178,7 +181,6 @@ fun PostList(navController: NavController) {
 
 @Composable
 fun PostItem(feedItem: FeedItem, navController: NavController) {
-    var isLogoClicked by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
 
@@ -232,7 +234,20 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                     text = feedItem.title,
                     style = underheaderTextStyle,
                     color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .then(
+                            if (feedItem.entityName == "Trail") {
+                                Modifier.clickable {
+                                    Log.d("PostItem", "Trail clicked: ${feedItem.entityId}")
+                                    gatherMoreInfo(feedItem.title, UserSession.token) { response ->
+                                        // Handle the response here
+                                    }
+                                }
+                            } else {
+                                Modifier
+                            }
+                        )
                 )
                 // Description
                 Text(
@@ -269,13 +284,6 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                 modifier = Modifier
                     .align(Alignment.TopEnd)
             ) {
-                Image(
-                    painter = painterResource(id = if (isLogoClicked) R.drawable.logo_filled_white else R.drawable.logo_white),
-                    contentDescription = "Logo",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clickable { isLogoClicked = !isLogoClicked }
-                )
                 Box {
                     IconButton(onClick = { isDropdownExpanded = true }) {
                         Icon(
@@ -313,6 +321,17 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                 token = UserSession.token,
                 onDismiss = { showReportDialog = false }
             )
+        }
+    }
+}
+
+fun gatherMoreInfo(title: String, token: String, onResult: (TrailsResponse) -> Unit) {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = fetchTrails(token, 1, title)
+            onResult(response)
+        } catch (e: Exception) {
+            Log.e("fetchTrails", "Error fetching trails", e)
         }
     }
 }
