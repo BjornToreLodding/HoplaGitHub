@@ -2,6 +2,7 @@ package com.example.hopla.apiService
 
 import android.util.Log
 import com.example.hopla.universalData.ErrorResponse2
+import com.example.hopla.universalData.FeedResponse
 import com.example.hopla.universalData.Following
 import com.example.hopla.universalData.Friend
 import com.example.hopla.universalData.FriendProfile
@@ -480,5 +481,30 @@ suspend fun fetchStableMessages(token: String, stableId: String, pageNumber: Int
     } catch (e: Exception) {
         Log.e("fetchStableMessages", "Error fetching stable messages", e)
         emptyList()
+    }
+}
+
+//--------------------Get requests for home screen ------------------------
+suspend fun fetchFeed(token: String, pageNumber: Int): FeedResponse {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl+"feed/all?show=userhikes,trails,trailreviews,horse&pageNumber=$pageNumber") {
+            headers {
+                append("Authorization", "Bearer $token")
+                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            }
+        }
+
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchFeed", "Response Code: ${response.status.value}")
+        Log.d("fetchFeed", "Response Body: $responseBody")
+
+        response.body()
     }
 }

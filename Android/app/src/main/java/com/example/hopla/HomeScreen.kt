@@ -1,29 +1,19 @@
 package com.example.hopla
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.res.colorResource
-import androidx.compose.runtime.Composable
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.Image
-import com.example.hopla.ui.theme.PrimaryBlack
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -35,30 +25,52 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.example.hopla.ui.theme.PrimaryWhite
+import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import com.example.hopla.apiService.fetchFeed
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.universalData.FeedItem
+import com.example.hopla.universalData.FeedResponse
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.UserSession
 
 @Composable
 fun HomeScreen() {
+    var selectedItem by remember { mutableStateOf(Icons.Outlined.Home) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
     ) {
-        TopTextColumn()
-        PostList()
+        TopTextColumn(selectedItem) { selectedItem = it }
+        when (selectedItem) {
+            Icons.Outlined.Home -> PostList()
+            Icons.Outlined.Person -> PostList()
+            Icons.Outlined.FavoriteBorder -> PostList()
+            Icons.Outlined.LocationOn -> PostList()
+            Icons.Outlined.ThumbUp -> PostList()
+        }
     }
 }
 
 @Composable
-fun TopTextColumn() {
+fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Unit) {
     val items = listOf(
         Icons.Outlined.Home,
         Icons.Outlined.Person,
@@ -66,7 +78,6 @@ fun TopTextColumn() {
         Icons.Outlined.LocationOn,
         Icons.Outlined.ThumbUp
     )
-    var selectedItem by remember { mutableStateOf(items[0]) }
 
     Column(
         modifier = Modifier
@@ -87,7 +98,7 @@ fun TopTextColumn() {
                             if (selectedItem == item) colorResource(id = R.color.transparentWhite)
                             else MaterialTheme.colorScheme.primary
                         )
-                        .clickable { selectedItem = item },
+                        .clickable { onItemSelected(item) },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -103,23 +114,27 @@ fun TopTextColumn() {
 
 @Composable
 fun PostList() {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp)
-    ) {
-        items(3) { index ->
-            PostItem(
-                imageRes = R.drawable.stockimg1,
-                text = "Example text $index"
-            )
+    val token = UserSession.token
+    val feedResponse by produceState<FeedResponse?>(initialValue = null) {
+        value = fetchFeed(token, 1)
+    }
+
+    feedResponse?.let { response ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(8.dp)
+        ) {
+            items(response.items) { item: FeedItem ->
+                PostItem(feedItem = item)
+            }
         }
     }
 }
 
 @Composable
-fun PostItem(imageRes: Int, text: String) {
+fun PostItem(feedItem: FeedItem) {
     var isLogoClicked by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
@@ -136,7 +151,7 @@ fun PostItem(imageRes: Int, text: String) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = imageRes),
+                painter = rememberAsyncImagePainter(feedItem.pictureUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,7 +165,7 @@ fun PostItem(imageRes: Int, text: String) {
                     .height(40.dp),
             ) {
                 Text(
-                    text = text,
+                    text = feedItem.title,
                     style = generalTextStyle,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -172,7 +187,7 @@ fun PostItem(imageRes: Int, text: String) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
                 DropdownMenu(
@@ -190,11 +205,10 @@ fun PostItem(imageRes: Int, text: String) {
             }
         }
     }
-    // !!!!!! Change to correct entity id and entity name
     if (showReportDialog) {
         ReportDialog(
-            entityId = UserSession.userId,
-            entityName = "Home",
+            entityId = feedItem.entityId,
+            entityName = feedItem.entityName,
             token = UserSession.token,
             onDismiss = { showReportDialog = false }
         )

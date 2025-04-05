@@ -380,3 +380,27 @@ data class UserRelationResponse(
     val message: String,
     val status: String ? = null
 )
+
+//---------------------Data classes for home screen-----------------
+@Serializable
+data class FeedItem(
+    val entityId: String,
+    val entityName: String,
+    val title: String,
+    val description: String,
+    val pictureUrl: String,
+    val actionType: String,
+    val createdAt: String,
+    val userId: String,
+    val userAlias: String,
+    val duration: Double
+)
+
+@Serializable
+data class FeedResponse(
+    val totalCount: Int,
+    val pageNumber: Int,
+    val pageSize: Int,
+    val hasNextPage: Boolean,
+    val items: List<FeedItem>
+)
