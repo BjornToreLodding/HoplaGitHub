@@ -26,7 +26,7 @@ nav ul li a, aside ul li a, label {
 }
 
 nav {
-    background-color: #333;
+    background-color: #456559;
     color: white;
     padding: 10px;
 }
@@ -54,7 +54,9 @@ nav ul li a {
 
 aside {
     width: 200px;
-    background: #f4f4f4;
+    list-style: none;
+    background: #745e4d;
+    color: white;
     padding: 20px;
 }
 
@@ -67,6 +69,7 @@ button {
 }
 main {
     flex-grow: 1;
+    background: #eae6e1;
     padding: 20px;
     padding-bottom: 50px; /* Litt luft nederst på ALLE sider */
    
