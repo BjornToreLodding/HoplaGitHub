@@ -18,13 +18,7 @@ function updateLoginState() {
     }
 }
 
-document.addEventListener('click', function (event) {
-    if (event.target.matches('nav a[data-section]')) {
-        event.preventDefault();
-        const section = event.target.getAttribute('data-section');
-        loadSideMenu(section);
-    }
-});
+
 function checkAuthStatus() {
     const token = localStorage.getItem("authToken");
     const logoutButton = document.getElementById("logout-button");
@@ -95,7 +89,13 @@ document.getElementById("login-submit").addEventListener("click", () => {
         alert("Vennligst fyll ut e-post og passord.");
     }
 });
-
+document.addEventListener('click', function (event) {
+    if (event.target.matches('nav a[data-section]')) {
+        event.preventDefault();
+        const section = event.target.getAttribute('data-section');
+        loadSideMenu(section);
+    }
+});
 /*
 document.addEventListener("DOMContentLoaded", () => {
     updateUserUI();      // Oppdater brukergrensesnittet basert på om bruker er logget inn
