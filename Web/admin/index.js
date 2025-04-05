@@ -89,6 +89,89 @@ document.getElementById("login-submit").addEventListener("click", () => {
         alert("Vennligst fyll ut e-post og passord.");
     }
 });
+function loadSideMenu(section) {
+    const menuList = document.getElementById("side-menu-list");
+    menuList.innerHTML = ""; // Tøm tidligere innhold
+
+    let menuItems = [];
+
+    switch (section) {
+        case "admin":
+            menuItems = [
+                { name: "SystemSettings", action: "loadContent('admin', 'systemsettings')" },
+                { name: "Filter Løyper", action: "loadContent('admin', 'trailfilters')" },
+                { name: "Rapporter", action: "loadContent('admin', 'reports')" },
+                { name: "Statistikker", action: "loadContent('admin', 'statistikker')" }
+            ];
+            break;
+
+        case "testing":
+            menuItems = [
+                { name: "Vis Alle Brukere", action: "loadContent('users', 'users_all')" },
+                { name: "Vis BrukerRapporter", action: "loadContent('admin', 'userreports')" },
+                { name: "Velg stall", action: "loadContent('stables', 'velgstallen')" }
+            ];
+            break;
+
+        case "users":
+            menuItems = [
+                { name: "Login", action: "loadContent('users', 'login')" },
+                { name: "Glemt Passord", action: "loadContent('users', 'glemtpassord')" },
+                { name: "Register", action: "loadContent('users', 'register')" },
+                { name: "Bytte Passord", action: "loadContent('users', 'changepw')" },
+                { name: "Horses", action: "loadContent('users', 'horses')" },
+                { name: "TurHistorikk", action: "loadContent('users', 'turhistorikk')" },
+                { name: "Meldinger", action: "loadContent('users', 'messages_all')" },
+                { name: "Venneforespørsler", action: "loadContent('users', 'venneforesporsler')" },
+                { name: "Venner", action: "loadContent('users', 'venner')" },
+                { name: "Følger", action: "loadContent('users', 'folger')" },
+                { name: "Blokkerte", action: "loadContent('users', 'blokkerte')" },
+                { name: "Innstillinger", action: "loadContent('users', 'innstillinger')" }
+            ];
+            break;
+
+        case "stables":
+            menuItems = [
+                { name: "Velg stall", action: "loadContent('stables', 'velgstallen')" }
+            ];
+            break;
+
+        case "trails":
+            menuItems = [
+                { name: "Liste", action: "loadContent('turer', 'list')" }
+            ];
+            break;
+    }
+
+    menuItems.forEach(item => {
+        let li = document.createElement("li");
+        li.innerHTML = `<a href="#" onclick="${item.action}">${item.name}</a>`;
+        menuList.appendChild(li);
+    });
+}
+
+async function loadContent(section, page, params = {}) {
+    const mainContent = document.getElementById("main-content");
+
+    try {
+        const htmlResponse = await fetch(`./pages/${section}/${page}.html`);
+        if (htmlResponse.ok) {
+            mainContent.innerHTML = await htmlResponse.text();
+        } else {
+            mainContent.innerHTML = `<h2>Kunne ikke finne ${page}.html</h2>`;
+        }
+
+        const module = await import(`./pages/${section}/${page}.js`);
+        if (module.render) {
+            module.render(mainContent, params);
+        }
+    } catch (error) {
+        console.error("Feil ved lasting av siden:", error);
+        mainContent.innerHTML = `<h2>Kunne ikke laste inn ${page}.</h2>`;
+    }
+}
+
+
 document.addEventListener('click', function (event) {
     if (event.target.matches('nav a[data-section]')) {
         event.preventDefault();
