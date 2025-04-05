@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,11 +30,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,8 +49,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.fetchFeed
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.universalData.FeedItem
-import com.example.hopla.universalData.FeedResponse
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.UserSession
 
@@ -115,19 +120,63 @@ fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Un
 @Composable
 fun PostList() {
     val token = UserSession.token
-    val feedResponse by produceState<FeedResponse?>(initialValue = null) {
-        value = fetchFeed(token, 1)
+    var pageNumber by remember { mutableIntStateOf(1) }
+    var isLoading by remember { mutableStateOf(false) }
+    var hasMorePosts by remember { mutableStateOf(true) }
+    var feedItems by remember { mutableStateOf(listOf<FeedItem>()) }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(pageNumber) {
+        isLoading = true
+        val newFeedResponse = fetchFeed(token, pageNumber)
+        if (newFeedResponse.items.isEmpty()) {
+            hasMorePosts = false
+        } else {
+            feedItems = feedItems + newFeedResponse.items
+        }
+        isLoading = false
     }
 
-    feedResponse?.let { response ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
-        ) {
-            items(response.items) { item: FeedItem ->
-                PostItem(feedItem = item)
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collect { lastVisibleItemIndex ->
+                if (lastVisibleItemIndex == listState.layoutInfo.totalItemsCount - 1 && hasMorePosts && !isLoading) {
+                    pageNumber++
+                }
+            }
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(8.dp)
+    ) {
+        items(feedItems) { item: FeedItem ->
+            PostItem(feedItem = item)
+        }
+        if (isLoading) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                }
+            }
+        } else if (!hasMorePosts) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.no_more_posts),
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
     }
@@ -187,7 +236,7 @@ fun PostItem(feedItem: FeedItem) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.secondary
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 DropdownMenu(
@@ -195,7 +244,13 @@ fun PostItem(feedItem: FeedItem) {
                     onDismissRequest = { isDropdownExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { stringResource(R.string.report) },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.report),
+                                style = generalTextStyleBold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        },
                         onClick = {
                             isDropdownExpanded = false
                             showReportDialog = true

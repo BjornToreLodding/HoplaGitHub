@@ -181,5 +181,6 @@
     <string name="server_error_message">An error has occurred, try again later</string>
     <string name="edit_trip">Edit trip</string>
     <string name="share_trip">Share trip</string>
+    <string name="no_more_posts">No more posts</string>
 
 </resources>

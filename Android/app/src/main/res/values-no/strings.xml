@@ -181,5 +181,6 @@
     <string name="server_error_message">Det har skjedd en feil, prøv igjen senere</string>
     <string name="edit_trip">Rediger tur</string>
     <string name="share_trip">Del tur</string>
+    <string name="no_more_posts">Ingen flere poster</string>
 
 </resources>
