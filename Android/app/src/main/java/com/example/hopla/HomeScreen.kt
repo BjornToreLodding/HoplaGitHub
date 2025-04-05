@@ -1,5 +1,6 @@
 package com.example.hopla
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -35,44 +37,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.fetchFeed
+import com.example.hopla.profile.UsersProfileScreen
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
+import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.FeedItem
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.UserSession
-
-@Composable
-fun HomeScreen() {
-    var selectedItem by remember { mutableStateOf(Icons.Outlined.Home) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-    ) {
-        TopTextColumn(selectedItem) { selectedItem = it }
-        when (selectedItem) {
-            Icons.Outlined.Home -> PostList()
-            Icons.Outlined.Person -> PostList()
-            Icons.Outlined.FavoriteBorder -> PostList()
-            Icons.Outlined.LocationOn -> PostList()
-            Icons.Outlined.ThumbUp -> PostList()
-        }
-    }
-}
+import com.example.hopla.universalData.formatDateTime
 
 @Composable
 fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Unit) {
@@ -118,7 +105,27 @@ fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Un
 }
 
 @Composable
-fun PostList() {
+fun HomeScreen(navController: NavController) {
+    var selectedItem by remember { mutableStateOf(Icons.Outlined.Home) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
+    ) {
+        TopTextColumn(selectedItem) { selectedItem = it }
+        when (selectedItem) {
+            Icons.Outlined.Home -> PostList(navController = navController)
+            Icons.Outlined.Person -> PostList(navController = navController)
+            Icons.Outlined.FavoriteBorder -> PostList(navController = navController)
+            Icons.Outlined.LocationOn -> PostList(navController = navController)
+            Icons.Outlined.ThumbUp -> PostList(navController = navController)
+        }
+    }
+}
+
+@Composable
+fun PostList(navController: NavController) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
@@ -140,7 +147,7 @@ fun PostList() {
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collect { lastVisibleItemIndex ->
-                if (lastVisibleItemIndex == listState.layoutInfo.totalItemsCount - 1 && hasMorePosts && !isLoading) {
+                if (lastVisibleItemIndex == feedItems.size - 1 && hasMorePosts && !isLoading) {
                     pageNumber++
                 }
             }
@@ -154,7 +161,7 @@ fun PostList() {
             .padding(8.dp)
     ) {
         items(feedItems) { item: FeedItem ->
-            PostItem(feedItem = item)
+            PostItem(feedItem = item, navController = navController)
         }
         if (isLoading) {
             item {
@@ -162,20 +169,7 @@ fun PostList() {
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                }
-            }
-        } else if (!hasMorePosts) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.no_more_posts),
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                    CircularProgressIndicator()
                 }
             }
         }
@@ -183,89 +177,142 @@ fun PostList() {
 }
 
 @Composable
-fun PostItem(feedItem: FeedItem) {
+fun PostItem(feedItem: FeedItem, navController: NavController) {
     var isLogoClicked by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
 
-    Box(
+    val (formattedDate, formattedTime) = formatDateTime(feedItem.createdAt)
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // User info
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .clickable {
+                    Log.d("PostItem", "Navigating to friend_profile/${feedItem.userId}")
+                    navController.navigate("friend_profile/${feedItem.userId}")
+                }
         ) {
             Image(
                 painter = rememberAsyncImagePainter(feedItem.pictureUrl),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+                    .clip(CircleShape)
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.onBackground)
-                    .height(40.dp),
+            Text(
+                text = feedItem.userAlias,
+                style = generalTextStyleBold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        // Post content
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.onBackground)
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Title
                 Text(
                     text = feedItem.title,
-                    style = generalTextStyle,
-                    color = MaterialTheme.colorScheme.secondary
+                    style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-        ) {
-            Image(
-                painter = painterResource(id = if (isLogoClicked) R.drawable.logo_filled_white else R.drawable.logo_white),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { isLogoClicked = !isLogoClicked }
-            )
-            Box {
-                IconButton(onClick = { isDropdownExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-                DropdownMenu(
-                    expanded = isDropdownExpanded,
-                    onDismissRequest = { isDropdownExpanded = false }
+                // Description
+                Text(
+                    text = feedItem.description,
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                // Image
+                Image(
+                    painter = rememberAsyncImagePainter(feedItem.pictureUrl),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.onBackground)
+                        .height(40.dp),
                 ) {
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = stringResource(R.string.report),
-                                style = generalTextStyleBold,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        },
-                        onClick = {
-                            isDropdownExpanded = false
-                            showReportDialog = true
-                        }
+                    // Date and Time
+                    Text(
+                        text = "$formattedDate $formattedTime",
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
                     )
                 }
             }
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+            ) {
+                Image(
+                    painter = painterResource(id = if (isLogoClicked) R.drawable.logo_filled_white else R.drawable.logo_white),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable { isLogoClicked = !isLogoClicked }
+                )
+                Box {
+                    IconButton(onClick = { isDropdownExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+
+                    }
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.report),
+                                    style = generalTextStyleBold,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            },
+                            onClick = {
+                                isDropdownExpanded = false
+                                showReportDialog = true
+                            }
+                        )
+                    }
+                }
+            }
         }
-    }
-    if (showReportDialog) {
-        ReportDialog(
-            entityId = feedItem.entityId,
-            entityName = feedItem.entityName,
-            token = UserSession.token,
-            onDismiss = { showReportDialog = false }
-        )
+        if (showReportDialog) {
+            ReportDialog(
+                entityId = feedItem.entityId,
+                entityName = feedItem.entityName,
+                token = UserSession.token,
+                onDismiss = { showReportDialog = false }
+            )
+        }
     }
 }

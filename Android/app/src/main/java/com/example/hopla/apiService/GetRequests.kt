@@ -494,7 +494,7 @@ suspend fun fetchFeed(token: String, pageNumber: Int): FeedResponse {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"feed/all?show=userhikes,trails,trailreviews,horse&pageNumber=$pageNumber") {
+        val response: HttpResponse = client.get(apiUrl+"feed/all?show=userhikes,trails,trailreviews,horses&pageNumber=$pageNumber") {
             headers {
                 append("Authorization", "Bearer $token")
                 append(HttpHeaders.ContentType, ContentType.Application.Json.toString())

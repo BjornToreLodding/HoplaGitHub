@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
                             startDestination = Screen.Home.route,
                             modifier = Modifier.padding(innerPadding)
                         ) {
-                            composable(Screen.Home.route) { HomeScreen() }
+                            composable(Screen.Home.route) { HomeScreen(navController) }
                             composable(Screen.Trails.route) { TrailsScreen(navController) }
                             composable(Screen.NewTrip.route) { NewTripScreen() }
                             composable(Screen.Community.route) { CommunityScreen(navController, UserSession.token) }
@@ -177,7 +177,9 @@ class MainActivity : ComponentActivity() {
                                 arguments = listOf(navArgument("userId") { type = NavType.StringType })
                             ) { backStackEntry ->
                                 val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                                Log.d("Navigation", "Navigating to friend_profile with userId: $userId")
                                 UsersProfileScreen(navController, userId)
+                                Log.d("Navigation", "UsersProfileScreen loaded successfully")
                             }
                             composable(
                                 "horse_detail/{horseId}",
