@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@:" : {
+
+    },
     "%@: %@" : {
       "localizations" : {
         "en" : {
@@ -485,6 +488,9 @@
         }
       }
     },
+    "Filters:" : {
+
+    },
     "Follow" : {
       "localizations" : {
         "nb" : {
@@ -820,6 +826,9 @@
           }
         }
       }
+    },
+    "No hikes found." : {
+
     },
     "No image selected" : {
       "localizations" : {
