@@ -123,16 +123,33 @@ function loadSideMenu(section) {
     let menuItems = [];
 
     switch (section) {
-        case "admin":
+        case "tools":
             menuItems = [
                 { name: "SystemSettings", action: "loadContent('admin', 'systemsettings')" },
                 { name: "Filter Løyper", action: "loadContent('admin', 'trailfilters')" },
-                { name: "Rapporter", action: "loadContent('admin', 'reports')" },
-                { name: "Statistikker", action: "loadContent('admin', 'statistikker')" }
+            ];
+        case "reports":
+            menuItems = [
+                { name: "Ubehandlet", action: "loadContent('admin', 'new')" },
+                { name: "Under Behandlig", action: "loadContent('admin', 'inprogress')" },
+                { name: "Ferdig Behandlig", action: "loadContent('admin', 'resolved')" },
+                { name: "Lukket", action: "loadContent('admin', 'closed')" }
+                
             ];
             break;
+        
+        case "stats":
+            menuItems = [
+                { name: "Fakta", action: "loadContent('stats', 'fakta')" },
+                { name: "Nye brukere", action: "loadContent('stats', 'newusers')" },
+                { name: "Turer", action: "loadContent('stats', 'turer')" },
+                { name: "YNI", action: "loadContent('stats', 'yni')" }
+                
+            ];
+            break;
+    
 
-        case "testing":
+        case "experimental":
             menuItems = [
                 { name: "Vis Alle Brukere", action: "loadContent('users', 'users_all')" },
                 { name: "Vis BrukerRapporter", action: "loadContent('admin', 'userreports')" },
@@ -159,13 +176,16 @@ function loadSideMenu(section) {
 
         case "stables":
             menuItems = [
-                { name: "Velg stall", action: "loadContent('stables', 'velgstallen')" }
+                { name: "Vis Staller", action: "loadContent('stables', 'velgstallen')" },
+                { name: "Vis Medlemmer", action: "loadContent('stables', 'velgstallen')" },
+                { name: "Vis Meldinger", action: "loadContent('stables', 'velgstallen')" }
             ];
             break;
 
         case "trails":
             menuItems = [
-                { name: "Liste", action: "loadContent('turer', 'list')" }
+                { name: "Vis nærmeste løyper", action: "loadContent('turer', 'list')" },
+                { name: "Søk etter løype", action: "loadContent('turer', 'list')" }
             ];
             break;
     }
