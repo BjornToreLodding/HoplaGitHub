@@ -1,5 +1,5 @@
 
-const apiUrl = window.appConfig.API_URL || "https://localhost:7128"; // Fallback hvis miljøvariabelen ikke er satt
+const apiUrl = window.appConfig.API_URL || "https://localhost:7128";
 console.log("API URL:", apiUrl);
 
 function showToast(message) {
@@ -26,6 +26,33 @@ export async function render(container) {
 
     const settingsContainer = document.getElementById("settings-container");
 
+    const refreshButton = document.createElement('button');
+    refreshButton.textContent = '🔄 Refresh Settings Cache';
+    refreshButton.className = 'button';
+    refreshButton.style.marginBottom = '20px';
+
+    refreshButton.addEventListener('click', async () => {
+        try {
+            const refreshResponse = await fetch(`${apiUrl}/admin/settings/refresh-cache`, {
+                method: 'POST',
+            });
+
+            if (!refreshResponse.ok) {
+                throw new Error(`HTTP error! Status: ${refreshResponse.status}`);
+            }
+
+            showToast("✅ Cache oppdatert!");
+
+            // ➡️ Nå henter vi settings på nytt
+            await render(document.querySelector("main"));
+        } catch (error) {
+            console.error('Feil ved refresh av cache:', error);
+            showToast("❌ Feil ved refresh!");
+        }
+    });
+
+    settingsContainer.appendChild(refreshButton);
+
     try {
         console.log("Fetching settings from API...");
         const response = await fetch(`${apiUrl}/admin/settings/all`, {
@@ -49,6 +76,8 @@ export async function render(container) {
             return a.key.localeCompare(b.key);
         });
 
+        let csvHeaderInserted = false;
+
         settings.forEach(setting => {
             const { key, value, type } = setting;
             const settingDiv = document.createElement('div');
@@ -67,11 +96,19 @@ export async function render(container) {
             let originalValue = value;
 
             if (type === "csv") {
-                const widthHeightFitLabel = document.createElement('div');
-                widthHeightFitLabel.textContent = 'Width - Height - Fit';
-                widthHeightFitLabel.className = 'width-height-fit-label';
-                widthHeightFitLabel.style.width = '100%';
-                inputContainer.appendChild(widthHeightFitLabel);
+                if (!csvHeaderInserted) {
+                    const csvHeader = document.createElement('div');
+                    csvHeader.className = 'csv-header';
+
+                    ['Width', 'Height', 'Fit'].forEach(title => {
+                        const col = document.createElement('div');
+                        col.textContent = title;
+                        csvHeader.appendChild(col);
+                    });
+
+                    settingsContainer.appendChild(csvHeader);
+                    csvHeaderInserted = true;
+                }
 
                 const [widthVal, heightVal, fitVal] = value.split(",");
 
@@ -193,6 +230,7 @@ export async function render(container) {
         console.error('Feil ved henting av settings:', error);
     }
 }
+
 
 
 /*
