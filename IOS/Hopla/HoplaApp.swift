@@ -13,7 +13,7 @@ import CoreLocation
 struct HoplaApp: App {
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isDarkMode") private var isDarkMode = false
-    @StateObject private var vm = ViewModel()
+    @StateObject var vm = ViewModel(profileViewModel: ProfileViewModel()) 
     @StateObject private var loginViewModel = LoginViewModel() // Create an instance
     @Environment(\.colorScheme) var colorScheme
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -45,7 +45,7 @@ struct HoplaApp: App {
                         MainTabView(navigationPath: $navigationPath)
                             .environmentObject(vm)
                     } else {
-                        Login(viewModel: LoginViewModel(), loginViewModel: loginViewModel) // Pass viewModel here
+                        Login(viewModel: LoginViewModel(), loginViewModel: loginViewModel)
                     }
                 }
             }
@@ -103,8 +103,8 @@ struct MainTabView: View {
             
             NavigationStack {
                 Profile(
-                    loginViewModel: LoginViewModel(),
-                    viewModel: loginViewModel,
+                    profileViewModel: ProfileViewModel(), loginViewModel: LoginViewModel(),
+                    
                     navigationPath: $navigationPath
                 )
             }

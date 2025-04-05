@@ -22,7 +22,8 @@ struct Settings: View {
     @FocusState private var isPasswordFieldFocused: Bool // To auto-focus password field
     @State private var showReportSheet = false // Report
     
-    @ObservedObject var viewModel: LoginViewModel
+    var viewModel: ProfileViewModel
+   
     
     var body: some View {
         ZStack {
@@ -79,7 +80,7 @@ struct Settings: View {
                                 message: Text("You will be logged out of your account."),
                                 primaryButton: .destructive(Text("Log Out")) {
                                     // Log Out Section
-                                    NavigationLink(destination: Login(viewModel: viewModel, loginViewModel: LoginViewModel())) {
+                                    NavigationLink(destination: Login(viewModel: LoginViewModel(), loginViewModel: LoginViewModel())) {
                                         Text("Log Out")
                                             .foregroundColor(.red)
                                     }
@@ -88,6 +89,7 @@ struct Settings: View {
                                 secondaryButton: .cancel()
                             )
                         }
+
                         
                         // Delete User Button
                         Button(action: {

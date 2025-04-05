@@ -21,14 +21,12 @@ class LoginViewModel: ObservableObject {
         let password: String
     }
     
-    struct DOB: Codable {
+    public struct DOB: Codable {
         let year: Int
         let month: Int
         let day: Int
-        let dayOfWeek: Int
-        let dayOfYear: Int
-        let dayNumber: Int
     }
+
 
     struct LoginResponse: Codable {
         let token: String
@@ -42,7 +40,7 @@ class LoginViewModel: ObservableObject {
         let redirect: String?
     }
 
-    struct UserProfile: Codable {
+    public struct UserProfile: Codable {
         let alias: String
         let name: String
         let email: String
@@ -89,14 +87,19 @@ class LoginViewModel: ObservableObject {
                     decoder.dateDecodingStrategy = .iso8601
 
                     let loginResponse = try decoder.decode(LoginResponse.self, from: data)
+                    print("Login Response Description:", loginResponse.description ?? "No description in response")
+
                     DispatchQueue.main.async {
-                        TokenManager.shared.saveToken(loginResponse.token) // Use the TokenManager
-                        
+                        TokenManager.shared.saveToken(loginResponse.token)
+                        TokenManager.shared.saveUserDescription(loginResponse.description) // Store description
+
+                        print("Stored Description in TokenManager:", TokenManager.shared.getUserDescription() ?? "No description stored") // Debugging print
+
                         self.isLoggedIn = true
                         UserDefaults.standard.set(true, forKey: "isLoggedIn")
                         UserDefaults.standard.set(loginResponse.userId, forKey: "userId")
-                        
-                        self.fetchUserProfile()
+
+                        self.fetchUserProfile() // Fetch user profile after login
                     }
                 } catch {
                     DispatchQueue.main.async {
@@ -144,8 +147,27 @@ class LoginViewModel: ObservableObject {
             if httpResponse.statusCode == 200 {
                 do {
                     let user = try JSONDecoder().decode(UserProfile.self, from: data)
+                    print("Fetched description before update:", TokenManager.shared.getUserDescription() ?? "No description found")
+
                     DispatchQueue.main.async {
-                        self.userProfile = user
+                        var finalDescription = user.description ?? TokenManager.shared.getUserDescription()
+
+                        // Save latest description from server if available
+                        if let serverDescription = user.description, !serverDescription.isEmpty {
+                            TokenManager.shared.saveUserDescription(serverDescription)
+                        }
+
+                        self.userProfile = UserProfile(
+                            alias: user.alias,
+                            name: user.name,
+                            email: user.email,
+                            pictureUrl: user.pictureUrl,
+                            telephone: user.telephone,
+                            description: finalDescription,
+                            dob: user.dob
+                        )
+
+                        print("Final User Profile:", self.userProfile ?? "No data")
                     }
                 } catch {
                     print("Error decoding user profile:", error.localizedDescription)

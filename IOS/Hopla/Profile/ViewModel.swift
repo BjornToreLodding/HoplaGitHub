@@ -6,20 +6,43 @@
 //
 
 import SwiftUI
+import PhotosUI
+
+enum ImageSource {
+    case camera
+    case library
+}
 
 class ViewModel: ObservableObject {
-    @Published var image: UIImage?
-    @Published var showPicker: Bool = false
-    @Published var source: Picker.Source = .library
-    
-    func showPhotoPicker() {
-        if source == .camera {
-            if !Picker.checkPermissions() {
-                print("Ther is no camera on this device")
-                return
+    @Published var source: ImageSource = .library
+    @Published var showPicker = false
+    @Published var image: UIImage? {
+        didSet {
+            if let image = image {
+                uploadSelectedImage(image)
             }
         }
+    }
+    
+    var profileViewModel: ProfileViewModel // Reference to ProfileViewModel
+
+    init(profileViewModel: ProfileViewModel) {
+        self.profileViewModel = profileViewModel
+    }
+
+    func showPhotoPicker() {
         showPicker = true
     }
+
+    private func uploadSelectedImage(_ image: UIImage) {
+        guard let token = TokenManager.shared.getToken(),
+              let userId = TokenManager.shared.getUserId() else {
+            print("Image, token, or user ID is missing.")
+            return
+        }
+
+        Task {
+            await profileViewModel.uploadProfileImage(image: image, entityId: userId, table: "Users", token: token)
+        }
+    }
 }
- 

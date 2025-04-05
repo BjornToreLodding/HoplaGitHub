@@ -992,6 +992,9 @@
         }
       }
     },
+    "Select New Date of Birth" : {
+
+    },
     "Send" : {
       "localizations" : {
         "nb" : {
@@ -1062,6 +1065,9 @@
         }
       }
     },
+    "Telephone" : {
+
+    },
     "The app must reload to apply language change" : {
       "localizations" : {
         "nb" : {
@@ -1101,6 +1107,12 @@
           }
         }
       }
+    },
+    "Update DOB" : {
+
+    },
+    "Upload" : {
+
     },
     "Username" : {
       "localizations" : {
