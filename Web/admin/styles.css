@@ -1,9 +1,28 @@
+@font-face {
+    font-family: 'ArialNova';
+    src: url('/fonts/ArialNova.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ArialNovaLight';
+    src: url('/fonts/ArialNova-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'GeorgiaProBlack';
+    src: url('/fonts/GeorgiaPro-Black.ttf') format('truetype');
+}
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'ArialNovaLight', sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
+}
+
+/* Menyvalg toppmeny og sidemeny */
+nav ul li a, aside ul li a, label {
+    font-family: 'ArialNova', sans-serif;
 }
 
 nav {
@@ -39,9 +58,18 @@ aside {
     padding: 20px;
 }
 
+h1, h2, h3 {
+    font-family: 'GeorgiaProBlack', serif;
+}
+
+button {
+    font-family: 'ArialNovaLight', sans-serif;
+}
 main {
     flex-grow: 1;
     padding: 20px;
+    padding-bottom: 50px; /* Litt luft nederst på ALLE sider */
+   
 }
 
 .hidden {

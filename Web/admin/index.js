@@ -1,4 +1,95 @@
+document.addEventListener("DOMContentLoaded", () => {
+    updateLoginState();
+    updateUserUI();
+    checkAuthStatus();
+});
 
+function updateLoginState() {
+    const token = localStorage.getItem("authToken");
+    const loginScreen = document.getElementById("login-screen");
+    const appContent = document.getElementById("app-content");
+
+    if (token) {
+        loginScreen.classList.add("hidden");
+        appContent.classList.remove("hidden");
+    } else {
+        loginScreen.classList.remove("hidden");
+        appContent.classList.add("hidden");
+    }
+}
+
+function checkAuthStatus() {
+    const token = localStorage.getItem("authToken");
+    const logoutButton = document.getElementById("logout-button");
+
+    if (token) {
+        logoutButton.classList.remove("hidden");
+    } else {
+        logoutButton.classList.add("hidden");
+    }
+}
+
+document.getElementById("logout-button").addEventListener("click", logout);
+
+function logout() {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userInfo");
+    updateLoginState();
+    updateUserUI();
+}
+
+function updateUserUI() {
+    const token = localStorage.getItem("authToken");
+    const userInfo = localStorage.getItem("userInfo");
+
+    const loginButton = document.getElementById("login-button");
+    const userInfoElement = document.getElementById("user-info");
+    const logoutButton = document.getElementById("logout-button");
+    const userText = document.getElementById("user-text");
+    const userAvatar = document.getElementById("user-avatar");
+
+    if (!token || !userInfo) {
+        if (loginButton) loginButton.classList.remove("hidden");
+        if (userInfoElement) userInfoElement.classList.add("hidden");
+        return;
+    }
+
+    let user = JSON.parse(userInfo);
+
+    if (loginButton) loginButton.classList.add("hidden");
+    if (userInfoElement) userInfoElement.classList.remove("hidden");
+    if (logoutButton) logoutButton.classList.remove("hidden");
+
+    if (userText) {
+        userText.textContent = `Logget inn som: ${user.alias} (${user.name})`;
+    }
+
+    if (userAvatar && user.pictureUrl) {
+        userAvatar.src = user.pictureUrl;
+        userAvatar.classList.remove("hidden");
+    }
+}
+
+document.getElementById("login-submit").addEventListener("click", () => {
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    if (email && password) {
+        localStorage.setItem("authToken", "dummy-token");
+        localStorage.setItem("userInfo", JSON.stringify({
+            alias: "Admin",
+            name: email.split('@')[0],
+            pictureUrl: ""
+        }));
+
+        updateLoginState();
+        updateUserUI();
+    } else {
+        alert("Vennligst fyll ut e-post og passord.");
+    }
+});
+
+/*
 document.addEventListener("DOMContentLoaded", () => {
     updateUserUI();      // Oppdater brukergrensesnittet basert på om bruker er logget inn
     //checkUserStatus();   // Sjekk om brukeren er admin eller har spesifikke roller
@@ -7,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function checkUserStatus() {
     console.log("checkUserStatus() ikke implementert ennå.");
 }
+*/
 /*
 document.addEventListener("DOMContentLoaded", updateUserUI);
 document.addEventListener("DOMContentLoaded", () => {
@@ -14,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkAuthStatus(); // Sjekker om brukeren er innlogget ved start
 });
 */
+/*
 function checkAuthStatus() {
     const token = localStorage.getItem("authToken");
     const logoutButton = document.getElementById("logout-button");
@@ -36,6 +129,7 @@ function logout() {
     localStorage.removeItem("userInfo");
     updateUserUI(); // Oppdater UI etter utlogging
 }
+*/
 /*
 function logout() {
     localStorage.removeItem("authToken"); // Fjern token
@@ -43,7 +137,7 @@ function logout() {
     checkAuthStatus(); // Oppdater UI etter logout
 }
 */
-
+/*
 document.getElementById("logout-button").addEventListener("click", logout);
 
 // Oppdater visning basert på om brukeren er logget inn eller ikke
@@ -113,7 +207,7 @@ function updateUserUI() {
 
     console.log("✅ updateUserUI fullført!");
 }
-
+*/
 /*function updateUserUI() {
     console.log("🛠️ Kjører updateUserUI...");
     const token = localStorage.getItem("authToken");
@@ -146,7 +240,7 @@ function updateUserUI() {
 }
 */
 
-
+/*
 // Laster inn sidemenyen basert på valgt toppmeny
 function loadSideMenu(section) {
     const menuList = document.getElementById("side-menu-list");
@@ -246,7 +340,7 @@ async function loadContent(section, page, params = {}) {  // Legg til params her
         mainContent.innerHTML = `<h2>Kunne ikke laste inn ${page}.</h2>`;
     }
 }
-
+*/
 /*
 // Laster innhold i hovedområdet
 async function loadContent(section, page) {
