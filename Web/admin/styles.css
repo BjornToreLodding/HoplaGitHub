@@ -109,10 +109,15 @@ aside {
 /* --- HOVEDINNHOLD --- */
 main {
     flex-grow: 1;
+    min-height: calc(100vh - 70px); /* Tilpasset for høyden på toppmenyen */
     background: #eae6e1;
     padding: 30px;
     margin: 20px;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
 }
 
 /* --- GENERELLE ELEMENTER --- */
