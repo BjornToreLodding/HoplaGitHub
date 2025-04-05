@@ -18,6 +18,13 @@ function updateLoginState() {
     }
 }
 
+document.addEventListener('click', function (event) {
+    if (event.target.matches('nav a[data-section]')) {
+        event.preventDefault();
+        const section = event.target.getAttribute('data-section');
+        loadSideMenu(section);
+    }
+});
 function checkAuthStatus() {
     const token = localStorage.getItem("authToken");
     const logoutButton = document.getElementById("logout-button");
