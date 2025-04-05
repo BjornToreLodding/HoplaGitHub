@@ -194,3 +194,21 @@ main {
     visibility: visible !important;
     opacity: 1 !important;
 }
+
+/* Legger til ekstra luft nederst på settings-siden */
+#settings-container {
+    padding-bottom: 50px;
+}
+
+/* Litt større avstand mellom settings */
+.setting {
+    margin-bottom: 24px;
+}
+
+/* Label over width, height, fit */
+.width-height-fit-label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+

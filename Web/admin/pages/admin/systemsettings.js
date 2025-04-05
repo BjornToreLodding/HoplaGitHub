@@ -62,10 +62,17 @@ export async function render(container) {
             inputContainer.style.display = 'flex';
             inputContainer.style.alignItems = 'center';
             inputContainer.style.gap = '8px';
+            inputContainer.style.flexWrap = 'wrap';
 
             let originalValue = value;
 
             if (type === "csv") {
+                const widthHeightFitLabel = document.createElement('div');
+                widthHeightFitLabel.textContent = 'Width - Height - Fit';
+                widthHeightFitLabel.className = 'width-height-fit-label';
+                widthHeightFitLabel.style.width = '100%';
+                inputContainer.appendChild(widthHeightFitLabel);
+
                 const [widthVal, heightVal, fitVal] = value.split(",");
 
                 const widthInput = document.createElement('input');
@@ -186,6 +193,7 @@ export async function render(container) {
         console.error('Feil ved henting av settings:', error);
     }
 }
+
 
 /*
 const apiUrl = window.appConfig.API_URL || "https://localhost:7128"; // Fallback hvis miljøvariabelen ikke er satt
