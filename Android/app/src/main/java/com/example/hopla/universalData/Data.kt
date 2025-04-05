@@ -145,7 +145,8 @@ data class ContentBoxInfo(
     val imageResource: List<Any>,
     val isFavorite: Boolean,
     val starRating: Int,
-    val description: String
+    val description: String,
+    val filters: List<String>
 )
 
 @Serializable

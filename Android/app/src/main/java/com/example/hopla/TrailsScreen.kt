@@ -540,7 +540,8 @@ fun TrailsScreen(navController: NavController) {
                                 ),
                                 isFavorite = trail.isFavorite ?: false,
                                 starRating = trail.averageRating,
-                                description = "This is a description of the trail"
+                                description = trail.description ?: "N/A",
+                                filters = trail.filters?.map { it.value } ?: emptyList()
                             ),
                             onHeartClick = {
                                 val newState = !(trail.isFavorite ?: false)
@@ -557,7 +558,8 @@ fun TrailsScreen(navController: NavController) {
                                     ),
                                     isFavorite = trail.isFavorite ?: false,
                                     starRating = trail.averageRating,
-                                    description = "This is a description of the trail"
+                                    description = trail.description ?: "N/A",
+                                    filters = trail.filters?.map { it.value } ?: emptyList()
                                 )
                                 isRouteClicked = true
                             }
@@ -752,7 +754,13 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.horizontalScroll(scrollState)
                 ) {
-
+                    info.filters.forEach { filter ->
+                        Text(
+                            text = filter,
+                            style = generalTextStyle,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
         }
