@@ -1,34 +1,32 @@
+/* --- FONTENE --- */
 @font-face {
     font-family: 'ArialNova';
     src: url('/fonts/ArialNova.ttf') format('truetype');
 }
-
 @font-face {
     font-family: 'ArialNovaLight';
     src: url('/fonts/ArialNova-Light.ttf') format('truetype');
 }
-
 @font-face {
     font-family: 'GeorgiaProBlack';
     src: url('/fonts/GeorgiaPro-Black.ttf') format('truetype');
 }
+
+/* --- BASE STYLES --- */
 body {
     font-family: 'ArialNovaLight', sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
+    background-color: #f8f9fa;
 }
 
-/* Menyvalg toppmeny og sidemeny */
-nav ul li a, aside ul li a, label {
-    font-family: 'ArialNova', sans-serif;
-}
-
+/* --- TOPPMENY --- */
 nav {
     background-color: #456559;
     color: white;
-    padding: 10px;
+    padding: 10px 20px;
 }
 
 nav ul {
@@ -36,30 +34,87 @@ nav ul {
     padding: 0;
     margin: 0;
     display: flex;
+    align-items: center;
 }
 
 nav ul li {
-    margin-right: 15px;
+    margin-right: 20px;
 }
 
 nav ul li a {
     color: white;
     text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-family: 'ArialNova', sans-serif;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
+nav ul li a:hover {
+    background-color: #5c7d6d; /* 30% lysere variant */
+}
+
+/* --- AKTIV KNAPP I TOPPMENY --- */
+nav ul li a.active {
+    background-color: #344d42; /* Liten mørkere variant */
+}
+
+/* --- LAYOUT --- */
 .container {
     display: flex;
     height: 100vh;
 }
 
+/* --- SIDEMENY --- */
 aside {
     width: 200px;
-    list-style: none;
     background: #745e4d;
     color: white;
     padding: 20px;
 }
 
+#side-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#side-menu ul li {
+    margin-bottom: 10px;
+}
+
+#side-menu ul li a {
+    display: block;
+    padding: 8px 12px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-family: 'ArialNova', sans-serif;
+    font-size: 16px;
+}
+
+/* Hover på sidemeny-knapper */
+#side-menu ul li a:hover {
+    background-color: #8c7260; /* 30% lysere variant */
+}
+
+/* --- AKTIV KNAPP I SIDEMENY --- */
+#side-menu ul li a.active {
+    background-color: #5c4638; /* Mørkere bakgrunn */
+}
+
+/* --- HOVEDINNHOLD --- */
+main {
+    flex-grow: 1;
+    background: #eae6e1;
+    padding: 30px;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+/* --- GENERELLE ELEMENTER --- */
 h1, h2, h3 {
     font-family: 'GeorgiaProBlack', serif;
 }
@@ -67,164 +122,62 @@ h1, h2, h3 {
 button {
     font-family: 'ArialNovaLight', sans-serif;
 }
-main {
-    flex-grow: 1;
-    background: #eae6e1;
-    padding: 20px;
-    padding-bottom: 50px; /* Litt luft nederst på ALLE sider */
-   
-}
 
+/* Skjulte elementer */
 .hidden {
     display: none;
 }
+
+/* --- SETTINGS-SPESIFIKT --- */
 .setting {
     display: flex;
     align-items: center;
-    gap: 10px; /* Mellomrom mellom elementene */
-    margin-bottom: 8px;
+    gap: 10px;
+    margin-bottom: 24px;
 }
 
 .setting label {
-    width: 300px; /* Fast bredde på label for justering */
+    width: 300px;
     font-weight: bold;
     text-align: left;
-    white-space: nowrap; /* Hindrer at teksten brytes */
+    white-space: nowrap;
 }
 
 .setting input {
-    width: 20ch; /* Nok plass til ca. 20 tegn */
+    width: 20ch;
     padding: 5px;
     font-size: 14px;
-    flex: none; /* Hindrer at input utvider seg */
+    flex: none;
 }
 
 .save-button {
-    visibility: hidden; /* Holder plassen, men skjuler knappen */
+    visibility: hidden;
     padding: 5px 10px;
     background-color: #28a745;
-    color: rgb(255, 255, 255);
+    color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
-/*
-.save-button {
-    visibility: hidden; 
-    transition: opacity 0.3s ease-in-out;
-}
-*/
+
 .save-button.show {
     visibility: visible;
     opacity: 1;
 }
 
 .save-button.hidden {
-    display: block; /* Endrer fra none til block */
+    display: block;
     visibility: hidden;
     opacity: 0;
 }
-
 
 .save-button:hover {
     background-color: #218838;
 }
 
-.user-item {
-    list-style: none;
-    padding: 10px;
-    margin: 5px;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.user-item.hover {
-    background-color: #f0f0f0;
-}
-
-.login-btn {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.login-btn.hidden {
-    display: none;
-}
-
-.login-btn:hover {
-    background-color: #0056b3;
-}
-.map-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px; /* Mellomrom mellom kart og liste */
-}
-
-#map {
-    width: 50%; /* Halv bredde */
-    height: 400px;
-    min-width: 300px; /* Minimumsstørrelse */
-}
-
-#trails-list-container {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-#find-trails {
-    margin-bottom: 10px;
-}
-
-.list-container {
-    width: 100%;
-    padding: 0;
-    list-style-type: none;
-}
-
-.list-item {
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.list-item:hover {
-    background-color: #f0f0f0;
-}
-
-.button {
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.button.hidden {
-    display: none;
-}
-
-.button:hover {
-    background-color: #0056b3;
-}
-
-.profile-btn {
-    display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+/* --- CSV HEADER (For settings) --- */
 .csv-header {
     display: flex;
     align-items: center;
@@ -239,20 +192,27 @@ main {
     text-align: center;
 }
 
-/* Legger til ekstra luft nederst på settings-siden */
+/* Settings container padding */
 #settings-container {
     padding-bottom: 50px;
 }
 
-/* Litt større avstand mellom settings */
-.setting {
-    margin-bottom: 24px;
+/* --- ANNET: KNAPPER, LISTER OSV --- */
+.button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-/* Label over width, height, fit */
-.width-height-fit-label {
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 6px;
+.button:hover {
+    background-color: #0056b3;
 }
 
+.profile-btn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

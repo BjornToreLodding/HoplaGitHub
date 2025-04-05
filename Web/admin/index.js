@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkAuthStatus();
 });
 
+// Oppdater om brukeren er innlogget
 function updateLoginState() {
     const token = localStorage.getItem("authToken");
     const loginScreen = document.getElementById("login-screen");
@@ -18,7 +19,7 @@ function updateLoginState() {
     }
 }
 
-
+// Sjekk auth status for logout-knapp
 function checkAuthStatus() {
     const token = localStorage.getItem("authToken");
     const logoutButton = document.getElementById("logout-button");
@@ -30,8 +31,7 @@ function checkAuthStatus() {
     }
 }
 
-document.getElementById("logout-button").addEventListener("click", logout);
-
+// Logg ut
 function logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userInfo");
@@ -39,6 +39,10 @@ function logout() {
     updateUserUI();
 }
 
+// Koble logout-knappen
+document.getElementById("logout-button").addEventListener("click", logout);
+
+// Oppdater bruker-UI
 function updateUserUI() {
     const token = localStorage.getItem("authToken");
     const userInfo = localStorage.getItem("userInfo");
@@ -65,12 +69,13 @@ function updateUserUI() {
         userText.textContent = `Logget inn som: ${user.alias} (${user.name})`;
     }
 
-    if (userAvatar && user.pictureUrl) {
-        userAvatar.src = user.pictureUrl;
+    if (userAvatar) {
+        userAvatar.src = user.pictureUrl || "https://via.placeholder.com/40"; // Fallback-bilde
         userAvatar.classList.remove("hidden");
     }
 }
 
+// Login-knapp (dummy login)
 document.getElementById("login-submit").addEventListener("click", () => {
     const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
@@ -80,7 +85,7 @@ document.getElementById("login-submit").addEventListener("click", () => {
         localStorage.setItem("userInfo", JSON.stringify({
             alias: "Admin",
             name: email.split('@')[0],
-            pictureUrl: ""
+            pictureUrl: "https://via.placeholder.com/40"
         }));
 
         updateLoginState();
@@ -89,9 +94,31 @@ document.getElementById("login-submit").addEventListener("click", () => {
         alert("Vennligst fyll ut e-post og passord.");
     }
 });
+
+// --- AKTIV LINK ---
+function setActiveMenuItem(clickedElement) {
+    document.querySelectorAll('nav ul li a').forEach(link => link.classList.remove('active'));
+    document.querySelectorAll('#side-menu ul li a').forEach(link => link.classList.remove('active'));
+
+    if (clickedElement) {
+        clickedElement.classList.add('active');
+    }
+}
+
+// --- TOPPMENY KLIKK ---
+document.addEventListener('click', function (event) {
+    if (event.target.matches('nav a[data-section]')) {
+        event.preventDefault();
+        const section = event.target.getAttribute('data-section');
+        loadSideMenu(section);
+        setActiveMenuItem(event.target);
+    }
+});
+
+// --- LASTE SIDEMENY BASERT PÅ TOPPMENY ---
 function loadSideMenu(section) {
     const menuList = document.getElementById("side-menu-list");
-    menuList.innerHTML = ""; // Tøm tidligere innhold
+    menuList.innerHTML = "";
 
     let menuItems = [];
 
@@ -148,8 +175,16 @@ function loadSideMenu(section) {
         li.innerHTML = `<a href="#" onclick="${item.action}">${item.name}</a>`;
         menuList.appendChild(li);
     });
+
+    // Koble også til aktiv-klasse når bruker klikker sidemenyvalg
+    menuList.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function () {
+            setActiveMenuItem(this);
+        });
+    });
 }
 
+// --- LASTE INNHOLD ---
 async function loadContent(section, page, params = {}) {
     const mainContent = document.getElementById("main-content");
 
@@ -171,14 +206,6 @@ async function loadContent(section, page, params = {}) {
     }
 }
 
-
-document.addEventListener('click', function (event) {
-    if (event.target.matches('nav a[data-section]')) {
-        event.preventDefault();
-        const section = event.target.getAttribute('data-section');
-        loadSideMenu(section);
-    }
-});
 /*
 document.addEventListener("DOMContentLoaded", () => {
     updateUserUI();      // Oppdater brukergrensesnittet basert på om bruker er logget inn

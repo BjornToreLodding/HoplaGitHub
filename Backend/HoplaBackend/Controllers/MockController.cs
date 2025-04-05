@@ -530,6 +530,7 @@ public class MockController : ControllerBase
     {
         
         _context.SystemSettings.RemoveRange(_context.SystemSettings); //ingen rød strek her
+        _context.UserReports.RemoveRange(_context.UserReports);
         _context.TrailFavorites.RemoveRange(_context.TrailFavorites);
         //_context.Users.RemoveRange(_context.Users); //ingen rød strek her
         _context.Horses.RemoveRange(_context.Horses);//ingen rød strek her

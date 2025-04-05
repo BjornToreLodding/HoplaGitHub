@@ -802,7 +802,8 @@ public class UserController : ControllerBase
             userId = user.Id,
             name = user.Name,
             alias = user.Alias,
-            PictureUrl =  !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "" //user.PictureUrl + "?w=50&h=50&fit=crop"
+            PictureUrl = PictureHelper.BuildPictureUrl(user.PictureUrl, "UserProfileWebPage"),
+            //PictureUrl =  !string.IsNullOrEmpty(user.PictureUrl) ? (user.PictureUrl.Contains("http") ? user.PictureUrl : "https://hopla.imgix.net/" + user.PictureUrl) + "?w=200&h=200&fit=crop" : "" //user.PictureUrl + "?w=50&h=50&fit=crop"
         });
     }
 
