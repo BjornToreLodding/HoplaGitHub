@@ -125,6 +125,7 @@ fun TrailsScreen(navController: NavController) {
     var isCloseByClicked by remember { mutableStateOf(false) }
     var isFavoriteClicked by remember { mutableStateOf(false) }
     var isFollowingClicked by remember { mutableStateOf(false) }
+    var isFiltersClicked by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var isRouteClicked by remember { mutableStateOf(false) }
     var selectedContentBoxInfo by remember { mutableStateOf<ContentBoxInfo?>(null) }
@@ -137,7 +138,6 @@ fun TrailsScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var noResults by remember { mutableStateOf(false) }
     var showFiltersDialog by remember { mutableStateOf(false) }
-    var isFiltersClicked by remember { mutableStateOf(false) }
     var trailFilters by remember { mutableStateOf<List<TrailFilter>>(emptyList()) }
 
     val context = LocalContext.current
@@ -189,6 +189,7 @@ fun TrailsScreen(navController: NavController) {
                                 isCloseByClicked = false
                                 isFavoriteClicked = false
                                 isFollowingClicked = false
+                                isFiltersClicked = false
                                 isDropdownExpanded = false
                                 showOnlyFavorites = false
 
@@ -208,7 +209,7 @@ fun TrailsScreen(navController: NavController) {
                         },
                         modifier = Modifier
                             .background(
-                                if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !showOnlyFavorites)) Color.White.copy(
+                                if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !isFiltersClicked && !showOnlyFavorites)) Color.White.copy(
                                     alpha = 0.5f
                                 ) else Color.Transparent,
                                 shape = RoundedCornerShape(8.dp)
@@ -247,7 +248,7 @@ fun TrailsScreen(navController: NavController) {
                                                     Log.d("TrailsScreen", "Latitude: $latitude, Longitude: $longitude")
                                                     coroutineScope.launch {
                                                         try {
-                                                            val trailsResponse = fetchTrailsByLocation(token, latitude, longitude, pageNumber = 1)
+                                                            val trailsResponse = fetchTrailsByLocation(token, latitude, longitude, pageNumber)
                                                             trails = trailsResponse.trails
                                                             noResults = trails.isEmpty()
                                                         } catch (e: Exception) {
@@ -300,6 +301,7 @@ fun TrailsScreen(navController: NavController) {
                                     }
                                 }
                             } else {
+                                // Reset trails to an empty list or fetch all trails again if needed
                                 trails = emptyList()
                                 noResults = false
                             }
@@ -325,6 +327,7 @@ fun TrailsScreen(navController: NavController) {
                                 isMapClicked = false
                                 isCloseByClicked = false
                                 isFavoriteClicked = false
+                                isFiltersClicked = false
                                 isDropdownExpanded = false
                                 showOnlyFavorites = false
 
@@ -385,7 +388,103 @@ fun TrailsScreen(navController: NavController) {
                 }
             }
         }
+        if (showFiltersDialog) {
+            Dialog(onDismissRequest = { showFiltersDialog = false }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.onBackground)
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.filters),
+                            style = headerTextStyleSmall,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        LazyColumn(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            items(trailFilters) { filter ->
+                                Text(
+                                    text = filter.displayName,
+                                    style = underheaderTextStyle,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                                if (filter.options.isEmpty()) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(8.dp)
+                                    ) {
+                                        var isYesChecked by remember { mutableStateOf(false) }
+                                        var isNoChecked by remember { mutableStateOf(false) }
 
+                                        Checkbox(
+                                            checked = isYesChecked,
+                                            onCheckedChange = {
+                                                isYesChecked = it
+                                                if (it) isNoChecked = false
+                                            }
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.yes),
+                                            style = generalTextStyle,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.padding(end = 8.dp)
+                                        )
+
+                                        Checkbox(
+                                            checked = isNoChecked,
+                                            onCheckedChange = {
+                                                isNoChecked = it
+                                                if (it) isYesChecked = false
+                                            }
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.no),
+                                            style = generalTextStyle,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
+                                } else {
+                                    Column {
+                                        filter.options.forEach { option ->
+                                            FilterOptionRow(option = option)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(onClick = { showFiltersDialog = false }) {
+                                Text(text = stringResource(R.string.cancel))
+                            }
+                            Button(onClick = {
+                                // Apply filter logic here
+                                showFiltersDialog = false
+                            }) {
+                                Text(text = stringResource(R.string.apply))
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         if (isRouteClicked) {
             selectedContentBoxInfo?.let { contentBoxInfo ->
@@ -404,7 +503,9 @@ fun TrailsScreen(navController: NavController) {
             }
         } else {
             if (showOnlyFavorites) {
-                trails = trails.filter { it.isFavorite }
+                trails.filter { it.isFavorite == true }
+            } else {
+                trails
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -434,15 +535,15 @@ fun TrailsScreen(navController: NavController) {
                             info = ContentBoxInfo(
                                 id = trail.id,
                                 title = trail.name,
-                                imageResource = if (trail.pictureUrl.isNotEmpty()) listOf(trail.pictureUrl) else listOf(
+                                imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                     R.drawable.stockimg1
                                 ),
-                                isFavorite = trail.isFavorite,
+                                isFavorite = trail.isFavorite ?: false,
                                 starRating = trail.averageRating,
-                                description = trail.description ?: "No description available"
+                                description = "This is a description of the trail"
                             ),
                             onHeartClick = {
-                                val newState = !trail.isFavorite
+                                val newState = !(trail.isFavorite ?: false)
                                 trails = trails.toMutableList().apply {
                                     this[index] = trail.copy(isFavorite = newState)
                                 }
@@ -451,12 +552,12 @@ fun TrailsScreen(navController: NavController) {
                                 selectedContentBoxInfo = ContentBoxInfo(
                                     id = trail.id,
                                     title = trail.name,
-                                    imageResource = if (trail.pictureUrl.isNotEmpty()) listOf(trail.pictureUrl) else listOf(
+                                    imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
                                         R.drawable.stockimg1
                                     ),
-                                    isFavorite = trail.isFavorite,
+                                    isFavorite = trail.isFavorite ?: false,
                                     starRating = trail.averageRating,
-                                    description = trail.description ?: "No description available"
+                                    description = "This is a description of the trail"
                                 )
                                 isRouteClicked = true
                             }
@@ -497,106 +598,8 @@ fun TrailsScreen(navController: NavController) {
             }
         }
     }
-
-    if (showFiltersDialog) {
-        Dialog(onDismissRequest = { showFiltersDialog = false }) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.onBackground)
-                    .padding(16.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.filters),
-                        style = headerTextStyleSmall,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    LazyColumn(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        items(trailFilters) { filter ->
-                            Text(
-                                text = filter.displayName,
-                                style = underheaderTextStyle,
-                                color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.padding(8.dp)
-                            )
-                            if (filter.options.isEmpty()) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(8.dp)
-                                ) {
-                                    var isYesChecked by remember { mutableStateOf(false) }
-                                    var isNoChecked by remember { mutableStateOf(false) }
-
-                                    Checkbox(
-                                        checked = isYesChecked,
-                                        onCheckedChange = {
-                                            isYesChecked = it
-                                            if (it) isNoChecked = false
-                                        }
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.yes),
-                                        style = generalTextStyle,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier.padding(end = 8.dp)
-                                    )
-
-                                    Checkbox(
-                                        checked = isNoChecked,
-                                        onCheckedChange = {
-                                            isNoChecked = it
-                                            if (it) isYesChecked = false
-                                        }
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.no),
-                                        style = generalTextStyle,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
-                            } else {
-                                Column {
-                                    filter.options.forEach { option ->
-                                        FilterOptionRow(option = option)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Button(onClick = { showFiltersDialog = false }) {
-                            Text(text = stringResource(R.string.cancel))
-                        }
-                        Button(onClick = {
-                            // Apply filter logic here
-                            showFiltersDialog = false
-                        }) {
-                            Text(text = stringResource(R.string.apply))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
+
 
 @Composable
 fun FilterOptionRow(option: String) {
@@ -749,30 +752,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.horizontalScroll(scrollState)
                 ) {
-                    // Display filter names
-                    info.filters.filterStrings.forEach { filter ->
-                        Box(
-                            modifier = Modifier
-                                .border(1.dp, MaterialTheme.colorScheme.primary)
-                                .background(MaterialTheme.colorScheme.primary)
-                                .padding(horizontal = 4.dp, vertical = 2.dp) // Adjust padding
-                        ) {
-                            Text(
-                                text = filter.replaceFirstChar { it.uppercaseChar() },
-                                style = generalTextStyleBold,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    // Display difficulty if available
-                    info.filters.difficulty?.let { it ->
-                        Text(
-                            text = it.name.lowercase().replaceFirstChar { it.uppercaseChar() },
-                            style = generalTextStyleBold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
+
                 }
             }
         }
@@ -1032,21 +1012,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                contentBoxInfo.filters.filterStrings.forEach { filter ->
-                                    Box(
-                                        modifier = Modifier
-                                            .border(2.dp, MaterialTheme.colorScheme.primary)
-                                            .background(MaterialTheme.colorScheme.primary)
-                                            .padding(2.dp)
-                                            .height(18.dp)
-                                    ) {
-                                        Text(
-                                            text = filter.replaceFirstChar { it.uppercaseChar() },
-                                            style = generalTextStyleBold,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                    }
-                                }
+
                             }
                         }
                     }

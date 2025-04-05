@@ -145,7 +145,6 @@ data class ContentBoxInfo(
     val imageResource: List<Any>,
     val isFavorite: Boolean,
     val starRating: Int,
-    val filters: Filters = Filters(),
     val description: String
 )
 
@@ -189,11 +188,11 @@ fun formatDate(dateString: String): String? {
 data class Trail(
     val id: String,
     val name: String,
-    val description: String?,
+    val description: String? = null,
     val pictureUrl: String,
     val averageRating: Int,
     val isFavorite: Boolean,
-    val filters: List<Filter>
+    val filters: List<Filter>? = null,
 )
 
 @Serializable
