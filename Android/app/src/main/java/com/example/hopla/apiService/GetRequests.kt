@@ -163,7 +163,7 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): Tr
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"trails/all?search=$searchQuery&pageNumber=$pageNumber") {
+        val response: HttpResponse = client.get(apiUrl + "trails/all?search=$searchQuery&pageNumber=$pageNumber") {
             headers {
                 append("Authorization", "Bearer $token")
             }

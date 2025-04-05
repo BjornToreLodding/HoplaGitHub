@@ -189,11 +189,22 @@ fun formatDate(dateString: String): String? {
 data class Trail(
     val id: String,
     val name: String,
-    val pictureUrl: String?,
+    val description: String?,
+    val pictureUrl: String,
     val averageRating: Int,
-    val difficulty: String? = "EASY",
-    val isFavorite: Boolean? = false,
-    val filters: List<String>? = listOf("gravel", "sand", "asphalt", "dirt"),
+    val isFavorite: Boolean,
+    val filters: List<Filter>
+)
+
+@Serializable
+data class Filter(
+    val id: String,
+    val name: String,
+    val displayName: String,
+    val type: String,
+    val options: List<String>,
+    val value: String,
+    val defaultValue: String
 )
 
 @Serializable
