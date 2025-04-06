@@ -498,7 +498,7 @@ suspend fun fetchStableMessages(token: String, stableId: String, pageNumber: Int
 }
 
 //--------------------Get requests for home screen ------------------------
-suspend fun fetchFeed(token: String, pageNumber: Int): FeedResponse {
+suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: Boolean = false): FeedResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -507,7 +507,17 @@ suspend fun fetchFeed(token: String, pageNumber: Int): FeedResponse {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl+"feed/all?show=userhikes,trails,trailreviews,horses&pageNumber=$pageNumber") {
+        val url = URLBuilder(apiUrl).apply {
+            path("feed", "all")
+            parameters.append("show", "userhikes,trails,trailreviews,horses")
+            parameters.append("pageNumber", pageNumber.toString())
+            if (onlyFriendsAndFollowing) {
+                parameters.append("onlyFriendsAndFollowing", "true")
+            }
+        }.buildString()
+
+        Log.d("fetchFeed", "Request URL: $url")
+        val response: HttpResponse = client.get(url) {
             headers {
                 append("Authorization", "Bearer $token")
                 append(HttpHeaders.ContentType, ContentType.Application.Json.toString())

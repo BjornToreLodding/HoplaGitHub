@@ -142,6 +142,7 @@ fun TrailsScreen(navController: NavController) {
     var filtersQuery by remember { mutableStateOf("") }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
+    var searchResponse by remember { mutableStateOf<List<Trail>>(emptyList()) }
 
     LaunchedEffect(searchQuery) {
         pageNumber = 0
@@ -154,6 +155,7 @@ fun TrailsScreen(navController: NavController) {
                     isLoading = true
                     val trailsResponse = fetchTrails(token, pageNumber, searchQuery, filtersQuery)
                     trails = trailsResponse.trails
+                    searchResponse = trailsResponse.trails
                     noResults = trails.isEmpty()
                 } catch (e: Exception) {
                     Log.e("TrailsScreen", "Error fetching trails", e)

@@ -118,7 +118,7 @@ fun HomeScreen(navController: NavController) {
         TopTextColumn(selectedItem) { selectedItem = it }
         when (selectedItem) {
             Icons.Outlined.Home -> PostList(navController = navController)
-            Icons.Outlined.Person -> PostList(navController = navController)
+            Icons.Outlined.Person -> PostList(navController = navController, onlyFriendsAndFollowing = true)
             Icons.Outlined.FavoriteBorder -> PostList(navController = navController)
             Icons.Outlined.LocationOn -> PostList(navController = navController)
             Icons.Outlined.ThumbUp -> PostList(navController = navController)
@@ -127,7 +127,7 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-fun PostList(navController: NavController) {
+fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = false) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
@@ -135,9 +135,9 @@ fun PostList(navController: NavController) {
     var feedItems by remember { mutableStateOf(listOf<FeedItem>()) }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(pageNumber) {
+    LaunchedEffect(pageNumber, onlyFriendsAndFollowing) {
         isLoading = true
-        val newFeedResponse = fetchFeed(token, pageNumber)
+        val newFeedResponse = fetchFeed(token, pageNumber, onlyFriendsAndFollowing)
         if (newFeedResponse.items.isEmpty()) {
             hasMorePosts = false
         } else {
