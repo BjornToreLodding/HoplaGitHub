@@ -174,7 +174,8 @@ data class Hike(
     val duration: Double,
     val pictureUrl: String,
     val page: Int? = null,
-    val size: Int? = null
+    val size: Int? = null,
+    val trailButton: Boolean = false,
 
 )
 
@@ -415,4 +416,11 @@ data class FeedResponse(
     val pageSize: Int,
     val hasNextPage: Boolean,
     val items: List<FeedItem>
+)
+
+//--------------------Data classes for new hike screen---------------
+data class NewHike (
+    val StartetAt: String,
+    val Distance: String,
+    val Duration: String
 )

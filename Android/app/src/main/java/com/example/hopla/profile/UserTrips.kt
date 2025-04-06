@@ -173,7 +173,7 @@ fun HikeItem(hike: Hike, filters: List<TrailFilter> = emptyList(), isMyTripsScre
                 color = MaterialTheme.colorScheme.secondary
             )
             Spacer(modifier = Modifier.height(8.dp))
-            if (isMyTripsScreen) {
+            if (isMyTripsScreen && hike.trailButton) {
                 Row {
                     Text(
                         text = stringResource(R.string.edit_trip),

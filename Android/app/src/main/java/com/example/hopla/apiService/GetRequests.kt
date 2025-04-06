@@ -504,7 +504,7 @@ suspend fun fetchStableMessages(token: String, stableId: String, pageNumber: Int
 }
 
 //--------------------Get requests for home screen ------------------------
-suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false, latitude: Double? = null, longitude: Double? = null): FeedResponse {
+suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false, latitude: Double? = null, longitude: Double? = null): FeedResponse? {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -542,6 +542,11 @@ suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: B
         Log.d("fetchFeed", "Response Code: ${response.status.value}")
         Log.d("fetchFeed", "Response Body: $responseBody")
 
-        response.body()
+        if (response.status == HttpStatusCode.OK) {
+            response.body()
+        } else {
+            Log.e("fetchFeed", "Error: ${response.status}")
+            null
+        }
     }
 }

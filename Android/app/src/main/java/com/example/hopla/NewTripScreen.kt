@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.NewHike
 import com.example.hopla.universalData.UserSession
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -65,14 +67,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.type.Date
 import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun NewTripScreen() {
     var isRunning by remember { mutableStateOf(false) }
-    var time by remember { mutableIntStateOf(0) }
+    var time by remember { mutableDoubleStateOf(0.0) }
     var distance by remember { mutableDoubleStateOf(0.0) }
     var lastLocation by remember { mutableStateOf<Location?>(null) }
     var showDialog by remember { mutableStateOf(false) }
@@ -82,6 +87,7 @@ fun NewTripScreen() {
     var horses by remember { mutableStateOf(listOf<String>()) }
     var expanded by remember { mutableStateOf(false) }
     var selectedHorse by remember { mutableStateOf("") }
+    var newHike by remember { mutableStateOf<NewHike?>(null) }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
@@ -199,13 +205,10 @@ fun NewTripScreen() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        val minutes = (time / 60).toInt()
+                        val seconds = (time % 60).toInt()
                         Text(
-                            text = String.format(
-                                "%02d:%02d:%02d",
-                                time / 3600,
-                                (time % 3600) / 60,
-                                time % 60
-                            )
+                            text = String.format("%02d:%02d", minutes, seconds)
                         )
                         Text(text = stringResource(R.string.time))
                     }
@@ -221,6 +224,17 @@ fun NewTripScreen() {
                                 showDialog = true
                             } else {
                                 isRunning = !isRunning
+                                val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(
+                                    java.util.Date()
+                                )
+                                val distanceStr = String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
+                                val durationStr = String.format(Locale.GERMANY, "%02d,%02d", (time / 60).toInt(), (time % 60).toInt()) // e.g., "5,45"
+
+                                newHike = NewHike(
+                                    StartetAt = currentTime,
+                                    Distance = distanceStr,
+                                    Duration = durationStr
+                                )
                             }
                         },
                         shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
@@ -345,11 +359,19 @@ fun NewTripScreen() {
                 Button(onClick = {
                     // Save the trip / set to 0
                     showDialog = false
-                    time = 0
+                    val minutes = (time / 60).toInt()
+                    val seconds = (time % 60).toInt()
+                    val distanceStr = String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
+                    val durationStr = String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds) // e.g., "5,45"
+                    newHike = newHike?.copy(Distance = distanceStr, Duration = durationStr)
+                    time = 0.0
                     distance = 0.0
                     tripName = ""
                     tripNotes = ""
                     selectedImage = null
+                    newHike?.let {
+                        Log.d("NewTripScreen", "NewHike: $it")
+                    }
                 }) {
                     Text(text = stringResource(R.string.save))
                 }

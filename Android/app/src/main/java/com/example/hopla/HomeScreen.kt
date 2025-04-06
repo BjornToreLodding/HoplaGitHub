@@ -145,15 +145,21 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
     var isLoading by remember { mutableStateOf(false) }
     var hasMorePosts by remember { mutableStateOf(true) }
     var feedItems by remember { mutableStateOf(listOf<FeedItem>()) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
 
     LaunchedEffect(pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude) {
         isLoading = true
         val newFeedResponse = fetchFeed(token, pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude)
-        if (newFeedResponse.items.isEmpty()) {
+        if (newFeedResponse == null) {
+            errorMessage = "Not available right now"
             hasMorePosts = false
         } else {
-            feedItems = feedItems + newFeedResponse.items
+            if (newFeedResponse.items.isEmpty()) {
+                hasMorePosts = false
+            } else {
+                feedItems = feedItems + newFeedResponse.items
+            }
         }
         isLoading = false
     }
@@ -167,17 +173,23 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
             }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(feedItems) { feedItem ->
-            PostItem(feedItem, navController)
+    if (errorMessage != null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = errorMessage!!)
         }
-        item {
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+    } else {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(feedItems) { feedItem ->
+                PostItem(feedItem, navController)
+            }
+            item {
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
