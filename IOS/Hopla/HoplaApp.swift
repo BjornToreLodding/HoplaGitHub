@@ -83,7 +83,7 @@ struct MainTabView: View {
                     Text("Home")
                 }
             
-            NavigationStack { Hikes() }
+            NavigationStack { Hikes(viewModel: HikeService()) }
                 .tabItem {
                     Image(systemName: "map")
                     Text("Hikes")

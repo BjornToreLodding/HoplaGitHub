@@ -16,7 +16,7 @@ struct Hike: Codable, Identifiable {
     let name: String
     let pictureUrl: String
     let averageRating: Int
-    let isFavorite: Bool
+    var isFavorite: Bool
     let distance: Double?
     let latitude: Double?
     let longitude: Double?
@@ -63,7 +63,7 @@ enum FilterOption: String, CaseIterable, Identifiable {
 }
 
 // MARK: - Fetching Hikes from Backend
-class HikeService {
+class HikeService: ObservableObject {
     static let shared = HikeService()
     @Published var hikes: [Hike] = []
     
@@ -246,7 +246,51 @@ class HikeService {
             }
         }.resume()
     }
+    
+    func toggleFavorite(for hike: Hike, completion: @escaping (Bool) -> Void) {
+        let isFavoriting = !hike.isFavorite // ✅ Correct toggle behavior
+        
+        guard let url = URL(string: "https://hopla.onrender.com/trails/favorite") else {
+            completion(false)
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = isFavoriting ? "POST" : "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: Any] = ["TrailId": hike.id]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            print("JSON serialization failed: \(error)")
+            completion(false)
+            return
+        }
 
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    print("Favorite error:", error.localizedDescription)
+                    completion(false)
+                    return
+                }
+
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("Favorite HTTP status:", httpResponse.statusCode)
+
+                    if let responseData = data {
+                        print("Raw API response:", String(data: responseData, encoding: .utf8) ?? "No response body")
+                    }
+
+                    completion((200...299).contains(httpResponse.statusCode))
+                } else {
+                    completion(false)
+                }
+            }
+        }.resume()
+    }
 }
 
 
@@ -263,6 +307,7 @@ struct Hikes: View {
     @State private var userLocation: CLLocation? = nil
     @StateObject private var locationManager = LocationManager()
     @State private var isShowingFilterOptions = false
+    @ObservedObject var viewModel: HikeService
 
 
     var body: some View {
@@ -278,19 +323,17 @@ struct Hikes: View {
                     .padding()
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 10) {
-                        let hikesToDisplay = filteredHikes()
-                        ForEach(hikesToDisplay.indices, id: \.self) { index in
-                            HikeCard(hike: hikesToDisplay[index], likedHikes: $likedHikes)
-                                .onAppear {
-                                    if index == hikesToDisplay.count - 1 {
-                                        loadMoreHikes()
-                                    }
-                                }
-                        }
-
-                        if isLoading {
-                            ProgressView("Loading more hikes...")
+                    LazyVStack {
+                        ForEach(hikes) { hike in
+                            HikeCard(
+                                hike: hike,
+                                likedHikes: $likedHikes,
+                                toggleFavoriteAction: { selectedHike in
+                                    handleToggleFavorite(for: selectedHike)
+                                },
+                                viewModel: viewModel // Ensure this is passed as well
+                            )
+                            .padding()
                         }
                     }
                 }
@@ -327,6 +370,45 @@ struct Hikes: View {
 
         .navigationBarHidden(true)
     }
+
+    func handleToggleFavorite(for hike: Hike) {
+        viewModel.toggleFavorite(for: hike) { success in
+            DispatchQueue.main.async {
+                if success {
+                    self.hikes = self.hikes.map { currentHike in
+                        var updatedHike = currentHike
+                        if updatedHike.id == hike.id {
+                            updatedHike.isFavorite.toggle() // ✅ Toggle AFTER API success
+                        }
+                        return updatedHike
+                    }
+                } else {
+                    print("Failed to toggle favorite")
+                }
+            }
+        }
+    }
+
+
+    
+    private func toggleFavorite(for hike: Hike) {
+        if let index = likedHikes.firstIndex(of: hike.id) {
+            likedHikes.remove(at: index)
+        } else {
+            likedHikes.append(hike.id)
+        }
+
+        // Update `isFavorite` directly within the hike list
+        hikes = hikes.map { currentHike in
+            var updatedHike = currentHike
+            if updatedHike.id == hike.id {
+                updatedHike.isFavorite.toggle()
+            }
+            return updatedHike
+        }
+    }
+
+
 
     // MARK: - Fetch Methods
     
@@ -533,7 +615,9 @@ struct Hikes: View {
 struct HikeCard: View {
     let hike: Hike
     @Binding var likedHikes: [String]
-    
+    var toggleFavoriteAction: (Hike) -> Void
+    @ObservedObject var viewModel: HikeService  // This works now
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack(alignment: .topTrailing) {
@@ -550,7 +634,7 @@ struct HikeCard: View {
                 
                 // Heart icon
                 Button(action: {
-                    toggleFavorite(for: hike)
+                    toggleFavoriteAction(hike) // ✅ Trigger API + UI update
                 }) {
                     Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
                         .foregroundColor(hike.isFavorite ? .red : .gray)
@@ -609,8 +693,6 @@ struct HikeCard: View {
         }
     }
 }
-
-
 
 
 // MARK: - Star Rating With Tap Gesture
