@@ -9,7 +9,6 @@ import android.location.Location
 import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,13 +22,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
@@ -51,9 +51,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.UserSession
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -77,11 +79,16 @@ fun NewTripScreen() {
     var tripName by remember { mutableStateOf("") }
     var tripNotes by remember { mutableStateOf("") }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-    val horses = listOf("Horse 1", "Horse 2", "Horse 3")
+    var horses by remember { mutableStateOf(listOf<String>()) }
     var expanded by remember { mutableStateOf(false) }
     var selectedHorse by remember { mutableStateOf("") }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    LaunchedEffect(Unit) {
+        val fetchedHorses = fetchHorses("", UserSession.token)
+        horses = fetchedHorses.map { it.name }
+    }
 
     val locationRequest = LocationRequest.create().apply {
         interval = 1000
