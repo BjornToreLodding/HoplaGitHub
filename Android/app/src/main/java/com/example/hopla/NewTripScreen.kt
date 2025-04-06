@@ -57,6 +57,7 @@ import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.Coordinate
+import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.NewHike
 import com.example.hopla.universalData.UserSession
@@ -92,6 +93,8 @@ fun NewTripScreen() {
     var horses by remember { mutableStateOf(listOf<String>()) }
     var expanded by remember { mutableStateOf(false) }
     var selectedHorse by remember { mutableStateOf("") }
+    var selectedHorseId by remember { mutableStateOf<String?>(null) }
+    var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
     var newHike by remember { mutableStateOf<NewHike?>(null) }
     var coordinates by remember { mutableStateOf(listOf<Coordinate>()) }
     val context = LocalContext.current
@@ -100,6 +103,7 @@ fun NewTripScreen() {
     LaunchedEffect(Unit) {
         val fetchedHorses = fetchHorses("", UserSession.token)
         horses = fetchedHorses.map { it.name }
+        horseMap = fetchedHorses.associateBy { it.name }
     }
 
     val locationRequest = LocationRequest.create().apply {
@@ -335,6 +339,7 @@ fun NewTripScreen() {
                             DropdownMenuItem(
                                 onClick = {
                                     selectedHorse = ""
+                                    selectedHorseId = null
                                     expanded = false
                                 }
                             ) {
@@ -344,6 +349,7 @@ fun NewTripScreen() {
                                 DropdownMenuItem(
                                     onClick = {
                                         selectedHorse = horse
+                                        selectedHorseId = horseMap[horse]?.id
                                         expanded = false
                                     }
                                 ) {
@@ -375,17 +381,23 @@ fun NewTripScreen() {
                     val seconds = (time % 60).toInt()
                     val distanceStr = String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
                     val durationStr = String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds) // e.g., "5,45"
-                    newHike = newHike?.copy(Distance = distanceStr, Duration = durationStr, Coordinates = coordinates)
+                    newHike = newHike?.copy(
+                        Distance = distanceStr,
+                        Duration = durationStr,
+                        Coordinates = coordinates,
+                        Title = if (tripName.isNotEmpty()) tripName else null,
+                        Description = if (tripNotes.isNotEmpty()) tripNotes else null,
+                        HorseId = selectedHorseId
+                    )
                     time = 0.0
                     distance = 0.0
                     tripName = ""
                     tripNotes = ""
-                    selectedImage = null
                     coordinates = emptyList()
                     newHike?.let {
                         Log.d("NewTripScreen", "NewHike: $it")
                         CoroutineScope(Dispatchers.IO).launch {
-                            val response = createNewHike(UserSession.token, it)
+                            val response = createNewHike(UserSession.token, it, selectedImage)
                             Log.d("NewTripScreen", "Create Hike Response: $response")
                         }
                     }

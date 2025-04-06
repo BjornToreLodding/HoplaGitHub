@@ -475,7 +475,7 @@ suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, messa
 }
 
 //--------------------------------Post requests for new trip----------------------
-suspend fun createNewHike(token: String, newHike: NewHike): String {
+suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap?): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -493,6 +493,24 @@ suspend fun createNewHike(token: String, newHike: NewHike): String {
         append("Distance", newHike.Distance)
         append("Duration", newHike.Duration)
         append("Coordinates", coordinatesJson)
+        newHike.Title?.let {
+            append("Title", it)
+        }
+        newHike.Description?.let {
+            append("Description", it)
+        }
+        newHike.HorseId?.let {
+            append("HorseId", it)
+        }
+        selectedImage?.let { bitmap ->
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val imageBytes = byteArrayOutputStream.toByteArray()
+            append("Image", imageBytes, Headers.build {
+                append(HttpHeaders.ContentType, "image/jpeg")
+                append(HttpHeaders.ContentDisposition, "filename=\"hike.jpg\"")
+            })
+        }
     }
 
     Log.d("createNewHike", "Request Body: $formData")

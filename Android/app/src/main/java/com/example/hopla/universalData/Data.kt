@@ -431,5 +431,8 @@ data class NewHike (
     val StartetAt: String,
     val Distance: String,
     val Duration: String,
-    val Coordinates: List<Coordinate>
+    val Coordinates: List<Coordinate>,
+    val Title: String? = null,
+    val Description: String? = null,
+    val HorseId: String? = null
 )
