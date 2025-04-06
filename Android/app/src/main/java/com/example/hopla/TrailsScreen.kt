@@ -139,11 +139,12 @@ fun TrailsScreen(navController: NavController) {
     var showFiltersDialog by remember { mutableStateOf(false) }
     var trailFilters by remember { mutableStateOf<List<TrailFilter>>(emptyList()) }
     val selectedFilters = remember { mutableStateMapOf<String, MutableList<String>>() }
+    var filtersQuery by remember { mutableStateOf("") }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
 
     LaunchedEffect(searchQuery) {
-        pageNumber = 1
+        pageNumber = 0
         if (searchQuery.isEmpty()) {
             trails = emptyList()
             noResults = false
@@ -151,7 +152,7 @@ fun TrailsScreen(navController: NavController) {
             coroutineScope.launch {
                 try {
                     isLoading = true
-                    val trailsResponse = fetchTrails(token, pageNumber, searchQuery, "")
+                    val trailsResponse = fetchTrails(token, pageNumber, searchQuery, filtersQuery)
                     trails = trailsResponse.trails
                     noResults = trails.isEmpty()
                 } catch (e: Exception) {
@@ -195,7 +196,7 @@ fun TrailsScreen(navController: NavController) {
                                 coroutineScope.launch {
                                     isLoading = true
                                     try {
-                                        val trailsResponse = fetchTrails(token, 1, "", "")
+                                        val trailsResponse = fetchTrails(token, 1, "", filtersQuery)
                                         trails = trailsResponse.trails
                                         noResults = trails.isEmpty()
                                     } catch (e: Exception) {
@@ -475,14 +476,14 @@ fun TrailsScreen(navController: NavController) {
                             }
                             Button(onClick = {
                                 // Apply filter logic here
-                                val selectedFiltersString = selectedFilters.entries.joinToString(separator = ";") { (id, options) ->
+                                filtersQuery = selectedFilters.entries.joinToString(separator = ";") { (id, options) ->
                                     "$id:${options.joinToString(separator = ",")}"
                                 }
-                                Log.d("SelectedFilters", selectedFiltersString)
+                                Log.d("SelectedFilters", filtersQuery)
 
                                 coroutineScope.launch {
                                     try {
-                                        val trailsResponse = fetchTrails(token, 1, searchQuery, selectedFiltersString)
+                                        val trailsResponse = fetchTrails(token, 1, searchQuery, filtersQuery)
                                         trails = trailsResponse.trails // Update the trails state with the new response
                                         noResults = trails.isEmpty()
                                     } catch (e: Exception) {
@@ -595,7 +596,7 @@ fun TrailsScreen(navController: NavController) {
                                     pageNumber++
                                     isLoading = true
                                     try {
-                                        val trailsResponse = fetchTrails(token, pageNumber, searchQuery, "")
+                                        val trailsResponse = fetchTrails(token, pageNumber, searchQuery, filtersQuery)
                                         if (trailsResponse.trails.isNotEmpty()) {
                                             trails = trails + trailsResponse.trails
                                         } else {
