@@ -65,10 +65,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -136,7 +138,7 @@ fun TrailsScreen(navController: NavController) {
     var noResults by remember { mutableStateOf(false) }
     var showFiltersDialog by remember { mutableStateOf(false) }
     var trailFilters by remember { mutableStateOf<List<TrailFilter>>(emptyList()) }
-
+    val selectedFilters = remember { mutableStateMapOf<String, MutableList<String>>() }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
 
@@ -149,7 +151,7 @@ fun TrailsScreen(navController: NavController) {
             coroutineScope.launch {
                 try {
                     isLoading = true
-                    val trailsResponse = fetchTrails(token, pageNumber, searchQuery)
+                    val trailsResponse = fetchTrails(token, pageNumber, searchQuery, "")
                     trails = trailsResponse.trails
                     noResults = trails.isEmpty()
                 } catch (e: Exception) {
@@ -193,7 +195,7 @@ fun TrailsScreen(navController: NavController) {
                                 coroutineScope.launch {
                                     isLoading = true
                                     try {
-                                        val trailsResponse = fetchTrails(token, 1, "")
+                                        val trailsResponse = fetchTrails(token, 1, "", "")
                                         trails = trailsResponse.trails
                                         noResults = trails.isEmpty()
                                     } catch (e: Exception) {
@@ -456,7 +458,7 @@ fun TrailsScreen(navController: NavController) {
                                 } else {
                                     Column {
                                         filter.options.forEach { option ->
-                                            FilterOptionRow(option = option)
+                                            FilterOptionRow(filterId = filter.id, option = option, selectedFilters = selectedFilters)
                                         }
                                     }
                                 }
@@ -473,6 +475,10 @@ fun TrailsScreen(navController: NavController) {
                             }
                             Button(onClick = {
                                 // Apply filter logic here
+                                val selectedFiltersString = selectedFilters.entries.joinToString(separator = "") { (id, options) ->
+                                    "$id:${options.joinToString(separator = ",")}"
+                                }
+                                Log.d("SelectedFilters", selectedFiltersString)
                                 showFiltersDialog = false
                             }) {
                                 Text(text = stringResource(R.string.apply))
@@ -578,7 +584,7 @@ fun TrailsScreen(navController: NavController) {
                                     pageNumber++
                                     isLoading = true
                                     try {
-                                        val trailsResponse = fetchTrails(token, pageNumber, searchQuery)
+                                        val trailsResponse = fetchTrails(token, pageNumber, searchQuery, "")
                                         if (trailsResponse.trails.isNotEmpty()) {
                                             trails = trails + trailsResponse.trails
                                         } else {
@@ -599,9 +605,8 @@ fun TrailsScreen(navController: NavController) {
     }
 }
 
-
 @Composable
-fun FilterOptionRow(option: String) {
+fun FilterOptionRow(filterId: String, option: String, selectedFilters: SnapshotStateMap<String, MutableList<String>>) {
     var isChecked by remember { mutableStateOf(false) }
 
     Row(
@@ -610,7 +615,17 @@ fun FilterOptionRow(option: String) {
     ) {
         Checkbox(
             checked = isChecked,
-            onCheckedChange = { isChecked = it }
+            onCheckedChange = { checked ->
+                isChecked = checked
+                if (checked) {
+                    selectedFilters.getOrPut(filterId) { mutableListOf() }.add(option)
+                } else {
+                    selectedFilters[filterId]?.remove(option)
+                    if (selectedFilters[filterId].isNullOrEmpty()) {
+                        selectedFilters.remove(filterId)
+                    }
+                }
+            }
         )
         Text(
             text = option,

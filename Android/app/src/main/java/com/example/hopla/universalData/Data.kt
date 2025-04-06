@@ -404,7 +404,8 @@ data class FeedItem(
     val createdAt: String,
     val userId: String,
     val userAlias: String,
-    val duration: Double
+    val duration: Double,
+    val userProfilePicture: String
 )
 
 @Serializable

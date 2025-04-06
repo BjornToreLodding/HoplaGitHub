@@ -45,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -57,7 +56,7 @@ import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.FeedItem
 import com.example.hopla.universalData.ReportDialog
-import com.example.hopla.universalData.TrailsResponse
+import com.example.hopla.universalData.Trail
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
 import kotlinx.coroutines.CoroutineScope
@@ -204,7 +203,7 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                 }
         ) {
             Image(
-                painter = rememberAsyncImagePainter(feedItem.pictureUrl),
+                painter = rememberAsyncImagePainter(feedItem.userProfilePicture),
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)
@@ -325,11 +324,13 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
     }
 }
 
-fun gatherMoreInfo(title: String, token: String, onResult: (TrailsResponse) -> Unit) {
+fun gatherMoreInfo(title: String, token: String, onResult: (List<Trail>) -> Unit) {
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val response = fetchTrails(token, 1, title)
-            onResult(response)
+            val response = fetchTrails(token, 1, title, "")
+            val filteredTrails = response.trails.filter { it.name.contains(title, ignoreCase = true) }
+            Log.d("gatherMoreInfo", "Filtered Trails: $filteredTrails")
+            onResult(filteredTrails)
         } catch (e: Exception) {
             Log.e("fetchTrails", "Error fetching trails", e)
         }

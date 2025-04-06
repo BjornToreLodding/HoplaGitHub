@@ -158,7 +158,7 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
 
 //---------------------------------Trails---------------------------------
 // All trails
-suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): TrailsResponse {
+suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String, filtersQuery: String): TrailsResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -171,6 +171,7 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String): Tr
             path("trails", "all")
             parameters.append("search", searchQuery)
             parameters.append("pageNumber", pageNumber.toString())
+            parameters.append("filter", filtersQuery)
         }.buildString()
 
         Log.d("fetchTrails", "Request URL: $url")
