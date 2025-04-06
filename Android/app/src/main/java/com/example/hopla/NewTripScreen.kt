@@ -4,41 +4,60 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Location
 import android.os.Looper
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.*
+import com.example.hopla.ui.theme.PrimaryBlack
+import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.universalData.ImagePicker
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
-import kotlinx.coroutines.delay
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.android.gms.maps.model.LatLng
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.twotone.Star
-import androidx.compose.ui.graphics.Color
-import com.example.hopla.ui.theme.PrimaryBlack
+import kotlinx.coroutines.delay
 
 @SuppressLint("DefaultLocale")
-@Preview
 @Composable
 fun NewTripScreen() {
     var isRunning by remember { mutableStateOf(false) }
@@ -48,8 +67,7 @@ fun NewTripScreen() {
     var showDialog by remember { mutableStateOf(false) }
     var tripName by remember { mutableStateOf("") }
     var tripNotes by remember { mutableStateOf("") }
-    var showDropdown by remember { mutableStateOf(false) }
-    var selectedWords by remember { mutableStateOf(listOf<String>()) }
+    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -132,13 +150,6 @@ fun NewTripScreen() {
             time++
         }
     }
-
-    // filter words list
-    val filterWords = listOf(
-        stringResource(R.string.asphalt),
-        stringResource(R.string.gravel),
-        stringResource(R.string.parking)
-    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
@@ -226,8 +237,6 @@ fun NewTripScreen() {
     }
 
     if (showDialog) {
-        var selectedRating by remember { mutableIntStateOf(0) } // Track selected stars
-
         AlertDialog(
             onDismissRequest = { showDialog = false },
             text = {
@@ -235,7 +244,8 @@ fun NewTripScreen() {
                     TextField(
                         value = tripName,
                         onValueChange = { tripName = it },
-                        label = { Text(text = stringResource(R.string.trip_name)) },
+                        singleLine = true,
+                        label = { Text(text = stringResource(R.string.trip_name), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp)
@@ -249,112 +259,26 @@ fun NewTripScreen() {
                             TextField(
                                 value = tripNotes,
                                 onValueChange = { tripNotes = it },
-                                label = { Text(text = stringResource(R.string.description)) },
+                                label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp)
+                                    .height(125.dp)
                             )
-
-                            // Star Rating Icons (Top-Right Corner)
-                            Row(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd) // Position at the top-right corner
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                (1..5).forEach { index ->
-                                    Icon(
-                                        imageVector = if (index <= selectedRating) Icons.Filled.Star else Icons.TwoTone.Star,
-                                        contentDescription = "Rating $index",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .clickable { selectedRating = index } // Update rating on click
-                                    )
-                                }
-                            }
                         }
                     }
-
-                    // Horizontally Scrollable Selected Words Box with Dropdown Icon
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp) // Fixed height for word list
-                            .background(MaterialTheme.colorScheme.secondary)
-                            .padding(horizontal = 8.dp, vertical = 12.dp)
-                    ) {
-                        Row(
+                    ImagePicker(
+                        onImageSelected = { bitmap -> selectedImage = bitmap },
+                        text = stringResource(R.string.add_image)
+                    )
+                    selectedImage?.let { bitmap ->
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
                             modifier = Modifier
-                                .fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween // Ensures dropdown icon stays on the right
-                        ) {
-                            // Scrollable Word List
-                            Row(
-                                modifier = Modifier
-                                    .weight(1f) // Makes sure words take up available space
-                                    .padding(end = 8.dp) // Adjust padding for good spacing
-                                    .horizontalScroll(rememberScrollState()),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                selectedWords.forEach { word ->
-                                    Box(
-                                        modifier = Modifier
-                                            .background(MaterialTheme.colorScheme.primary)
-                                            .height(36.dp)
-                                            .width(72.dp)
-                                            .padding(end = 8.dp)
-                                            .clickable { selectedWords = selectedWords - word },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(text = word, color = Color.White)
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                            }
-                            // Dropdown Menu Icon (Fixed on the Right)
-                            IconButton(
-                                onClick = { showDropdown = !showDropdown },
-                                modifier = Modifier
-                                    .size(36.dp) // Adjust size for good spacing
-                                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add Word",
-                                )
-                            }
-
-                            // Dropdown Menu
-                            DropdownMenu(
-                                expanded = showDropdown,
-                                onDismissRequest = { showDropdown = false }
-                            ) {
-                                filterWords.forEach { word ->
-                                    val isSelected = word in selectedWords
-
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = word,
-                                                color = if (isSelected) Color.Gray else Color.Unspecified // Dim if selected
-                                            )
-                                        },
-                                        onClick = {
-                                            if (!isSelected) {
-                                                selectedWords = selectedWords + word
-                                                showDropdown = false
-                                            }
-                                        },
-                                        enabled = !isSelected // Disable if already selected
-                                    )
-                                }
-                            }
-                        }
+                                .size(200.dp)
+                                .padding(top = 16.dp)
+                        )
                     }
-
-
                 }
             },
             confirmButton = {
@@ -365,9 +289,7 @@ fun NewTripScreen() {
                     distance = 0.0
                     tripName = ""
                     tripNotes = ""
-                    filterWords.forEach { word ->
-                        selectedWords = selectedWords - word
-                    }
+                    selectedImage = null
                 }) {
                     Text(text = stringResource(R.string.save))
                 }
