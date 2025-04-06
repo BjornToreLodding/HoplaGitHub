@@ -419,12 +419,14 @@ data class FeedResponse(
 )
 
 //--------------------Data classes for new hike screen---------------
+@Serializable
 data class Coordinate(
     val timestamp: Double,
     val lat: Double,
     val long: Double
 )
 
+@Serializable
 data class NewHike (
     val StartetAt: String,
     val Distance: String,

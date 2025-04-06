@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import com.example.hopla.apiService.createNewHike
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.generalTextStyle
@@ -69,7 +70,10 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.type.Date
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -380,6 +384,10 @@ fun NewTripScreen() {
                     coordinates = emptyList()
                     newHike?.let {
                         Log.d("NewTripScreen", "NewHike: $it")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val response = createNewHike(UserSession.token, it)
+                            Log.d("NewTripScreen", "Create Hike Response: $response")
+                        }
                     }
                 }) {
                     Text(text = stringResource(R.string.save))

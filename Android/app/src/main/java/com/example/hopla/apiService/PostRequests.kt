@@ -8,6 +8,7 @@ import com.example.hopla.saveLoginState
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
+import com.example.hopla.universalData.NewHike
 import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableActionRequest
 import com.example.hopla.universalData.StableActionResponse
@@ -43,6 +44,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import kotlinx.serialization.encodeToString
 
 //---------- Post requests for several pages  ---------------
 suspend fun createUserReport(token: String, reportRequest: UserReportRequest): UserReportResponse {
@@ -472,3 +474,38 @@ suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, messa
     return responseBody
 }
 
+//--------------------------------Post requests for new trip----------------------
+suspend fun createNewHike(token: String, newHike: NewHike): String {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val coordinatesJson = Json.encodeToString(newHike.Coordinates)
+
+    val formData = formData {
+        append("StartetAt", newHike.StartetAt)
+        append("Distance", newHike.Distance)
+        append("Duration", newHike.Duration)
+        append("Coordinates", coordinatesJson)
+    }
+
+    Log.d("createNewHike", "Request Body: $formData")
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.post("https://hopla.onrender.com/userhikes/create") {
+            header("Authorization", "Bearer $token")
+            setBody(MultiPartFormDataContent(formData))
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("createNewHike", "Response Status: ${response.status}")
+    Log.d("createNewHike", "Response Body: $responseBody")
+    return responseBody
+}
