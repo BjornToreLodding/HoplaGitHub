@@ -7,24 +7,90 @@
 
 import CoreLocation
 
+struct Coordinate: Codable, Identifiable {
+    var id = UUID()
+    let lat: Double
+    let long: Double
+    let timestamp: TimeInterval
+}
+
+
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var locationManager = CLLocationManager()
-
+    
     @Published var userLocation: CLLocation? = nil
+    @Published var coordinates: [Coordinate] = []
     @Published var latitude: Double?
     @Published var longitude: Double?
-
+    @Published var distance: Double = 0.0
+    @Published var isTracking: Bool = false
+    
     override init() {
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
+    }
+    
+    func calculateDistance(from start: Coordinate, to end: Coordinate) -> Double {
+        let startLocation = CLLocation(latitude: start.lat, longitude: start.long)
+        let endLocation = CLLocation(latitude: end.lat, longitude: end.long)
+        
+        let distanceMeters = startLocation.distance(from: endLocation)
+        print("📏 Calculating Distance: \(distanceMeters) meters") // ✅ Debug print
+        return distanceMeters / 1000 // Convert meters to km
+    }
+    
+    func startTracking() {
+        isTracking = true
+        coordinates = []
+        distance = 0.0
+        locationManager.distanceFilter = 5 // ✅ Update when moving at least 5 meters
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
-
-        checkLocationAuthorization()
-        print("Authorization status: \(locationManager.authorizationStatus.rawValue)")
+        print("🏃‍♂️ Location tracking started!")
     }
 
+    
+    
+    func stopTracking() {
+        isTracking = false
+        locationManager.stopUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else {
+            print("⚠️ No locations received!")
+            return
+        }
+
+        let newCoordinate = Coordinate(lat: location.coordinate.latitude, long: location.coordinate.longitude, timestamp: Date().timeIntervalSince1970)
+
+        print("📍 New Location Received: \(newCoordinate.lat), \(newCoordinate.long)") // ✅ Debug GPS updates
+
+        if isTracking, let lastCoordinate = coordinates.last {
+            let calculatedDistance = calculateDistance(from: lastCoordinate, to: newCoordinate)
+
+            print("📍 Previous Location: \(lastCoordinate.lat), \(lastCoordinate.long)")
+            print("📏 Calculated Distance: \(calculatedDistance) meters")
+
+            if calculatedDistance > 0.005 { // Calculate if more than 5 meter movement
+                DispatchQueue.main.async {
+                    self.distance += calculatedDistance
+                }
+                print("✅ Distance Updated: \(self.distance) km")
+            } else {
+                print("⚠️ Ignored small movement: \(calculatedDistance) km")
+            }
+        }
+
+        DispatchQueue.main.async {
+            self.coordinates.append(newCoordinate)
+        }
+    }
+
+
+    
     func checkLocationAuthorization() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -60,31 +126,35 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             }
         }
     }
-
+    
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         checkLocationAuthorization()
     }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        DispatchQueue.main.async {
-            self.userLocation = location
-            self.latitude = location.coordinate.latitude
-            self.longitude = location.coordinate.longitude
-            print("Latitude: \(self.latitude ?? 0), Longitude: \(self.longitude ?? 0)")
-            print("Updated location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-        }
-        NotificationCenter.default.post(name: .didUpdateLocation, object: location)
-    }
-
+    
+    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to get location: \(error.localizedDescription)")
     }
     
+    func startUpdatingLocation(completion: @escaping (Coordinate) -> Void) {
+        locationManager.startUpdatingLocation()
+        
+        NotificationCenter.default.addObserver(forName: .didUpdateLocation, object: nil, queue: .main) { notification in
+            if let location = notification.object as? CLLocation {
+                let coordinate = Coordinate(lat: location.coordinate.latitude, long: location.coordinate.longitude, timestamp: Date().timeIntervalSince1970)
+                completion(coordinate) // ✅ Send new location update to tracking system
+            }
+        }
+    }
+    
+    func requestLocationUpdate() {
+        locationManager.requestLocation() // ✅ Force a fresh location update
+        print("📍 Requesting new location update...")
+    }
     
 }
 
 extension Notification.Name {
-        static let didUpdateLocation = Notification.Name("didUpdateLocation")
-        static let locationAccessDenied = Notification.Name("locationAccessDenied")
-    }
+    static let didUpdateLocation = Notification.Name("didUpdateLocation")
+    static let locationAccessDenied = Notification.Name("locationAccessDenied")
+}

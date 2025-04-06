@@ -42,8 +42,20 @@ struct MapView: UIViewRepresentable {
         )
 
         mapView.animate(to: camera)
+
+        // ✅ Draw hike route
+        let path = GMSMutablePath()
+        for coordinate in locationManager.coordinates {
+            path.add(CLLocationCoordinate2D(latitude: coordinate.lat, longitude: coordinate.long))
+        }
+
+        let polyline = GMSPolyline(path: path)
+        polyline.strokeWidth = 5
+        polyline.strokeColor = .blue
+        polyline.map = mapView
     }
 }
+
 
 
 

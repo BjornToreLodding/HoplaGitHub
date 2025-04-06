@@ -619,62 +619,64 @@ struct HikeCard: View {
     @ObservedObject var viewModel: HikeService  // This works now
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ZStack(alignment: .topTrailing) {
-                // Image background
-                AsyncImage(url: URL(string: hike.pictureUrl)) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Color.gray
-                    }
-                }
-                .frame(height: 150)
-                .clipped()
-                
-                // Heart icon
-                Button(action: {
-                    toggleFavoriteAction(hike) // ✅ Trigger API + UI update
-                }) {
-                    Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
-                        .foregroundColor(hike.isFavorite ? .red : .gray)
-                        .padding(10)
-                }
-            }
-
-            // Hike name and rating
-            HStack {
-                Text(hike.name)
-                    .font(.headline)
-                Spacer()
-                StarRating(rating: .constant(hike.averageRating))
-                    .frame(width: 100)
-            }
-            .padding(.horizontal)
-
-            // Filters
-            if let filters = hike.filters, !filters.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Filters:")
-                        .font(.subheadline)
-                        .bold()
-                    ForEach(filters, id: \.id) { filter in
-                        HStack {
-                            Text("\(filter.displayName):")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                            Text(displayValue(for: filter))
-                                .font(.caption)
+        NavigationLink(destination: HikesDetails(hike: hike)) {
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack(alignment: .topTrailing) {
+                    // Image background
+                    AsyncImage(url: URL(string: hike.pictureUrl)) { phase in
+                        if let image = phase.image {
+                            image.resizable().scaledToFill()
+                        } else {
+                            Color.gray
                         }
                     }
+                    .frame(height: 150)
+                    .clipped()
+                    
+                    // Heart icon
+                    Button(action: {
+                        toggleFavoriteAction(hike) // ✅ Trigger API + UI update
+                    }) {
+                        Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
+                            .foregroundColor(hike.isFavorite ? .red : .gray)
+                            .padding(10)
+                    }
+                }
+
+                // Hike name and rating
+                HStack {
+                    Text(hike.name)
+                        .font(.headline)
+                    Spacer()
+                    StarRating(rating: .constant(hike.averageRating))
+                        .frame(width: 100)
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 10)
+
+                // Filters
+                if let filters = hike.filters, !filters.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Filters:")
+                            .font(.subheadline)
+                            .bold()
+                        ForEach(filters, id: \.id) { filter in
+                            HStack {
+                                Text("\(filter.displayName):")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                Text(displayValue(for: filter))
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
+                }
             }
+            .background(Color(.systemBackground))
+            .cornerRadius(10)
+            .shadow(radius: 4)
         }
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(radius: 4)
     }
     
     private func toggleFavorite(for hike: Hike) {

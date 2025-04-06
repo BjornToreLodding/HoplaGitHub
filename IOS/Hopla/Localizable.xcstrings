@@ -299,6 +299,7 @@
       }
     },
     "Distance" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1065,6 +1066,9 @@
         }
       }
     },
+    "Stop" : {
+
+    },
     "Submit" : {
       "localizations" : {
         "nb" : {
@@ -1099,6 +1103,7 @@
       }
     },
     "Time" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {

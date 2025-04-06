@@ -10,5 +10,10 @@
 		<string>ArialNova.ttf</string>
 		<string>ArialNova-Light.ttf</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string></string>
+		<string>location</string>
+	</array>
 </dict>
 </plist>
