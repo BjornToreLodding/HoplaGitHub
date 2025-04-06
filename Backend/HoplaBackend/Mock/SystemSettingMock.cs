@@ -27,6 +27,7 @@ public static class SystemSettingMock
             // 🖼️ Bildeinnstillinger i CSV-format
             new SystemSetting { Key = "UserProfilePictureList", Value = "64,64,crop", Type = "csv" },
             new SystemSetting { Key = "UserProfilePictureSelect", Value = "200,200,crop", Type = "csv" },
+            new SystemSetting { Key = "UserProfileUserHikes", Value = "900,350,crop", Type = "csv" },
             new SystemSetting { Key = "HorsePictureList", Value = "64,64,crop", Type = "csv" },
             new SystemSetting { Key = "HorsePictureSelect", Value = "200,200,crop", Type = "csv" },
             new SystemSetting { Key = "TrailPicture", Value = "1020,420,crop", Type = "csv" }, // fyll heller enn crop

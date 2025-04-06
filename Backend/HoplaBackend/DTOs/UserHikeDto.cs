@@ -7,6 +7,10 @@ public class UserHikeDto
     public double? Length { get ; set; }
     public double Duration { get; set; }
     public string? PictureUrl { get; set; }
+    public string? Title { get; set; }
+    public string? Comment { get; set; }
+    public string HorseName { get; set; }
+
     public bool TrailButton { get; set; }
 }
 public class CoordinateInput

@@ -1,5 +1,6 @@
 using HoplaBackend.Data;
 using HoplaBackend.DTOs;
+using HoplaBackend.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -30,7 +31,11 @@ public class UserHikeService
             TrailId = u.TrailId ?? Guid.Empty,
             Length = u.Distance,
             Duration = u.Duration,
-            PictureUrl = u.PictureUrl,
+            Title = u.Title,
+            Comment = u.Comment,
+            HorseName = u.Horse.Name,
+            PictureUrl = PictureHelper.BuildPictureUrl(u.PictureUrl, "UserProfileUserHikes"),
+            //PictureUrl = u.PictureUrl,
             TrailButton = !u.TrailId.HasValue
         }).ToList();
     }

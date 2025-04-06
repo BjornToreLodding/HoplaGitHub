@@ -1031,6 +1031,7 @@ Response:
             "createdAt": "2025-04-04T13:00:52.091311Z",
             "userId": "12345678-0000-0000-0001-123456780002",
             "userAlias": "Kamuflasjen",
+            "likes": 2,
             "duration": 0 //Kun for UserHikes
         },
     ....
@@ -1044,6 +1045,7 @@ Response:
             "createdAt": "2025-04-04T13:00:48.351645Z",
             "userId": "12345678-0000-0000-0001-123456780003",
             "userAlias": "Embalasjen",
+            "likes": 2,
             "duration": 0
         },
 
@@ -1099,7 +1101,6 @@ Response: Se feed alt
 
 **BT**  
 
-Kommer litt senere
 API:
 ```http
 GET http https://hopla.onrender.com/feed/all?sort=likes
@@ -1107,6 +1108,31 @@ GET http https://hopla.onrender.com/feed/all?sort=likes
 
 Response: Se feed alt
 
+## **:green_book: :red_car: :apple: POST reactions
+
+Denne setter reaksjonen til Like som standard, men kan enkelt utvides til flere reaksjonstyper.  
+Har også tilrettelagt for dette i database og backend hvis Hopla ønsker å utvide dette senere  
+DVS: etter sommern når vi har fått sensur på oppgaven.
+
+
+Postman:
+```http
+POST https://hopla.onrender.com/reactions
+DELETE https://hopla.onrender.com/reactions
+```
+
+Body:
+```json
+{
+    "EntityId": "03315aed-37bf-477f-a70c-367dbbc641ec" //bruk Id fra EntityFeed som eksisterer.
+}
+
+Response:
+```json
+200 OK
+400 Bad Request: User has already reacted to this post. //Ved POST
+404 Not Found: No reaction found to remove. //Ved DELETE
+```
 
 </td>
 </tr>
@@ -2166,6 +2192,50 @@ Response:
 }
 ```
 
+## **:green_book:** :red_car: **:apple: GET /userhikes/coordinates(/mock)/{userHikeId}**
+
+postman:
+```http
+GET https://hopla.onrender.com/userhikes/coordinates/{userHikeId}
+GEt https://hopla.onrender.com/userhikes/coordinates/mock/{userHikeId}
+```
+
+Eksempel:
+```http
+GET https://hopla.onrender.com/userhikes/coordinates/12345678-0000-0000-0011-123456780002 
+//OSB: Ingen av testdataene har koordinater
+//Derfor har jeg også laget denne:
+GET https://hopla.onrender.com/userhikes/coordinates/mock/12345678-0000-0000-0011-123456780002 
+//Denne returnerer 500 koordinater som lager turen som en sirkel.
+```
+
+**?query*
+ * ?points=int (antall punkter) optional. Settes til 500 hvis ikke oppgitt.
+
+Response:
+```json
+[
+    {
+        "lat": 60.955579999999998,
+        "lng": 10.648417120937717
+    },
+    {
+        "lat": 60.955805218650163,
+        "lng": 10.648414206117041
+    },
+    {
+        "lat": 60.956030401735696,
+        "lng": 10.648405462115296
+    },
+    ...
+    {
+        "lat": 60.95625551369757,
+        "lng": 10.64839089031326
+    }
+]
+```
+
+Jeg bruker lat og lng her fordi long er et variabelnavn, så jeg måtte endre det til lng.
 
 </td>
 </tr>

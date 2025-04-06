@@ -35,6 +35,77 @@ public class UserHikeController : ControllerBase
         _imageUploadService = imageUploadService;
     }
 
+
+    [HttpGet("coordinates/{userHikeId}")]
+    public async Task<IActionResult> GetUserHikeCoordinates(Guid userHikeId, [FromQuery] int? maxPoints = null)
+    {
+        var details = await _context.UserHikeDetails
+            .FirstOrDefaultAsync(d => d.UserHikeId == userHikeId);
+
+        if (details == null || string.IsNullOrEmpty(details.CoordinatesCsv))
+        {
+            return NotFound(new { Message = "No coordinates found for this UserHike." });
+        }
+
+        // Hent kun Lat/Lng (ignorer OffsetTenths)
+        var coordinates = CoordinateHelper.ParseLatLngOnly(details.CoordinatesCsv);
+
+        if (maxPoints.HasValue)
+        {
+            coordinates = CoordinateHelper.DownsampleCoordinates(coordinates, maxPoints.Value);
+        }
+
+        // Returner liste av lat/lng
+        return Ok(coordinates.Select(c => new { lat = c.Lat, lng = c.Lng }));
+    }
+
+    [HttpGet("coordinates/mock/{userHikeId}")]
+    public async Task<IActionResult> GetMockUserHikeCoordinates(Guid userHikeId, [FromQuery] int points = 500)
+    {
+        var userHike = await _context.UserHikes
+            .Include(u => u.Trail) // Viktig å inkludere Trail
+            .Include(u => u.UserHikeDetail) // Og UserHikeDetail
+            .FirstOrDefaultAsync(u => u.Id == userHikeId);
+
+        if (userHike == null)
+        {
+            return NotFound(new { Message = "No UserHike found for this ID." });
+        }
+
+        double lat = 0;
+        double lng = 0;
+        double distance = 2.0; // Default fallback
+
+        // Prøv å hente fra UserHikeDetail først
+        if (userHike.UserHikeDetail != null && 
+            (userHike.UserHikeDetail.LatMean != 0 || userHike.UserHikeDetail.LongMean != 0))
+        {
+            lat = userHike.UserHikeDetail.LatMean;
+            lng = userHike.UserHikeDetail.LongMean;
+        }
+        // Hvis ikke: prøv å hente fra Trail
+        else if (userHike.Trail != null)
+        {
+            lat = userHike.Trail.LatMean;
+            lng = userHike.Trail.LongMean;
+            distance = userHike.Trail.Distance;
+        }
+
+        // Hvis fortsatt 0, fallback til midt i Norge
+        if (lat == 0 && lng == 0)
+        {
+            lat = 60.0;
+            lng = 10.0;
+        }
+
+        // Generer mock koordinater
+        var allCoords = MockHelper.GenerateCircularTrail(lat, lng, distance);
+        var downsampled = CoordinateHelper.DownsampleCoordinates(allCoords, points);
+
+        return Ok(downsampled.Select(c => new { lat = c.Lat, lng = c.Lng }));
+    }
+
+
     [Authorize]
     [HttpGet("user")]
     public async Task<ActionResult<List<TrailDto>>> GetUserHikes(

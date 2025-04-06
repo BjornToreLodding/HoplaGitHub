@@ -272,7 +272,7 @@ public class EntityFeedController : ControllerBase
             UserId = trail.UserId,
             UserAlias = trail.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(trail.User.PictureUrl, "UserProfilePictureList"),
-
+            Likes =  entry.LikesCount
         };
     }
     private async Task<FeedItemDto?> BuildUserHikeDto(EntityFeed entry)
@@ -314,7 +314,8 @@ public class EntityFeedController : ControllerBase
             UserProfilePicture = PictureHelper.BuildPictureUrl(hike.User.PictureUrl, "UserProfilePictureList"),
             Latitude = latitude,
             Longitude = longitude,
-            Duration = hike.Duration
+            Duration = hike.Duration,
+            Likes = entry.LikesCount
         };
     }
 
@@ -371,7 +372,7 @@ public class EntityFeedController : ControllerBase
             Longitude = review.Trail.LongMean,
             UserAlias = review.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(review.User.PictureUrl, "UserProfilePictureList"),
-
+            Likes =  entry.LikesCount
         };
     }
     private async Task<FeedItemDto?> BuildTrailRatingDto(EntityFeed entry)
@@ -397,7 +398,7 @@ public class EntityFeedController : ControllerBase
             Longitude = rating.Trail.LongMean,
             UserAlias = rating.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(rating.User.PictureUrl, "UserProfilePictureList"),
-
+            Likes = entry.LikesCount
         };
     }
     private async Task<FeedItemDto?> BuildHorseDto(EntityFeed entry)
@@ -421,7 +422,7 @@ public class EntityFeedController : ControllerBase
             UserId = horse.UserId,
             UserAlias = horse.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(horse.User.PictureUrl, "UserProfilePictureList"),
-
+            Likes = entry.LikesCount
         };
     }
     private async Task<FeedItemDto?> BuildStableDto(EntityFeed entry)
@@ -450,7 +451,7 @@ public class EntityFeedController : ControllerBase
             UserId = owner?.Id ?? Guid.Empty, // 👈 bruker eieren hvis finnes
             UserAlias = owner?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(owner.PictureUrl, "UserProfilePictureList"),
-
+            Likes = entry.LikesCount
         };
     }
 
@@ -475,7 +476,7 @@ public class EntityFeedController : ControllerBase
             UserId = stableMessage.UserId,
             UserAlias = stableMessage.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(stableMessage.User.PictureUrl, "UserProfilePictureList"),
-
+            Likes =  entry.LikesCount
         };
     }
 

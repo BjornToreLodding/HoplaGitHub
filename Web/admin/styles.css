@@ -156,6 +156,7 @@ button {
     flex: none;
 }
 
+/* Save-knapp */
 .save-button {
     visibility: hidden;
     padding: 5px 10px;
@@ -183,27 +184,49 @@ button {
     background-color: #218838;
 }
 
-/* --- CSV HEADER (For settings) --- */
-.csv-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: bold;
-    margin-top: 30px;
-    margin-bottom: 6px;
-}
-
-.csv-header div {
-    width: 6rem;
-    text-align: center;
-}
-
 /* Settings container padding */
 #settings-container {
     padding-bottom: 50px;
 }
 
-/* --- ANNET: KNAPPER, LISTER OSV --- */
+/* --- CSV SETTINGS-SPESIFIKT (Ny støtte) --- */
+.csv-setting-group {
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.csv-setting-label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 18px;
+    text-align: left;
+}
+
+.csv-header-row, .csv-input-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) auto; /* 3 kolonner + 1 for knappen */
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.csv-header-row {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.csv-header-row div {
+    text-align: center;
+}
+
+.csv-input-row input {
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+}
+
+/* --- KNAPPER --- */
 .button {
     padding: 5px 10px;
     background-color: #007bff;
@@ -217,6 +240,7 @@ button {
     background-color: #0056b3;
 }
 
+/* --- Profilknapp --- */
 .profile-btn {
     display: inline-block !important;
     visibility: visible !important;

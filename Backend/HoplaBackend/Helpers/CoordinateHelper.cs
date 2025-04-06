@@ -1,3 +1,5 @@
+using System.Globalization;
+
 public static class CoordinateHelper
 {
     public static List<(double Lat, double Lng)> ParseLatLngOnly(string coordinatesCsv)
@@ -8,8 +10,8 @@ public static class CoordinateHelper
             {
                 var split = part.Split(',');
                 return (
-                    Lat: double.Parse(split[1]),
-                    Lng: double.Parse(split[2])
+                    Lat: double.Parse(split[1], CultureInfo.InvariantCulture),
+                    Lng: double.Parse(split[2], CultureInfo.InvariantCulture)
                 );
             }).ToList();
     }

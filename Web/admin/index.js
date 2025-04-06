@@ -153,7 +153,7 @@ function loadSideMenu(section) {
         case "experimental":
             menuItems = [
                 { name: "Vis Alle Brukere", action: "loadContent('users', 'users_all')" },
-                { name: "Vis BrukerRapporter", action: "loadContent('admin', 'userreports')" },
+                { name: "Vis BrukerRapporter", action: "loadContent('admin', 'reports')" },
                 { name: "Velg stall", action: "loadContent('stables', 'velgstallen')" }
             ];
             break;
