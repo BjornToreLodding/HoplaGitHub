@@ -280,6 +280,8 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<EntityService>();
 builder.Services.AddScoped<ImageUploadService>();
 builder.Services.AddScoped<RequestLoggingService>(); // Registrer tjenesten
+builder.Services.AddScoped<TrailListItemBuilder>();
+
 
 builder.Services.AddControllers(options =>
 {

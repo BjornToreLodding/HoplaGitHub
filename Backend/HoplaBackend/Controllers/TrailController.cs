@@ -29,17 +29,20 @@ public class TrailController : ControllerBase
     private readonly TrailFavoriteService _trailFavoriteService;
     private readonly ITrailFilterService _trailFilterService;
     private readonly ImageUploadService _imageUploadService;
+    private readonly TrailListItemBuilder _trailListItemBuilder;
     public TrailController(Authentication authentication, 
                             AppDbContext context, 
                                 TrailFavoriteService trailFavoriteService, 
                                 ImageUploadService imageUploadService,
-                                ITrailFilterService trailFilterService)
+                                ITrailFilterService trailFilterService,
+                                TrailListItemBuilder trailListItemBuilder)
     {
         _authentication = authentication;
         _context = context;
         _trailFavoriteService = trailFavoriteService;
         _imageUploadService = imageUploadService;
-         _trailFilterService = trailFilterService;
+        _trailFilterService = trailFilterService;
+        _trailListItemBuilder = trailListItemBuilder;
     }
 
     [Authorize]
@@ -90,7 +93,271 @@ public class TrailController : ControllerBase
         return Ok(results);
     }
 
-   
+    [Authorize]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllTrails(
+        [FromQuery] string? search,
+        [FromQuery] string? sort,
+        [FromQuery] string? filter,
+        [FromQuery] double? distMin,
+        [FromQuery] double? distMax,
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userId, out Guid parsedUserId))
+            return Unauthorized();
+
+        var query = _context.Trails
+            .Include(t => t.TrailFilterValues)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));
+
+        if (distMin.HasValue)
+            query = query.Where(t => t.Distance >= distMin.Value);
+        if (distMax.HasValue)
+            query = query.Where(t => t.Distance <= distMax.Value);
+
+        var parsedFilters = TrailFilterHelper.ParseFilterQuery(filter);
+        query = _trailFilterService.ApplyDynamicFilters(query, parsedFilters);
+
+        query = sort?.ToLower() switch
+        {
+            "newest" => query.OrderByDescending(t => t.CreatedAt),
+            "oldest" => query.OrderBy(t => t.CreatedAt),
+            "rating" or _ => query
+                .OrderByDescending(t => Math.Round(t.AverageRating ?? 0))
+                .ThenByDescending(t => t.CreatedAt),
+        };
+
+        var favoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => tf.UserId == parsedUserId)
+            .Select(tf => tf.TrailId)
+            .ToListAsync();
+
+        var trails = await query
+            .Skip((pageNumber.Value - 1) * pageSize.Value)
+            .Take(pageSize.Value)
+            .ToListAsync();
+
+        var definitions = await _context.TrailFilterDefinitions
+            .Where(d => d.IsActive)
+            .OrderBy(d => d.Order)
+            .ToListAsync();
+
+        var values = await _context.TrailFilterValues
+            .Where(v => trails.Select(t => t.Id).Contains(v.TrailId))
+            .ToListAsync();
+
+        var trailDtos = _trailListItemBuilder.Build(trails, favoriteTrailIds, definitions, values);
+
+        return Ok(new 
+        { 
+            Trails = trailDtos,
+            PageNumber = pageNumber, 
+            PageSize = pageSize 
+        });
+    }
+
+    [Authorize]
+    [HttpGet("list")]
+    public async Task<IActionResult> GetClosestTrails(
+        [FromQuery] double latitude,
+        [FromQuery] double longitude,
+        [FromQuery] double radius = 0,
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10,
+        [FromQuery] string? filter = null,
+        [FromQuery] double? distMin = null,
+        [FromQuery] double? distMax = null)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userId, out Guid parsedUserId))
+            return Unauthorized();
+
+        var query = _context.Trails
+            .Include(t => t.TrailFilterValues)
+            .Where(t => t.LatMean != 0 && t.LongMean != 0 && t.Visibility == 0)
+            .AsQueryable();
+
+        if (distMin.HasValue)
+            query = query.Where(t => t.Distance >= distMin.Value);
+        if (distMax.HasValue)
+            query = query.Where(t => t.Distance <= distMax.Value);
+
+        var parsedFilters = TrailFilterHelper.ParseFilterQuery(filter);
+        query = _trailFilterService.ApplyDynamicFilters(query, parsedFilters);
+
+        var favoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => tf.UserId == parsedUserId)
+            .Select(tf => tf.TrailId)
+            .ToListAsync();
+
+        var trails = await query.ToListAsync();
+
+        // Beregn avstand
+        var distances = trails.ToDictionary(
+            t => t.Id,
+            t => DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean)
+        );
+
+        // If radius > 0 -> show only trails within radius from lat&long. Else show all results (no need for Else-statement)
+        if (radius > 0)
+        {
+            distances = distances
+                .Where(d => d.Value <= radius)
+                .ToDictionary(d => d.Key, d => d.Value);
+        }
+
+        var orderedTrails = trails
+            .Where(t => distances.ContainsKey(t.Id)) // Kun de som er innen radius
+            .OrderBy(t => distances[t.Id])
+            .Skip((pageNumber.Value - 1) * pageSize.Value)
+            .Take(pageSize.Value)
+            .ToList();
+
+
+        var definitions = await _context.TrailFilterDefinitions
+            .Where(d => d.IsActive)
+            .OrderBy(d => d.Order)
+            .ToListAsync();
+
+        var values = await _context.TrailFilterValues
+            .Where(v => orderedTrails.Select(t => t.Id).Contains(v.TrailId))
+            .ToListAsync();
+
+        var trailDtos = _trailListItemBuilder.Build(orderedTrails, favoriteTrailIds, definitions, values, distances);
+
+        return Ok(new { Trails = trailDtos, PageNumber = pageNumber, PageSize = pageSize });
+    }
+
+    [Authorize]
+    [HttpGet("favorites")]
+    public async Task<IActionResult> GetFavoriteTrails(
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10,
+        [FromQuery] string? filter = null,
+        [FromQuery] double? distMin = null,
+        [FromQuery] double? distMax = null)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userId, out Guid parsedUserId))
+            return Unauthorized();
+
+        var favoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => tf.UserId == parsedUserId)
+            .Select(tf => tf.TrailId)
+            .ToListAsync();
+
+        var query = _context.Trails
+            .Include(t => t.TrailFilterValues)
+            .Where(t => favoriteTrailIds.Contains(t.Id))
+            .AsQueryable();
+
+        var parsedFilters = TrailFilterHelper.ParseFilterQuery(filter);
+        query = _trailFilterService.ApplyDynamicFilters(query, parsedFilters);
+
+        var trails = await query
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((pageNumber.Value - 1) * pageSize.Value)
+            .Take(pageSize.Value)
+            .ToListAsync();
+
+        var definitions = await _context.TrailFilterDefinitions
+            .Where(d => d.IsActive)
+            .OrderBy(d => d.Order)
+            .ToListAsync();
+
+        var values = await _context.TrailFilterValues
+            .Where(v => trails.Select(t => t.Id).Contains(v.TrailId))
+            .ToListAsync();
+
+        var trailDtos = _trailListItemBuilder.Build(trails, favoriteTrailIds, definitions, values);
+
+        return Ok(new { Trails = trailDtos, PageNumber = pageNumber, PageSize = pageSize });
+    }
+
+    [Authorize]
+    [HttpGet("relations")]
+    public async Task<IActionResult> GetRelationTrails(
+        [FromQuery] bool? following = false,
+        [FromQuery] bool? friends = false,
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10,
+        [FromQuery] string? filter = null,
+        [FromQuery] double? distMin = null,
+        [FromQuery] double? distMax = null)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userId, out Guid parsedUserId))
+            return Unauthorized();
+
+        List<Guid> relevantUserIds = new();
+
+        if (following == true)
+        {
+            var followedUserIds = await _context.UserRelations
+                .Where(ur => ur.FromUserId == parsedUserId && ur.Status == "FOLLOWING")
+                .Select(ur => ur.ToUserId)
+                .ToListAsync();
+
+            relevantUserIds.AddRange(followedUserIds);
+        }
+
+        if (friends == true)
+        {
+            var friendUserIds = await _context.UserRelations
+                .Where(ur => (ur.FromUserId == parsedUserId || ur.ToUserId == parsedUserId) && ur.Status == "FRIENDS")
+                .Select(ur => ur.FromUserId == parsedUserId ? ur.ToUserId : ur.FromUserId)
+                .ToListAsync();
+
+            relevantUserIds.AddRange(friendUserIds);
+        }
+
+        relevantUserIds = relevantUserIds.Distinct().ToList();
+
+        var favoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => relevantUserIds.Contains(tf.UserId))
+            .Select(tf => tf.TrailId)
+            .Distinct()
+            .ToListAsync();
+
+        var userFavoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => tf.UserId == parsedUserId)
+            .Select(tf => tf.TrailId)
+            .ToListAsync();
+
+        var query = _context.Trails
+            .Include(t => t.TrailFilterValues)
+            .Where(t => favoriteTrailIds.Contains(t.Id))
+            .AsQueryable();
+
+        var parsedFilters = TrailFilterHelper.ParseFilterQuery(filter);
+        query = _trailFilterService.ApplyDynamicFilters(query, parsedFilters);
+
+        var trails = await query
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((pageNumber.Value - 1) * pageSize.Value)
+            .Take(pageSize.Value)
+            .ToListAsync();
+
+        var definitions = await _context.TrailFilterDefinitions
+            .Where(d => d.IsActive)
+            .OrderBy(d => d.Order)
+            .ToListAsync();
+
+        var values = await _context.TrailFilterValues
+            .Where(v => trails.Select(t => t.Id).Contains(v.TrailId))
+            .ToListAsync();
+
+        var trailDtos = _trailListItemBuilder.Build(trails, userFavoriteTrailIds, definitions, values);
+
+        return Ok(new { Trails = trailDtos, PageNumber = pageNumber, PageSize = pageSize });
+    }
+
+    /*
     [Authorize]
     [HttpGet("all")]
     public async Task<IActionResult> GetAllTrails(
@@ -230,9 +497,138 @@ public class TrailController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
+    [HttpGet("list")]
+    public async Task<IActionResult> GetClosestTrails(
+        [FromQuery] double latitude,
+        [FromQuery] double longitude,
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10,
+        [FromQuery] string? filter = null,
+        [FromQuery] double? distMin = null,
+        [FromQuery] double? distMax = null)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid parsedUserId))
+        {
+            return Unauthorized(new { message = "Ugyldig token eller bruker-ID" });
+        }
 
-    
+        var query = _context.Trails
+            .Include(t => t.TrailFilterValues)
+            .AsQueryable();
 
+        query = query.Where(t => t.LatMean != 0 && t.LongMean != 0 && t.Visibility == 0);
+
+        if (distMin.HasValue)
+        {
+            query = query.Where(t => t.Distance >= distMin.Value);
+        }
+
+        if (distMax.HasValue)
+        {
+            query = query.Where(t => t.Distance <= distMax.Value);
+        }
+
+        var parsedFilters = TrailFilterHelper.ParseFilterQuery(filter);
+        query = _trailFilterService.ApplyDynamicFilters(query, parsedFilters);
+
+        var favoriteTrailIds = await _context.TrailFavorites
+            .Where(tf => tf.UserId == parsedUserId)
+            .Select(tf => tf.TrailId)
+            .ToListAsync();
+
+        var trailList = await query
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                t.LatMean,
+                t.LongMean,
+                t.PictureUrl,
+                t.AverageRating,
+                t.Distance,
+                TrailFilterValues = t.TrailFilterValues
+            })
+            .ToListAsync();
+
+        var sortedTrails = trailList
+            .Select(t => new
+            {
+                Trail = t,
+                Distance = DistanceCalc.SimplePytagoras(latitude, longitude, t.LatMean, t.LongMean)
+            })
+            .OrderBy(t => t.Distance)
+            .Skip(((pageNumber ?? 1) - 1) * (pageSize ?? 10))
+            .Take(pageSize ?? 10)
+            .ToList();
+
+        var selectedTrails = sortedTrails.Select(t => t.Trail).ToList();
+        var trailIds = selectedTrails.Select(t => t.Id).ToList();
+
+        // Hent alle aktive filterdefinisjoner
+        var definitions = await _context.TrailFilterDefinitions
+            .Where(d => d.IsActive)
+            .OrderBy(d => d.Order)
+            .ToListAsync();
+
+        var values = await _context.TrailFilterValues
+            .Where(v => trailIds.Contains(v.TrailId))
+            .ToListAsync();
+
+        var trailDtos = selectedTrails.Select(trail =>
+        {
+            var trailFilterValues = values.Where(v => v.TrailId == trail.Id).ToList();
+
+            var filters = definitions.Select(def =>
+            {
+                var val = trailFilterValues.FirstOrDefault(v => v.TrailFilterDefinitionId == def.Id);
+                if (val == null || string.IsNullOrWhiteSpace(val.Value))
+                    return null;
+
+                return new
+                {
+                    def.Id,
+                    def.Name,
+                    def.DisplayName,
+                    Type = def.Type.ToString(),
+                    Options = string.IsNullOrEmpty(def.OptionsJson)
+                        ? new List<string>()
+                        : JsonSerializer.Deserialize<List<string>>(def.OptionsJson!),
+                    Value = val?.Value,
+                    DefaultValue = def.DefaultValue
+                };
+            })
+            .Where(r => r != null)
+            .ToList();
+
+            var matchingSortedTrail = sortedTrails.First(s => s.Trail.Id == trail.Id);
+
+            return new TrailDto
+            {
+                Id = trail.Id,
+                Name = trail.Name,
+                PictureUrl = trail.PictureUrl + "?h=140&fit=crop",
+                AverageRating = trail.AverageRating ?? 0,
+                IsFavorite = favoriteTrailIds.Contains(trail.Id),
+                Distance = matchingSortedTrail.Distance,
+                Filters = filters
+            };
+        }).ToList();
+
+        var response = new
+        {
+            Trails = trailDtos,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        return Ok(response);
+    }
+
+    */
+
+    /*
     [Authorize]
     [HttpGet("list")]
     public async Task<IActionResult> GetClosestTrails(
@@ -338,6 +734,8 @@ public class TrailController : ControllerBase
         return Ok(response);
 
     }
+    */
+    /*
     [Authorize]
     [HttpGet("favorites")]
     public async Task<IActionResult> GetFavoriteTrails(
@@ -480,7 +878,7 @@ public class TrailController : ControllerBase
             query = query.Where(t => t.Length <= lengthMax.Value);
         }
         */
-
+        /*
         // Paginering og seleksjon
         var trails = await query
             .Select(t => new
@@ -511,7 +909,7 @@ public class TrailController : ControllerBase
             PageSize = pageSize
         });
     }
-
+    */
     //[Authorize]
     [HttpGet("map")]
     public async Task<IActionResult> CreateTrailsList(
@@ -639,7 +1037,7 @@ public class TrailController : ControllerBase
 
         return Ok(reviews);
     }
-
+    
 
     [Authorize]
     [HttpPost("review")]

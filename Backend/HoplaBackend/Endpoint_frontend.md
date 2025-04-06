@@ -1,7 +1,12 @@
 
+
+
 # **OBS**
 
-trails/all mangler: beskrivelse av løypen
+**BT** har oppdatert kun trails/all med filters. Trenger tilbakemelding om dette er greit, før jeg endrer de andre endpointene i /trails :-)
+
+trails/all mangler: beskrivelse av løypen  
+**BT:** har lagt det inn, men skal dette vises på lista /all eller skal det vises når man går inn på en løype for mer detaljer?
 
 Skal trails/map få liste med koordinater når zoomlevel er under et vist nivå? Gjerne få lagt inn dette så jeg får testet
 
@@ -586,14 +591,18 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
             "trailName": "Høvikrunden",
             "length": 16.54,
             "duration": 50.75,
-            "pictureUrl": ""
+            "pictureUrl": "",
+            "TrailButton": true
+
         },
         {
             "id": "12345678-0000-0000-0011-123456780016",
             "trailName": "Fornebutravbane",
             "length": 16.54,
             "duration": 50.75,
-            "pictureUrl": ""
+            "pictureUrl": "",
+            "TrailButton": false
+
         }
     ],
     "page": 7,
@@ -760,10 +769,20 @@ https://hopla.onrender.com/trails/all
 * sort= (ikke i bruk enda, men tenkte stars skulle være option. Akuratt nå er det hardcoded at den sorterer på averagerating(stars))
 * pageNumber Optional. Hvis ikke oppgitt, settes den til 1
 * pageSize Optional. Hvis ikke oppgitt settes den til 10
+* filter= Optional. HVis ikke oppgitt matcher alle løyper.
+
+**format-filter:**  
+
+```json
+?filter=FilterId1:Values;FilterId2:Values;...;FilterIdN:Values  
+eks:
+?filter=12345678-0000-0000-0101-123456780001:dirt,gravel;12345678-0000-0000-0101-123456780002:easy;12345678-0000-0000-0101-123456780004:false
+```
+
 
 :alien: :apple: **eks**
 
-https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
+https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5&filter=12345678-0000-0000-0101-123456780002:easy;12345678-0000-0000-0101-123456780001:dirt,gravel;12345678-0000-0000-0101-123456780004:false
 
 **Response eksempel**
 
@@ -775,14 +794,24 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
             "name": "Høvikrunden",
             "pictureUrl": "https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?h=140&fit=crop",
             "averageRating": 4,
-            "isFavorite": false
+            "isFavorite": false,
+            "filter": {
+                "filter1": "verdier",
+                "filter2": "verdier",
+                "filter3": "verdier"                                
+            }
         },
         {
             "id": "12345678-0000-0000-0021-123456780002",
             "name": "Gjøviksruta",
             "pictureUrl": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?h=140&fit=crop",
             "averageRating": 1,
-            "isFavorite": true
+            "isFavorite": true,
+            "filter": {
+                "filter1": "verdier",
+                "filter2": "verdier",
+                "filter3": "verdier"                                
+            }
         }
     ],
     "pageNumber": 1,
@@ -798,7 +827,7 @@ https://hopla.onrender.com/trails/all?search=øvik&pagenumber=1&pagesize=5
 
 **eks**
 
-https://hopla.onrender.com:7128/trails/list
+https://hopla.onrender.com/trails/list
 
 Mangler i response: bilde, averageRating og "liktstatus" **dette er med nå**
 
@@ -845,7 +874,7 @@ https://hopla.onrender.com/trails/list?latitude=60.95458&longitude=10.6315
 
 * Kun løyper som brukeren har trykket liker på
 
-https://hopla.onrender.com:7128/trails/favorites
+https://hopla.onrender.com/trails/favorites
 
 **query**
 
@@ -884,7 +913,7 @@ https://hopla.onrender.com/trails/favorites?pagenumber=1&pagesize=2
 
 * Løyper til brukere brukeren følger og venner med
 
-http://hopla.onrender.com:7128/trails/relations ?friends=true & following=true
+http://hopla.onrender.com/trails/relations ?friends=true & following=true
 
 **query**
 
@@ -928,7 +957,7 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
 </td>
 <td>
 
-## **:green_book: :alien: :apple: POST/DELETE trails/favorite**
+## **:green_book: :alien: :gree_apple: POST/DELETE trails/favorite**
 
 Trykke av/på hjerte på løyper (legge de til eller slette de som favoritt)
 
@@ -962,37 +991,123 @@ Response:
 </td>
 <td>
 
-## **:red_circle: :red_car: :apple: Get /home?**
+## **:green_apple: :red_car: :apple: Get /feed**
 
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
 Brukere skal kunne gi dem "likes". Skal stå hvor mange likes innlegget har fått (symbol skal prøve å være logoen)
 
-**Hjem -\> Alt**
+**Feed -\> Alt **:green_apple: :alien: :apple:**
 
 * Denne skal inneholde: Nye løyper lagt til, nye kommentarer på løyper fra alle brukere i appen.
 * 10 og 10 innlegg etter hvert som man blar blir hentet (samme måte som over)
   * Hvis løype: bilde, id, navn, løype beskrivelse, id og brukernavn på bruker som har registrert løypa
   * Hvis ny kommentar på løype: løype navn, løype id, kommentaren selv, evt bilde lagt til i kommentaren, brukernavn og brukerid til brukeren som la til kommentaren
 
-**Hjem -\> (ikon 2 personer)**
+**BT**  
+
+Jeg har laget denne slik at man bruker GET feed/all og henter det man vil ha ved å bruke queries. Det er noen småproblemer som jeg fikser fortløpende.
+
+API:
+```http
+GET https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horse
+```
+
+Response:
+```json
+{
+    "totalCount": 21,
+    "pageNumber": 1,
+    "pageSize": 50,
+    "hasNextPage": false,
+    "items": [
+        {
+            "entityId": "12345678-0000-0000-0021-123456780021",
+            "entityName": "Trail",  
+            "title": null, //Jeg ser denne er feil, men rettelse kommer senere
+            "description": "Opprettet en løype",
+            "pictureUrl": "https://images.unsplash.com/photo-1504893524553-b855bce32c67",
+            "actionType": "Created", //Denne taes nok bort.
+            "createdAt": "2025-04-04T13:00:52.091311Z",
+            "userId": "12345678-0000-0000-0001-123456780002",
+            "userAlias": "Kamuflasjen",
+            "duration": 0 //Kun for UserHikes
+        },
+    ....
+    {
+            "entityId": "12345678-0000-0000-0002-123456780038",
+            "entityName": "Horse",
+            "title": "Lommedalsplogen",
+            "description": "En ny hest: Lommedalsplogen",
+            "pictureUrl": "https://images.unsplash.com/photo-1438283173091-5dbf5c5a3206",
+            "actionType": "Created",
+            "createdAt": "2025-04-04T13:00:48.351645Z",
+            "userId": "12345678-0000-0000-0001-123456780003",
+            "userAlias": "Embalasjen",
+            "duration": 0
+        },
+
+    ]
+}
+```
+
+**Hjem -\> (ikon 2 personer) **:green_apple: :red_car: :apple:**
 
 * Samme som over, men alle løyper og kommentarer som hentes må være venn eller følge med brukeren som er logget in
 * Også hente for venner:
   * Stjerner gitt av venner på løyper (trenger da num stjerner, løype navn og løype id, brukerid og brukernavn)
   * Hvis venner har lagt til nye hester kan det også komme her
 
-**Hjem -\> Hjerte**
+**BT**  
+
+API:
+```http
+GET https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&onlyFriendsAndFollowing=true
+```
+
+Response: Se feed alt
+
+**Hjem -\> Hjerte **:green_apple: :red_car: :apple:**
 
 * Oppdateringer og kommentarer på løyper man har likt
 
-**Hjem -\> Område**
+**BT**  
 
-* Samme som første bare at det er en viss avstand fra brukeren på alt som vises her
+API:
+```http
+GET http https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&onlyLikedTrails=true
+```
 
-**Hjem -\> Populært siste 30 dager**
+Response: Se feed alt
+
+**Hjem -\> Område **:green_apple: :red_car: :apple:**
+
+* Samme som første bare at det er en viss avstand fra brukeren på alt som vises her  
+
+**BT**  
+
+API:
+```http 
+GET https://hopla.onrender.com/feed/all?userlat=60&userlong=10&radius=120
+```
+
+Response: Se feed alt
+
+**Hjem -\> Populært siste 30 dager **:green_apple: :red_car: :apple:**
 
 * Samme som første bare sortert etter likes
+
+**BT**  
+
+Kommer litt senere
+API:
+```http
+GET http https://hopla.onrender.com/feed/all?sort=likes
+```
+
+Response: Se feed alt
+
+
 </td>
 </tr>
 <tr>
@@ -1573,7 +1688,7 @@ Admin skal kunne: slette community (?)
 eks:
 
 ```http
-https://hopla.onrender.com:7128/stables/12345678-0000-0000-0031-123456780001
+https://hopla.onrender.com/stables/12345678-0000-0000-0031-123456780001
 ```
 
 Response:
@@ -1601,7 +1716,7 @@ Videre må man hente meldinger med neste endpoint
 eks:
 
 ```http
-https://hopla.onrender.com:7128/stablemessages/12345678-0000-0000-0031-123456780001?pagesize=10&pagenumber=1
+https://hopla.onrender.com/stablemessages/12345678-0000-0000-0031-123456780001?pagesize=10&pagenumber=1
 ```
 
 Response:
@@ -1774,7 +1889,7 @@ Response:
 <td></td>
 <td>
 
-## **:yellow_circle: :red_car: :apple: POST userhikes/create (ny tur knapp)**
+## **:green_book: :red_car: :apple: POST userhikes/create (ny tur knapp)**
 
 Denne generer en liste koordinater, sammen med tid og distanse fra bruker trykker på start til stopp.\
 Da kan brukeren velge å bare trykke lagre eller fylle inn mer informasjon:
@@ -1799,24 +1914,19 @@ Postman:
 POST https://hopla.onrender.com/userhikes/create
 ```
 
-Body
+FormData. Coordinates er text-JSON-data
 
-```json
+```text
 {
-  "horseId": "12345678-0000-0000-0002-123456780002", //optional
-  "trailId": null, //optional, forhåndsvalgt før man går tur?
-  "startedAt": "2024-12-01T10:00:00Z", //Er dette et greit format for frontend?
-  "description": "Testtur gjennom skogen", //kan eventuelt legges inn ved oppdaterig/redigere informasjon om tur i neste endpoint.
-  "distance": 32.43,
-  "duration": 75.57,
-  "coordinates": [
-    { "timestamp": 0, "lat": 60.8381, "lng": 10.5767 },
-    { "timestamp": 0, "lat": 60.8382, "lng": 10.5768 },
-    { "timestamp": 0, "lat": 60.8383, "lng": 10.5769 },
-    ...
-    { "timestamp": 0, "lat": 60.8390, "lng": 10.5776 }
-  ]
-}
+    Image               File        vakker.jpg
+    HorseId             Text        12345678-0000-0000-0002-123456780002 //optional
+    TrailId             Text        null //optional, forhåndsvalgt før man går tur?
+    StartedAt           Text        2024-12-01T10:00:00Z" //Er dette et greit format for frontend?
+    Title               Text        TestTur
+    Description         Text        Testtur gjennom skogen //kan eventuelt legges inn ved oppdaterig/redigere informasjon om tur i neste endpoint.
+    Distance            Text        32.43 (km)
+    Duration            Text        75.57 (minutter.sekunder)
+    Coordinates         Text        [ { "timestamp": 0, "lat": 60.8381, "long": 10.5767 }, { "timestamp": 0, "lat": 60.8382, long": 10.5768 }, { "timestamp": 0, "lat": 60.8383, "long": 10.5769 }, ... { "timestamp": 0, "lat": 60.8390, "long": 10.5776 } ] }
 ```
 
 Response:
@@ -1827,14 +1937,14 @@ Response:
 }
 ```
 
-## **:yellow_circle: :red_car: :apple: PUT userhikes/{userHikeId} redigere informasjon om en tur**
+## **:green_book: :red_car: :apple: PUT userhikes/{userHikeId} redigere informasjon om en tur**
 
 Endpoint der informasjonen over skal kunne redigeres i ettertid.\
 Hvis public her også må det lages en løype av den.
 
 **BT**
 
-Kan vi ha en Knapp hvor man kan gjøre en tur om til en Løype?
+
 
 Postman:
 
@@ -1847,9 +1957,11 @@ FormData:
 ```text
 {
     Image                   File    vakkertur.jpg
+    HorseId                 Text    12345678-0000-0000-0002-123456780002 //optional
     Title                   Text    "For en flott tur"
     Description             Text    "Ja, dette var en fantastisk tur"
 }
+//Er det hensiktsmessig å ha med noe annet her? De andre feltene burde man ikke kunne endre?
 ```
 
 Respons:
@@ -1860,7 +1972,7 @@ Respons:
 }
 ```
 
-## **:yellow_circle: :red_car: :apple: POST trails/create lage ny løype**
+## **:green_book: :red_car: :apple: POST trails/create lage ny løype**
 
 For å lage dette må man bruke en UserHike (tur) som man Oppgraderer til Trail (Løype).\
 Her må man sende med multipart/form-data. Det bare høres litt vanskelig ut,\
@@ -2054,38 +2166,7 @@ Response:
 }
 ```
 
-## **:yellow_circle: :red_car: :apple: POST ny tur. Denne utgår?**
 
-**BT**
-
-Denne utgår?
-
-**Vilde**
-
-Etter turen er ferdig (brukeren er på sluttkoordinatet eller trykker på stopp.)
-
-Turen lagres som en ny tur koblet til brukeren
-
-**BT**
-
-Denne utgår?
-
-Skal dette være hike eller trail? Jeg trenger også å vite litt mer om hvordan det er enklest å få sendt inn data her.
-
-```http
-POST https://hopla.onrender.com/userhikes/create //OBS!! Endret
-```
-
-Body:
-
-```json
-{
-    "Name": "TestRunden",
-    "Distance": 314.159
-    "Coordinates": //sendes på en hensiktsmessig måte som tuppelpar i liste eller json.
-    //Andre ting?
-}
-```
 </td>
 </tr>
 </table>

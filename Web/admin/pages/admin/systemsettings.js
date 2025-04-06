@@ -97,28 +97,31 @@ export async function render(container) {
 
             if (type === "csv") {
                 if (!csvHeaderInserted) {
+                    // Først lager du en ekte overskrift
+                    const title = document.createElement('h2');
+                    title.textContent = 'System Settings for Images'; // <- eller hva du vil
+                    title.className = 'csv-title'; // (valgfri klasse hvis du vil style)
+                    settingsContainer.appendChild(title);
+            
+                    // Så lager du kolonne-titlene (Width, Height, Fit)
                     const csvHeader = document.createElement('div');
                     csvHeader.className = 'csv-header';
-
-                    ['Width', 'Height', 'Fit'].forEach(title => {
+            
+                    ['Width', 'Height', 'Fit'].forEach(titleText => {
                         const col = document.createElement('div');
-                        col.textContent = title;
+                        col.textContent = titleText;
                         csvHeader.appendChild(col);
                     });
-
+            
                     settingsContainer.appendChild(csvHeader);
                     csvHeaderInserted = true;
                 }
-
+            
                 const [widthVal, heightVal, fitVal] = value.split(",");
-
+            
                 const widthInput = document.createElement('input');
                 widthInput.type = 'number';
                 widthInput.value = widthVal || "";
-
-                const heightInput = document.createElement('input');
-                heightInput.type = 'number';
-                heightInput.value = heightVal || "";
 
                 const fitInput = document.createElement('input');
                 fitInput.type = 'text';

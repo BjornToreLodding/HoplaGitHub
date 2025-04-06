@@ -29,7 +29,8 @@ public static class SystemSettingMock
             new SystemSetting { Key = "UserProfilePictureSelect", Value = "200,200,crop", Type = "csv" },
             new SystemSetting { Key = "HorsePictureList", Value = "64,64,crop", Type = "csv" },
             new SystemSetting { Key = "HorsePictureSelect", Value = "200,200,crop", Type = "csv" },
-            new SystemSetting { Key = "TrailPicture", Value = "400,300,crop", Type = "csv" }, // fyll heller enn crop
+            new SystemSetting { Key = "TrailPicture", Value = "1020,420,crop", Type = "csv" }, // fyll heller enn crop
+            //new SystemSetting { Key = "TrailPicture", Value = "400,300,crop", Type = "csv" }, // fyll heller enn crop
             new SystemSetting { Key = "TrailReviewPicture", Value = "400,300,crop", Type = "csv" },
             new SystemSetting { Key = "StablePicture", Value = "300,300,crop", Type = "csv" },
             new SystemSetting { Key = "StableMessagePicture", Value = "300,300,crop", Type = "csv" },
