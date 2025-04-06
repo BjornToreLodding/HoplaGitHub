@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -109,6 +111,16 @@ fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Un
 @Composable
 fun HomeScreen(navController: NavController) {
     var selectedItem by remember { mutableStateOf(Icons.Outlined.Home) }
+    var latitude by remember { mutableDoubleStateOf(0.0) }
+    var longitude by remember { mutableDoubleStateOf(0.0) }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        getCurrentLocation(context) { location ->
+            latitude = location.latitude
+            longitude = location.longitude
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -120,14 +132,14 @@ fun HomeScreen(navController: NavController) {
             Icons.Outlined.Home -> PostList(navController = navController)
             Icons.Outlined.Person -> PostList(navController = navController, onlyFriendsAndFollowing = true)
             Icons.Outlined.FavoriteBorder -> PostList(navController = navController, onlyLikedTrails = true)
-            Icons.Outlined.LocationOn -> PostList(navController = navController)
+            Icons.Outlined.LocationOn -> PostList(navController = navController, latitude = latitude, longitude = longitude)
             Icons.Outlined.ThumbUp -> PostList(navController = navController)
         }
     }
 }
 
 @Composable
-fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false) {
+fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false, latitude: Double? = null, longitude: Double? = null) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
@@ -135,9 +147,9 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
     var feedItems by remember { mutableStateOf(listOf<FeedItem>()) }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(pageNumber, onlyFriendsAndFollowing, onlyLikedTrails) {
+    LaunchedEffect(pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude) {
         isLoading = true
-        val newFeedResponse = fetchFeed(token, pageNumber, onlyFriendsAndFollowing, onlyLikedTrails)
+        val newFeedResponse = fetchFeed(token, pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude)
         if (newFeedResponse.items.isEmpty()) {
             hasMorePosts = false
         } else {
@@ -157,20 +169,14 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
 
     LazyColumn(
         state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        items(feedItems) { item: FeedItem ->
-            PostItem(feedItem = item, navController = navController)
+        items(feedItems) { feedItem ->
+            PostItem(feedItem, navController)
         }
-        if (isLoading) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
+        item {
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
