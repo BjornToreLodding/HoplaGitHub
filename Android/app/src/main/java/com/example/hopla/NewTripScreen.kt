@@ -55,6 +55,7 @@ import androidx.core.app.ActivityCompat
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.universalData.Coordinate
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.NewHike
 import com.example.hopla.universalData.UserSession
@@ -88,6 +89,7 @@ fun NewTripScreen() {
     var expanded by remember { mutableStateOf(false) }
     var selectedHorse by remember { mutableStateOf("") }
     var newHike by remember { mutableStateOf<NewHike?>(null) }
+    var coordinates by remember { mutableStateOf(listOf<Coordinate>()) }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
@@ -112,6 +114,11 @@ fun NewTripScreen() {
                             distance += distanceIncrement
                         }
                         lastLocation = newLocation
+                        coordinates = coordinates + Coordinate(
+                            timestamp = time,
+                            lat = newLocation.latitude,
+                            long = newLocation.longitude
+                        )
                     }
                 }
             }
@@ -233,7 +240,8 @@ fun NewTripScreen() {
                                 newHike = NewHike(
                                     StartetAt = currentTime,
                                     Distance = distanceStr,
-                                    Duration = durationStr
+                                    Duration = durationStr,
+                                    Coordinates = coordinates
                                 )
                             }
                         },
@@ -363,12 +371,13 @@ fun NewTripScreen() {
                     val seconds = (time % 60).toInt()
                     val distanceStr = String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
                     val durationStr = String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds) // e.g., "5,45"
-                    newHike = newHike?.copy(Distance = distanceStr, Duration = durationStr)
+                    newHike = newHike?.copy(Distance = distanceStr, Duration = durationStr, Coordinates = coordinates)
                     time = 0.0
                     distance = 0.0
                     tripName = ""
                     tripNotes = ""
                     selectedImage = null
+                    coordinates = emptyList()
                     newHike?.let {
                         Log.d("NewTripScreen", "NewHike: $it")
                     }

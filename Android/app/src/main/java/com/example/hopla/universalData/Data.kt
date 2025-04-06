@@ -419,8 +419,15 @@ data class FeedResponse(
 )
 
 //--------------------Data classes for new hike screen---------------
+data class Coordinate(
+    val timestamp: Double,
+    val lat: Double,
+    val long: Double
+)
+
 data class NewHike (
     val StartetAt: String,
     val Distance: String,
-    val Duration: String
+    val Duration: String,
+    val Coordinates: List<Coordinate>
 )
