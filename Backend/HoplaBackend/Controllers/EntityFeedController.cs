@@ -298,14 +298,14 @@ public class EntityFeedController : ControllerBase
             latitude = hike.UserHikeDetail.LatMean;
             longitude = hike.UserHikeDetail.LongMean;
         }
-        var title = !string.IsNullOrWhiteSpace(hike.Trail?.Name) ? hike.Trail.Name : "finnes ikke";
+        var trailName = !string.IsNullOrWhiteSpace(hike.Trail?.Name) ? hike.Trail.Name : "finnes ikke";
         return new FeedItemDto
         {
             EntityId = hike.Id,
             EntityName = "UserHike",
-            Title = title,
+            Title = !string.IsNullOrWhiteSpace(hike.Title) ? hike.Title : "Ridetur",
             //Title = hike.Trail?.Name ?? "Tur",
-            Description = $"{hike.User.Alias} red en tur i løypen: {title}",
+            Description = $"{hike.User.Alias} red en tur i løypen: {trailName}",
             PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
             ActionType = entry.ActionType,
             CreatedAt = entry.CreatedAt,

@@ -14,6 +14,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 using Org.BouncyCastle.Bcpg;
+using System.Text.Json.Serialization;
+using System.Globalization;
 
 namespace HoplaBackend.Controllers;
 
@@ -86,26 +88,61 @@ public class UserHikeController : ControllerBase
         var userId = _authentication.GetUserIdFromToken(User);
 
         // Sjekk at brukeren finnes
-        var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
-        if (!userExists)
+        if (!await _context.Users.AnyAsync(u => u.Id == userId))
             return Unauthorized(new { message = "Bruker ikke funnet" });
 
         var hikeId = Guid.NewGuid();
         var startMs = new DateTimeOffset(request.StartedAt).ToUnixTimeMilliseconds();
-        var coordinateList = JsonSerializer.Deserialize<List<CoordinateInput>>(request.Coordinates);
 
+        if (string.IsNullOrEmpty(request.Coordinates))
+            return BadRequest(new { message = "Coordinates mangler." });
 
+        // Deserialize Coordinates
+        List<CoordinateInput> coordinateList;
+        try
+        {
+            var serializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+            coordinateList = JsonSerializer.Deserialize<List<CoordinateInput>>(request.Coordinates, serializerOptions);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Ugyldig koordinat-data", error = ex.Message });
+        }
+
+        // Parse Distance og Duration, godta både punktum og komma
+        string distanceInput = request.Distance?.Replace(',', '.');
+        string durationInput = request.Duration?.Replace(',', '.');
+
+        if (!double.TryParse(distanceInput, NumberStyles.Float, CultureInfo.InvariantCulture, out double distance))
+            return BadRequest(new { message = "Ugyldig tallformat for Distance" });
+
+        if (!double.TryParse(durationInput, NumberStyles.Float, CultureInfo.InvariantCulture, out double duration))
+            return BadRequest(new { message = "Ugyldig tallformat for Duration" });
+
+        // Konverter koordinater
         var convertedCoords = coordinateList.Select(c =>
         {
-            var offset = (int)((c.Timestamp - startMs) / 100); // 1/10 sekunder
+            var offset = (int)c.Timestamp; // millisekunder
             return (offset, c.Lat, c.Long);
         }).ToList();
+
+        // Laste opp bilde hvis det finnes
+        string? pictureUrl = null;
+        if (request.Image != null)
+        {
+            var fileName = await _imageUploadService.UploadImageAsync(request.Image);
+            pictureUrl = fileName;
+        }
 
         var details = new UserHikeDetail
         {
             UserHikeId = hikeId,
             Description = request.Description,
             Coordinates = convertedCoords
+            // Her kan du lagre pictureUrl senere hvis ønskelig
         };
 
         var hike = new UserHike
@@ -115,31 +152,20 @@ public class UserHikeController : ControllerBase
             TrailId = request.TrailId,
             HorseId = request.HorseId,
             StartedAt = request.StartedAt,
-            CreatedAt = DateTime.UtcNow, 
-            Distance = request.Distance,
-            Duration = request.Duration
+            CreatedAt = DateTime.UtcNow,
+            PictureUrl = pictureUrl,
+            Distance = distance,
+            Duration = duration
+            // Her kan du også lagre pictureUrl hvis ønskelig
         };
 
         _context.UserHikes.Add(hike);
         _context.UserHikeDetails.Add(details);
 
-        //Opprette Feed
-        /*
-        var feedHelper = new EntityFeedHelper(_context);
-        await feedHelper.AddFeedEntryAsync(
-            entityType: EntityType.TrailReview,
-            actionType: "opprettet ny løype",
-            userId: review.UserId,
-            entityTitle: review.User.Alias,
-            pictureUrl: review.PictureUrl // hvis du har det
-    );
-    */
-
         await _context.SaveChangesAsync();
 
         return Ok(new { hike.Id });
     }
-
 
     [Authorize]
     [HttpPut("{id}")]

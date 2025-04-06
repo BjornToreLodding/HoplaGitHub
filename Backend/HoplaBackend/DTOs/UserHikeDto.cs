@@ -25,8 +25,8 @@ public class CreateUserHikeForm
     public DateTime StartedAt { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }  
-    public double Distance { get; set; } 
-    public double Duration { get; set; } 
+    public string Distance { get; set; } 
+    public string Duration { get; set; } 
 
     public string Coordinates { get; set; }
     //public List<CoordinateInput> Coordinates { get; set; } = new();

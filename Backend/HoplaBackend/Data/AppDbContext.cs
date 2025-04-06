@@ -175,6 +175,13 @@ private async Task PublishEventsForEntity<T>(string entityTypeName) where T : cl
             .HasForeignKey(h => h.UserId) // FK ligger i Horses-tabellen
             .OnDelete(DeleteBehavior.Cascade); // Sletter hester hvis bruker slettes
         
+        modelBuilder.Entity<EntityReaction>()
+            .Property(e => e.Reaction)
+            .HasConversion<string>();  // 👈 Dette gjør at Reaction enum lagres som tekst i databasen
+
+        base.OnModelCreating(modelBuilder);
+    
+
         /*
         // 1:1 Relasjon mellom Ride og RideDetails
         modelBuilder.Entity<RideDetail>()

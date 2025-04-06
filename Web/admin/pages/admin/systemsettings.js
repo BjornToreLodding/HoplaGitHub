@@ -42,8 +42,6 @@ export async function render(container) {
             }
 
             showToast("✅ Cache oppdatert!");
-
-            // ➡️ Nå henter vi settings på nytt
             await render(document.querySelector("main"));
         } catch (error) {
             console.error('Feil ved refresh av cache:', error);
@@ -97,31 +95,39 @@ export async function render(container) {
 
             if (type === "csv") {
                 if (!csvHeaderInserted) {
-                    // Først lager du en ekte overskrift
                     const title = document.createElement('h2');
-                    title.textContent = 'System Settings for Images'; // <- eller hva du vil
-                    title.className = 'csv-title'; // (valgfri klasse hvis du vil style)
+                    title.textContent = 'System Settings for Images';
+                    title.className = 'csv-title';
                     settingsContainer.appendChild(title);
-            
-                    // Så lager du kolonne-titlene (Width, Height, Fit)
+
                     const csvHeader = document.createElement('div');
                     csvHeader.className = 'csv-header';
-            
                     ['Width', 'Height', 'Fit'].forEach(titleText => {
                         const col = document.createElement('div');
                         col.textContent = titleText;
                         csvHeader.appendChild(col);
                     });
-            
                     settingsContainer.appendChild(csvHeader);
+
+                    const csvInputs = document.createElement('div');
+                    csvInputs.className = 'csv-inputs';
+                    settingsContainer.appendChild(csvInputs);
+
                     csvHeaderInserted = true;
                 }
-            
+
+                // Finner riktig input-container
+                const csvInputs = settingsContainer.querySelector('.csv-inputs');
+
                 const [widthVal, heightVal, fitVal] = value.split(",");
-            
+
                 const widthInput = document.createElement('input');
                 widthInput.type = 'number';
                 widthInput.value = widthVal || "";
+
+                const heightInput = document.createElement('input');
+                heightInput.type = 'number';
+                heightInput.value = heightVal || "";
 
                 const fitInput = document.createElement('input');
                 fitInput.type = 'text';
@@ -148,13 +154,10 @@ export async function render(container) {
 
                 saveButton.addEventListener('click', async () => {
                     const newValue = `${widthInput.value},${heightInput.value},${fitInput.value}`;
-
                     try {
                         const putResponse = await fetch(`${apiUrl}/admin/settings/${key}`, {
                             method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ value: newValue })
                         });
 
@@ -171,10 +174,11 @@ export async function render(container) {
                     }
                 });
 
-                inputContainer.appendChild(widthInput);
-                inputContainer.appendChild(heightInput);
-                inputContainer.appendChild(fitInput);
-                inputContainer.appendChild(saveButton);
+                csvInputs.appendChild(widthInput);
+                csvInputs.appendChild(heightInput);
+                csvInputs.appendChild(fitInput);
+                csvInputs.appendChild(saveButton);
+
             } else {
                 const input = document.createElement('input');
                 input.type = type === "bool" ? 'checkbox' : (type === "int" || type === "float" ? 'number' : 'text');
@@ -198,13 +202,10 @@ export async function render(container) {
 
                 saveButton.addEventListener('click', async () => {
                     const newValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
-
                     try {
                         const putResponse = await fetch(`${apiUrl}/admin/settings/${key}`, {
                             method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ value: newValue })
                         });
 
@@ -223,16 +224,17 @@ export async function render(container) {
 
                 inputContainer.appendChild(input);
                 inputContainer.appendChild(saveButton);
-            }
 
-            settingDiv.appendChild(label);
-            settingDiv.appendChild(inputContainer);
-            settingsContainer.appendChild(settingDiv);
+                settingDiv.appendChild(label);
+                settingDiv.appendChild(inputContainer);
+                settingsContainer.appendChild(settingDiv);
+            }
         });
     } catch (error) {
         console.error('Feil ved henting av settings:', error);
     }
 }
+
 
 
 
