@@ -24,6 +24,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var longitude: Double?
     @Published var distance: Double = 0.0
     @Published var isTracking: Bool = false
+    @Published var elapsedTime: TimeInterval = 0.0
     
     override init() {
         super.init()

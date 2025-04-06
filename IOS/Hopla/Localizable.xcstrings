@@ -479,6 +479,9 @@
         }
       }
     },
+    "Fill in Details" : {
+
+    },
     "Filter" : {
       "localizations" : {
         "nb" : {
@@ -488,6 +491,9 @@
           }
         }
       }
+    },
+    "Filters" : {
+
     },
     "Filters:" : {
 
@@ -553,6 +559,9 @@
       }
     },
     "Hi" : {
+
+    },
+    "Hike Details" : {
 
     },
     "Hikes" : {
@@ -676,7 +685,6 @@
       }
     },
     "Loading more hikes..." : {
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -902,6 +910,9 @@
         }
       }
     },
+    "Private Hike?" : {
+
+    },
     "Profile" : {
       "comment" : "Profile tab",
       "localizations" : {
@@ -932,6 +943,12 @@
           }
         }
       }
+    },
+    "Save Hike" : {
+
+    },
+    "Save or Fill in Details" : {
+
     },
     "Search following..." : {
       "localizations" : {
@@ -1046,6 +1063,9 @@
         }
       }
     },
+    "Stars: %lld" : {
+
+    },
     "Start" : {
       "localizations" : {
         "nb" : {
@@ -1112,6 +1132,9 @@
           }
         }
       }
+    },
+    "Title" : {
+
     },
     "Type a message..." : {
       "localizations" : {

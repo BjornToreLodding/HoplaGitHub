@@ -16,6 +16,7 @@ struct MyHike: Codable, Identifiable {
     let length: Double
     let duration: Double
     let pictureUrl: String?
+    let TrailButton: Bool?
 }
 
 // MARK: - API Response Model
@@ -28,16 +29,34 @@ struct MyHikeResponse: Codable {
 // MARK: - ViewModel
 class MyHikeViewModel: ObservableObject {
     @Published var myHikes: [MyHike] = []
+    @Published var isLoading = false
     
     private var cancellable: AnyCancellable?
-    
+    private var currentPage: Int = 3 // Starting point
+    private let pageSize = 4
+    private var hasMorePages = true
+
     func fetchMyHikes() {
-        guard let token = TokenManager.shared.getToken() else {
-            print("No token found")
+        guard !isLoading else { return }
+        guard hasMorePages else { return }
+
+        isLoading = true
+
+        guard let token = TokenManager.shared.getToken(),
+              let userId = TokenManager.shared.getUserId() else {
+            print("❌ No token or user ID found.")
             return
         }
-        
-        let url = URL(string: "https://hopla.onrender.com/userhikes/user")!
+
+        let urlString = "https://hopla.onrender.com/userhikes/user?userId=\(userId)&pageNumber=\(currentPage)&pageSize=\(pageSize)"
+        print("📤 Final request URL:", urlString)
+
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
+            isLoading = false
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -45,34 +64,54 @@ class MyHikeViewModel: ObservableObject {
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
 
+            defer {
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
+            }
+
+
+            if let data = data, let rawResponse = String(data: data, encoding: .utf8) {
+                print("📡 Raw API Response:", rawResponse)
+            }
+
             if let error = error {
-                print("Request error:", error.localizedDescription)
+                print("❌ Request error:", error.localizedDescription)
                 return
             }
-            
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
-                print("Invalid response or status code")
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200,
+                  let data = data else {
+                print("❌ Invalid response or status code")
                 return
             }
-            
+
             do {
                 let decodedResponse = try JSONDecoder().decode(MyHikeResponse.self, from: data)
                 DispatchQueue.main.async {
-                    self.myHikes = decodedResponse.userHikes
+                    if decodedResponse.userHikes.isEmpty {
+                        self.hasMorePages = false
+                    } else {
+                        self.myHikes.append(contentsOf: decodedResponse.userHikes)
+                        self.currentPage += 1
+                    }
+                    print("✅ Total Hikes:", self.myHikes.count)
                 }
             } catch {
-                print("Error decoding hike details:", error.localizedDescription)
+                print("❌ Error decoding:", error.localizedDescription)
             }
         }.resume()
     }
-
 }
+
 
 
 // MARK: - MyHikes View
 struct MyHikes: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel = MyHikeViewModel() // Use ViewModel
+    
     
     var body: some View {
         NavigationStack {
@@ -83,18 +122,31 @@ struct MyHikes: View {
                 
                 // ScrollView with Hikes
                 ScrollView {
-                    VStack(spacing: 10) {
-                        ForEach(viewModel.myHikes) { myHike in
+                    LazyVStack(spacing: 10) {
+                        ForEach(viewModel.myHikes.indices, id: \.self) { index in
+                            let myHike = viewModel.myHikes[index]
                             MyHikePostContainer(
-                                imageName: myHike.pictureUrl!,
+                                imageName: myHike.pictureUrl ?? "https://your-default-image-url.com",
                                 comment: myHike.trailName,
                                 length: myHike.length,
                                 duration: myHike.duration,
                                 colorScheme: colorScheme
                             )
+                            .onAppear {
+                                if index == viewModel.myHikes.count - 1 {
+                                    // User scrolled to last hike
+                                    viewModel.fetchMyHikes()
+                                }
+                            }
                         }
+                        
                     }
                     .padding()
+                    
+                    if viewModel.isLoading {
+                        ProgressView("Loading more hikes...")
+                            .padding()
+                    }
                 }
             }
             .padding(.top, 20)
