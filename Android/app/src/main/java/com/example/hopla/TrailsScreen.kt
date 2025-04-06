@@ -475,10 +475,21 @@ fun TrailsScreen(navController: NavController) {
                             }
                             Button(onClick = {
                                 // Apply filter logic here
-                                val selectedFiltersString = selectedFilters.entries.joinToString(separator = "") { (id, options) ->
+                                val selectedFiltersString = selectedFilters.entries.joinToString(separator = ";") { (id, options) ->
                                     "$id:${options.joinToString(separator = ",")}"
                                 }
                                 Log.d("SelectedFilters", selectedFiltersString)
+
+                                coroutineScope.launch {
+                                    try {
+                                        val trailsResponse = fetchTrails(token, 1, searchQuery, selectedFiltersString)
+                                        trails = trailsResponse.trails // Update the trails state with the new response
+                                        noResults = trails.isEmpty()
+                                    } catch (e: Exception) {
+                                        Log.e("fetchTrails", "Error fetching trails", e)
+                                    }
+                                }
+
                                 showFiltersDialog = false
                             }) {
                                 Text(text = stringResource(R.string.apply))

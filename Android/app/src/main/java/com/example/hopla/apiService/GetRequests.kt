@@ -171,7 +171,8 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String, fil
             path("trails", "all")
             parameters.append("search", searchQuery)
             parameters.append("pageNumber", pageNumber.toString())
-            parameters.append("filter", filtersQuery)
+            // Append the filtersQuery directly without URL encoding
+            encodedParameters.append("filter", filtersQuery)
         }.buildString()
 
         Log.d("fetchTrails", "Request URL: $url")
