@@ -145,7 +145,7 @@ fun TrailsScreen(navController: NavController) {
     var searchResponse by remember { mutableStateOf<List<Trail>>(emptyList()) }
 
     LaunchedEffect(searchQuery) {
-        pageNumber = 0
+        pageNumber = 1
         if (searchQuery.isEmpty()) {
             trails = emptyList()
             noResults = false

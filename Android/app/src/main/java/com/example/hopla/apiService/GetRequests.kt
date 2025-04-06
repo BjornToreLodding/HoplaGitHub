@@ -498,7 +498,7 @@ suspend fun fetchStableMessages(token: String, stableId: String, pageNumber: Int
 }
 
 //--------------------Get requests for home screen ------------------------
-suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: Boolean = false): FeedResponse {
+suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false): FeedResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -513,6 +513,9 @@ suspend fun fetchFeed(token: String, pageNumber: Int, onlyFriendsAndFollowing: B
             parameters.append("pageNumber", pageNumber.toString())
             if (onlyFriendsAndFollowing) {
                 parameters.append("onlyFriendsAndFollowing", "true")
+            }
+            if (onlyLikedTrails) {
+                parameters.append("onlyLikedTrails", "true")
             }
         }.buildString()
 
