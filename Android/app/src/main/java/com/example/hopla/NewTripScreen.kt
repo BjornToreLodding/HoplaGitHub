@@ -9,10 +9,12 @@ import android.location.Location
 import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,9 +23,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -57,6 +65,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun NewTripScreen() {
@@ -68,7 +77,9 @@ fun NewTripScreen() {
     var tripName by remember { mutableStateOf("") }
     var tripNotes by remember { mutableStateOf("") }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-
+    val horses = listOf("Horse 1", "Horse 2", "Horse 3")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedHorse by remember { mutableStateOf("") }
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
@@ -262,8 +273,50 @@ fun NewTripScreen() {
                                 label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(125.dp)
+                                    .height(100.dp)
                             )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        TextField(
+                            readOnly = true,
+                            value = if (selectedHorse.isEmpty()) "No Horse Selected" else selectedHorse,
+                            onValueChange = {},
+                            label = { Text("Select Horse") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedHorse = ""
+                                    expanded = false
+                                }
+                            ) {
+                                Text("No Horse Selected")
+                            }
+                            horses.forEach { horse ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        selectedHorse = horse
+                                        expanded = false
+                                    }
+                                ) {
+                                    Text(horse)
+                                }
+                            }
                         }
                     }
                     ImagePicker(
@@ -275,7 +328,7 @@ fun NewTripScreen() {
                             bitmap = bitmap.asImageBitmap(),
                             contentDescription = null,
                             modifier = Modifier
-                                .size(200.dp)
+                                .size(50.dp)
                                 .padding(top = 16.dp)
                         )
                     }

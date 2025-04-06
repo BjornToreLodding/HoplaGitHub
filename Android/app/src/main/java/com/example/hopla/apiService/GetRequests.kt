@@ -21,20 +21,23 @@ import com.example.hopla.universalData.TrailsResponse
 import com.example.hopla.universalData.UserHikesResponse
 import com.example.hopla.universalData.UserRelationRequest
 import com.example.hopla.universalData.apiUrl
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
-import io.ktor.http.HttpHeaders
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.path
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 
 suspend fun fetchHorses(userId: String, token: String): List<Horse> {
     val httpClient = HttpClient {
@@ -48,6 +51,9 @@ suspend fun fetchHorses(userId: String, token: String): List<Horse> {
                 append("Authorization", "Bearer $token")
             }
         }
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchHorses", "Response Code: ${response.status.value}")
+        Log.d("fetchHorses", "Response Body: $responseBody")
         response.body()
     }
 }
