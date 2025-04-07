@@ -22,6 +22,7 @@ public class FeedItemDto
     [JsonIgnore]
     public double? Longitude { get; set; } // 🌍
     public int Likes { get; set; }
+    public bool isLikedByUser { get; set; }
 
     public Double Duration { get; set; } // Kun relevant for UserHike
 }

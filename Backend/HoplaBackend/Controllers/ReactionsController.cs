@@ -53,8 +53,13 @@ public class ReactionController : ControllerBase
         _context.EntityReactions.Add(reaction);
 
         // Oppdater LikesCount i EntityFeed
-        var feed = await _context.EntityFeeds.FirstOrDefaultAsync(f => f.Id == response.EntityId);
+        var feed = await _context.EntityFeeds.FirstOrDefaultAsync(f => f.EntityId == response.EntityId);
+        Console.WriteLine("");
+        Console.WriteLine(response.EntityId);
         
+        Console.WriteLine(feed);
+        //Console.WriteLine(feed.LikesCount);
+        Console.WriteLine("");
         if (feed != null)
         {
             feed.LikesCount++;
@@ -89,7 +94,7 @@ public class ReactionController : ControllerBase
         _context.EntityReactions.Remove(existingReaction);
 
         // Oppdater LikesCount i EntityFeed
-        var feed = await _context.EntityFeeds.FirstOrDefaultAsync(f => f.Id == response.EntityId);
+        var feed = await _context.EntityFeeds.FirstOrDefaultAsync(f => f.EntityId == response.EntityId);
         if (feed != null && feed.LikesCount > 0)
         {
             feed.LikesCount--;

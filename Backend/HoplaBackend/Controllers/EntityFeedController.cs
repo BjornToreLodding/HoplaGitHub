@@ -116,17 +116,24 @@ public class EntityFeedController : ControllerBase
         // 🌍 Bygg Feed DTOs og filtrer på radius
         var result = new List<FeedItemDto>();
 
+        var feedEntityIds = feedEntries.Select(f => f.EntityId).ToList();
+
+        var likedEntityIds = await _context.EntityReactions
+            .Where(r => r.UserId == userId && feedEntityIds.Contains(r.EntityId))
+            .Select(r => r.EntityId)
+            .ToListAsync();
+
         foreach (var entry in feedEntries)
         {
             var dto = entry.EntityName switch
             {
-                EntityType.Trail => await BuildTrailDto(entry),
-                EntityType.UserHike => await BuildUserHikeDto(entry),
-                EntityType.TrailReview => await BuildTrailReviewDto(entry),
-                EntityType.TrailRating => await BuildTrailRatingDto(entry),
-                EntityType.Horse => await BuildHorseDto(entry),
-                EntityType.Stable => await BuildStableDto(entry),
-                EntityType.StableMessage => await BuildStableMessageDto(entry),
+                EntityType.Trail => await BuildTrailDto(entry, likedEntityIds),
+                EntityType.UserHike => await BuildUserHikeDto(entry, likedEntityIds),
+                EntityType.TrailReview => await BuildTrailReviewDto(entry, likedEntityIds),
+                EntityType.TrailRating => await BuildTrailRatingDto(entry, likedEntityIds),
+                EntityType.Horse => await BuildHorseDto(entry, likedEntityIds),
+                EntityType.Stable => await BuildStableDto(entry, likedEntityIds),
+                EntityType.StableMessage => await BuildStableMessageDto(entry, likedEntityIds),
                 _ => null
             };
 
@@ -248,7 +255,7 @@ public class EntityFeedController : ControllerBase
     */
 
 
-    private async Task<FeedItemDto?> BuildTrailDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildTrailDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var trail = await _context.Trails
             .Include(t => t.User)
@@ -272,10 +279,11 @@ public class EntityFeedController : ControllerBase
             UserId = trail.UserId,
             UserAlias = trail.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(trail.User.PictureUrl, "UserProfilePictureList"),
-            Likes =  entry.LikesCount
+            Likes =  entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(trail.Id)
         };
     }
-    private async Task<FeedItemDto?> BuildUserHikeDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildUserHikeDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var hike = await _context.UserHikes
             .Include(h => h.User)
@@ -315,7 +323,8 @@ public class EntityFeedController : ControllerBase
             Latitude = latitude,
             Longitude = longitude,
             Duration = hike.Duration,
-            Likes = entry.LikesCount
+            Likes = entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(hike.Id)
         };
     }
 
@@ -348,7 +357,7 @@ public class EntityFeedController : ControllerBase
         }
         */
 
-    private async Task<FeedItemDto?> BuildTrailReviewDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildTrailReviewDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var review = await _context.TrailReviews
             .Include(r => r.User)
@@ -372,10 +381,11 @@ public class EntityFeedController : ControllerBase
             Longitude = review.Trail.LongMean,
             UserAlias = review.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(review.User.PictureUrl, "UserProfilePictureList"),
-            Likes =  entry.LikesCount
+            Likes =  entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(review.Id)
         };
     }
-    private async Task<FeedItemDto?> BuildTrailRatingDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildTrailRatingDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var rating = await _context.TrailRatings
             .Include(r => r.User)
@@ -398,10 +408,11 @@ public class EntityFeedController : ControllerBase
             Longitude = rating.Trail.LongMean,
             UserAlias = rating.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(rating.User.PictureUrl, "UserProfilePictureList"),
-            Likes = entry.LikesCount
+            Likes = entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(rating.Id)
         };
     }
-    private async Task<FeedItemDto?> BuildHorseDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildHorseDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var horse = await _context.Horses
             .Include(h => h.User)
@@ -422,10 +433,11 @@ public class EntityFeedController : ControllerBase
             UserId = horse.UserId,
             UserAlias = horse.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(horse.User.PictureUrl, "UserProfilePictureList"),
-            Likes = entry.LikesCount
+            Likes = entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(horse.Id)
         };
     }
-    private async Task<FeedItemDto?> BuildStableDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildStableDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var stable = await _context.Stables
             .Include(s => s.StableUsers)
@@ -451,11 +463,12 @@ public class EntityFeedController : ControllerBase
             UserId = owner?.Id ?? Guid.Empty, // 👈 bruker eieren hvis finnes
             UserAlias = owner?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(owner.PictureUrl, "UserProfilePictureList"),
-            Likes = entry.LikesCount
+            Likes = entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(stable.Id)
         };
     }
 
-    private async Task<FeedItemDto?> BuildStableMessageDto(EntityFeed entry)
+    private async Task<FeedItemDto?> BuildStableMessageDto(EntityFeed entry, List<Guid> likedEntityIds)
     {
         var stableMessage = await _context.StableMessages
             .Include(sm => sm.User)
@@ -476,7 +489,8 @@ public class EntityFeedController : ControllerBase
             UserId = stableMessage.UserId,
             UserAlias = stableMessage.User?.Alias,
             UserProfilePicture = PictureHelper.BuildPictureUrl(stableMessage.User.PictureUrl, "UserProfilePictureList"),
-            Likes =  entry.LikesCount
+            Likes =  entry.LikesCount,
+            isLikedByUser = likedEntityIds.Contains(stableMessage.Id)
         };
     }
 
