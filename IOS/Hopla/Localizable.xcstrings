@@ -77,6 +77,9 @@
         }
       }
     },
+    "Apply Filters" : {
+
+    },
     "Are you sure you want to delete %@?" : {
       "localizations" : {
         "nb" : {
@@ -156,6 +159,9 @@
           }
         }
       }
+    },
+    "Choose" : {
+
     },
     "Community" : {
       "comment" : "Community tab",
@@ -1193,6 +1199,9 @@
           }
         }
       }
+    },
+    "Yes" : {
+
     },
     "You will be logged out of your account." : {
       "localizations" : {
