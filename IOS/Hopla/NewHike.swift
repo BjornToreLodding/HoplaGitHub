@@ -9,6 +9,7 @@ import SwiftUI
 import GoogleMaps
 import GooglePlaces
 
+
 struct NewHike: View {
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject private var locationManager = LocationManager()
@@ -37,8 +38,8 @@ struct NewHike: View {
 
                 // Time and Distance Tracking
                 HStack {
-                    Text(formatTime(elapsedTime))
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    Text("Elapsed Time: \(Int(locationManager.elapsedTime) / 60):\(Int(locationManager.elapsedTime) % 60)")
+
 
                     Button(action: {
                         isTracking.toggle()
@@ -61,12 +62,15 @@ struct NewHike: View {
                     // ✅ Move .alert outside
                     .alert("Save or Fill in Details", isPresented: $showPopup) {
                         Button("Save") {
-                            saveHike()
+                            saveHike {
+                                // Optional: what to do after saving
+                            }
                         }
                         Button("Fill in Details") {
                             showDetailForm = true
                         }
                     }
+
 
                     // ✅ Move .sheet outside
                     .sheet(isPresented: $showDetailForm) {
@@ -98,10 +102,14 @@ struct NewHike: View {
 
         print("🚀 Starting hike tracking!")
 
-        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
-            locationManager.requestLocationUpdate()
-            self.elapsedTime += 3
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            DispatchQueue.main.async {
+                locationManager.elapsedTime += 1 // ✅ Updates every second
+                print("⏳ Timer Updated Elapsed Time:", locationManager.elapsedTime) // ✅ Debugging duration updates
+            }
         }
+
+
 
         locationManager.startTracking()
     }
@@ -116,7 +124,7 @@ struct NewHike: View {
         showPopup = true // ✅ Show pop-up when stopping
     }
     
-    private func saveHike() {
+    private func saveHike(completion: @escaping () -> Void) {
         guard let token = TokenManager.shared.getToken() else { return }
         
         let url = URL(string: "https://hopla.onrender.com/userhikes/create")!
@@ -124,6 +132,9 @@ struct NewHike: View {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        print("📡 Title being sent:", title) // ✅ Debugging hike name
+
 
         let body: [String: Any] = [
             "Title": title.isEmpty ? "Unnamed Hike" : title,
@@ -163,6 +174,9 @@ struct NewHike: View {
             if let httpResponse = response as? HTTPURLResponse {
                 print("📡 Hike saved successfully! Status:", httpResponse.statusCode)
             }
+            DispatchQueue.main.async {
+                        completion()
+                    }
         }.resume()
     }
 }
@@ -172,13 +186,16 @@ struct FillHikeDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var locationManager: LocationManager
+    
+    @State private var selectedImage: UIImage?
+    @State private var showImagePicker = false
+
 
     @State private var title = ""
     @State private var description = ""
     @State private var stars: Int = 0
     @State private var filters: String = ""
     @State private var isPrivate = false
-    @State private var selectedImage: UIImage?
 
     var body: some View {
         NavigationStack {
@@ -196,16 +213,33 @@ struct FillHikeDetailsView: View {
                         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
 
                     // Image Picker
-                    Button("Select Image") {
-                        // Implement image picker
+                    Section(header: Text("Image Selection")) {
+                        Button(action: { showImagePicker = true }) {
+                            Text("Select Image")
+                        }
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+
+                        if let image = selectedImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 100)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        } else {
+                            Text("No image selected")
+                        }
                     }
-                    .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                    .sheet(isPresented: $showImagePicker) {
+                        ImagePicker(sourceType: .photoLibrary, selectedImage: $selectedImage, showImagePicker: $showImagePicker)
+                    }
+
                 }
                 .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
 
                 Button("Save Hike") {
-                    saveHike()
-                    presentationMode.wrappedValue.dismiss()
+                    saveHike {
+                            presentationMode.wrappedValue.dismiss() // ✅ Only dismiss when saving
+                        }
                 }
                 .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             }
@@ -214,7 +248,7 @@ struct FillHikeDetailsView: View {
         }
     }
 
-    private func saveHike() {
+    private func saveHike(completion: @escaping () -> Void) {
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found.")
             return
@@ -223,32 +257,70 @@ struct FillHikeDetailsView: View {
         let url = URL(string: "https://hopla.onrender.com/userhikes/create")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        // ✅ Debugging Duration Before Sending
+            print("📡 Title being sent:", title)
+            print("📡 Duration before sending:", locationManager.elapsedTime)
+            print("📡 Formatted Duration:", String(format: "%.2f", locationManager.elapsedTime / 60))
+        
+        // Prepare coordinates JSON string
+        let coordinatesArray = locationManager.coordinates.map {
+            [
+                "timestamp": Int($0.timestamp),
+                "lat": $0.lat,
+                "long": $0.long
+            ]
+        }
 
-        let body: [String: Any] = [
-            "Title": title.isEmpty ? "Unnamed Hike" : title, // ✅ Ensure title exists
-            "Description": description.isEmpty ? "No description provided." : description,
-            "StartedAt": ISO8601DateFormatter().string(from: Date()),
-            "Distance": String(format: "%.2f", locationManager.distance),
-            "Duration": String(format: "%.2f", locationManager.elapsedTime / 60),
-            "Coordinates": locationManager.coordinates.map {
-                ["timestamp": Int($0.timestamp), "lat": $0.lat, "long": $0.long]
-            },
-            "HorseId": NSNull(),
-            "TrailId": NSNull(),
-            "Stars": stars, // ✅ Now correctly references the @State variable
-            "Filters": filters.isEmpty ? "None" : filters,
-            "IsPrivate": isPrivate
-        ]
 
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-        } catch {
-            print("❌ Failed to encode JSON:", error)
+        guard let coordinatesData = try? JSONSerialization.data(withJSONObject: coordinatesArray, options: []),
+              let coordinatesString = String(data: coordinatesData, encoding: .utf8) else {
+            print("❌ Failed to serialize coordinates")
             return
         }
 
+        // Prepare other fields
+        var body = Data()
+        
+        func appendField(name: String, value: String) {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(value)\r\n".data(using: .utf8)!)
+        }
+
+        appendField(name: "Title", value: title.isEmpty ? "Unnamed Hike" : title)
+        appendField(name: "Description", value: description.isEmpty ? "No description provided." : description)
+        appendField(name: "StartedAt", value: ISO8601DateFormatter().string(from: Date()))
+        appendField(name: "Distance", value: locationManager.distance > 0 ? String(format: "%.2f", locationManager.distance) : "0.00")
+        appendField(name: "Duration", value: locationManager.elapsedTime > 0 ? String(format: "%.2f", locationManager.elapsedTime / 60) : "1.00")
+
+
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"Coordinates\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!) // ✅ Explicit JSON format
+        body.append(coordinatesData) // ✅ Direct JSON data
+        body.append("\r\n".data(using: .utf8)!)
+
+
+        appendField(name: "HorseId", value: "") // send empty string instead of NSNull
+        appendField(name: "TrailId", value: "")
+        appendField(name: "Stars", value: "\(stars)")
+        appendField(name: "Filters", value: filters.isEmpty ? "None" : filters)
+        appendField(name: "IsPrivate", value: isPrivate ? "true" : "false")
+        
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        if let rawBody = String(data: body, encoding: .utf8) {
+            print("📡 Final Request Body:\n", rawBody) // ✅ Debugging raw request payload
+        }
+
+        request.httpBody = body
+
+        // Send request
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Error saving hike:", error.localizedDescription)
@@ -258,6 +330,8 @@ struct FillHikeDetailsView: View {
             if let httpResponse = response as? HTTPURLResponse {
                 print("📡 Hike saved! Status:", httpResponse.statusCode)
             }
+            
+            
 
             if let data = data {
                 do {
@@ -266,9 +340,13 @@ struct FillHikeDetailsView: View {
                 } catch {
                     print("❌ Failed to decode server response:", error.localizedDescription)
                 }
+                
+                
+            }
+            
+            DispatchQueue.main.async {
+                completion()
             }
         }.resume()
     }
-
-
 }

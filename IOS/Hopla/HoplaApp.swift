@@ -44,6 +44,8 @@ struct HoplaApp: App {
                     if isLoggedIn {
                         MainTabView(navigationPath: $navigationPath)
                             .environmentObject(vm)
+                            .environmentObject(loginViewModel)
+                            .environmentObject(locationManager)
                     } else {
                         Login(viewModel: LoginViewModel(), loginViewModel: loginViewModel)
                     }

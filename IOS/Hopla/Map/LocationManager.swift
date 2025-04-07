@@ -26,6 +26,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var isTracking: Bool = false
     @Published var elapsedTime: TimeInterval = 0.0
     
+    
     override init() {
         super.init()
         locationManager.delegate = self
@@ -69,6 +70,11 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
         print("📍 New Location Received: \(newCoordinate.lat), \(newCoordinate.long)") // ✅ Debug GPS updates
 
+        DispatchQueue.main.async {
+            self.userLocation = location // ✅ Update user location
+            print("📍 User Location Updated:", self.userLocation?.coordinate.latitude ?? "No Latitude", self.userLocation?.coordinate.longitude ?? "No Longitude") // ✅ Debug UI behavior
+        }
+
         if isTracking, let lastCoordinate = coordinates.last {
             let calculatedDistance = calculateDistance(from: lastCoordinate, to: newCoordinate)
 
@@ -89,6 +95,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             self.coordinates.append(newCoordinate)
         }
     }
+
 
 
     

@@ -463,20 +463,41 @@ struct Hikes: View {
         guard !isLoading else { return }
         isLoading = true
 
-        HikeService.shared.fetchHikesByLocation(latitude: location.coordinate.latitude,
-                                                longitude: location.coordinate.longitude) { result in
-            DispatchQueue.main.async {
+        HikeService.shared.fetchHikesByLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { result in
+            DispatchQueue.main.async(execute: DispatchWorkItem {
+                
                 switch result {
+                    
                 case .success(let response):
-                    hikes = response.trails
-                    canLoadMore = false // No pagination for location-based fetch
+                    print("📍 Raw Hike Data:", response.trails)
+                    self.hikes = response.trails.sorted { (hike1, hike2) in
+                        guard let hike1Lat = hike1.latitude,
+                              let hike1Long = hike1.longitude,
+                              let hike2Lat = hike2.latitude,
+                              let hike2Long = hike2.longitude else { return false }
+
+                        let hike1Location = CLLocation(latitude: hike1Lat, longitude: hike1Long)
+                        let hike2Location = CLLocation(latitude: hike2Lat, longitude: hike2Long)
+
+                        let distance1 = location.distance(from: hike1Location)
+                        let distance2 = location.distance(from: hike2Location)
+
+                        print("📏 Hike 1 Distance:", distance1, "📏 Hike 2 Distance:", distance2) // ✅ Debug distance calculations
+
+                        return distance1 < distance2 // ✅ Sort by proximity
+                    }
+
+                    self.canLoadMore = false // No pagination for location-based fetch
                 case .failure(let error):
                     print("❌ Error fetching hikes by location:", error.localizedDescription)
                 }
-                isLoading = false
-            }
+                self.isLoading = false
+            })
         }
+
     }
+
+
     
     private func fetchFavoriteHikes(page: Int, pageSize: Int = 20) {
         guard !isLoading else { return }
@@ -545,8 +566,11 @@ struct Hikes: View {
             fetchHikes()
         case .location:
             if let location = userLocation {
-                fetchHikesByLocation(location)
-            }
+                    print("📍 Fetching hikes by user location")
+                    fetchHikesByLocation(location)
+                } else {
+                    print("❌ User location is nil!")
+                }
         case .heart:
             fetchAllHikesIfNeeded()
         case .star:

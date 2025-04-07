@@ -278,6 +278,9 @@
         }
       }
     },
+    "Description of trail" : {
+
+    },
     "Description:" : {
       "localizations" : {
         "nb" : {
@@ -325,6 +328,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Varighet: %@ min"
+          }
+        }
+      }
+    },
+    "Elapsed Time: %lld:%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Elapsed Time: %1$lld:%2$lld"
           }
         }
       }
@@ -797,6 +810,9 @@
         }
       }
     },
+    "My rating:" : {
+
+    },
     "Name" : {
       "localizations" : {
         "nb" : {
@@ -859,6 +875,9 @@
           }
         }
       }
+    },
+    "Nyeste oppdatering om ruten" : {
+
     },
     "OK" : {
       "localizations" : {
@@ -923,6 +942,9 @@
           }
         }
       }
+    },
+    "Rating:" : {
+
     },
     "Report an Issue" : {
       "localizations" : {

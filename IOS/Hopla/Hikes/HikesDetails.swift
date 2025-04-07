@@ -4,29 +4,53 @@ struct HikesDetails: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     let hike: Hike
-    
+
     @State private var userRating: Int = 0
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                
+                // 1. Title
                 HikeTitleView(hike: hike)
-                ScrollView {
-                    VStack {
-                        HikeImageView(hike: hike)
-                        //HikeFiltersView(hike: hike)
-                        HikeButtonsView()
-                        // Add other extracted subviews here
-                    }
-                    .padding()
-                }
-                //.background(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen, colorScheme: colorScheme))
+
+                // 2. Image
+                HikeImageView(hike: hike)
+
+                // 3. Filters
+                HikeFiltersView(hike: hike)
+
+                // 4. Buttons
+                HikeButtonsView()
+
+                // 5. Description
+                Text("Description of trail")
+
+                // 6. Rating
+                HStack {
+                    Text("Rating:")
+                    StarRating(rating: .constant(hike.averageRating))
+                }.padding(.horizontal)
+
+                // 7. User rating
+                VStack(alignment: .leading) {
+                    Text("My rating:")
+                    StarRating(rating: $userRating) // You need to make this too
+                }.padding(.horizontal)
+
+                // 8. Update box
+                Text("Nyeste oppdatering om ruten")
+                    .padding(.horizontal)
+                    .padding(.vertical)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(10)
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(.top)
         }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
+
 
 
 // Title of struct
@@ -60,29 +84,30 @@ struct HikeImageView: View {
     }
 }
 
-// Filter section
-/*
 struct HikeFiltersView: View {
     let hike: Hike
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(hike.filters) { filter in
-                    Text(filter.rawValue)
-                        .font(.subheadline)
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 5)
-                        .background(Color.green.opacity(0.2))
-                        .cornerRadius(10)
+                if let filters = hike.filters {
+                    ForEach(filters, id: \.id) { filter in
+                        Text(filter.displayName)
+                            .font(.subheadline)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(8)
+                    }
                 }
+
             }
-            .padding(.leading, 5)
+            .padding(.horizontal)
         }
-        .frame(height: 40)
     }
 }
-*/
+
+
  
 // Hikes button
 struct HikeButtonsView: View {
@@ -100,3 +125,31 @@ struct HikeButtonsView: View {
     }
 }
 
+struct StarsView: View {
+    let rating: Int
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(1...5, id: \.self) { index in
+                Image(systemName: index <= rating ? "star.fill" : "star")
+                    .foregroundColor(.yellow)
+            }
+        }
+    }
+}
+
+struct StarsPicker: View {
+    @Binding var rating: Int
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(1...5, id: \.self) { index in
+                Image(systemName: index <= rating ? "star.fill" : "star")
+                    .foregroundColor(.yellow)
+                    .onTapGesture {
+                        rating = index
+                    }
+            }
+        }
+    }
+}

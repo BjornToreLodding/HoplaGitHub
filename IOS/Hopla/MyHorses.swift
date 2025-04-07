@@ -469,7 +469,7 @@ struct AddHorseView: View {
                 }
             }
             .sheet(isPresented: $showImagePicker) {
-                ImagePicker(sourceType: .photoLibrary, selectedImage: $selectedImage)
+                ImagePicker(sourceType: .photoLibrary, selectedImage: $selectedImage, showImagePicker: $showImagePicker)
             }
         }
     }

@@ -17,6 +17,16 @@ struct MyHike: Codable, Identifiable {
     let duration: Double
     let pictureUrl: String?
     let TrailButton: Bool?
+    
+    // Custom initializer from dictionary
+        init(from dictionary: [String: Any]) {
+            self.id = dictionary["id"] as? String ?? UUID().uuidString // Assuming `id` is present in your dictionary
+            self.trailName = dictionary["Title"] as? String ?? "Unnamed"
+            self.length = Double(dictionary["Distance"] as? String ?? "0") ?? 0.0
+            self.duration = Double(dictionary["Duration"] as? String ?? "0") ?? 0.0
+            self.pictureUrl = dictionary["PictureUrl"] as? String
+            self.TrailButton = dictionary["TrailButton"] as? Bool
+        }
 }
 
 // MARK: - API Response Model
@@ -32,7 +42,7 @@ class MyHikeViewModel: ObservableObject {
     @Published var isLoading = false
     
     private var cancellable: AnyCancellable?
-    private var currentPage: Int = 3 // Starting point
+    private var currentPage: Int = 1 // Starting point
     private let pageSize = 4
     private var hasMorePages = true
 
@@ -103,6 +113,14 @@ class MyHikeViewModel: ObservableObject {
             }
         }.resume()
     }
+    
+    func refresh() {
+        self.currentPage = 1
+        self.myHikes = []
+        self.hasMorePages = true
+        fetchMyHikes()
+    }
+
 }
 
 
@@ -126,7 +144,7 @@ struct MyHikes: View {
                         ForEach(viewModel.myHikes.indices, id: \.self) { index in
                             let myHike = viewModel.myHikes[index]
                             MyHikePostContainer(
-                                imageName: myHike.pictureUrl ?? "https://your-default-image-url.com",
+                                imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
                                 comment: myHike.trailName,
                                 length: myHike.length,
                                 duration: myHike.duration,

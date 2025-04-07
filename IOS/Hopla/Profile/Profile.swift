@@ -281,7 +281,7 @@ struct Profile: View {
                             }
                         }
                         .sheet(isPresented: $vm.showPicker) {
-                            ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image)
+                            ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image, showImagePicker: $isShowingCamera)
                             // Ensure the profileImage is updated when vm.image changes
                                 .onChange(of: vm.image) { newImage in
                                     profileImage = newImage
@@ -543,7 +543,7 @@ struct Profile: View {
             }
         }
         .sheet(isPresented: $vm.showPicker) {
-            ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image)
+            ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image, showImagePicker: $isShowingCamera)
         }
         
     }
