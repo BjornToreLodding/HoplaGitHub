@@ -9,6 +9,7 @@ import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
 import com.example.hopla.universalData.NewHike
+import com.example.hopla.universalData.ReactionRequest
 import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableActionRequest
 import com.example.hopla.universalData.StableActionResponse
@@ -525,5 +526,30 @@ suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap
     val responseBody: String = response.bodyAsText()
     Log.d("createNewHike", "Response Status: ${response.status}")
     Log.d("createNewHike", "Response Body: $responseBody")
+    return responseBody
+}
+
+//-------------------Post requests for home screen------------------------
+suspend fun postReaction(token: String, entityId: String): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val requestBody = ReactionRequest(EntityId = entityId)
+    val response: HttpResponse = client.post("https://hopla.onrender.com/reactions") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(requestBody)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("reactionResponse", "Response Status: ${response.status}")
+    client.close()
     return responseBody
 }

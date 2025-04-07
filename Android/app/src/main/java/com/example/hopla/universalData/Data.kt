@@ -420,7 +420,11 @@ data class FeedResponse(
     val items: List<FeedItem>
 )
 
-//--------------------Data classes for new hi   ke screen---------------
+// data class for the reaction to a post
+@Serializable
+data class ReactionRequest(val EntityId: String)
+
+//--------------------Data classes for new hike screen---------------
 @Serializable
 data class Coordinate(
     val timestamp: Long,

@@ -53,8 +53,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.hopla.apiService.deleteReaction
 import com.example.hopla.apiService.fetchFeed
 import com.example.hopla.apiService.fetchTrails
+import com.example.hopla.apiService.postReaction
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
@@ -211,6 +213,7 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
     var likesCount by remember { mutableStateOf(feedItem.likes) }
 
     val (formattedDate, formattedTime) = formatDateTime(feedItem.createdAt)
+    val token = UserSession.token
 
     Column(
         modifier = Modifier
@@ -289,18 +292,6 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
                         .padding(bottom = 8.dp)
-                        .then(
-                            if (feedItem.entityName == "Trail") {
-                                Modifier.clickable {
-                                    Log.d("PostItem", "Trail clicked: ${feedItem.entityId}")
-                                    gatherMoreInfo(feedItem.title, UserSession.token) { response ->
-                                        // Handle the response here
-                                    }
-                                }
-                            } else {
-                                Modifier
-                            }
-                        )
                 )
                 // Description
                 Text(
@@ -342,7 +333,13 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                 IconButton(onClick = {
                     isLiked = !isLiked
                     likesCount = if (isLiked) likesCount + 1 else likesCount - 1
-                    // TODO: Connect to post/delete endpoint to give posts likes
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (isLiked) {
+                            postReaction(token, feedItem.entityId)
+                        } else {
+                            deleteReaction(token, feedItem.entityId)
+                        }
+                    }
                 }) {
                     Icon(
                         imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -350,7 +347,6 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                         tint = if (isLiked) HeartColor else MaterialTheme.colorScheme.secondary
                     )
                 }
-
                 Text(
                     text = likesCount.toString(),
                     style = generalTextStyle,
@@ -358,7 +354,6 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
-
         }
         if (showReportDialog) {
             ReportDialog(

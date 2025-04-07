@@ -8,6 +8,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import android.util.Log
+import com.example.hopla.universalData.ReactionRequest
 import com.example.hopla.universalData.StableActionRequest
 import com.example.hopla.universalData.StableActionResponse
 import com.example.hopla.universalData.UserRelationChangeRequest
@@ -116,4 +117,28 @@ suspend fun leaveStable(token: String, stableActionRequest: StableActionRequest)
     client.close()
     Log.d("stableJoinLeave", "Response Body: $responseBody")
     return Json.decodeFromString(StableActionResponse.serializer(), responseBody)
+}
+
+suspend fun deleteReaction(token: String, entityId: String): String {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val requestBody = ReactionRequest(EntityId = entityId)
+    val response: HttpResponse = client.delete("https://hopla.onrender.com/reactions") {
+        header("Authorization", "Bearer $token")
+        contentType(ContentType.Application.Json)
+        setBody(requestBody)
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("reactionResponse", "Response Status: ${response.status}")
+    client.close()
+    return responseBody
 }
