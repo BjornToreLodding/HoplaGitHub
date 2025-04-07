@@ -22,12 +22,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,18 +58,24 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.R
+import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.apiService.fetchTrailFilters
 import com.example.hopla.apiService.fetchUserHikes
+import com.example.hopla.apiService.updateUserHike
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.Hike
+import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.MapButton
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.TrailFilter
 import com.example.hopla.universalData.UserSession
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -75,15 +86,18 @@ fun MyTripsScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
 
-    LaunchedEffect(pageNumber) {
+    fun reloadHikes() {
         coroutineScope.launch {
             try {
-                val newHikes = fetchUserHikes(token, pageNumber)
-                userHikes = userHikes + newHikes
+                userHikes = fetchUserHikes(token, pageNumber)
             } catch (e: Exception) {
                 Log.e("UserHikesScreen", "Error fetching user hikes", e)
             }
         }
+    }
+
+    LaunchedEffect(pageNumber) {
+        reloadHikes()
     }
 
     LaunchedEffect(Unit) {
@@ -113,7 +127,7 @@ fun MyTripsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(userHikes) { hike ->
-                        HikeItem(hike = hike, filters = filters, isMyTripsScreen = true)
+                        HikeItem(hike = hike, filters = filters, isMyTripsScreen = true, onHikesReload = { reloadHikes() })
                     }
                     item {
                         Button(
@@ -132,17 +146,23 @@ fun MyTripsScreen(navController: NavController) {
 }
 
 @Composable
-fun HikeItem(hike: Hike, filters: List<TrailFilter> = emptyList(), isMyTripsScreen: Boolean) {
+fun HikeItem(
+    hike: Hike,
+    filters: List<TrailFilter> = emptyList(),
+    isMyTripsScreen: Boolean,
+    onHikesReload: () -> Unit = {}
+) {
     var showEditDialog by remember { mutableStateOf(false) }
 
     if (showEditDialog) {
         EditTripDialog(
             hike = hike,
             onDismiss = { showEditDialog = false },
-            onSave = { tripName, tripDescription, selectedImage ->
+            onSave = { tripName, tripDescription, selectedImage, selectedHorseId ->
                 // Handle save action
                 showEditDialog = false
-            }
+            },
+            onHikesReload = onHikesReload
         )
     }
 
@@ -331,15 +351,27 @@ fun ShareTripDialog(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditTripDialog(
     hike: Hike,
     onDismiss: () -> Unit,
-    onSave: (String, String, Bitmap?) -> Unit
+    onSave: (String, String, Bitmap?, String?) -> Unit,
+    onHikesReload: () -> Unit
 ) {
     var tripName by remember { mutableStateOf(hike.title) }
     var tripDescription by remember { mutableStateOf(hike.comment ?: "") }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
+    var horses by remember { mutableStateOf(listOf<String>()) }
+    var selectedHorse by remember { mutableStateOf("") }
+    var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
+    var expanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val fetchedHorses = fetchHorses("", UserSession.token)
+        horses = fetchedHorses.map { it.name }
+        horseMap = fetchedHorses.associateBy { it.name }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -350,7 +382,7 @@ fun EditTripDialog(
                     TextField(
                         value = it,
                         onValueChange = { tripName = it },
-                        label = { Text (text = stringResource(R.string.trip_name)) },
+                        label = { Text(text = stringResource(R.string.trip_name)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -361,6 +393,46 @@ fun EditTripDialog(
                     label = { Text(text = stringResource(R.string.description)) },
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    TextField(
+                        readOnly = true,
+                        value = if (selectedHorse.isEmpty()) "No Horse Selected" else selectedHorse,
+                        onValueChange = {},
+                        label = { Text("Select Horse") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedHorse = ""
+                                expanded = false
+                            }
+                        ) {
+                            Text("No Horse Selected", color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        horses.forEach { horse ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedHorse = horse
+                                    expanded = false
+                                }
+                            ) {
+                                Text(horse, color = MaterialTheme.colorScheme.secondary)
+                            }
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 ImagePicker(
                     onImageSelected = { bitmap -> selectedImage = bitmap },
@@ -379,7 +451,22 @@ fun EditTripDialog(
         },
         confirmButton = {
             Button(onClick = {
+                val updatedTitle = if (tripName != hike.title) tripName else null
+                val updatedDescription = if (tripDescription != hike.comment) tripDescription else null
+                val updatedHorseId = if (selectedHorse.isNotEmpty()) horseMap[selectedHorse]?.id else null
 
+                CoroutineScope(Dispatchers.IO).launch {
+                    updateUserHike(
+                        token = UserSession.token,
+                        userHikeId = hike.id,
+                        title = updatedTitle,
+                        horseId = updatedHorseId,
+                        imageBitmap = selectedImage,
+                        description = updatedDescription
+                    )
+                }
+                onSave(tripName ?: "", tripDescription ?: "", selectedImage, updatedHorseId)
+                onHikesReload()
                 onDismiss()
             }) {
                 Text("Save")

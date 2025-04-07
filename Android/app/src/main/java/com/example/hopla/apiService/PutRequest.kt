@@ -214,5 +214,8 @@ suspend fun updateUserHike(
     }
 
     val responseBody: String = response.bodyAsText()
+    Log.d("updateUserHike", "Response code: ${response.status.value}")
+    Log.d("updateUserHike" , "Response form data: $formData")
+    Log.d("updateUserHike", "Response: $responseBody")
     return responseBody
 }
