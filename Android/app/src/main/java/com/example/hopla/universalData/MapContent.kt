@@ -1,28 +1,21 @@
 package com.example.hopla.universalData
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import android.Manifest
+import android.graphics.Bitmap
 import android.location.LocationManager
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -30,30 +23,44 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
+import com.example.hopla.AlertDialogContent
+import com.example.hopla.R
+import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.apiService.fetchTrailCoordinates
 import com.example.hopla.apiService.fetchTrailsOnMap
 import com.example.hopla.apiService.fetchUserHikeCoordinates
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
-import com.example.hopla.R
 
 // Map screen for displaying trails on a map
 @Composable
@@ -177,53 +184,114 @@ fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
     }
 }
 
+//@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun StartTripMapScreen(trailId: String) {
+fun StartTripMapScreen(trailId: String, navController: NavController) {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
-    val zoomLevel = remember { mutableIntStateOf(15) } // Adjusted zoom level for closer view
+    val zoomLevel = remember { mutableIntStateOf(15) }
     val latitude = remember { mutableDoubleStateOf(0.0) }
     val longitude = remember { mutableDoubleStateOf(0.0) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
     val trailCoordinates = remember { mutableStateOf<List<TrailCoordinate>>(emptyList()) }
+    var showSaveDialog by remember { mutableStateOf(false) }
+    var tripName by remember { mutableStateOf("") }
+    var tripNotes by remember { mutableStateOf("") }
+    var selectedHorse by remember { mutableStateOf("") }
+    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
+    var horses by remember { mutableStateOf(listOf<String>()) }
+    var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
 
-    AndroidView({ mapView }) {
-        mapView.getMapAsync { googleMap ->
-            googleMap.uiSettings.isZoomControlsEnabled = true
-            enableMyLocation(googleMap, context)
+    LaunchedEffect(Unit) {
+        val fetchedHorses = fetchHorses("", UserSession.token)
+        horses = fetchedHorses.map { it.name }
+        horseMap = fetchedHorses.associateBy { it.name }
+    }
 
-            // Fetch trail coordinates and draw polyline
-            coroutineScope.launch {
-                val trailResponse = fetchTrailCoordinates(trailId, token)
-                trailResponse?.let {
-                    trailCoordinates.value = it.allCoords
-                    val polylineOptions = PolylineOptions().apply {
-                        addAll(it.allCoords.map { coord -> LatLng(coord.lat, coord.long) })
-                        color(Color.Black.toArgb())
-                        width(5f)
-                    }
-                    googleMap.addPolyline(polylineOptions)
+    Column(modifier = Modifier.fillMaxSize()) {
+        AndroidView({ mapView }, modifier = Modifier.weight(1f)) {
+            mapView.getMapAsync { googleMap ->
+                googleMap.uiSettings.isZoomControlsEnabled = true
+                enableMyLocation(googleMap, context)
 
-                    // Move the camera to the center of the trail coordinates
-                    if (trailCoordinates.value.isNotEmpty()) {
-                        val boundsBuilder = LatLngBounds.Builder()
-                        trailCoordinates.value.forEach { coord ->
-                            boundsBuilder.include(LatLng(coord.lat, coord.long))
+                coroutineScope.launch {
+                    val trailResponse = fetchTrailCoordinates(trailId, token)
+                    trailResponse?.let {
+                        trailCoordinates.value = it.allCoords
+                        val polylineOptions = PolylineOptions().apply {
+                            addAll(it.allCoords.map { coord -> LatLng(coord.lat, coord.long) })
+                            color(Color.Black.toArgb())
+                            width(5f)
                         }
-                        val bounds = boundsBuilder.build()
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                        googleMap.addPolyline(polylineOptions)
+
+                        if (trailCoordinates.value.isNotEmpty()) {
+                            val boundsBuilder = LatLngBounds.Builder()
+                            trailCoordinates.value.forEach { coord ->
+                                boundsBuilder.include(LatLng(coord.lat, coord.long))
+                            }
+                            val bounds = boundsBuilder.build()
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                        }
                     }
                 }
-            }
 
-            // Update zoom level and center coordinates when the camera changes
-            googleMap.setOnCameraIdleListener {
-                zoomLevel.intValue = googleMap.cameraPosition.zoom.toInt()
-                latitude.doubleValue = googleMap.cameraPosition.target.latitude
-                longitude.doubleValue = googleMap.cameraPosition.target.longitude
-                Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
+                googleMap.setOnCameraIdleListener {
+                    zoomLevel.intValue = googleMap.cameraPosition.zoom.toInt()
+                    latitude.doubleValue = googleMap.cameraPosition.target.latitude
+                    longitude.doubleValue = googleMap.cameraPosition.target.longitude
+                    Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
+                }
             }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = { navController.popBackStack() }) {
+                Text("Cancel")
+            }
+            Button(onClick = { showSaveDialog = true }) {
+                Text("Save")
+            }
+        }
+
+        if (showSaveDialog) {
+            AlertDialog(
+                onDismissRequest = { showSaveDialog = false },
+                title = { Text("Save Trip") },
+                text = {
+                    AlertDialogContent(
+                        tripName = tripName,
+                        onTripNameChange = { tripName = it },
+                        tripNotes = tripNotes,
+                        onTripNotesChange = { tripNotes = it },
+                        horses = horses,
+                        selectedHorse = selectedHorse,
+                        onHorseSelected = { selectedHorse = it },
+                        selectedImage = selectedImage,
+                        onImageSelected = { selectedImage = it }
+                    )
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        // Handle save action
+                        showSaveDialog = false
+                        navController.popBackStack()
+                    }) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showSaveDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }

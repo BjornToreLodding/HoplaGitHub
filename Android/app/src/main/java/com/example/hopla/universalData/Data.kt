@@ -441,7 +441,8 @@ data class NewHike (
     val Coordinates: List<Coordinate>,
     val Title: String? = null,
     val Description: String? = null,
-    val HorseId: String? = null
+    val HorseId: String? = null,
+    val TrailId: String? = null
 )
 
 //----------------------Data classes for userhikes---------------------

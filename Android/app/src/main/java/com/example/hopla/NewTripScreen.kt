@@ -283,95 +283,21 @@ fun NewTripScreen() {
             }
         }
     }
-
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             text = {
-                Column {
-                    TextField(
-                        value = tripName,
-                        onValueChange = { tripName = it },
-                        singleLine = true,
-                        label = { Text(text = stringResource(R.string.trip_name), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(200.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            TextField(
-                                value = tripNotes,
-                                onValueChange = { tripNotes = it },
-                                label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(100.dp)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
-                    ) {
-                        TextField(
-                            readOnly = true,
-                            value = if (selectedHorse.isEmpty()) "No Horse Selected" else selectedHorse,
-                            onValueChange = {},
-                            label = { Text("Select Horse") },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    selectedHorse = ""
-                                    selectedHorseId = null
-                                    expanded = false
-                                }
-                            ) {
-                                Text("No Horse Selected")
-                            }
-                            horses.forEach { horse ->
-                                DropdownMenuItem(
-                                    onClick = {
-                                        selectedHorse = horse
-                                        selectedHorseId = horseMap[horse]?.id
-                                        expanded = false
-                                    }
-                                ) {
-                                    Text(horse)
-                                }
-                            }
-                        }
-                    }
-                    ImagePicker(
-                        onImageSelected = { bitmap -> selectedImage = bitmap },
-                        text = stringResource(R.string.add_image)
-                    )
-                    selectedImage?.let { bitmap ->
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(50.dp)
-                                .padding(top = 16.dp)
-                        )
-                    }
-                }
+                AlertDialogContent(
+                    tripName = tripName,
+                    onTripNameChange = { tripName = it },
+                    tripNotes = tripNotes,
+                    onTripNotesChange = { tripNotes = it },
+                    horses = horses,
+                    selectedHorse = selectedHorse,
+                    onHorseSelected = { selectedHorse = it; selectedHorseId = horseMap[it]?.id },
+                    selectedImage = selectedImage,
+                    onImageSelected = { selectedImage = it }
+                )
             },
             confirmButton = {
                 Button(onClick = {
@@ -404,7 +330,111 @@ fun NewTripScreen() {
                 }) {
                     Text(text = stringResource(R.string.save))
                 }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogContent(
+    tripName: String,
+    onTripNameChange: (String) -> Unit,
+    tripNotes: String,
+    onTripNotesChange: (String) -> Unit,
+    horses: List<String>,
+    selectedHorse: String,
+    onHorseSelected: (String) -> Unit,
+    selectedImage: Bitmap?,
+    onImageSelected: (Bitmap?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        TextField(
+            value = tripName,
+            onValueChange = onTripNameChange,
+            singleLine = true,
+            label = { Text(text = stringResource(R.string.trip_name), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        )
+        Box(
+            modifier = Modifier
+                .height(200.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                TextField(
+                    value = tripNotes,
+                    onValueChange = onTripNotesChange,
+                    label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                readOnly = true,
+                value = if (selectedHorse.isEmpty()) "No Horse Selected" else selectedHorse,
+                onValueChange = {},
+                label = { Text("Select Horse") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    onClick = {
+                        onHorseSelected("")
+                        expanded = false
+                    }
+                ) {
+                    Text("No Horse Selected", color = MaterialTheme.colorScheme.onSurface)
+                }
+                horses.forEach { horse ->
+                    DropdownMenuItem(
+                        onClick = {
+                            onHorseSelected(horse)
+                            expanded = false
+                        }
+                    ) {
+                        Text(horse, color = MaterialTheme.colorScheme.secondary)
+                    }
+                }
+            }
+        }
+        ImagePicker(
+            onImageSelected = onImageSelected,
+            text = stringResource(R.string.add_image)
+        )
+        selectedImage?.let { bitmap ->
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(50.dp)
+                    .padding(top = 16.dp)
+            )
+        }
     }
 }

@@ -145,7 +145,7 @@ class MainActivity : ComponentActivity() {
                             composable("map_screen") { MapScreen() }
                             composable("start_trip_map/{trailId}") { backStackEntry ->
                                 val trailId = backStackEntry.arguments?.getString("trailId") ?: ""
-                                StartTripMapScreen(trailId)
+                                StartTripMapScreen(trailId, navController)
                             }
                             composable("my_horses") { MyHorsesScreen(navController) }
                             composable("friends") { FriendsScreen(navController) }
