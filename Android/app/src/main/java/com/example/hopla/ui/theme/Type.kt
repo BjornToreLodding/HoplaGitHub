@@ -47,7 +47,7 @@ val customFontFamilyUnderHeader = FontFamily(
 
 val underheaderTextStyle = TextStyle(
     fontFamily = customFontFamilyUnderHeader,
-    fontSize = 24.sp,
+    fontSize = 18.sp,
     fontWeight = FontWeight.Medium,
 )
 

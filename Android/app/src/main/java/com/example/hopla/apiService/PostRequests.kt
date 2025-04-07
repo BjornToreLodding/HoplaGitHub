@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.example.hopla.R
 import com.example.hopla.saveLoginState
+import com.example.hopla.universalData.CreateTrailRequest
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.LoginRequest
@@ -165,6 +166,51 @@ suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
     Log.d("createHorse", "Response Status: ${response.status}")
     Log.d("createHorse", "Response Headers: ${response.headers}")
     Log.d("createHorse", "Response Body: $responseBody")
+    return responseBody
+}
+
+suspend fun createTrail(token: String, image: Bitmap, createTrailRequest: CreateTrailRequest): String {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    val imageBytes = byteArrayOutputStream.toByteArray()
+
+    val jsonString = Json.encodeToString(createTrailRequest)
+
+    Log.d("createTrail", "Request Body: $jsonString")
+
+    val formData = formData {
+        append("image", imageBytes, Headers.build {
+            append(HttpHeaders.ContentType, "image/jpeg")
+            append(HttpHeaders.ContentDisposition, "filename=\"trail.jpg\"")
+        })
+        append("dataJson", jsonString, Headers.build {
+            append(HttpHeaders.ContentType, "application/json")
+        })
+    }
+
+    Log.d("createTrail", "Form Data: $formData")
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.post("https://hopla.onrender.com/trails/create") {
+            header("Authorization", "Bearer $token")
+            setBody(MultiPartFormDataContent(formData))
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    Log.d("createTrail", "Response Status: ${response.status}")
+    Log.d("createTrail", "Response body: $responseBody")
+    httpClient.close()
     return responseBody
 }
 

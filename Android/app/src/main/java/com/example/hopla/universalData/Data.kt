@@ -453,3 +453,17 @@ data class HikeCoordinate(
     val lat: Double,
     val lng: Double
 )
+
+@Serializable
+data class FilterData(
+    val FilterDefinitionId: String,
+    val Value: String
+)
+
+@Serializable
+data class CreateTrailRequest(
+    val Name: String,
+    val description: String,
+    val UserHikeId: String,
+    val Filters: List<FilterData>
+)

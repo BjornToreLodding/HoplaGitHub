@@ -57,7 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.hopla.CreateUserDialog
 import com.example.hopla.R
+import com.example.hopla.apiService.createTrail
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.apiService.fetchTrailFilters
 import com.example.hopla.apiService.fetchUserHikes
@@ -66,6 +68,8 @@ import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.universalData.CreateTrailRequest
+import com.example.hopla.universalData.FilterData
 import com.example.hopla.universalData.Hike
 import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.ImagePicker
@@ -153,6 +157,9 @@ fun HikeItem(
     onHikesReload: () -> Unit = {}
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val token = UserSession.token
 
     if (showEditDialog) {
         EditTripDialog(
@@ -163,6 +170,31 @@ fun HikeItem(
                 showEditDialog = false
             },
             onHikesReload = onHikesReload
+        )
+    }
+
+    if (showShareDialog) {
+        ShareTripDialog(
+            hike = hike,
+            filters = filters,
+            onDismiss = { showShareDialog = false },
+            onSave = { name: String, description: String, imageBitmap: Bitmap?, userHikeId: String, filterData: List<FilterData> ->
+                coroutineScope.launch {
+                    val createTrailRequest = CreateTrailRequest(
+                        Name = name,
+                        description = description,
+                        UserHikeId = userHikeId,
+                        Filters = filterData
+                    )
+                    try {
+                        val response = createTrail(token, imageBitmap!!, createTrailRequest)
+                        Log.d("createTrail", "Response: $response")
+                        showShareDialog = false
+                    } catch (e: Exception) {
+                        Log.e("createTrail", "Error creating trail", e)
+                    }
+                }
+            }
         )
     }
 
@@ -210,7 +242,7 @@ fun HikeItem(
                         style = generalTextStyle,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable {
-                            // Handle share trip click
+                            showShareDialog = true
                         }
                     )
                     Spacer(modifier = Modifier.width(16.dp))
@@ -227,13 +259,15 @@ fun ShareTripDialog(
     hike: Hike,
     filters: List<TrailFilter>,
     onDismiss: () -> Unit,
-    onSave: (String, String, Bitmap?) -> Unit
+    onSave: (String, String, Bitmap?, String, List<FilterData>) -> Unit
 ) {
     var name by remember { mutableStateOf(hike.trailName) }
     var description by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf(filters.firstOrNull()?.name ?: "") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val selectedOptions = remember { mutableStateMapOf<String, MutableSet<String>>() }
+
+    val isSaveEnabled = name.isNotBlank() && description.isNotBlank() && selectedOptions.isNotEmpty() && imageBitmap != null
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -274,6 +308,8 @@ fun ShareTripDialog(
                             Column(modifier = Modifier.padding(8.dp)) {
                                 Text(
                                     text = filter.displayName,
+                                    style = underheaderTextStyle,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Row(
@@ -289,11 +325,10 @@ fun ShareTripDialog(
                                             modifier = Modifier
                                                 .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
                                                 .clickable {
-                                                selectedOptions[filter.name] = selectedOptions[filter.name]?.toMutableSet()?.apply {
-                                                    if (isSelected) remove(option) else add(option)
-                                                } ?: mutableSetOf(option)
-                                            }
-
+                                                    selectedOptions[filter.name] = selectedOptions[filter.name]?.toMutableSet()?.apply {
+                                                        if (isSelected) remove(option) else add(option)
+                                                    } ?: mutableSetOf(option)
+                                                }
                                                 .padding(8.dp)
                                         )
                                     }
@@ -331,9 +366,20 @@ fun ShareTripDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Button(onClick = {
-                        onSave(name, description, imageBitmap)
-                    }) {
+                    Button(
+                        onClick = {
+                            val filterData = selectedOptions.flatMap { (filterName, options) ->
+                                options.map { option ->
+                                    FilterData(
+                                        FilterDefinitionId = filters.find { it.name == filterName }?.id ?: "",
+                                        Value = option
+                                    )
+                                }
+                            }
+                            onSave(name, description, imageBitmap, hike.id, filterData)
+                        },
+                        enabled = isSaveEnabled
+                    ) {
                         Text(
                             text = stringResource(R.string.save),
                             style = buttonTextStyle
