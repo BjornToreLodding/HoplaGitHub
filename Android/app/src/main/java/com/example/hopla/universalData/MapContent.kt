@@ -189,7 +189,6 @@ fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
     }
 }
 
-//@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StartTripMapScreen(trailId: String, navController: NavController) {
     val mapView = rememberMapViewWithLifecycle()
@@ -208,6 +207,8 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
     var horses by remember { mutableStateOf(listOf<String>()) }
     var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
     var newHike by remember { mutableStateOf<NewHike?>(null) }
+    val startTime = remember { System.currentTimeMillis() }
+    var trailDistance by remember { mutableStateOf(0.0) }
 
     LaunchedEffect(Unit) {
         val fetchedHorses = fetchHorses("", UserSession.token)
@@ -223,31 +224,14 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
 
                 coroutineScope.launch {
                     val trailResponse = fetchTrailCoordinates(trailId, token)
-                    trailResponse?.let {
-                        trailCoordinates.value = it.allCoords
-                        val polylineOptions = PolylineOptions().apply {
-                            addAll(it.allCoords.map { coord -> LatLng(coord.lat, coord.long) })
-                            color(Color.Black.toArgb())
-                            width(5f)
-                        }
-                        googleMap.addPolyline(polylineOptions)
-
-                        if (trailCoordinates.value.isNotEmpty()) {
-                            val boundsBuilder = LatLngBounds.Builder()
-                            trailCoordinates.value.forEach { coord ->
-                                boundsBuilder.include(LatLng(coord.lat, coord.long))
-                            }
-                            val bounds = boundsBuilder.build()
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-                        }
+                    trailCoordinates.value = trailResponse?.allCoords ?: emptyList()
+                    if (trailResponse != null) {
+                        trailDistance = trailResponse.distance ?: 0.0
                     }
                 }
 
                 googleMap.setOnCameraIdleListener {
-                    zoomLevel.intValue = googleMap.cameraPosition.zoom.toInt()
-                    latitude.doubleValue = googleMap.cameraPosition.target.latitude
-                    longitude.doubleValue = googleMap.cameraPosition.target.longitude
-                    Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
+                    // Handle camera idle
                 }
             }
         }
@@ -287,33 +271,33 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                     Button(onClick = {
                         showSaveDialog = false
                         val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(java.util.Date())
-                        val coordinates = listOf(
-                            Coordinate(timestamp = 0, lat = 60.8381, long = 10.5767),
-                            Coordinate(timestamp = 0, lat = 60.8382, long = 10.5768),
-                            Coordinate(timestamp = 0, lat = 60.8383, long = 10.5769),
-                            Coordinate(timestamp = 0, lat = 60.8390, long = 10.5776)
-                        )
+                        val durationMillis = System.currentTimeMillis() - startTime
+                        val durationMinutes = (durationMillis / 60000).toInt()
+                        val durationSeconds = ((durationMillis % 60000) / 1000).toInt()
+                        val durationStr = String.format(Locale.GERMANY, "%02d,%02d", durationMinutes, durationSeconds)
+                        val distanceStr = String.format(Locale.GERMANY, "%.2f", trailDistance)
+
+                        val coordinates = trailCoordinates.value.map {
+                            Coordinate(timestamp = 0, lat = it.lat, long = it.long)
+                        }
+
                         newHike = NewHike(
                             StartetAt = currentTime,
-                            Distance = "00,00",
-                            Duration = "00,00",
+                            Distance = distanceStr,
+                            Duration = durationStr,
                             Coordinates = coordinates,
                             Title = if (tripName.isNotEmpty()) tripName else null,
                             Description = if (tripNotes.isNotEmpty()) tripNotes else null,
                             HorseId = horseMap[selectedHorse]?.id,
                             TrailId = trailId
                         )
+
                         newHike?.let {
-                            Log.d("MapContent", "NewHike: $it")
                             CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    val response = createNewHike(UserSession.token, it, selectedImage)
-                                    Log.d("MapContent", "Create Hike Response: $response")
-                                } catch (e: Exception) {
-                                    Log.e("MapContent", "Error creating hike", e)
-                                }
+                                val response = createNewHike(UserSession.token, it, selectedImage)
+                                Log.d("StartTripMapScreen", "Create Hike Response: $response")
                             }
-                        } ?: Log.e("MapContent", "NewHike is null")
+                        }
                         navController.popBackStack()
                     }) {
                         Text("Save")
