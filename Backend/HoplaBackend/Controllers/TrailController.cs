@@ -1111,7 +1111,7 @@ public class TrailController : ControllerBase
         var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
             return Unauthorized(new { message = "Bruker ikke funnet" });
-
+        
         var dto = JsonSerializer.Deserialize<CreateTrailDto>(request.dataJson);
 
         if (dto == null)
@@ -1120,6 +1120,7 @@ public class TrailController : ControllerBase
         var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId); //Rødt under UserHikeId
         var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
         Console.WriteLine("");
+        Console.WriteLine(request.dataJson);
         Console.WriteLine(dto.UserHikeId);
         Console.WriteLine(dto.Description);
         Console.WriteLine(dto.Name);
