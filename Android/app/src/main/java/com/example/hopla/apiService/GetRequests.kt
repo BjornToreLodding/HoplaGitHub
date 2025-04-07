@@ -7,6 +7,7 @@ import com.example.hopla.universalData.Following
 import com.example.hopla.universalData.Friend
 import com.example.hopla.universalData.FriendProfile
 import com.example.hopla.universalData.Hike
+import com.example.hopla.universalData.HikeCoordinate
 import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.HorseDetail
 import com.example.hopla.universalData.MapTrail
@@ -124,6 +125,7 @@ suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
     }
 }
 
+//----------------Get requests for user hikes-------------------
 suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -146,6 +148,35 @@ suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
     }
 }
 
+suspend fun fetchUserHikeCoordinates(userHikeId: String, token: String): List<HikeCoordinate>? {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
+    return httpClient.use { client ->
+        val url = "https://hopla.onrender.com/userhikes/coordinates/$userHikeId"
+        Log.d("fetchUserHikeCoordinates", "Request URL: $url")
+        val response: HttpResponse = client.get(url) {
+            header("Authorization", "Bearer $token")
+        }
+
+        val responseBody: String = response.bodyAsText()
+        Log.d("fetchUserHikeCoordinates", "Response: $responseBody")
+
+        if (response.status == HttpStatusCode.OK) {
+            response.body()
+        } else {
+            Log.e("fetchUserHikeCoordinates", "Error: ${response.status}")
+            null
+        }
+    }
+}
+
+//----------------Get requests for user relations-------------------
 suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {

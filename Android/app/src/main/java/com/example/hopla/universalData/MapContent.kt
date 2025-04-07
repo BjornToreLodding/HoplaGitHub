@@ -16,8 +16,22 @@ import com.google.android.gms.maps.MapView
 import android.Manifest
 import android.location.LocationManager
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -25,15 +39,21 @@ import com.google.android.gms.maps.model.MarkerOptions
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.hopla.apiService.fetchTrailCoordinates
 import com.example.hopla.apiService.fetchTrailsOnMap
+import com.example.hopla.apiService.fetchUserHikeCoordinates
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
+import com.example.hopla.R
 
 // Map screen for displaying trails on a map
 @Composable
@@ -203,6 +223,84 @@ fun StartTripMapScreen(trailId: String) {
                 latitude.doubleValue = googleMap.cameraPosition.target.latitude
                 longitude.doubleValue = googleMap.cameraPosition.target.longitude
                 Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
+            }
+        }
+    }
+}
+
+//-------------Functions to open up a map that displays coordinates
+@Composable
+fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
+    val mapView = rememberMapViewWithLifecycle()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val coordinates = remember { mutableStateOf<List<HikeCoordinate>>(emptyList()) }
+    val zoomLevel = remember { mutableIntStateOf(15) } // Adjusted zoom level for closer view
+
+    LaunchedEffect(userHikeId) {
+        coroutineScope.launch {
+            val fetchedCoordinates = fetchUserHikeCoordinates(userHikeId, token)
+            if (fetchedCoordinates != null) {
+                coordinates.value = fetchedCoordinates
+                Log.d("CoordinatesOnMap", "Fetched coordinates: $fetchedCoordinates")
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView({ mapView })
+
+        LaunchedEffect(coordinates.value) {
+            if (coordinates.value.isNotEmpty()) {
+                mapView.getMapAsync { googleMap ->
+                    googleMap.uiSettings.isZoomControlsEnabled = true
+                    enableMyLocation(googleMap, context)
+
+                    val boundsBuilder = LatLngBounds.Builder()
+                    val polylineOptions = PolylineOptions().apply {
+                        color(Color.Black.toArgb())
+                        width(5f)
+                    }
+
+                    coordinates.value.forEach { coord ->
+                        val latLng = LatLng(coord.lat, coord.lng)
+                        boundsBuilder.include(latLng)
+                        polylineOptions.add(latLng)
+                        //googleMap.addMarker(MarkerOptions().position(latLng))
+                    }
+
+                    googleMap.addPolyline(polylineOptions)
+                    val bounds = boundsBuilder.build()
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                    Log.d("CoordinatesOnMap", "Polyline added with coordinates: ${polylineOptions.points}")
+                }
+            } else {
+                Log.d("CoordinatesOnMap", "No coordinates to display")
+            }
+        }
+
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+        }
+    }
+
+}
+
+@Composable
+fun MapButton(userHikeId: String, token: String) {
+    var showMap by remember { mutableStateOf(false) }
+    Column {
+        Text(
+            text = stringResource(R.string.show_on_map),
+            modifier = Modifier.clickable{ showMap = true }.padding(16.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        if (showMap) {
+            Dialog(onDismissRequest = { showMap = false }) {
+                CoordinatesOnMap(userHikeId = userHikeId, token = token, onClose = { showMap = false })
             }
         }
     }

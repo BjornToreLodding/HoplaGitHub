@@ -73,6 +73,7 @@ import com.example.hopla.universalData.DateOfBirthPicker
 import com.example.hopla.universalData.EditableTextField
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.MapButton
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
@@ -175,6 +176,7 @@ fun ProfileScreen(navController: NavController) {
             UserChanges(modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth())
+            MapButton(userHikeId = "mock/12345678-0000-0000-0011-123456780002  ", token = UserSession.token)
         }
     }
 }

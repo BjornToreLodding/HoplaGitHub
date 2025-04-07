@@ -408,7 +408,8 @@ data class FeedItem(
     val userAlias: String,
     val duration: Double,
     val userProfilePicture: String,
-    val likes: Int
+    val likes: Int,
+    val isLikedByUser: Boolean
 )
 
 @Serializable
@@ -441,4 +442,11 @@ data class NewHike (
     val Title: String? = null,
     val Description: String? = null,
     val HorseId: String? = null
+)
+
+//----------------------Data classes for userhikes---------------------
+@Serializable
+data class HikeCoordinate(
+    val lat: Double,
+    val lng: Double
 )

@@ -209,8 +209,8 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
 fun PostItem(feedItem: FeedItem, navController: NavController) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
-    var isLiked by remember { mutableStateOf(false) }
-    var likesCount by remember { mutableStateOf(feedItem.likes) }
+    var isLiked by remember { mutableStateOf(feedItem.isLikedByUser) }
+    var likesCount by remember { mutableIntStateOf(feedItem.likes) }
 
     val (formattedDate, formattedTime) = formatDateTime(feedItem.createdAt)
     val token = UserSession.token
