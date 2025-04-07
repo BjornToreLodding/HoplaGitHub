@@ -1121,6 +1121,9 @@ public class TrailController : ControllerBase
         var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
         Console.WriteLine("");
         Console.WriteLine(dto.UserHikeId);
+        Console.WriteLine(dto.Description);
+        Console.WriteLine(dto.Name);
+        Console.WriteLine(dto.Filters);
         if (hike == null || hikeDetails == null)
             return BadRequest("Tur eller detaljer ikke funnet");
         string? pictureUrl = null;
