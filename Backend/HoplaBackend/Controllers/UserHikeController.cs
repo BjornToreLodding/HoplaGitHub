@@ -221,6 +221,7 @@ public class UserHikeController : ControllerBase
             Id = hikeId,
             UserId = userId,
             Title = request.Title,
+            Comment = request.Description,
             TrailId = request.TrailId,
             HorseId = request.HorseId,
             StartedAt = request.StartedAt,

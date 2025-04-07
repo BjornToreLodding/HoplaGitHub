@@ -21,8 +21,9 @@ public class UserHikeService
             .OrderByDescending(u => u.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Include(u => u.Trail) // Husk å hente Trail!
+            .Include(u => u.Trail) 
             .Include(u => u.Horse)
+            //.Include(u => u.UserHikeDetail) har lagt det inn i userhikes.comments istedenfor, så trenger ikke inkludere
             .ToListAsync();
 
         return hikes.Select(u => new UserHikeDto //linje 28
@@ -33,7 +34,7 @@ public class UserHikeService
             Length = u.Distance,
             Duration = u.Duration,
             Title = string.IsNullOrWhiteSpace(u?.Title) ? "" : u.Title,
-            Comment = string.IsNullOrWhiteSpace(u.UserHikeDetail?.Description) ? "" :u.UserHikeDetail.Description ,
+            Comment = string.IsNullOrWhiteSpace(u?.Comment) ? "" : u.Comment ,
             HorseName = string.IsNullOrWhiteSpace(u.Horse?.Name) ? "Ukjent" : u.Horse.Name,
             PictureUrl = PictureHelper.BuildPictureUrl(u.PictureUrl, "UserProfileUserHikes"),
             //PictureUrl = u.PictureUrl,
