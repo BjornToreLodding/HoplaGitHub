@@ -11,7 +11,7 @@ import CoreLocation
 
 
 // MARK: - Hike Model
-struct Hike: Codable, Identifiable {
+struct Hike: Codable, Identifiable, Equatable {
     let id: String
     let name: String
     let pictureUrl: String
@@ -25,7 +25,7 @@ struct Hike: Codable, Identifiable {
 
 
 // MARK: - Filters for Hikes
-struct HikeFilter: Codable, Identifiable {
+struct HikeFilter: Codable, Identifiable, Equatable {
     let id: String
     let name: String
     let displayName: String
@@ -322,20 +322,14 @@ struct Hikes: View {
                     .foregroundColor(.gray)
                     .padding()
             } else {
-                ScrollView {
-                    LazyVStack {
-                        ForEach(hikes) { hike in
-                            HikeCard(
-                                hike: hike,
-                                likedHikes: $likedHikes,
-                                toggleFavoriteAction: { selectedHike in
-                                    handleToggleFavorite(for: selectedHike)
-                                },
-                                viewModel: viewModel // Ensure this is passed as well
-                            )
-                            .padding()
-                        }
-                    }
+                if isLoading && hikes.isEmpty {
+                    ProgressView("Loading Hikes...")
+                } else if filteredHikes().isEmpty {
+                    Text("No hikes found.")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else {
+                    hikeList
                 }
             }
         }
@@ -347,29 +341,65 @@ struct Hikes: View {
             userLocation = newLocation
         }
         .onChange(of: selectedFilter) { newFilter in
-            switch newFilter {
-            case .map:
-                resetAndFetch() // Reset and fetch map-based hikes
-            case .location:
-                if let location = userLocation {
-                    fetchHikesByLocation(location) // Fetch location-based hikes
+            handleFilterChange(newFilter)
+        }
+        .navigationBarHidden(true)
+    }
+    
+    private func handleFilterChange(_ filter: FilterOption) {
+        switch filter {
+        case .map:
+            resetAndFetch()
+        case .location:
+            if let location = userLocation {
+                fetchHikesByLocation(location)
+            }
+        case .heart:
+            resetAndFetchFavorites()
+        case .star:
+            hikes = []
+            currentPage = 1
+            fetchRelationHikes()
+        case .arrow:
+            withAnimation {
+                isShowingFilterOptions.toggle()
+            }
+        }
+    }
+
+    
+    private var hikeList: some View {
+        ScrollView {
+            LazyVStack {
+                ForEach(filteredHikes()) { hike in
+                    HikeCard(
+                        hike: hike,
+                        likedHikes: $likedHikes,
+                        toggleFavoriteAction: { selectedHike in
+                            handleToggleFavorite(for: selectedHike)
+                        },
+                        viewModel: viewModel
+                    )
+                    .onAppear {
+                        // Trigger load more when nearing the end of the list
+                        if hike == hikes.last {
+                            loadMoreHikes()
+                        }
+                    }
+                    .padding()
                 }
-            case .heart:
-                resetAndFetchFavorites() // Fetch favorite hikes
-            case .star:
-                // Reset and fetch friend/following hikes
-                hikes = [] // Clear existing hikes
-                currentPage = 1
-                fetchRelationHikes() // Fetch relation hikes based on friends or following
-            case .arrow:
-                withAnimation {
-                    isShowingFilterOptions.toggle()
+
+                if isLoading {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
+                    }
                 }
             }
         }
-
-        .navigationBarHidden(true)
     }
+
 
     func handleToggleFavorite(for hike: Hike) {
         viewModel.toggleFavorite(for: hike) { success in
