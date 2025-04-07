@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
@@ -136,10 +137,9 @@ fun HikeItem(hike: Hike, filters: List<TrailFilter> = emptyList(), isMyTripsScre
     if (showEditDialog) {
         EditTripDialog(
             hike = hike,
-            filters = filters,
             onDismiss = { showEditDialog = false },
-            onSave = { _, _, _ ->
-                // Handle save logic here
+            onSave = { tripName, tripDescription, selectedImage ->
+                // Handle save action
                 showEditDialog = false
             }
         )
@@ -199,7 +199,7 @@ fun HikeItem(hike: Hike, filters: List<TrailFilter> = emptyList(), isMyTripsScre
 }
 
 @Composable
-fun EditTripDialog(
+fun ShareTripDialog(
     hike: Hike,
     filters: List<TrailFilter>,
     onDismiss: () -> Unit,
@@ -325,4 +325,64 @@ fun EditTripDialog(
             }
         }
     }
+}
+
+@Composable
+fun EditTripDialog(
+    hike: Hike,
+    onDismiss: () -> Unit,
+    onSave: (String, String, Bitmap?) -> Unit
+) {
+    var tripName by remember { mutableStateOf(hike.trailName) }
+    var tripDescription by remember { mutableStateOf(hike.description ?: "") }
+    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.edit_trip), style = underheaderTextStyle) },
+        text = {
+            Column {
+                TextField(
+                    value = tripName,
+                    onValueChange = { tripName = it },
+                    label = { Text (text = stringResource(R.string.trip_name)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = tripDescription,
+                    onValueChange = { tripDescription = it },
+                    label = { Text(text = stringResource(R.string.description)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                ImagePicker(
+                    onImageSelected = { bitmap -> selectedImage = bitmap },
+                    text = stringResource(R.string.change_image),
+                )
+                selectedImage?.let { bitmap ->
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(top = 16.dp)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                onSave(tripName, tripDescription, selectedImage)
+                onDismiss()
+            }) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

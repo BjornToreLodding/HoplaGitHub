@@ -176,6 +176,8 @@ data class Hike(
     val page: Int? = null,
     val size: Int? = null,
     val trailButton: Boolean = false,
+    val description: String? = null,
+    val horseId: String? = null,
 )
 
 fun formatDate(dateString: String): String? {
@@ -405,7 +407,8 @@ data class FeedItem(
     val userId: String,
     val userAlias: String,
     val duration: Double,
-    val userProfilePicture: String
+    val userProfilePicture: String,
+    val likes: Int
 )
 
 @Serializable
@@ -417,10 +420,10 @@ data class FeedResponse(
     val items: List<FeedItem>
 )
 
-//--------------------Data classes for new hike screen---------------
+//--------------------Data classes for new hi   ke screen---------------
 @Serializable
 data class Coordinate(
-    val timestamp: Double,
+    val timestamp: Long,
     val lat: Double,
     val long: Double
 )

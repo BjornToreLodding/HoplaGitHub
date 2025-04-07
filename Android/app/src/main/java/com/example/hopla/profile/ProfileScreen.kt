@@ -482,7 +482,8 @@ fun UserChanges(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(R.string.change_password),
                 modifier = Modifier.clickable { showDialog = true },
-                style = underlinedTextStyleSmall
+                style = underlinedTextStyleSmall,
+                color = MaterialTheme.colorScheme.secondary
             )
             Spacer(modifier = Modifier.height(8.dp))
         }

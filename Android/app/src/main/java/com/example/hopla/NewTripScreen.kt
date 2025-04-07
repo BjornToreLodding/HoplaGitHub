@@ -123,7 +123,7 @@ fun NewTripScreen() {
                         }
                         lastLocation = newLocation
                         coordinates = coordinates + Coordinate(
-                            timestamp = time,
+                            timestamp = time.toLong(),
                             lat = newLocation.latitude,
                             long = newLocation.longitude
                         )

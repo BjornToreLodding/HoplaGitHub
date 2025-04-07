@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -53,6 +55,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.fetchFeed
 import com.example.hopla.apiService.fetchTrails
+import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.underheaderTextStyle
@@ -133,13 +136,13 @@ fun HomeScreen(navController: NavController) {
             Icons.Outlined.Person -> PostList(navController = navController, onlyFriendsAndFollowing = true)
             Icons.Outlined.FavoriteBorder -> PostList(navController = navController, onlyLikedTrails = true)
             Icons.Outlined.LocationOn -> PostList(navController = navController, latitude = latitude, longitude = longitude)
-            Icons.Outlined.ThumbUp -> PostList(navController = navController)
+            Icons.Outlined.ThumbUp -> PostList(navController = navController, sortByLikes = true)
         }
     }
 }
 
 @Composable
-fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false, latitude: Double? = null, longitude: Double? = null) {
+fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false, latitude: Double? = null, longitude: Double? = null, sortByLikes: Boolean = false) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
@@ -148,9 +151,13 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude) {
+    LaunchedEffect(pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude, sortByLikes) {
         isLoading = true
-        val newFeedResponse = fetchFeed(token, pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude)
+        val newFeedResponse = if (sortByLikes) {
+            fetchFeed(token, pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude, sortByLikes = true)
+        } else {
+            fetchFeed(token, pageNumber, onlyFriendsAndFollowing, onlyLikedTrails, latitude, longitude)
+        }
         if (newFeedResponse == null) {
             errorMessage = "Not available right now"
             hasMorePosts = false
@@ -200,6 +207,8 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
 fun PostItem(feedItem: FeedItem, navController: NavController) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    var isLiked by remember { mutableStateOf(false) }
+    var likesCount by remember { mutableStateOf(feedItem.likes) }
 
     val (formattedDate, formattedTime) = formatDateTime(feedItem.createdAt)
 
@@ -210,11 +219,12 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
             .background(MaterialTheme.colorScheme.onBackground)
             .padding(16.dp)
     ) {
-        // User info
+        // User info and more options button
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(bottom = 8.dp)
+                .fillMaxWidth()
                 .clickable {
                     Log.d("PostItem", "Navigating to friend_profile/${feedItem.userId}")
                     navController.navigate("friend_profile/${feedItem.userId}")
@@ -234,6 +244,32 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(start = 8.dp)
             )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { isDropdownExpanded = true }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More options",
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }
+            DropdownMenu(
+                expanded = isDropdownExpanded,
+                onDismissRequest = { isDropdownExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(R.string.report),
+                            style = generalTextStyleBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    },
+                    onClick = {
+                        isDropdownExpanded = false
+                        showReportDialog = true
+                    }
+                )
+            }
         }
         // Post content
         Box(
@@ -299,37 +335,30 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
             }
             Row(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
+                    .align(Alignment.BottomStart)
+                    .padding(top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box {
-                    IconButton(onClick = { isDropdownExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More options",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-
-                    }
-                    DropdownMenu(
-                        expanded = isDropdownExpanded,
-                        onDismissRequest = { isDropdownExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = stringResource(R.string.report),
-                                    style = generalTextStyleBold,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            },
-                            onClick = {
-                                isDropdownExpanded = false
-                                showReportDialog = true
-                            }
-                        )
-                    }
+                IconButton(onClick = {
+                    isLiked = !isLiked
+                    likesCount = if (isLiked) likesCount + 1 else likesCount - 1
+                    // TODO: Connect to post/delete endpoint to give posts likes
+                }) {
+                    Icon(
+                        imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Like",
+                        tint = if (isLiked) HeartColor else MaterialTheme.colorScheme.secondary
+                    )
                 }
+
+                Text(
+                    text = likesCount.toString(),
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
             }
+
         }
         if (showReportDialog) {
             ReportDialog(
