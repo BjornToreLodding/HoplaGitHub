@@ -1123,8 +1123,8 @@ public class TrailController : ControllerBase
         Console.WriteLine(request.dataJson);
         Console.WriteLine(dto.UserHikeId);
         Console.WriteLine(dto.Description);
-        Console.WriteLine(dto.Name);
-        Console.WriteLine(dto.Filters);
+        Console.WriteLine(dto?.Name ?? "ukjent");
+        Console.WriteLine(dto?.Filters);
         if (hike == null || hikeDetails == null)
             return BadRequest("Tur eller detaljer ikke funnet");
         string? pictureUrl = null;
@@ -1156,7 +1156,7 @@ public class TrailController : ControllerBase
         var trailDetails = new TrailDetail
         {
             Id = trail.Id,
-            Description = dto.Description, //hikeDetails.Description,
+            Description = dto?.Description ?? "Ukjent", //hikeDetails.Description,
             LatMin = hikeDetails.LatMin,
             LatMax = hikeDetails.LatMax,
             LongMin = hikeDetails.LongMin,
