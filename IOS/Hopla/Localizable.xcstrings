@@ -163,6 +163,9 @@
     "Choose" : {
 
     },
+    "Comment: %@" : {
+
+    },
     "Community" : {
       "comment" : "Community tab",
       "localizations" : {
@@ -318,6 +321,9 @@
         }
       }
     },
+    "Distance: %@" : {
+
+    },
     "Done" : {
       "localizations" : {
         "nb" : {
@@ -327,6 +333,9 @@
           }
         }
       }
+    },
+    "Duration: %@" : {
+
     },
     "Duration: %@ min" : {
       "localizations" : {
@@ -1155,6 +1164,9 @@
 
     },
     "Title" : {
+
+    },
+    "Title: %@" : {
 
     },
     "Type a message..." : {

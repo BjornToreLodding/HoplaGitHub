@@ -13,7 +13,8 @@ import CoreLocation
 // MARK: - Hike Model
 struct Hike: Codable, Identifiable, Equatable {
     let id: String
-    let name: String
+    var name: String
+    var description: String?
     let pictureUrl: String
     let averageRating: Int
     var isFavorite: Bool

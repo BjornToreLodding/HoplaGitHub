@@ -12,22 +12,33 @@ import Combine
 // MARK: - MyHike Model
 struct MyHike: Codable, Identifiable {
     let id: String
-    let trailName: String
+    var trailName: String
+    let trailId: String? // ✅ Optional TrailId
     let length: Double
     let duration: Double
     let pictureUrl: String?
-    let TrailButton: Bool?
-    
-    // Custom initializer from dictionary
-        init(from dictionary: [String: Any]) {
-            self.id = dictionary["id"] as? String ?? UUID().uuidString // Assuming `id` is present in your dictionary
-            self.trailName = dictionary["Title"] as? String ?? "Unnamed"
-            self.length = Double(dictionary["Distance"] as? String ?? "0") ?? 0.0
-            self.duration = Double(dictionary["Duration"] as? String ?? "0") ?? 0.0
-            self.pictureUrl = dictionary["PictureUrl"] as? String
-            self.TrailButton = dictionary["TrailButton"] as? Bool
-        }
+    let title: String // ✅ Matches `title` in API
+    var comment: String // ✅ Matches `comment` instead of `description`
+    let horseName: String? // ✅ Matches `horseName`
+    let trailButton: Bool // ✅ Matches API `trailButton`
+
+    // Custom initializer from dictionary (in case of manual parsing)
+    init(from dictionary: [String: Any]) {
+        self.id = dictionary["id"] as? String ?? UUID().uuidString
+        self.trailName = dictionary["trailName"] as? String ?? "Unnamed"
+        self.trailId = dictionary["trailId"] as? String
+        self.length = Double(dictionary["length"] as? String ?? "0") ?? 0.0
+        self.duration = Double(dictionary["duration"] as? String ?? "0") ?? 0.0
+        self.pictureUrl = dictionary["pictureUrl"] as? String
+        self.title = dictionary["title"] as? String ?? "Unnamed Hike"
+        self.comment = dictionary["comment"] as? String ?? "No description provided"
+        self.horseName = dictionary["horseName"] as? String
+        self.trailButton = dictionary["trailButton"] as? Bool ?? false
+    }
 }
+
+
+
 
 // MARK: - API Response Model
 struct MyHikeResponse: Codable {
@@ -40,9 +51,10 @@ struct MyHikeResponse: Codable {
 class MyHikeViewModel: ObservableObject {
     @Published var myHikes: [MyHike] = []
     @Published var isLoading = false
-    
+    @Published var rawApiResponse: String = "" // ✅ Add this property
+
     private var cancellable: AnyCancellable?
-    private var currentPage: Int = 1 // Starting point
+    private var currentPage: Int = 1
     private let pageSize = 4
     private var hasMorePages = true
 
@@ -70,7 +82,7 @@ class MyHikeViewModel: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
+
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
 
@@ -80,9 +92,11 @@ class MyHikeViewModel: ObservableObject {
                 }
             }
 
-
-            if let data = data, let rawResponse = String(data: data, encoding: .utf8) {
-                print("📡 Raw API Response:", rawResponse)
+            if let data = data {
+                DispatchQueue.main.async {
+                    self.rawApiResponse = String(data: data, encoding: .utf8) ?? "No data" // ✅ Store response
+                    print("📡 Raw API Response:", self.rawApiResponse)
+                }
             }
 
             if let error = error {
@@ -113,15 +127,8 @@ class MyHikeViewModel: ObservableObject {
             }
         }.resume()
     }
-    
-    func refresh() {
-        self.currentPage = 1
-        self.myHikes = []
-        self.hasMorePages = true
-        fetchMyHikes()
-    }
-
 }
+
 
 
 
@@ -143,13 +150,16 @@ struct MyHikes: View {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.myHikes.indices, id: \.self) { index in
                             let myHike = viewModel.myHikes[index]
-                            MyHikePostContainer(
-                                imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
-                                comment: myHike.trailName,
-                                length: myHike.length,
-                                duration: myHike.duration,
-                                colorScheme: colorScheme
-                            )
+                            NavigationLink(destination: MyHikesDetails(hike: myHike, myHikes: $viewModel.myHikes)) {
+                                MyHikePostContainer(
+                                    imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
+                                    comment: myHike.trailName,
+                                    length: myHike.length,
+                                    duration: myHike.duration,
+                                    colorScheme: colorScheme
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle()) // ✅ Removes default button styling
                             .onAppear {
                                 if index == viewModel.myHikes.count - 1 {
                                     // User scrolled to last hike
