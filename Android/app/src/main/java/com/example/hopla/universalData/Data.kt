@@ -176,8 +176,10 @@ data class Hike(
     val page: Int? = null,
     val size: Int? = null,
     val trailButton: Boolean = false,
-    val description: String? = null,
-    val horseId: String? = null,
+    val comment: String? = null,
+    val horseName: String? = null,
+    val title: String? = null,
+    val trailId: String? = null
 )
 
 fun formatDate(dateString: String): String? {

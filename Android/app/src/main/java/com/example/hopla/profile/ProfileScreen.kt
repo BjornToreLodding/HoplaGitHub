@@ -176,7 +176,6 @@ fun ProfileScreen(navController: NavController) {
             UserChanges(modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth())
-            MapButton(userHikeId = "mock/12345678-0000-0000-0011-123456780002  ", token = UserSession.token)
         }
     }
 }

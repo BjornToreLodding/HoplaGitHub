@@ -61,6 +61,7 @@ import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.Hike
 import com.example.hopla.universalData.ImagePicker
+import com.example.hopla.universalData.MapButton
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.TrailFilter
 import com.example.hopla.universalData.UserSession
@@ -192,6 +193,9 @@ fun HikeItem(hike: Hike, filters: List<TrailFilter> = emptyList(), isMyTripsScre
                             // Handle share trip click
                         }
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    //BYTT MED FAKTISK HIKEID NÅR KOORDINATER FINNS
+                    MapButton(userHikeId = "mock/12345678-0000-0000-0011-123456780002  ", token = UserSession.token)
                 }
             }
         }
@@ -333,21 +337,23 @@ fun EditTripDialog(
     onDismiss: () -> Unit,
     onSave: (String, String, Bitmap?) -> Unit
 ) {
-    var tripName by remember { mutableStateOf(hike.trailName) }
-    var tripDescription by remember { mutableStateOf(hike.description ?: "") }
+    var tripName by remember { mutableStateOf(hike.title) }
+    var tripDescription by remember { mutableStateOf(hike.comment ?: "") }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.edit_trip), style = underheaderTextStyle) },
+        title = { Text(text = stringResource(R.string.edit_trip), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
         text = {
             Column {
-                TextField(
-                    value = tripName,
-                    onValueChange = { tripName = it },
-                    label = { Text (text = stringResource(R.string.trip_name)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                tripName?.let {
+                    TextField(
+                        value = it,
+                        onValueChange = { tripName = it },
+                        label = { Text (text = stringResource(R.string.trip_name)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = tripDescription,
@@ -373,7 +379,7 @@ fun EditTripDialog(
         },
         confirmButton = {
             Button(onClick = {
-                onSave(tripName, tripDescription, selectedImage)
+
                 onDismiss()
             }) {
                 Text("Save")

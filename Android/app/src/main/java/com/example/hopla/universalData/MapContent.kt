@@ -54,6 +54,7 @@ import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.apiService.fetchTrailCoordinates
 import com.example.hopla.apiService.fetchTrailsOnMap
 import com.example.hopla.apiService.fetchUserHikeCoordinates
+import com.example.hopla.ui.theme.generalTextStyle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -381,6 +382,7 @@ fun MapButton(userHikeId: String, token: String) {
         Text(
             text = stringResource(R.string.show_on_map),
             modifier = Modifier.clickable{ showMap = true }.padding(16.dp),
+            style = generalTextStyle,
             color = MaterialTheme.colorScheme.primary
         )
         if (showMap) {

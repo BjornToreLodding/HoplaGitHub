@@ -171,3 +171,48 @@ suspend fun sendUserRelationRequestPut(token: String, request: UserRelationChang
     client.close()
     return Json.decodeFromString(UserRelationResponse.serializer(), responseBody)
 }
+
+//-----------------------PUT requests for user hikes-------------------------
+suspend fun updateUserHike(
+    token: String,
+    userHikeId: String,
+    title: String? = null,
+    horseId: String? = null,
+    imageBitmap: Bitmap? = null,
+    description: String? = null
+): String {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+    }
+
+    val formData = formData {
+        title?.let { append("Title", it) }
+        horseId?.let { append("HorseId", it) }
+        description?.let { append("Description", it) }
+        imageBitmap?.let {
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            it.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val imageBytes = byteArrayOutputStream.toByteArray()
+            append("Image", imageBytes, Headers.build {
+                append(HttpHeaders.ContentType, "image/jpeg")
+                append(HttpHeaders.ContentDisposition, "filename=\"image.jpg\"")
+            })
+        }
+    }
+
+    val response: HttpResponse = httpClient.use { client ->
+        client.put("https://hopla.onrender.com/userhikes/$userHikeId") {
+            header("Authorization", "Bearer $token")
+            setBody(MultiPartFormDataContent(formData))
+        }
+    }
+
+    val responseBody: String = response.bodyAsText()
+    return responseBody
+}
