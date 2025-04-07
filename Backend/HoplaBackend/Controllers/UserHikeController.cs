@@ -244,44 +244,55 @@ public class UserHikeController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUserHike(Guid id, [FromForm] UpdateUserHikeForm request)
     {
-        
         var userId = _authentication.GetUserIdFromToken(User);
 
-        // Sjekk at brukeren finnes
         var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
             return Unauthorized(new { message = "Bruker ikke funnet" });
 
-        
-
         var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == id);
-
-
-        var hikeDetail = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == id);
-        if (hike == null || hikeDetail == null)
+        //var hikeDetail = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == id);
+        if (hike == null) // || hikeDetail == null)
             return NotFound("Fant ikke turen.");
 
-        string? pictureUrl = null;
+        // Sjekk at brukeren eier turen
+        if (hike.UserId != userId)
+            return Unauthorized(new { message = "Du kan ikke endre andre sine turer" });
+
+        // Bare oppdater felter som faktisk er sendt inn
+        if (!string.IsNullOrWhiteSpace(request.Title))
+            hike.Title = request.Title;
 
         if (request.Image != null)
         {
             var fileName = await _imageUploadService.UploadImageAsync(request.Image);
-            pictureUrl = fileName;
+            hike.PictureUrl = fileName;
         }
 
-        
-        // Sjekk at brukeren eier turen
-        if (hike.UserId != userId)
-            return Unauthorized(new {message = "Du kan ikke endre andre sine turer"});
+        if (!string.IsNullOrWhiteSpace(request.Description))
+            hike.Comment = request.Description;
 
-        hike.Title = request.Title ?? hike.Title;
-        hike.PictureUrl = pictureUrl ?? pictureUrl;
-        hikeDetail.Description = request.Description ?? hikeDetail.Description;
-        hike.HorseId = request.HorseId;
-        hike.TrailId = request.TrailId;
+        if (request.HorseId.HasValue)
+        {
+            var horseExists = await _context.Horses.AnyAsync(h => h.Id == request.HorseId.Value);
+            if (!horseExists)
+                return BadRequest(new { message = "Ugyldig HorseId" });
+
+            hike.HorseId = request.HorseId.Value;
+        }
+
+        if (request.TrailId.HasValue)
+        {
+            var trailExists = await _context.Trails.AnyAsync(t => t.Id == request.TrailId.Value);
+            if (!trailExists)
+                return BadRequest(new { message = "Ugyldig TrailId" });
+
+            hike.TrailId = request.TrailId.Value;
+        }
 
         await _context.SaveChangesAsync();
         return Ok(new { Message = "Turen er oppdatert." });
     }
+
 
 }

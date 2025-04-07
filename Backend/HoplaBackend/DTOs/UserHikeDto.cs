@@ -40,10 +40,10 @@ public class UpdateUserHikeForm
 {
     public Guid? TrailId { get; set; } //lage søkefunksjon for å finne matching Trail. 
     // f.eks utgangspunkt i lat/longMean og sammenligne rutas koordinater.
-    public IFormFile Image { get; set; } 
+    public IFormFile? Image { get; set; } 
     public string? Title { get; set; }
     public string? Description { get; set; }
     //public int? Rating { get; set; }
     
-    public Guid HorseId { get; set; }
+    public Guid? HorseId { get; set; }
 }
