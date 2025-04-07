@@ -338,15 +338,8 @@
         }
       }
     },
-    "Elapsed Time: %lld:%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Elapsed Time: %1$lld:%2$lld"
-          }
-        }
-      }
+    "Elapsed Time: %@" : {
+
     },
     "Email" : {
       "localizations" : {

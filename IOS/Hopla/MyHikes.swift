@@ -224,9 +224,7 @@ struct MyHikePostContainer: View {
                 .font(.subheadline)
                 .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             
-            Text("Duration: \(String(format: "%.2f", duration)) min")
-                .font(.subheadline)
-                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+            Text("Duration: \(String(format: "%02d.%02d", Int(duration) / 60, Int(duration) % 60)) min")
         }
         .frame(maxWidth: .infinity)
         .padding()

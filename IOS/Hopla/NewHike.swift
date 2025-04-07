@@ -38,9 +38,8 @@ struct NewHike: View {
 
                 // Time and Distance Tracking
                 HStack {
-                    Text("Elapsed Time: \(Int(locationManager.elapsedTime) / 60):\(Int(locationManager.elapsedTime) % 60)")
-
-
+                    Text("Time: \(String(format: "%02d:%02d", Int(locationManager.elapsedTime) / 60, Int(locationManager.elapsedTime) % 60))")
+                        .padding()
                     Button(action: {
                         isTracking.toggle()
                         if isTracking {
@@ -90,8 +89,14 @@ struct NewHike: View {
     private func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
-        return String(format: "%02d:%02d min", minutes, seconds)
+        let formattedDuration = String(format: "%02d:%02d", minutes, seconds) // ✅ Correct MM:SS format
+        
+        print("📡 Correctly Formatted Duration:", formattedDuration) // ✅ Debugging output
+        
+        return formattedDuration
     }
+
+
 
     
     private func startHikeTracking() {
@@ -108,8 +113,6 @@ struct NewHike: View {
                 print("⏳ Timer Updated Elapsed Time:", locationManager.elapsedTime) // ✅ Debugging duration updates
             }
         }
-
-
 
         locationManager.startTracking()
     }
@@ -141,7 +144,7 @@ struct NewHike: View {
             "Description": description.isEmpty ? "No description provided." : description,
             "StartedAt": ISO8601DateFormatter().string(from: Date()),
             "Distance": String(format: "%.2f", locationManager.distance),
-            "Duration": String(format: "%.2f", locationManager.elapsedTime / 60),
+            "Duration": String(format: "%02d:%02d", Int(locationManager.elapsedTime) / 60, Int(locationManager.elapsedTime) % 60), // ✅ Correct
             "Coordinates": locationManager.coordinates.map {
                 ["timestamp": Int($0.timestamp), "lat": $0.lat, "long": $0.long]
             }, // ✅ Ensure it's an array of JSON objects
@@ -238,6 +241,10 @@ struct FillHikeDetailsView: View {
 
                 Button("Save Hike") {
                     saveHike {
+                            DispatchQueue.main.async {
+                                locationManager.elapsedTime = 0 // ✅ Reset elapsed time
+                                locationManager.distance = 0 // ✅ Reset distance
+                            }
                             presentationMode.wrappedValue.dismiss() // ✅ Only dismiss when saving
                         }
                 }
@@ -296,7 +303,8 @@ struct FillHikeDetailsView: View {
         appendField(name: "Description", value: description.isEmpty ? "No description provided." : description)
         appendField(name: "StartedAt", value: ISO8601DateFormatter().string(from: Date()))
         appendField(name: "Distance", value: locationManager.distance > 0 ? String(format: "%.2f", locationManager.distance) : "0.00")
-        appendField(name: "Duration", value: locationManager.elapsedTime > 0 ? String(format: "%.2f", locationManager.elapsedTime / 60) : "1.00")
+        appendField(name: "Duration", value: "\(Int(locationManager.elapsedTime))") // ✅ Send raw seconds as an integer
+
 
 
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
