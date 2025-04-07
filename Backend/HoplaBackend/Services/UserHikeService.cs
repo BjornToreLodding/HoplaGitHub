@@ -22,6 +22,7 @@ public class UserHikeService
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Include(u => u.Trail) // Husk å hente Trail!
+            .Include(u => u.Horse)
             .ToListAsync();
 
         return hikes.Select(u => new UserHikeDto
