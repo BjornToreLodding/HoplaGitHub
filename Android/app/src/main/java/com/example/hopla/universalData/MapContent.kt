@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.hopla.AlertDialogContent
 import com.example.hopla.R
+import com.example.hopla.apiService.createNewHike
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.apiService.fetchTrailCoordinates
 import com.example.hopla.apiService.fetchTrailsOnMap
@@ -60,7 +61,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 // Map screen for displaying trails on a map
 @Composable
@@ -202,6 +207,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     var horses by remember { mutableStateOf(listOf<String>()) }
     var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
+    var newHike by remember { mutableStateOf<NewHike?>(null) }
 
     LaunchedEffect(Unit) {
         val fetchedHorses = fetchHorses("", UserSession.token)
@@ -279,8 +285,35 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                 },
                 confirmButton = {
                     Button(onClick = {
-                        // Handle save action
                         showSaveDialog = false
+                        val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(java.util.Date())
+                        val coordinates = listOf(
+                            Coordinate(timestamp = 0, lat = 60.8381, long = 10.5767),
+                            Coordinate(timestamp = 0, lat = 60.8382, long = 10.5768),
+                            Coordinate(timestamp = 0, lat = 60.8383, long = 10.5769),
+                            Coordinate(timestamp = 0, lat = 60.8390, long = 10.5776)
+                        )
+                        newHike = NewHike(
+                            StartetAt = currentTime,
+                            Distance = "00,00",
+                            Duration = "00,00",
+                            Coordinates = coordinates,
+                            Title = if (tripName.isNotEmpty()) tripName else null,
+                            Description = if (tripNotes.isNotEmpty()) tripNotes else null,
+                            HorseId = horseMap[selectedHorse]?.id,
+                            TrailId = trailId
+                        )
+                        newHike?.let {
+                            Log.d("MapContent", "NewHike: $it")
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    val response = createNewHike(UserSession.token, it, selectedImage)
+                                    Log.d("MapContent", "Create Hike Response: $response")
+                                } catch (e: Exception) {
+                                    Log.e("MapContent", "Error creating hike", e)
+                                }
+                            }
+                        } ?: Log.e("MapContent", "NewHike is null")
                         navController.popBackStack()
                     }) {
                         Text("Save")

@@ -476,7 +476,7 @@ suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, messa
 }
 
 //--------------------------------Post requests for new trip----------------------
-suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap?): String {
+suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap?, trailId: String? = null): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -503,6 +503,9 @@ suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap
         newHike.HorseId?.let {
             append("HorseId", it)
         }
+        newHike.TrailId?.let {
+            append("TrailId", it)
+        }
         selectedImage?.let { bitmap ->
             val byteArrayOutputStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
@@ -514,18 +517,20 @@ suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap
         }
     }
 
+    val url = apiUrl + "userhikes/create"
+    Log.d("createNewHike", "Request URL: $url")
     Log.d("createNewHike", "Request Body: $formData")
 
     val response: HttpResponse = httpClient.use { client ->
-        client.post("https://hopla.onrender.com/userhikes/create") {
+        client.post(url) {
             header("Authorization", "Bearer $token")
             setBody(MultiPartFormDataContent(formData))
         }
     }
 
+    Log.d("createNewHike", "Response Code: ${response.status.value}")
     val responseBody: String = response.bodyAsText()
-    Log.d("createNewHike", "Response Status: ${response.status}")
-    Log.d("createNewHike", "Response Body: $responseBody")
+    httpClient.close()
     return responseBody
 }
 
