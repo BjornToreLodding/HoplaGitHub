@@ -58,9 +58,10 @@ public class UserController : ControllerBase
 
         var existingVerification = await _context.EmailVerifications.AnyAsync(ev => ev.Email == request.Email && !ev.IsUsed && ev.ExpiryDate < DateTime.UtcNow);
         var existingVerification2 = await _context.EmailVerifications.FirstOrDefaultAsync(ev => ev.Email == request.Email);
-        Console.WriteLine(existingVerification2.Email);
-        Console.WriteLine(existingVerification2.IsUsed);
-        Console.WriteLine(existingVerification2.ExpiryDate);
+        //var ev2Email = string.IsNullOrEmpty(existingVerification2.Email) ? existingVerification2.Email : "tomt"; //Linje 61
+        Console.WriteLine(existingVerification2?.Email ?? "Tomt");
+        Console.WriteLine(existingVerification2?.IsUsed.ToString() ?? "ukjent");
+        Console.WriteLine(existingVerification2?.ExpiryDate.ToString() ?? "ukjent");
         Console.WriteLine(DateTime.UtcNow);
         if (existingVerification)
             return BadRequest("En verifikasjonsprosess er allerede i gang. Sjekk e-posten din og evt søppelpost.");

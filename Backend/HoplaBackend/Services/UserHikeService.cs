@@ -25,7 +25,7 @@ public class UserHikeService
             .Include(u => u.Horse)
             .ToListAsync();
 
-        return hikes.Select(u => new UserHikeDto
+        return hikes.Select(u => new UserHikeDto //linje 28
         {
             Id = u.Id,
             TrailName = string.IsNullOrWhiteSpace(u.Trail?.Name) ? "ikke oppgitt" : u.Trail?.Name,
@@ -34,7 +34,7 @@ public class UserHikeService
             Duration = u.Duration,
             Title = u.Title,
             Comment = u.Comment,
-            HorseName = u.Horse.Name,
+            HorseName = string.IsNullOrWhiteSpace(u.Horse?.Name) ? "Ukjent" : u.Horse.Name,
             PictureUrl = PictureHelper.BuildPictureUrl(u.PictureUrl, "UserProfileUserHikes"),
             //PictureUrl = u.PictureUrl,
             TrailButton = !u.TrailId.HasValue
