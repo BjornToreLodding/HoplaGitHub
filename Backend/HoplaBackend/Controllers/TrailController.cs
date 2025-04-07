@@ -1119,7 +1119,8 @@ public class TrailController : ControllerBase
 
         var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId); //Rødt under UserHikeId
         var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
-
+        Console.WriteLine("");
+        Console.WriteLine(dto.UserHikeId);
         if (hike == null || hikeDetails == null)
             return BadRequest("Tur eller detaljer ikke funnet");
         string? pictureUrl = null;
@@ -1151,7 +1152,7 @@ public class TrailController : ControllerBase
         var trailDetails = new TrailDetail
         {
             Id = trail.Id,
-            Description = hikeDetails.Description,
+            Description = dto.Description, //hikeDetails.Description,
             LatMin = hikeDetails.LatMin,
             LatMax = hikeDetails.LatMax,
             LongMin = hikeDetails.LongMin,

@@ -27,9 +27,8 @@ public class TrailListItemDto
 
 public class CreateTrailForm
 {
-    //public string Name { get; set; }
-    //public Guid UserHikeId { get; set; }
-    public IFormFile Image { get; set; }
+
+    public IFormFile? Image { get; set; }
     public string dataJson { get; set; }
     //public List<FilterInputDto> Filters { get; set; } = new();
 }
@@ -37,6 +36,7 @@ public class CreateTrailDto
 {
     public Guid UserHikeId { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; } 
     public string? PictureUrl { get; set; }
     public List<FilterInputDto> Filters { get; set; } = new();
 }
