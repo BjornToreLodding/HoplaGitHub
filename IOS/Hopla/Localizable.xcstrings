@@ -338,9 +338,6 @@
         }
       }
     },
-    "Elapsed Time: %@" : {
-
-    },
     "Email" : {
       "localizations" : {
         "nb" : {
@@ -1153,6 +1150,9 @@
           }
         }
       }
+    },
+    "Time: %@" : {
+
     },
     "Title" : {
 
