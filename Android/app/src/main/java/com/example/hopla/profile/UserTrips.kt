@@ -118,7 +118,6 @@ fun MyTripsScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
         ) {
             ScreenHeader(navController, stringResource(R.string.my_trips))
 
@@ -214,14 +213,13 @@ fun HikeItem(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(text = hike.trailName, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
             Text(text = stringResource(R.string.length) + ": ${hike.length} km", style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
             Text(
-                text = stringResource(R.string.duration) + ": ${hike.duration} min",
+                text = stringResource(R.string.duration2) + ": ${hike.duration} min",
                 style = generalTextStyle,
                 color = MaterialTheme.colorScheme.secondary
             )

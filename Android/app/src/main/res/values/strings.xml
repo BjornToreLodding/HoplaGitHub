@@ -182,5 +182,6 @@
     <string name="share_trip">Del tur</string>
     <string name="no_more_posts">Ingen flere poster</string>
     <string name="show_on_map">Vis på kart</string>
+    <string name="duration2">Varighet</string>
 
 </resources>

@@ -59,7 +59,7 @@ val customFontFamilyText = FontFamily(
 // Custom text style for buttons
 val generalTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
-    fontSize = 12.sp,
+    fontSize = 14.sp,
     fontWeight = FontWeight.Normal
 )
 

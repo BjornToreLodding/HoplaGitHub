@@ -1,6 +1,7 @@
 package com.example.hopla.profile
 
 //noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -23,7 +24,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -63,7 +63,6 @@ import com.example.hopla.apiService.fetchAllUsers
 import com.example.hopla.apiService.updateUserInfo
 import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.HeartColor
-import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
@@ -74,7 +73,6 @@ import com.example.hopla.universalData.DateOfBirthPicker
 import com.example.hopla.universalData.EditableTextField
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.ImagePicker
-import com.example.hopla.universalData.MapButton
 import com.example.hopla.universalData.OtherUsers
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
