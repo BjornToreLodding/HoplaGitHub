@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct HomePost: Identifiable, Decodable {
     var id: String { entityId }
@@ -13,7 +14,7 @@ struct HomePost: Identifiable, Decodable {
     let entityId: String
     let title: String
     let description: String
-    let pictureUrl: String
+    let pictureUrl: String?
     let userAlias: String
     let userProfilePicture: String
     let likes: Int
@@ -21,16 +22,17 @@ struct HomePost: Identifiable, Decodable {
     let createdAt: String
 }
 
+
 class HomeViewModel: ObservableObject {
     @Published var homePosts: [HomePost] = []
 
-    func fetchPosts(for filter: String) {
+    func fetchPosts(for filter: String, latitude: Double? = nil, longitude: Double? = nil) {
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found")
             return
         }
 
-        let urlString: String
+        var urlString: String
         switch filter {
         case "globe":
             urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horse"
@@ -39,7 +41,12 @@ class HomeViewModel: ObservableObject {
         case "point.bottomleft.forward.to.point.topright.scurvepath":
             urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&onlyLikedTrails=true"
         case "location":
-            urlString = "https://hopla.onrender.com/feed/all?userlat=60&userlong=10&radius=120"
+            if let lat = latitude, let long = longitude {
+                urlString = "https://hopla.onrender.com/feed/all?userlat=\(lat)&userlong=\(long)&radius=120"
+            } else {
+                print("❌ Missing latitude/longitude for location filter")
+                return
+            }
         case "hand.thumpsup":
             urlString = "https://hopla.onrender.com/feed/all?sort=likes"
         default:
@@ -50,6 +57,9 @@ class HomeViewModel: ObservableObject {
             print("❌ Invalid URL")
             return
         }
+        
+        print("🌍 Fetching posts with URL: \(urlString)")
+
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -76,6 +86,7 @@ class HomeViewModel: ObservableObject {
             }
         }.resume()
     }
+
 }
 
 struct FeedResponse: Decodable {
@@ -87,6 +98,7 @@ struct FeedResponse: Decodable {
 struct Home: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel = HomeViewModel()
+    @StateObject private var locationManager = LocationManager()
     @State private var selectedFilter: String = "globe"
 
 
@@ -107,7 +119,7 @@ struct Home: View {
                                     userAlias: homePost.userAlias,
                                     title: homePost.title,
                                     description: homePost.description,
-                                    imageUrl: homePost.pictureUrl,
+                                    imageUrl: homePost.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
                                     createdAt: homePost.createdAt,
                                     colorScheme: colorScheme
                                 )
@@ -116,11 +128,24 @@ struct Home: View {
                     }
                     .padding(.top, 0)
                     .onChange(of: selectedFilter) { newValue in
-                        viewModel.fetchPosts(for: newValue)
+                        if newValue == "location" {
+                            if let location = locationManager.userLocation {
+                                viewModel.fetchPosts(for: newValue, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                            } else {
+                                print("❌ Location not yet available")
+                            }
+                        } else {
+                            viewModel.fetchPosts(for: newValue)
+                        }
                     }
                     .onAppear {
-                        viewModel.fetchPosts(for: selectedFilter)
+                        if selectedFilter == "location", let location = locationManager.userLocation {
+                            viewModel.fetchPosts(for: selectedFilter, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                        } else {
+                            viewModel.fetchPosts(for: selectedFilter)
+                        }
                     }
+
                 }
             }
         }
@@ -129,14 +154,25 @@ struct Home: View {
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
-                Image(systemName: "globe").tag("globe")
-                Image(systemName: "person.2").tag("person.2")
-                Image(systemName: "point.bottomleft.forward.to.point.topright.scurvepath").tag("point.bottomleft.forward.to.point.topright.scurvepath") // løype
-                Image(systemName: "location").tag("location")
-                Image(systemName: "hand.thumbsup").tag("hand.thumbsup") //.fill
+                ForEach(["globe", "person.2", "point.bottomleft.forward.to.point.topright.scurvepath", "location", "hand.thumbsup"], id: \.self) { filter in
+                    Image(systemName: filter)
+                        .tag(filter)
+                        .onTapGesture {
+                            if selectedFilter == filter {
+                                // Re-selecting the same filter
+                                if filter == "location", let location = locationManager.userLocation {
+                                    viewModel.fetchPosts(for: filter, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                                } else {
+                                    viewModel.fetchPosts(for: filter)
+                                }
+                            }
+                        }
+                }
             }
             .pickerStyle(SegmentedPickerStyle())
         }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
         .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
     }
 }
@@ -146,11 +182,9 @@ struct PostContainer: View {
     var userAlias: String
     var title: String
     var description: String
-    var imageUrl: String
+    var imageUrl: String // <-- Use imageUrl instead of pictureUrl
     var createdAt: String
     var colorScheme: ColorScheme
-    
-    
 
     var formattedDate: String {
         let isoFormatter = ISO8601DateFormatter()
@@ -192,27 +226,34 @@ struct PostContainer: View {
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 
             // Image
-            AsyncImage(url: URL(string: imageUrl)) { image in
-                image.resizable()
-            } placeholder: {
-                ProgressView()
+            if let url = URL(string: imageUrl) { // <-- Using imageUrl here
+                AsyncImage(url: url) { image in
+                    image.resizable()
+                } placeholder: {
+                    ProgressView()
+                }
+                .scaledToFill()
+                .frame(width: 350)
+                .frame(height: 260)
+                .clipped()
+                .cornerRadius(2)
+            } else {
+                // Optional: Show a placeholder image or empty view if no image URL exists
+                Image("https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 350, height: 260)
+                    .clipped()
+                    .cornerRadius(2)
             }
-            .scaledToFill()
-            .frame(maxWidth: .infinity)
-            .frame(height: 260)
-            .clipped()
-            .cornerRadius(8)
 
             // Date and time (bottom right)
-                Spacer()
-                Text(formattedDate)
-            
+            Spacer()
+            Text(formattedDate)
         }
-        
         .padding()
         .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-        .cornerRadius(12)
+        .cornerRadius(10)
         .padding(.horizontal)
     }
 }
-
