@@ -184,5 +184,6 @@
     <string name="no_more_posts">No more posts</string>
     <string name="show_on_map">Show on map</string>
     <string name="duration2">Duration</string>
+    <string name="trail">Trail</string>
 
 </resources>

@@ -105,14 +105,6 @@ val underlinedTextStyleSmall = TextStyle(
     textDecoration = TextDecoration.Underline
 )
 
-// Custom text style for underlined text (big)
-val underlinedTextStyleBig = TextStyle(
-    fontFamily = customFontFamilyText,
-    fontSize = 24.sp,
-    fontWeight = FontWeight.Normal,
-    textDecoration = TextDecoration.Underline
-)
-
 // Custom text style for buttons
 val dropdownMenuTextStyle = TextStyle(
     fontFamily = customFontFamilyText,

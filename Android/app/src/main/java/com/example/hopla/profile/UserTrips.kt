@@ -1,5 +1,6 @@
 package com.example.hopla.profile
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -19,13 +20,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -49,7 +48,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -57,7 +55,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.hopla.CreateUserDialog
 import com.example.hopla.R
 import com.example.hopla.apiService.createTrail
 import com.example.hopla.apiService.fetchHorses
@@ -74,12 +71,12 @@ import com.example.hopla.universalData.Hike
 import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.MapButton
+import com.example.hopla.universalData.MapButtonTrail
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.TrailFilter
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -216,7 +213,18 @@ fun HikeItem(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = hike.trailName, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+            Text(
+                text = hike.title ?: " ",
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            if(!hike.trailButton) {
+                Text (
+                    text = stringResource(R.string.trail) + ": ${hike.trailName}",
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
             Text(text = stringResource(R.string.length) + ": ${hike.length} km", style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
             Text(
                 text = stringResource(R.string.duration2) + ": ${hike.duration} min",
@@ -244,8 +252,27 @@ fun HikeItem(
                         }
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    //BYTT MED FAKTISK HIKEID NÅR KOORDINATER FINNS
-                    MapButton(userHikeId = "mock/12345678-0000-0000-0011-123456780002  ", token = UserSession.token)
+                    MapButton(userHikeId = hike.id, token = UserSession.token)
+                }
+            }
+            if (isMyTripsScreen && !hike.trailButton) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.edit_trip),
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            showEditDialog = true
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    hike.trailId?.let { trailId ->
+                        MapButtonTrail(trailId = trailId, token = UserSession.token)
+                    }
                 }
             }
         }

@@ -355,7 +355,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
     }
 }
 
-//-------------Functions to open up a map that displays coordinates
+//-------------Functions to open up a map that displays coordinates for userhikes ------------
 @Composable
 fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
     val mapView = rememberMapViewWithLifecycle()
@@ -429,6 +429,77 @@ fun MapButton(userHikeId: String, token: String) {
         if (showMap) {
             Dialog(onDismissRequest = { showMap = false }) {
                 CoordinatesOnMap(userHikeId = userHikeId, token = token, onClose = { showMap = false })
+            }
+        }
+    }
+}
+
+//-------------Functions to open up a map that displays coordinates for trails ------------
+@Composable
+fun CoordinatesOnMapTrail(trailId: String, token: String, onClose: () -> Unit) {
+    val mapView = rememberMapViewWithLifecycle()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val coordinates = remember { mutableStateOf<List<TrailCoordinate>>(emptyList()) }
+    val zoomLevel = remember { mutableIntStateOf(15) }
+
+    LaunchedEffect(trailId) {
+        coroutineScope.launch {
+            val trailResponse = fetchTrailCoordinates(trailId, token)
+            coordinates.value = trailResponse?.allCoords ?: emptyList()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView({ mapView })
+
+        LaunchedEffect(coordinates.value) {
+            if (coordinates.value.isNotEmpty()) {
+                mapView.getMapAsync { googleMap ->
+                    googleMap.uiSettings.isZoomControlsEnabled = true
+                    enableMyLocation(googleMap, context)
+
+                    val boundsBuilder = LatLngBounds.Builder()
+                    val polylineOptions = PolylineOptions().apply {
+                        color(Color.Black.toArgb())
+                        width(5f)
+                    }
+
+                    coordinates.value.forEach { coord ->
+                        val latLng = LatLng(coord.lat, coord.lng)
+                        boundsBuilder.include(latLng)
+                        polylineOptions.add(latLng)
+                    }
+
+                    googleMap.addPolyline(polylineOptions)
+                    val bounds = boundsBuilder.build()
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                }
+            }
+        }
+
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+        }
+    }
+}
+
+@Composable
+fun MapButtonTrail(trailId: String, token: String) {
+    var showMap by remember { mutableStateOf(false) }
+    Column {
+        Text(
+            text = stringResource(R.string.show_on_map),
+            modifier = Modifier.clickable { showMap = true }.padding(16.dp),
+            style = generalTextStyle,
+            color = MaterialTheme.colorScheme.primary
+        )
+        if (showMap) {
+            Dialog(onDismissRequest = { showMap = false }) {
+                CoordinatesOnMapTrail(trailId = trailId, token = token, onClose = { showMap = false })
             }
         }
     }
