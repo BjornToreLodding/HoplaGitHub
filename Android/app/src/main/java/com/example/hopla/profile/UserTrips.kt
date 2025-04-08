@@ -28,6 +28,8 @@ import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -162,7 +164,6 @@ fun HikeItem(
             hike = hike,
             onDismiss = { showEditDialog = false },
             onSave = { tripName, tripDescription, selectedImage, selectedHorseId ->
-                // Handle save action
                 showEditDialog = false
             },
             onHikesReload = onHikesReload
@@ -174,7 +175,7 @@ fun HikeItem(
             hike = hike,
             filters = filters,
             onDismiss = { showShareDialog = false },
-            onSave = { name: String, description: String, imageBitmap: Bitmap?, userHikeId: String, filterData: List<FilterData> ->
+            onSave = { name, description, imageBitmap, userHikeId, filterData ->
                 coroutineScope.launch {
                     val createTrailRequest = CreateTrailRequest(
                         Name = name,
@@ -218,19 +219,7 @@ fun HikeItem(
                 style = underheaderTextStyle,
                 color = MaterialTheme.colorScheme.secondary
             )
-            if(!hike.trailButton) {
-                Text (
-                    text = stringResource(R.string.trail) + ": ${hike.trailName}",
-                    style = generalTextStyle,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-            Text(text = stringResource(R.string.length) + ": ${hike.length} km", style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
-            Text(
-                text = stringResource(R.string.duration2) + ": ${hike.duration} min",
-                style = generalTextStyle,
-                color = MaterialTheme.colorScheme.secondary
-            )
+            ExpandableDescription(hike = hike) // Add the expandable description here
             Spacer(modifier = Modifier.height(8.dp))
             if (isMyTripsScreen && hike.trailButton) {
                 Row {
@@ -273,6 +262,59 @@ fun HikeItem(
                     hike.trailId?.let { trailId ->
                         MapButtonTrail(trailId = trailId, token = UserSession.token)
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableDescription(hike: Hike) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { isExpanded = !isExpanded }
+        ) {
+            Text(
+                text = stringResource(R.string.trail) + ": ${hike.trailName}",
+                style = generalTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = if (isExpanded) "Collapse" else "Expand",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+
+        if (isExpanded) {
+            Column {
+                Text(
+                    text = stringResource(R.string.length) + ": ${hike.length} km",
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.duration2) + ": ${hike.duration} min",
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                if (hike.horseName != "Ukjent") {
+                    Text(
+                        text = stringResource(R.string.horse) + ": ${hike.horseName}",
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+                if (hike.comment != "No description provided.") {
+                    Text(
+                        text = stringResource(R.string.description) + ": ${hike.comment}",
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 }
             }
         }
