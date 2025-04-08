@@ -411,7 +411,6 @@ fun FriendsListScreen(navController: NavController, userId: String) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
         ) {
             ScreenHeader(navController, stringResource(R.string.friends))
 
@@ -461,7 +460,6 @@ fun UserListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
         ) {
             ScreenHeader(navController, title)
 
@@ -516,10 +514,11 @@ fun UserItemComposable(userItem: UserItem, navController: NavController) {
             .fillMaxWidth()
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.onBackground)
-            .padding(16.dp)
+            .padding(8.dp)
             .clickable {
                 navController.navigate("friend_profile/${userItem.id}")
-            }
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = userItem.pictureUrl),
@@ -527,11 +526,9 @@ fun UserItemComposable(userItem: UserItem, navController: NavController) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = userItem.name, style = headerTextStyleSmall, color = MaterialTheme.colorScheme.secondary)
             Text(text = userItem.alias, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
         }
     }
@@ -544,18 +541,18 @@ fun UserItemComposable(user: OtherUsers, navController: NavController) {
             .fillMaxWidth()
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.onBackground)
-            .padding(16.dp)
-            .clickable { navController.navigate("friend_profile/${user.id}") }
+            .padding(8.dp)
+            .clickable { navController.navigate("friend_profile/${user.id}") },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = user.pictureUrl),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(64.dp).clip(CircleShape)
+            modifier = Modifier.size(64.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = user.name ?: "Unknown", style = headerTextStyleSmall, color = MaterialTheme.colorScheme.secondary)
             Text(text = user.alias ?: "Unknown", style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
         }
     }
