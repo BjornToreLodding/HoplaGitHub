@@ -160,7 +160,7 @@
     <string name="year">Year</string>
     <string name="success">Success</string>
     <string name="error_occurred">Error occurred, try again later</string>
-    <string name="add_new_horse">Add new horse</string>
+    <string name="add_new_horse">New horse</string>
     <string name="notifications">Notifications</string>
     <string name="friend_requests">Friend requests</string>
     <string name="no_friend_requests">No friend requests at the moment</string>

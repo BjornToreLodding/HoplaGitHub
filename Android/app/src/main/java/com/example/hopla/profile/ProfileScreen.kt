@@ -66,6 +66,7 @@ import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.DateOfBirth
@@ -74,6 +75,7 @@ import com.example.hopla.universalData.EditableTextField
 import com.example.hopla.universalData.HorseRequest
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.OtherUsers
+import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -612,12 +614,15 @@ fun AddNewType(
     ) {
         when (type) {
             "Horse" -> {
-                Text(text = stringResource(R.string.add_new_horse), style = headerTextStyleSmall)
+                ScreenHeader(
+                    navController = navController,
+                    headerText =  stringResource(R.string.add_new_horse),
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(text = stringResource(R.string.name)) },
+                    label = { Text(text = stringResource(R.string.name), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -629,7 +634,7 @@ fun AddNewType(
                         TextField(
                             value = breedOrFriendType,
                             onValueChange = { breedOrFriendType = it },
-                            label = { Text(text = stringResource(R.string.breed)) },
+                            label = { Text(text = stringResource(R.string.breed), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -691,8 +696,8 @@ fun AddNewType(
                             Log.e("createHorse", "Error creating horse", e)
                         }
                     }
-                }) {
-                    Text(text = "Add $type")
+                }, shape = RectangleShape ) {
+                    Text(text = stringResource(R.string.add), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                 }
 
             }

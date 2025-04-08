@@ -72,7 +72,7 @@ val generalTextStyleDialog = TextStyle(
 
 val generalTextStyleRed = TextStyle(
     fontFamily = customFontFamilyText,
-    fontSize = 12.sp,
+    fontSize = 18.sp,
     fontWeight = FontWeight.Normal,
     color = HeartColor
 )

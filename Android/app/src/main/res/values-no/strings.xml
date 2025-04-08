@@ -160,7 +160,7 @@
     <string name="year">År</string>
     <string name="success">Suksess</string>
     <string name="error_occurred">Noe feil skjedde, prøv igjen senere</string>
-    <string name="add_new_horse">Legg til ny hest</string>
+    <string name="add_new_horse">Ny hest</string>
     <string name="notifications">Varsler</string>
     <string name="friend_requests">Venne forespørsler</string>
     <string name="no_friend_requests">Ingen venneforespørsler for øyeblikket</string>

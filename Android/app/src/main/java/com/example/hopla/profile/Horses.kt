@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -60,6 +61,7 @@ import com.example.hopla.universalData.Horse
 import com.example.hopla.universalData.HorseDetail
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.UserSession
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -113,6 +115,9 @@ fun MyHorsesScreen(navController: NavController) {
             items(horses) { horse ->
                 HorseItem(horse, navController)
             }
+            item {
+                Spacer(modifier = Modifier.height(64.dp))
+            }
         }
     }
     AddButton(onClick = { navController.navigate("addHorseScreen") })
@@ -121,7 +126,6 @@ fun MyHorsesScreen(navController: NavController) {
 @Composable
 fun HorseDetailScreen(navController: NavController, horseId: String) {
     var horseDetail by remember { mutableStateOf<HorseDetail?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(horseId) {
@@ -134,12 +138,19 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
     ) {
+        // Use ScreenHeader with the horse name
+        Box {
+            ScreenHeader(
+                navController = navController,
+                headerText = horseDetail?.name ?: stringResource(R.string.horse)
+            )
+        }
+
         horseDetail?.let { horse ->
             val formattedDob = try {
                 val dob = horse.dob
@@ -155,12 +166,6 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                 verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
             ) {
                 item {
-                    // Name
-                    Text(
-                        text = horse.name,
-                        style = headerTextStyle,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Image with Border & Shadow
@@ -186,7 +191,7 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(6.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground), // Set the desired color
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
@@ -196,73 +201,88 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             DetailRow(label = stringResource(R.string.breed) + ":", value = horse.breed)
-                            DetailRow(
-                                label = stringResource(R.string.age) + ":",
-                                value = horse.age.toString()
-                            )
-                            DetailRow(
-                                label = stringResource(R.string.date_of_birth) + ":",
-                                value = formattedDob
-                            )
+                            DetailRow(label = stringResource(R.string.age) + ":", value = horse.age.toString())
+                            DetailRow(label = stringResource(R.string.date_of_birth) + ":", value = formattedDob)
                         }
                     }
 
-                    // Delete Horse Text
-                    Text(
-                        text = stringResource(R.string.delete_horse),
-                        style = generalTextStyleRed,
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .clickable {
-                                showDialog = true
-                            }
+                    DeleteHorseSection(
+                        horseId = horseId,
+                        navController = navController,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
             }
         }
+    }
+}
 
-        // Close Button (Top-Right)
-        IconButton(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(48.dp)
-        ) {
+
+@Composable
+fun HorseItem(horse: Horse, navController: NavController) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.onBackground, RoundedCornerShape(12.dp))
+            .clickable {
+                navController.navigate("horse_detail/${horse.id}")
+            }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = horse.name,
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+
+        IconButton(onClick = { showDeleteDialog = true }) {
             Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.back),
-                tint = MaterialTheme.colorScheme.onBackground
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete horse",
+                tint = MaterialTheme.colorScheme.error
             )
         }
     }
 
-    // Confirmation Dialog
-    if (showDialog) {
+    if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { showDeleteDialog = false },
             title = { Text(text = stringResource(R.string.delete_horse)) },
             text = { Text(text = stringResource(R.string.delete_horse_dialogue)) },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        coroutineScope.launch {
-                            try {
-                                deleteHorse(UserSession.token, horseId)
-                                navController.popBackStack() // Navigate back after deletion
-                            } catch (e: Exception) {
-                                Log.e("HorseDetailScreen", "Error deleting horse", e)
-                            }
-                        }
-                        showDialog = false
+                        deleteHorseAndNavigateBack(
+                            token = UserSession.token,
+                            horseId = horse.id,
+                            navController = navController,
+                            coroutineScope = coroutineScope
+                        )
+                        showDeleteDialog = false
                     }
                 ) {
                     Text(text = stringResource(R.string.yes))
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showDialog = false }
-                ) {
+                TextButton(onClick = { showDeleteDialog = false }) {
                     Text(text = stringResource(R.string.no))
                 }
             }
@@ -270,34 +290,6 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
     }
 }
 
-@Composable
-fun HorseItem(horse: Horse, navController: NavController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.onBackground)
-            .padding(16.dp)
-            .clickable {
-                navController.navigate("horse_detail/${horse.id}")
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = horse.name,
-            style = underheaderTextStyle,
-            color = MaterialTheme.colorScheme.secondary
-        )
-    }
-}
 
 @Composable
 fun DetailRow(label: String, value: String) {
@@ -314,3 +306,68 @@ fun DetailRow(label: String, value: String) {
     }
 }
 
+fun deleteHorseAndNavigateBack(
+    token: String,
+    horseId: String,
+    navController: NavController,
+    coroutineScope: CoroutineScope
+) {
+    coroutineScope.launch {
+        try {
+            deleteHorse(token, horseId)
+            navController.popBackStack() // Navigate back on success
+        } catch (e: Exception) {
+            Log.e("HorseDetailScreen", "Error deleting horse", e)
+        }
+    }
+}
+
+@Composable
+fun DeleteHorseSection(
+    horseId: String,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(modifier = modifier) {
+        // Delete Horse Text
+        Text(
+            text = stringResource(R.string.delete_horse),
+            style = generalTextStyleRed,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .clickable { showDialog = true }
+        )
+
+        // Confirmation Dialog
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = stringResource(R.string.delete_horse)) },
+                text = { Text(text = stringResource(R.string.delete_horse_dialogue)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            deleteHorseAndNavigateBack(
+                                token = UserSession.token,
+                                horseId = horseId,
+                                navController = navController,
+                                coroutineScope = coroutineScope
+                            )
+                            showDialog = false
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text(text = stringResource(R.string.no))
+                    }
+                }
+            )
+        }
+    }
+}
