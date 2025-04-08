@@ -464,7 +464,7 @@ struct Hikes: View {
         .navigationBarHidden(true)
     }
     
-    private func fetchTrailFilters() {
+    func fetchTrailFilters() {
         trailFilters = [
             TrailFilter(
                 id: "12345678-0000-0000-0101-123456780001",
@@ -626,6 +626,7 @@ struct Hikes: View {
                 ForEach(filteredHikes()) { hike in
                     HikeCard(
                         hike: hike,
+                        trailFilters: trailFilters,
                         likedHikes: $likedHikes,
                         toggleFavoriteAction: { selectedHike in
                             handleToggleFavorite(for: selectedHike)
@@ -1006,12 +1007,14 @@ struct Hikes: View {
 // MARK: - Hike Card
 struct HikeCard: View {
     let hike: Hike
+    let trailFilters: [TrailFilter]
+    
     @Binding var likedHikes: [String]
     var toggleFavoriteAction: (Hike) -> Void
     @ObservedObject var viewModel: HikeService  // This works now
     
     var body: some View {
-        NavigationLink(destination: HikesDetails(hike: hike)) {
+        NavigationLink(destination: HikesDetails(hike: hike, trailFilters: trailFilters)) {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack(alignment: .topTrailing) {
                     // Image background
