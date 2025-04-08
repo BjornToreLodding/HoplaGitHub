@@ -1218,6 +1218,24 @@ public class TrailController : ControllerBase
         _context.Trails.Add(trail);
         _context.TrailDetails.Add(trailDetails);
         _context.TrailAllCoordinates.Add(trailAllCoordinates);
+                foreach (var filter in dto.Filters)
+        {
+            var definitionExists = await _context.TrailFilterDefinitions
+                .AnyAsync(d => d.Id == filter.FilterDefinitionId);
+
+            if (!definitionExists)
+                continue; // hopp over ukjente filterDefinisjoner
+
+            var value = new TrailFilterValue
+            {
+                Id = Guid.NewGuid(),
+                TrailId = trail.Id,
+                TrailFilterDefinitionId = filter.FilterDefinitionId,
+                Value = filter.Value
+            };
+
+            _context.TrailFilterValues.Add(value);
+        }
 
         // Save everything in one go
         await _context.SaveChangesAsync();
