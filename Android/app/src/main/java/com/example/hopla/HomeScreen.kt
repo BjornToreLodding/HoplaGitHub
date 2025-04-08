@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Cable
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
@@ -69,13 +70,15 @@ import com.example.hopla.universalData.formatDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.PeopleOutline
 
 @Composable
 fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Unit) {
     val items = listOf(
-        Icons.Outlined.Home,
-        Icons.Outlined.Person,
-        Icons.Outlined.FavoriteBorder,
+        Icons.Outlined.Language,
+        Icons.Outlined.PeopleOutline,
+        Icons.Outlined.Cable,
         Icons.Outlined.LocationOn,
         Icons.Outlined.ThumbUp
     )
