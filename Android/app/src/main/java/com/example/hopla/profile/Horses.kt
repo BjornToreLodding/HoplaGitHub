@@ -104,7 +104,7 @@ fun MyHorsesScreen(navController: NavController) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.padding(8.dp)) {
+        Box {
             ScreenHeader(navController, stringResource(R.string.my_horses))
         }
         LazyColumn(
@@ -280,7 +280,8 @@ fun HorseItem(horse: Horse, navController: NavController) {
             .padding(16.dp)
             .clickable {
                 navController.navigate("horse_detail/${horse.id}")
-            }
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = horse.horsePictureUrl),
@@ -288,10 +289,13 @@ fun HorseItem(horse: Horse, navController: NavController) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = horse.name, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+        Text(
+            text = horse.name,
+            style = underheaderTextStyle,
+            color = MaterialTheme.colorScheme.secondary
+        )
     }
 }
 
@@ -309,3 +313,4 @@ fun DetailRow(label: String, value: String) {
         Text(text = value, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
     }
 }
+

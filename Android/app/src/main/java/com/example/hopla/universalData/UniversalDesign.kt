@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.DropdownMenuItem
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -104,22 +105,27 @@ fun SearchBar(
     )
 }
 
-// An button (used for add) that takes navigation in as a parameter
+// A button (used for add) that takes navigation in as a parameter
 @Composable
 fun AddButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(16.dp)
             .fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
             onClick = onClick,
-            modifier = Modifier
-                .size(45.dp),
-            containerColor = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(47.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            shape = CircleShape
         ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Add", tint = MaterialTheme.colorScheme.onPrimary)
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add",
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(37.dp)
+            )
         }
 
     }
