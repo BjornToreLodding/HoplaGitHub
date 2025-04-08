@@ -122,44 +122,58 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // ScreenHeader at the top
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    Text(
-                        text = profile.alias,
-                        style = headerTextStyleSmall,
-                        color = MaterialTheme.colorScheme.secondary
+                ScreenHeader(navController = navController, headerText = profile.alias)
+            }
+
+            // Row for IconButton and DropdownMenu
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More options",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
-                IconButton(
-                    onClick = { expanded = true },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.secondary)
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.block_user), style = dropdownMenuTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                        onClick = { showBlockConfirmationDialog = true }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.report_user), style = dropdownMenuTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                        onClick = { showReportDialog = true }
-                    )
-                }
+            }
+
+            // DropdownMenu
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(R.string.block_user),
+                            style = dropdownMenuTextStyle,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    },
+                    onClick = { showBlockConfirmationDialog = true }
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(R.string.report_user),
+                            style = dropdownMenuTextStyle,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    },
+                    onClick = { showReportDialog = true }
+                )
             }
 
             if (showBlockConfirmationDialog) {
@@ -199,85 +213,180 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                     }
                 )
             }
-
-            Spacer(modifier = Modifier.height(3.dp))
-            Row(
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = profile.pictureUrl),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape)
-                        .border(5.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
-                )
+            Image(
+                painter = rememberAsyncImagePainter(model = profile.pictureUrl),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(175.dp)
+                    .clip(CircleShape)
+                    .border(5.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
+            )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = profile.name, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = profile.name,
+                            style = underheaderTextStyle,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                     if (profile.relationStatus == PersonStatus.FRIENDS.name) {
-                        Text(
-                            text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
-                            style = underlinedTextStyleSmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.clickable {
-                                navController.navigate("friends_list/${profile.id}")
-                            }
-                        )
-                        Text(
-                            text = stringResource(R.string.horses) + ": ${profile.horseCount}",
-                            style = underlinedTextStyleSmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.clickable {
-                                navController.navigate("user_horses/$userId")
-                            }
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.friends) + ": ${profile.friendsCount}",
+                                style = underlinedTextStyleSmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.clickable {
+                                    navController.navigate("friends_list/${profile.id}")
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = stringResource(R.string.horses) + ": ${profile.horseCount}",
+                                style = underlinedTextStyleSmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.clickable {
+                                    navController.navigate("user_horses/$userId")
+                                }
+                            )
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-                    profile.relationStatus?.let { Text(text = it, style = underheaderTextStyle) }
-                    if (profile.relationStatus == PersonStatus.PENDING.name)  {
-                        CustomButton(text = stringResource(R.string.pending)) { /*Handle button click*/ }
-                    }
-                    if (profile.relationStatus == PersonStatus.FOLLOWING.name) {
-                        CustomButton(text = stringResource(R.string.stop_following)) {
-                            val deleteRequest = UserRelationChangeRequest(
-                                TargetUserId = userId
-                            )
-                            coroutineScope.launch {
-                                try {
-                                    val response = sendUserRelationRequestDelete(UserSession.token, deleteRequest)
-                                    Log.d("changeRelations", "Response: $response")
-                                    reloadTrigger++
-                                } catch (e: Exception) {
-                                    Log.e("changeRelations", "Error stop following", e)
+                    if (profile.relationStatus == PersonStatus.PENDING.name) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CustomButton(text = stringResource(R.string.pending)) {
+                                val deleteRequest = UserRelationChangeRequest(
+                                    TargetUserId = userId
+                                )
+                                coroutineScope.launch {
+                                    try {
+                                        val response = sendUserRelationRequestDelete(
+                                            UserSession.token,
+                                            deleteRequest
+                                        )
+                                        Log.d("changeRelations", "Response: $response")
+                                        reloadTrigger++
+                                    } catch (e: Exception) {
+                                        Log.e("changeRelations", "Error stop following", e)
+                                    }
                                 }
                             }
                         }
-                        CustomButton(text = stringResource(R.string.add_friend)) {
-                            val request = UserRelationChangeRequest(
-                                TargetUserId = userId,
-                                Status = "PENDING"
-                            )
-                            coroutineScope.launch {
-                                try {
-                                    val response = sendUserRelationRequest(UserSession.token, request)
-                                    Log.d("changeRelations", "Response: ${response.message}")
-                                    reloadTrigger++
-                                } catch (e: Exception) {
-                                    Log.e("changeRelations", "Error sending user relation request", e)
+                    }
+                    if (profile.relationStatus == PersonStatus.FOLLOWING.name) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CustomButton(text = stringResource(R.string.following)) {
+                                val deleteRequest = UserRelationChangeRequest(
+                                    TargetUserId = userId
+                                )
+                                coroutineScope.launch {
+                                    try {
+                                        val response = sendUserRelationRequestDelete(
+                                            UserSession.token,
+                                            deleteRequest
+                                        )
+                                        Log.d("changeRelations", "Response: $response")
+                                        reloadTrigger++
+                                    } catch (e: Exception) {
+                                        Log.e("changeRelations", "Error stop following", e)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            if (profile.relationStatus == PersonStatus.FOLLOWING.name && profile.relationStatus != PersonStatus.PENDING.name) {
+                                CustomButton(text = stringResource(R.string.add_friend)) {
+                                    val request = UserRelationChangeRequest(
+                                        TargetUserId = userId,
+                                        Status = "PENDING"
+                                    )
+                                    coroutineScope.launch {
+                                        try {
+                                            val response =
+                                                sendUserRelationRequest(UserSession.token, request)
+                                            Log.d(
+                                                "changeRelations",
+                                                "Response: ${response.message}"
+                                            )
+                                            reloadTrigger++
+                                        } catch (e: Exception) {
+                                            Log.e(
+                                                "changeRelations",
+                                                "Error sending user relation request",
+                                                e
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            if (profile.relationStatus == PersonStatus.FOLLOWING.name && profile.relationStatus == PersonStatus.PENDING.name) {
+                                CustomButton(text = stringResource(R.string.pending)) {
+                                    val deleteRequest = UserRelationChangeRequest(
+                                        TargetUserId = userId
+                                    )
+                                    coroutineScope.launch {
+                                        try {
+                                            val response = sendUserRelationRequestDelete(
+                                                UserSession.token,
+                                                deleteRequest
+                                            )
+                                            Log.d("changeRelations", "Response: $response")
+                                            reloadTrigger++
+                                        } catch (e: Exception) {
+                                            Log.e("changeRelations", "Error stop following", e)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (profile.relationStatus == PersonStatus.FRIENDS.name) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CustomButton(text = stringResource(R.string.friends)) {
+                                val deleteRequest = UserRelationChangeRequest(
+                                    TargetUserId = userId
+                                )
+                                coroutineScope.launch {
+                                    try {
+                                        val response = sendUserRelationRequestDelete(
+                                            UserSession.token,
+                                            deleteRequest
+                                        )
+                                        Log.d("changeRelations", "Response: $response")
+                                        reloadTrigger++
+                                    } catch (e: Exception) {
+                                        Log.e("changeRelations", "Error stop following", e)
+                                    }
                                 }
                             }
                         }
                     }
                     if (profile.relationStatus == PersonStatus.NONE.name) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Sende en venneforespørsel hvis ingen relasjon fra før
+                            // Button to send a friend request
                             CustomButton(text = stringResource(R.string.add)) {
                                 val request = UserRelationChangeRequest(
                                     TargetUserId = userId,
@@ -293,6 +402,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                                     }
                                 }
                             }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            // Button to follow the user
                             CustomButton(text = stringResource(R.string.follow)) {
                                 val request = UserRelationChangeRequest(
                                     TargetUserId = userId,
@@ -311,7 +422,6 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         }
                     }
                 }
-            }
             Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
