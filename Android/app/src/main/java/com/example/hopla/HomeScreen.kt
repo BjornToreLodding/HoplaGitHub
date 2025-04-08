@@ -23,9 +23,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Cable
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PeopleOutline
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -56,7 +56,6 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.apiService.deleteReaction
 import com.example.hopla.apiService.fetchFeed
-import com.example.hopla.apiService.fetchTrails
 import com.example.hopla.apiService.postReaction
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.generalTextStyle
@@ -64,14 +63,11 @@ import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.FeedItem
 import com.example.hopla.universalData.ReportDialog
-import com.example.hopla.universalData.Trail
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.PeopleOutline
 
 @Composable
 fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Unit) {
@@ -118,7 +114,7 @@ fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Un
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    var selectedItem by remember { mutableStateOf(Icons.Outlined.Home) }
+    var selectedItem by remember { mutableStateOf(Icons.Outlined.Language) }
     var latitude by remember { mutableDoubleStateOf(0.0) }
     var longitude by remember { mutableDoubleStateOf(0.0) }
     val context = LocalContext.current
@@ -137,9 +133,9 @@ fun HomeScreen(navController: NavController) {
     ) {
         TopTextColumn(selectedItem) { selectedItem = it }
         when (selectedItem) {
-            Icons.Outlined.Home -> PostList(navController = navController)
-            Icons.Outlined.Person -> PostList(navController = navController, onlyFriendsAndFollowing = true)
-            Icons.Outlined.FavoriteBorder -> PostList(navController = navController, onlyLikedTrails = true)
+            Icons.Outlined.Language -> PostList(navController = navController)
+            Icons.Outlined.PeopleOutline -> PostList(navController = navController, onlyFriendsAndFollowing = true)
+            Icons.Outlined.Cable -> PostList(navController = navController, onlyLikedTrails = true)
             Icons.Outlined.LocationOn -> PostList(navController = navController, latitude = latitude, longitude = longitude)
             Icons.Outlined.ThumbUp -> PostList(navController = navController, sortByLikes = true)
         }
@@ -369,15 +365,3 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
     }
 }
 
-fun gatherMoreInfo(title: String, token: String, onResult: (List<Trail>) -> Unit) {
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val response = fetchTrails(token, 1, title, "")
-            val filteredTrails = response.trails.filter { it.name.contains(title, ignoreCase = true) }
-            Log.d("gatherMoreInfo", "Filtered Trails: $filteredTrails")
-            onResult(filteredTrails)
-        } catch (e: Exception) {
-            Log.e("fetchTrails", "Error fetching trails", e)
-        }
-    }
-}
