@@ -47,7 +47,7 @@ val customFontFamilyUnderHeader = FontFamily(
 
 val underheaderTextStyle = TextStyle(
     fontFamily = customFontFamilyUnderHeader,
-    fontSize = 18.sp,
+    fontSize = 22.sp,
     fontWeight = FontWeight.Medium,
 )
 
@@ -60,6 +60,13 @@ val customFontFamilyText = FontFamily(
 val generalTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
     fontSize = 12.sp,
+    fontWeight = FontWeight.Normal
+)
+
+// Custom text style for buttons
+val generalTextStyleDialog = TextStyle(
+    fontFamily = customFontFamilyText,
+    fontSize = 15.sp,
     fontWeight = FontWeight.Normal
 )
 
@@ -93,7 +100,7 @@ val textFieldLabelTextStyle = TextStyle(
 // Custom text style for underlined text (small)
 val underlinedTextStyleSmall = TextStyle(
     fontFamily = customFontFamilyText,
-    fontSize = 12.sp,
+    fontSize = 18.sp,
     fontWeight = FontWeight.Normal,
     textDecoration = TextDecoration.Underline
 )

@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,6 +54,7 @@ import com.example.hopla.apiService.resetPassword
 import com.example.hopla.ui.theme.ThemeViewModel
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleDialog
 import com.example.hopla.ui.theme.headerTextStyle
 import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
@@ -237,7 +239,8 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 8.dp)
+                        .padding(horizontal = 32.dp, vertical = 8.dp),
+                    shape = RectangleShape
                 ) {
                     Text(
                         text = stringResource(R.string.log_in),
@@ -248,10 +251,10 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
 
             Text(
                 text = stringResource(R.string.create_user),
-                style = underlinedTextStyleBig,
+                style = underlinedTextStyleSmall,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
-                    .padding(top = 16.dp)
+                    .padding(top = 8.dp)
                     .clickable { showCreateUserDialogue = true }
             )
         }
@@ -345,11 +348,11 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                         color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    Text(text = stringResource(R.string.forgotten_password_description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
+                    Text(text = stringResource(R.string.forgotten_password_description), style = generalTextStyleDialog, color = MaterialTheme.colorScheme.secondary)
                     TextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text(text = stringResource(R.string.email)) },
+                        label = { Text(text = stringResource(R.string.email), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                     )
@@ -360,10 +363,11 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Button(onClick = onDismiss) {
+                            Button(onClick = onDismiss, shape = RectangleShape) {
                                 Text(
                                     text = stringResource(R.string.cancel),
-                                    style = buttonTextStyle
+                                    style = buttonTextStyle,
+                                    color = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                             Button(onClick = {
@@ -379,10 +383,11 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
                                         isLoading = false
                                     }
                                 }
-                            }) {
+                            }, shape = RectangleShape) {
                                 Text(
                                     text = stringResource(R.string.send),
-                                    style = buttonTextStyle
+                                    style = buttonTextStyle,
+                                    color = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         }
@@ -559,7 +564,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                             checked = isChecked,
                             onCheckedChange = { isChecked = it }
                         )
-                        Text(text = stringResource(R.string.allow_usage), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
+                        Text(text = stringResource(R.string.allow_usage), style = generalTextStyleDialog, color = MaterialTheme.colorScheme.secondary)
                         IconButton(onClick = { showInfoDialogCU = true }) {
                             Icon(imageVector = Icons.Default.Info, contentDescription = "Info", tint = MaterialTheme.colorScheme.secondary)
                         }
@@ -568,10 +573,11 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = onDismiss) {
+                        Button(onClick = onDismiss, shape = RectangleShape) {
                             Text(
                                 text = stringResource(R.string.cancel),
-                                style = buttonTextStyle
+                                style = buttonTextStyle,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         Button(
@@ -601,11 +607,13 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
                                     }
                                 }
                             },
+                            shape = RectangleShape,
                             enabled = isChecked
                         ) {
                             Text(
                                 text = stringResource(R.string.create_user),
-                                style = buttonTextStyle
+                                style = buttonTextStyle,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -645,7 +653,7 @@ fun InfoDialogCU(onDismiss: () -> Unit) {
                 }
                 Text(
                     text = stringResource(R.string.statistics_info),
-                    style = generalTextStyle,
+                    style = generalTextStyleDialog,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
