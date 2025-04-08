@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlinx.serialization.SerialName
 
 // Base URL for the API
 const val apiUrl = "https://hopla.onrender.com/"
@@ -363,14 +364,14 @@ data class TrailUpdate(
 @Serializable
 data class TrailCoordinate(
     val lat: Double,
-    val long: Double
+    val lng: Double
 )
 
 @Serializable
 data class TrailResponse(
     val id: String,
     val distance: Double,
-    val allCoords: List<TrailCoordinate>
+    @SerialName("coordinates") val allCoords: List<TrailCoordinate>
 )
 
 //---------------------Data classes for relations-----------

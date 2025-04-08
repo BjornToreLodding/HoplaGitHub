@@ -210,6 +210,9 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
     var newHike by remember { mutableStateOf<NewHike?>(null) }
     val startTime = remember { System.currentTimeMillis() }
     var trailDistance by remember { mutableStateOf(0.0) }
+    var isLoading by remember { mutableStateOf(true) } // Loading state
+
+    val polylineColor = MaterialTheme.colorScheme.primary.toArgb()
 
     LaunchedEffect(Unit) {
         val fetchedHorses = fetchHorses("", UserSession.token)
@@ -217,22 +220,60 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
         horseMap = fetchedHorses.associateBy { it.name }
     }
 
+    // Fetch trail coordinates
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val trailResponse = fetchTrailCoordinates(trailId, token)
+            trailCoordinates.value = trailResponse?.allCoords ?: emptyList()
+            trailDistance = trailResponse?.distance ?: 0.0
+            isLoading = false // Update loading state
+            Log.d("StartTripMapScreen", "Trail Coordinates: ${trailCoordinates.value}")
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        AndroidView({ mapView }, modifier = Modifier.weight(1f)) {
-            mapView.getMapAsync { googleMap ->
-                googleMap.uiSettings.isZoomControlsEnabled = true
-                enableMyLocation(googleMap, context)
+        if (isLoading) {
+            // Show a loading indicator while fetching data
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Loading trail data...")
+            }
+        } else {
+            AndroidView({ mapView }, modifier = Modifier.weight(1f)) {
+                mapView.getMapAsync { googleMap ->
+                    googleMap.uiSettings.isZoomControlsEnabled = true
+                    enableMyLocation(googleMap, context)
 
-                coroutineScope.launch {
-                    val trailResponse = fetchTrailCoordinates(trailId, token)
-                    trailCoordinates.value = trailResponse?.allCoords ?: emptyList()
-                    if (trailResponse != null) {
-                        trailDistance = trailResponse.distance ?: 0.0
+                    if (trailCoordinates.value.isNotEmpty()) {
+                        val polylineOptions = PolylineOptions().apply {
+                            color(polylineColor)
+                            width(5f)
+                        }
+
+                        trailCoordinates.value.forEachIndexed { index, coordinate ->
+                            val latLng = LatLng(coordinate.lat, coordinate.lng)
+                            polylineOptions.add(latLng)
+
+                            if (index == 0) {
+                                googleMap.addMarker(
+                                    MarkerOptions()
+                                        .position(latLng)
+                                        .title("Start Point")
+                                )
+                            }
+                        }
+
+                        googleMap.addPolyline(polylineOptions)
+
+                        val firstCoordinate = trailCoordinates.value.first()
+                        googleMap.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(firstCoordinate.lat, firstCoordinate.lng),
+                                15f
+                            )
+                        )
+                    } else {
+                        Log.d("StartTripMapScreen", "No coordinates available to display.")
                     }
-                }
-
-                googleMap.setOnCameraIdleListener {
-                    // Handle camera idle
                 }
             }
         }
@@ -279,7 +320,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                         val distanceStr = String.format(Locale.GERMANY, "%.2f", trailDistance)
 
                         val coordinates = trailCoordinates.value.map {
-                            Coordinate(timestamp = 0, lat = it.lat, long = it.long)
+                            Coordinate(timestamp = 0, lat = it.lat, long = it.lng)
                         }
 
                         newHike = NewHike(
