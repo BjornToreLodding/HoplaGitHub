@@ -17,6 +17,7 @@ using Microsoft.VisualBasic;
 using HoplaBackend.Models.DTOs;
 using System.Formats.Tar;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 
 namespace HoplaBackend.Controllers;
 
@@ -1086,21 +1087,37 @@ public class TrailController : ControllerBase
     public async Task<IActionResult> StartTrail([FromQuery] Guid trailId)
     {
         var trailData = await _context.Trails.FirstOrDefaultAsync(t => t.Id == trailId);
+        var trailCoordinates = await _context.TrailAllCoordinates.FirstOrDefaultAsync(t => t.Id == trailId);
+
         if (trailData == null) 
         {
-            return BadRequest("Trail finnes ikke");
+            return BadRequest("Trail does not exist");
         }
-        //Bare fiktiv for å generere løypa
-        var allCoords = MockHelper.GenerateCircularTrail(trailData.LatMean, trailData.LongMean, trailData.Distance);
+
+        // Parse coordinates into a list
+        var coordinates = trailCoordinates?.CoordinatesCsv?
+            .Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(coord =>
+            {
+                var parts = coord.Split(',');
+                return new
+                {
+                    Lat = double.Parse(parts[0], CultureInfo.InvariantCulture),
+                    Lng = double.Parse(parts[1], CultureInfo.InvariantCulture)
+                };
+            })
+            .ToList();
+
         var response = new
         {
             trailData.Id,
             trailData.Distance,
-            allCoords
+            Coordinates = coordinates
         };
 
         return Ok(response);
     }
+
 
     [Authorize]
     [HttpPost("create")]
