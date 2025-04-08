@@ -58,7 +58,6 @@ import com.example.hopla.ui.theme.generalTextStyleDialog
 import com.example.hopla.ui.theme.headerTextStyle
 import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
-import com.example.hopla.ui.theme.underlinedTextStyleBig
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.ServerErrorDialog
 import kotlinx.coroutines.delay
@@ -262,7 +261,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
         if (showCreateUserDialogue) {
             CreateUserDialog(
                 onDismiss = { showCreateUserDialogue = false },
-                onCreateUser = { email, password ->
+                onCreateUser = { _, password ->
                     onCreateUser()
                 }
             )

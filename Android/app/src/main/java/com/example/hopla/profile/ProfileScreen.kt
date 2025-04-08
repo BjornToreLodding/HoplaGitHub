@@ -64,6 +64,7 @@ import com.example.hopla.apiService.updateUserInfo
 import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryWhite
+import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
@@ -129,7 +130,7 @@ fun ProfileScreen(navController: NavController) {
                             // Handle error
                         }
                     }
-                }) {
+                }, shape = RectangleShape) {
                     Text(text = stringResource(R.string.save))
                 }
             }
@@ -197,7 +198,7 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
             modifier = Modifier
                 .size(200.dp)
                 .clip(CircleShape)
-                .border(5.dp, PrimaryWhite, CircleShape)
+                .border(5.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
         ) {
             if (imageBitmap != null) {
                 Image(
@@ -239,7 +240,7 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
 fun ProfileButtons(navController: NavController) {
     Column(
         modifier = Modifier
-            .padding(top = 8.dp)
+            .padding(8.dp)
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -331,13 +332,13 @@ fun PasswordConfirmationDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(password) }) {
-                Text(text = stringResource(R.string.confirm))
+            Button(onClick = { onConfirm(password) }, shape = RectangleShape) {
+                Text(text = stringResource(R.string.confirm), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
+            Button(onClick = onDismiss, shape = RectangleShape) {
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     )
@@ -478,17 +479,17 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     showResponseDialog = true
                 }
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.change_password),
-                modifier = Modifier.clickable { showDialog = true },
-                style = underlinedTextStyleSmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
+
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = stringResource(R.string.change_password),
+        modifier = Modifier.clickable { showDialog = true },
+        style = underlinedTextStyleSmall,
+        color = MaterialTheme.colorScheme.secondary
+    )
+    Spacer(modifier = Modifier.height(8.dp))
 
     if (showDialog) {
         AlertDialog(

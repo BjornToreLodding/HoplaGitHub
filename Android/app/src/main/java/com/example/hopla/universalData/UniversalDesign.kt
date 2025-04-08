@@ -69,6 +69,7 @@ import com.example.hopla.apiService.createUserReport
 import com.example.hopla.profile.PasswordConfirmationDialog
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.generalTextStyleDialog
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
@@ -231,8 +232,8 @@ fun ImagePicker(
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(text = stringResource(R.string.change_profile_picture), style = underheaderTextStyle) },
-            text = { Text(text = stringResource(R.string.profile_pic_description), style = generalTextStyle) },
+            title = { Text(text = stringResource(R.string.change_profile_picture), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
+            text = { Text(text = stringResource(R.string.profile_pic_description), style = generalTextStyleDialog, color = MaterialTheme.colorScheme.secondary) },
             confirmButton = {
                 Column {
                     Button(onClick = {
@@ -240,21 +241,21 @@ fun ImagePicker(
                             cameraLauncher.launch(null)
                         }
                         showDialog.value = false
-                    }) {
-                        Text(text = stringResource(R.string.take_a_picture), style = buttonTextStyle)
+                    }, shape = RectangleShape ) {
+                        Text(text = stringResource(R.string.take_a_picture), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = {
                         contentPickerLauncher.launch("image/*")
                         showDialog.value = false
-                    }) {
-                        Text(text = stringResource(R.string.choose_from_library), style = buttonTextStyle)
+                    }, shape = RectangleShape) {
+                        Text(text = stringResource(R.string.choose_from_library), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog.value = false }) {
-                    Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
+                Button(onClick = { showDialog.value = false }, shape = RectangleShape) {
+                    Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         )
