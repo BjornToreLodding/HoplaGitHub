@@ -1101,105 +1101,111 @@ public class TrailController : ControllerBase
 
         return Ok(response);
     }
+
     [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> CreateTrail([FromForm] CreateTrailForm request)
     {
         Console.WriteLine("trails create start");
+
+        // Get userId from token
         var userId = _authentication.GetUserIdFromToken(User);
 
+        // Check if the user exists
         var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
-            return Unauthorized(new { message = "Bruker ikke funnet" });
-        
+            return Unauthorized(new { message = "User not found" });
+
+        // Deserialize the request JSON
         var dto = JsonSerializer.Deserialize<CreateTrailDto>(request.dataJson);
 
         if (dto == null)
-        return BadRequest("Ugyldig JSON");
+            return BadRequest("Invalid JSON");
 
-        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId); //Rødt under UserHikeId
+        // Find the UserHike and UserHikeDetails
+        var hike = await _context.UserHikes.FirstOrDefaultAsync(h => h.Id == dto.UserHikeId);
         var hikeDetails = await _context.UserHikeDetails.FirstOrDefaultAsync(hd => hd.UserHikeId == dto.UserHikeId);
+
         Console.WriteLine("");
         Console.WriteLine(request.dataJson);
         Console.WriteLine(dto.UserHikeId);
         Console.WriteLine(dto.Description);
-        Console.WriteLine(dto?.Name ?? "ukjent");
+        Console.WriteLine(dto?.Name ?? "unknown");
         Console.WriteLine(dto?.Filters);
+
         if (hike == null || hikeDetails == null)
-            return BadRequest("Tur eller detaljer ikke funnet");
+            return BadRequest("Hike or hike details not found");
+
         string? pictureUrl = null;
 
+        // Upload image if provided
         if (request.Image != null)
         {
             var fileName = await _imageUploadService.UploadImageAsync(request.Image);
             pictureUrl = fileName;
         }
 
+        // Parse the original CoordinatesCsv and extract only lat/lng
+        var parsed = CoordinateHelper.ParseLatLngOnly(hikeDetails.CoordinatesCsv);
+
+        // Generate a full clean CSV (all points without timestamp)
+        var fullCsv = CoordinateHelper.ToCsv(parsed);
+
+        // Downsample to 50 points for preview
+        var reduced = CoordinateHelper.DownsampleCoordinates(parsed, 50);
+        var reducedCsv = CoordinateHelper.ToCsv(reduced);
+
+        var stats = CoordinateHelper.CalculateCoordinateStats(parsed);
+
+        // Create a new Trail
         var trail = new Trail
         {
             Id = Guid.NewGuid(),
             Name = dto.Name,
-            LatMean = hikeDetails.LatMean,
-            LongMean = hikeDetails.LongMean,
+            LatMean = stats.LatMean,
+            LongMean = stats.LongMean,
             Distance = hike.Distance,
             PictureUrl = pictureUrl,
             Visibility = TrailVisibility.Public,
             UserId = userId,
         };
 
-        // Hent koordinater og lag 50 punkter
-        var parsed = CoordinateHelper.ParseLatLngOnly(hikeDetails.CoordinatesCsv);
-        var reduced = CoordinateHelper.DownsampleCoordinates(parsed, 50);
-        var reducedCsv = CoordinateHelper.ToCsv(reduced);
 
-
+        // Create TrailDetail with 50 points
         var trailDetails = new TrailDetail
         {
             Id = trail.Id,
-            Description = dto?.Description ?? "Ukjent", //hikeDetails.Description,
-            LatMin = hikeDetails.LatMin,
-            LatMax = hikeDetails.LatMax,
-            LongMin = hikeDetails.LongMin,
-            LongMax = hikeDetails.LongMax,
-            PreviewCoordinatesCsv = reducedCsv //50koordinater
+            Description = dto?.Description ?? "Unknown",
+            LatMin = stats.LatMin,
+            LatMax = stats.LatMax,
+            LongMin = stats.LongMin,
+            LongMax = stats.LongMax,
+            PreviewCoordinatesCsv = reducedCsv // 50 points
         };
 
+        // Create TrailAllCoordinate with full points (without timestamp)
         var trailAllCoordinates = new TrailAllCoordinate
         {
             Id = trail.Id,
-            CoordinatesCsv = hikeDetails.CoordinatesCsv // full csv med offset beholdes
+            CoordinatesCsv = fullCsv // Full cleaned coordinates without timestamp
         };
 
-
-
-        trail.TrailDetails = trailDetails;
-        trail.TrailAllCoordinates = trailAllCoordinates;
-        _context.Trails.Add(trail);
-        //_context.TrailDetails.Add(trailDetails);
-        //_context.TrailAllCoordinates.Add(trailAllCoordinates);
-
-        // Legg til TrailFilterValues
-        foreach (var filter in dto.Filters)
+        // Update UserHike with the new TrailId
+        if (hike != null)
         {
-            var definitionExists = await _context.TrailFilterDefinitions
-                .AnyAsync(d => d.Id == filter.FilterDefinitionId);
-
-            if (!definitionExists)
-                continue; // hopp over ukjente filterDefinisjoner
-
-            var value = new TrailFilterValue
-            {
-                Id = Guid.NewGuid(),
-                TrailId = trail.Id,
-                TrailFilterDefinitionId = filter.FilterDefinitionId,
-                Value = filter.Value
-            };
-
-            _context.TrailFilterValues.Add(value);
+            hike.TrailId = trail.Id;
+            _context.UserHikes.Update(hike);
         }
+
+        // Add new entities to DbContext
+        _context.Trails.Add(trail);
+        _context.TrailDetails.Add(trailDetails);
+        _context.TrailAllCoordinates.Add(trailAllCoordinates);
+
+        // Save everything in one go
         await _context.SaveChangesAsync();
 
-        return Ok(new { trail.Id, Message = "Trail created" });
+        return Ok(new { message = "Trail created successfully", TrailId = trail.Id });
     }
 
 /*
