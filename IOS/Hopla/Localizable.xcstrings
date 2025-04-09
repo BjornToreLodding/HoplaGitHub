@@ -177,6 +177,9 @@
         }
       }
     },
+    "Condition: %lld" : {
+
+    },
     "Confirm Deletion" : {
       "localizations" : {
         "nb" : {
@@ -725,6 +728,9 @@
         }
       }
     },
+    "Loading updates..." : {
+
+    },
     "Loading..." : {
       "localizations" : {
         "nb" : {
@@ -876,6 +882,9 @@
           }
         }
       }
+    },
+    "No updates found for this trail." : {
+
     },
     "Not a member? Sign up" : {
       "localizations" : {
@@ -1181,6 +1190,9 @@
     "Trail Name: %@" : {
 
     },
+    "Trail Updates" : {
+
+    },
     "Type a message..." : {
       "localizations" : {
         "nb" : {
@@ -1192,6 +1204,9 @@
       }
     },
     "Update DOB" : {
+
+    },
+    "Updated on: %@" : {
 
     },
     "Upload" : {

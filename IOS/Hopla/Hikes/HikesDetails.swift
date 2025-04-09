@@ -20,7 +20,7 @@ struct HikesDetails: View {
                 HikeFiltersView(hike: hike, trailFilters: trailFilters)
                 
                 // 4. Buttons
-                HikeButtonsView()
+                HikeButtonsView(hike: hike)
                 
                 // 5. Description
                 Text("Description of trail")
@@ -51,13 +51,15 @@ struct HikesDetails: View {
                 .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 
                 // 8. Update box
-                Text("Newest updates on trail")
-                    .frame(alignment: .center)
-                    .padding(.horizontal)
-                    .padding(.vertical)
-                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                    .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-                
+                NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
+                    Text("Newest updates on trail")
+                        .frame(alignment: .center)
+                        .padding(.horizontal)
+                        .padding(.vertical)
+                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                }
+
                 Spacer()
             }
             .padding(.top)
@@ -214,6 +216,8 @@ struct HikeFiltersView: View {
 struct HikeButtonsView: View {
     @Environment(\.colorScheme) var colorScheme
     
+    let hike: Hike
+    
     var body: some View {
         HStack(alignment: .center) {
             NavigationLink(destination: StartHike()) {
@@ -223,7 +227,7 @@ struct HikeButtonsView: View {
             .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
             .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
             
-            NavigationLink(destination: HikeUpdate()) {
+            NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
                 Text("New update")
                     .frame(width: 120, height: 50)
             }
