@@ -7,6 +7,21 @@
 
 import SwiftUI
 
+struct CoordinateMyHikes: Codable {
+    //var id: UUID { UUID() } // For SwiftUI's Identifiable
+    let lat: Double
+    let lng: Double
+}
+
+struct TrailResponse: Codable {
+    let id: String
+    let distance: Double
+    let allCoords: [CoordinateMyHikes]
+}
+
+
+
+
 struct MyHikesDetails: View {
     @Binding var myHikes: [MyHike]
     @StateObject private var viewModel = MyHikeViewModel()
@@ -15,6 +30,8 @@ struct MyHikesDetails: View {
     @State private var updatedDescription: String
     @State private var updatedTitle: String
     @State var hike: MyHike
+    @State private var coordinates: [CoordinateMyHikes] = []
+
     
     init(hike: MyHike, myHikes: Binding<[MyHike]>) {
         self.hike = hike
@@ -95,12 +112,23 @@ struct MyHikesDetails: View {
                 
                 Text("Distance: \(String(format: "%.2f km", hike.length))")
                 Text("Duration: \(String(format: "%02d:%02d", Int(hike.duration) / 60, Int(hike.duration) % 60))")
+                
+                if hike.trailButton && !coordinates.isEmpty {
+                    MapWithRouteView(coordinates: coordinates, trailButton: hike.trailButton)
+                        .frame(height: 300)
+                        .cornerRadius(12)
+                }
+
+
             }
             .padding()
             .onAppear {
                 viewModel.fetchMyHikes()
                 fetchUpdatedHikeDetails()
-                print("📡 New API Response:", viewModel.rawApiResponse) // ✅ Use instance, not type
+
+                if hike.trailButton {
+                    fetchCoordinates()
+                }
             }
         }
         .navigationTitle("Hike Details")
@@ -203,5 +231,51 @@ struct MyHikesDetails: View {
                 }
             }
         }.resume()
+    }
+    
+    private func fetchCoordinates() {
+        let urlString: String
+        if hike.trailButton {
+            // Use the "userhikes/coordinates" endpoint
+            urlString = "https://hopla.onrender.com/userhikes/coordinates/\(hike.id)"
+        } else {
+            // Use the "trails/prepare" endpoint
+            urlString = "https://hopla.onrender.com/trails/prepare?trailId=\(hike.id)"
+        }
+
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL: \(urlString)")
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("❌ Error fetching coordinates:", error.localizedDescription)
+                return
+            }
+
+            if let data = data {
+                do {
+                    if hike.trailButton {
+                        // Decode coordinates for userhikes (lat, lng)
+                        let fetchedCoordinates = try JSONDecoder().decode([CoordinateMyHikes].self, from: data)
+                        DispatchQueue.main.async {
+                            self.coordinates = fetchedCoordinates
+                            print("✅ Coordinates fetched for userhikes:", fetchedCoordinates)
+                        }
+                    } else {
+                        // Decode coordinates for trails/prepare (id, distance, allCoords)
+                        let trailResponse = try JSONDecoder().decode(TrailResponse.self, from: data)
+                        DispatchQueue.main.async {
+                            self.coordinates = trailResponse.allCoords.map { CoordinateMyHikes(lat: $0.lat, lng: $0.lng) }
+                            print("✅ Coordinates fetched for trails/prepare:", self.coordinates)
+                        }
+                    }
+                } catch {
+                    print("❌ Failed to decode coordinates:", error.localizedDescription)
+                }
+            }
+        }
+        .resume()
     }
 }
