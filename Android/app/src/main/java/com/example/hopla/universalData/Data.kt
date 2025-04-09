@@ -225,7 +225,7 @@ data class MapTrail(
     val name: String,
     val latMean: Double,
     val longMean: Double,
-    val trailAllCoordinates: String? = null
+    val trailAllCoordinates: JsonElement? = null
 )
 
 @Serializable

@@ -29,21 +29,18 @@ val customFontFamilyHeader = FontFamily(
 val headerTextStyle = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 48.sp,
-    fontStyle = FontStyle.Italic,
     fontWeight = FontWeight.Bold
 )
 
 val headerTextStyleSmall = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 32.sp,
-    fontStyle = FontStyle.Italic,
     fontWeight = FontWeight.Bold
 )
 
 val headerTextStyleVerySmall = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 20.sp,
-    fontStyle = FontStyle.Italic,
     fontWeight = FontWeight.Bold
 )
 

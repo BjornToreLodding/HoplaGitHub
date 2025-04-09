@@ -517,6 +517,8 @@ suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, messa
     }
 
     val responseBody: String = response.bodyAsText()
+    Log.d("postTrailReview", "Response Status: ${response.status}")
+    Log.d("postTrailReview", "Response body: $responseBody")
     httpClient.close()
     return responseBody
 }

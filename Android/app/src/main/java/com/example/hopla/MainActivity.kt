@@ -91,6 +91,7 @@ import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
+    private val bottomBarViewModel: BottomBarViewModel by viewModels()
 
     private val languageViewModel: LanguageViewModel by viewModels {
         object : ViewModelProvider.Factory {
@@ -116,6 +117,7 @@ class MainActivity : ComponentActivity() {
             HoplaTheme {
                 val navController = rememberNavController()
                 val isLoggedIn by userViewModel.isLoggedIn
+                val isBottomBarVisible by bottomBarViewModel.isBottomBarVisible
 
                 CheckLoginState(navController = navController, onLogin = {
                     userViewModel.logIn(navController)
@@ -124,7 +126,11 @@ class MainActivity : ComponentActivity() {
                 if (isLoggedIn) {
                     Scaffold(
                         topBar = { TopBar() },
-                        bottomBar = { BottomNavigationBar(navController) }
+                        bottomBar = {
+                            if (isBottomBarVisible) {
+                                BottomNavigationBar(navController)
+                            }
+                        }
                     ) { innerPadding ->
                         NavHost(
                             navController = navController,
@@ -133,7 +139,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(Screen.Home.route) { HomeScreen(navController) }
                             composable(Screen.Trails.route) { TrailsScreen(navController) }
-                            composable(Screen.NewTrip.route) { NewTripScreen() }
+                            composable(Screen.NewTrip.route) { NewTripScreen(bottomBarViewModel = bottomBarViewModel) }
                             composable(Screen.Community.route) { CommunityScreen(navController, UserSession.token) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("friends_list/{userId}") { backStackEntry ->
@@ -360,4 +366,15 @@ sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
     data object Profile : Screen("profile", { context -> context.getString(R.string.profile) })
 }
 
+class BottomBarViewModel : ViewModel() {
+    private val _isBottomBarVisible = mutableStateOf(true)
+    val isBottomBarVisible: State<Boolean> = _isBottomBarVisible
 
+    fun showBottomBar() {
+        _isBottomBarVisible.value = true
+    }
+
+    fun hideBottomBar() {
+        _isBottomBarVisible.value = false
+    }
+}

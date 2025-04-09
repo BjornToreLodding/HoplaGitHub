@@ -80,7 +80,7 @@ import java.util.Locale
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun NewTripScreen() {
+fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
     var isRunning by remember { mutableStateOf(false) }
     var time by remember { mutableDoubleStateOf(0.0) }
     var distance by remember { mutableDoubleStateOf(0.0) }
@@ -103,6 +103,14 @@ fun NewTripScreen() {
         val fetchedHorses = fetchHorses("", UserSession.token)
         horses = fetchedHorses.map { it.name }
         horseMap = fetchedHorses.associateBy { it.name }
+    }
+
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            bottomBarViewModel.hideBottomBar()
+        } else {
+            bottomBarViewModel.showBottomBar()
+        }
     }
 
     val locationRequest = LocationRequest.create().apply {
