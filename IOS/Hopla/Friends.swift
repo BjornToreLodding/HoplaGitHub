@@ -234,10 +234,11 @@ struct Friends: View {
                         Image(systemName: "plus.circle.fill")
                             .resizable()
                             .frame(width: 60, height: 60)
-                        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
-                            .color(for: colorScheme)
-                            .padding()
+                            .foregroundColor(AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                                                .color(for: colorScheme))
                     }
+                    .padding(.bottom, 30)
+                    .padding(.trailing, 20)
                 }
             }
         }
