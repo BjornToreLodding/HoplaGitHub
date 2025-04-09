@@ -87,6 +87,91 @@ class HomeViewModel: ObservableObject {
         }.resume()
     }
 
+    func likePost(entityId: String) {
+            guard let token = TokenManager.shared.getToken() else {
+                print("❌ No token found")
+                return
+            }
+
+            guard let url = URL(string: "https://hopla.onrender.com/reactions") else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            let body: [String: String] = ["EntityId": entityId]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+            URLSession.shared.dataTask(with: request) { _, response, error in
+                if let error = error {
+                    print("❌ Like error: \(error)")
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse else { return }
+
+                DispatchQueue.main.async {
+                    if httpResponse.statusCode == 200 {
+                        self.updatePost(entityId: entityId, liked: true)
+                    } else if httpResponse.statusCode == 400 {
+                        print("⚠️ Already liked")
+                    }
+                }
+            }.resume()
+        }
+
+        func unlikePost(entityId: String) {
+            guard let token = TokenManager.shared.getToken() else {
+                print("❌ No token found")
+                return
+            }
+
+            guard let url = URL(string: "https://hopla.onrender.com/reactions") else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            let body: [String: String] = ["EntityId": entityId]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+            URLSession.shared.dataTask(with: request) { _, response, error in
+                if let error = error {
+                    print("❌ Unlike error: \(error)")
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse else { return }
+
+                DispatchQueue.main.async {
+                    if httpResponse.statusCode == 200 {
+                        self.updatePost(entityId: entityId, liked: false)
+                    } else if httpResponse.statusCode == 404 {
+                        print("⚠️ No like to remove")
+                    }
+                }
+            }.resume()
+        }
+
+        private func updatePost(entityId: String, liked: Bool) {
+            if let index = homePosts.firstIndex(where: { $0.entityId == entityId }) {
+                var post = homePosts[index]
+                let newLikes = liked ? post.likes + 1 : max(post.likes - 1, 0)
+                homePosts[index] = HomePost(
+                    entityId: post.entityId,
+                    title: post.title,
+                    description: post.description,
+                    pictureUrl: post.pictureUrl,
+                    userAlias: post.userAlias,
+                    userProfilePicture: post.userProfilePicture,
+                    likes: newLikes,
+                    isLikedByUser: liked,
+                    createdAt: post.createdAt
+                )
+            }
+        }
 }
 
 struct FeedResponse: Decodable {
@@ -115,13 +200,9 @@ struct Home: View {
                         VStack(spacing: 10) {
                             ForEach(viewModel.homePosts) { homePost in
                                 PostContainer(
-                                    profileImageUrl: homePost.userProfilePicture,
-                                    userAlias: homePost.userAlias,
-                                    title: homePost.title,
-                                    description: homePost.description,
-                                    imageUrl: homePost.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
-                                    createdAt: homePost.createdAt,
-                                    colorScheme: colorScheme
+                                    post: homePost,
+                                    colorScheme: colorScheme,
+                                    viewModel: viewModel
                                 )
                             }
                         }
@@ -178,17 +259,13 @@ struct Home: View {
 }
 
 struct PostContainer: View {
-    var profileImageUrl: String
-    var userAlias: String
-    var title: String
-    var description: String
-    var imageUrl: String // <-- Use imageUrl instead of pictureUrl
-    var createdAt: String
+    var post: HomePost
     var colorScheme: ColorScheme
+    @ObservedObject var viewModel: HomeViewModel
 
     var formattedDate: String {
         let isoFormatter = ISO8601DateFormatter()
-        if let date = isoFormatter.date(from: createdAt) {
+        if let date = isoFormatter.date(from: post.createdAt) {
             let formatter = DateFormatter()
             formatter.dateFormat = "dd.MM.yyyy HH.mm"
             return formatter.string(from: date)
@@ -198,9 +275,9 @@ struct PostContainer: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Profile picture and user alias
-            HStack(alignment: .center) {
-                AsyncImage(url: URL(string: profileImageUrl)) { image in
+            // Header
+            HStack {
+                AsyncImage(url: URL(string: post.userProfilePicture)) { image in
                     image.resizable()
                 } placeholder: {
                     ProgressView()
@@ -208,48 +285,54 @@ struct PostContainer: View {
                 .frame(width: 40, height: 40)
                 .clipShape(Circle())
 
-                Text(userAlias)
+                Text(post.userAlias)
                     .font(.headline)
                     .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 
                 Spacer()
             }
 
-            // Title
-            Text(title)
+            Text(post.title)
                 .bold()
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 
-            // Description
-            Text(description)
-                .font(.body)
+            Text(post.description)
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 
-            // Image
-            if let url = URL(string: imageUrl) { // <-- Using imageUrl here
+            if let url = URL(string: post.pictureUrl ?? "") {
                 AsyncImage(url: url) { image in
                     image.resizable()
                 } placeholder: {
                     ProgressView()
                 }
                 .scaledToFill()
-                .frame(width: 350)
-                .frame(height: 260)
+                .frame(width: 350, height: 260)
                 .clipped()
                 .cornerRadius(2)
-            } else {
-                // Optional: Show a placeholder image or empty view if no image URL exists
-                Image("https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 350, height: 260)
-                    .clipped()
-                    .cornerRadius(2)
             }
 
-            // Date and time (bottom right)
-            Spacer()
-            Text(formattedDate)
+            HStack {
+                Button(action: {
+                    if post.isLikedByUser {
+                        viewModel.unlikePost(entityId: post.entityId)
+                    } else {
+                        viewModel.likePost(entityId: post.entityId)
+                    }
+                }) {
+                    Image(systemName: post.isLikedByUser ? "heart.fill" : "heart")
+                        .foregroundColor(post.isLikedByUser ? .red : .gray)
+                }
+
+                Text("\(post.likes)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                Text(formattedDate)
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
         }
         .padding()
         .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
@@ -257,3 +340,4 @@ struct PostContainer: View {
         .padding(.horizontal)
     }
 }
+
