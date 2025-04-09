@@ -664,129 +664,126 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
             .height(180.dp)
             .clickable(onClick = onBoxClick)
     ) {
-        Column {
-            // Main Image Box
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .height(140.dp)
-                    .background(MaterialTheme.colorScheme.secondary)
-            ) {
-                val firstImageResource = info.imageResource.firstOrNull() ?: R.drawable.logo1
-                val painter = when (firstImageResource) {
-                    is String -> rememberAsyncImagePainter(model = firstImageResource)
-                    is Int -> painterResource(id = firstImageResource)
-                    else -> painterResource(id = R.drawable.stockimg1)
-                }
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize()
-                )
-                // Overlay for visibility
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(Color.Black.copy(alpha = 0.5f))
-                )
-                // Row for Heart Icon and Three-dots Icon
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(5.dp)
-                ) {
-                    // Heart Icon
-                    IconButton(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                if (info.isFavorite) {
-                                    removeFavoriteTrail(token, info.id)
-                                } else {
-                                    addFavoriteTrail(token, info.id)
-                                }
-                                onHeartClick()
-                            } catch (e: Exception) {
-                                Log.e("ContentBox", "Error updating favorite status", e)
-                            }
-                        }
-                    }) {
-                        Icon(
-                            imageVector = if (info.isFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                            contentDescription = null,
-                            tint = if (info.isFavorite) HeartColor else PrimaryWhite
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(0.1.dp))
-                    // Three-dots Icon
-                    Box {
-                        IconButton(onClick = { isDropdownExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More options",
-                                tint = PrimaryWhite
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = isDropdownExpanded,
-                            onDismissRequest = { isDropdownExpanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(text = stringResource(R.string.report)) },
-                                onClick = {
-                                    isDropdownExpanded = false
-                                    showReportDialog = true
-                                }
-                            )
-                        }
-                    }
-                }
-                // Star Rating
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(5.dp)
-                ) {
-                    repeat(5) { index ->
-                        Icon(
-                            imageVector = if (index < info.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
-                            contentDescription = null,
-                            tint = StarColor
-                        )
-                    }
-                }
-                // Trip Title
-                Text(
-                    text = info.title,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = underheaderTextStyle,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(5.dp)
-                )
+        // Main Box containing image + overlay + filters
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.secondary)
+        ) {
+            val firstImageResource = info.imageResource.firstOrNull() ?: R.drawable.logo1
+            val painter = when (firstImageResource) {
+                is String -> rememberAsyncImagePainter(model = firstImageResource)
+                is Int -> painterResource(id = firstImageResource)
+                else -> painterResource(id = R.drawable.stockimg1)
             }
 
-            // White box for filters
+            Image(
+                painter = painter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize()
+            )
+
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.onBackground)
-                    .padding(vertical = 5.dp, horizontal = 10.dp)
+                    .matchParentSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+            )
+
+            // Top-right icons
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(5.dp)
             ) {
-                val scrollState = rememberScrollState()
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.horizontalScroll(scrollState)
-                ) {
-                    info.filters.forEach { filter ->
-                        Text(
-                            text = filter,
-                            style = generalTextStyle,
-                            color = MaterialTheme.colorScheme.secondary
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        try {
+                            if (info.isFavorite) {
+                                removeFavoriteTrail(token, info.id)
+                            } else {
+                                addFavoriteTrail(token, info.id)
+                            }
+                            onHeartClick()
+                        } catch (e: Exception) {
+                            Log.e("ContentBox", "Error updating favorite status", e)
+                        }
+                    }
+                }) {
+                    Icon(
+                        imageVector = if (info.isFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (info.isFavorite) HeartColor else PrimaryWhite
+                    )
+                }
+
+                Box {
+                    IconButton(onClick = { isDropdownExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = PrimaryWhite
                         )
                     }
+
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(R.string.report)) },
+                            onClick = {
+                                isDropdownExpanded = false
+                                showReportDialog = true
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Title bottom-left
+            Text(
+                text = info.title,
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = underheaderTextStyle,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 5.dp, bottom = 35.dp)
+            )
+
+            // Stars bottom-right
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 5.dp, bottom = 35.dp)
+            ) {
+                repeat(5) { index ->
+                    Icon(
+                        imageVector = if (index < info.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
+                        contentDescription = null,
+                        tint = StarColor
+                    )
+                }
+            }
+
+            // Filters row at bottom
+            val scrollState = rememberScrollState()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.onBackground)
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                    .horizontalScroll(scrollState)
+            ) {
+                info.filters.forEach { filter ->
+                    Text(
+                        text = filter,
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 }
             }
         }

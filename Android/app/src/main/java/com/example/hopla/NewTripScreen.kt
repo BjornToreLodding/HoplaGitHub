@@ -2,6 +2,8 @@ package com.example.hopla
 
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -53,7 +55,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.example.hopla.apiService.createNewHike
 import com.example.hopla.apiService.fetchHorses
-import com.example.hopla.ui.theme.PrimaryBlack
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.Coordinate
@@ -77,7 +78,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun NewTripScreen() {
