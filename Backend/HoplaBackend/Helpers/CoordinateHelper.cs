@@ -2,6 +2,22 @@ using System.Globalization;
 
 public static class CoordinateHelper
 {
+    public static (double LatMin, double LatMax, double LongMin, double LongMax, double LatMean, double LongMean) 
+    CalculateCoordinateStats(List<(double Lat, double Lng)> coordinates)
+    {
+        var latitudes = coordinates.Select(c => c.Lat);
+        var longitudes = coordinates.Select(c => c.Lng);
+
+        double latMin = latitudes.Min();
+        double latMax = latitudes.Max();
+        double longMin = longitudes.Min();
+        double longMax = longitudes.Max();
+        double latMean = latitudes.Average();
+        double longMean = longitudes.Average();
+
+        return (latMin, latMax, longMin, longMax, latMean, longMean);
+    }
+
     public static List<(double Lat, double Lng)> ParseLatLngOnly(string coordinatesCsv)
     {
         var coordinates = new List<(double Lat, double Lng)>();
