@@ -40,6 +40,13 @@ val headerTextStyleSmall = TextStyle(
     fontWeight = FontWeight.Bold
 )
 
+val headerTextStyleVerySmall = TextStyle(
+    fontFamily = customFontFamilyHeader,
+    fontSize = 20.sp,
+    fontStyle = FontStyle.Italic,
+    fontWeight = FontWeight.Bold
+)
+
 //---------------Custom font for "under headers"------------------
 val customFontFamilyUnderHeader = FontFamily(
     Font(R.font.underheaders, FontWeight.Normal)
@@ -59,7 +66,13 @@ val customFontFamilyText = FontFamily(
 // Custom text style for buttons
 val generalTextStyle = TextStyle(
     fontFamily = customFontFamilyText,
-    fontSize = 14.sp,
+    fontSize = 16.sp,
+    fontWeight = FontWeight.Normal
+)
+
+val generalTextStyleSmall = TextStyle(
+    fontFamily = customFontFamilyText,
+    fontSize = 12.sp,
     fontWeight = FontWeight.Normal
 )
 

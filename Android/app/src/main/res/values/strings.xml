@@ -107,7 +107,7 @@
     <string name="add_new_community">Nytt fellesskap</string>
     <string name="info">Info</string>
     <string name="close">Lukk</string>
-    <string name="enter_you_message">Skriv meldingen her</string>
+    <string name="enter_you_message">Skriv meldingen her...</string>
     <string name="error">Feil</string>
     <string name="input_fields_cannot_be_empty">Ingen av feltene kan være tomme</string>
     <string name="ok">OK</string>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -39,6 +40,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.Button
@@ -66,6 +68,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -85,8 +88,12 @@ import com.example.hopla.apiService.fetchStables
 import com.example.hopla.apiService.joinStable
 import com.example.hopla.apiService.leaveStable
 import com.example.hopla.apiService.sendStableMessage
+import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
+import com.example.hopla.ui.theme.generalTextStyleSmall
+import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.headerTextStyleVerySmall
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.Message
@@ -342,20 +349,12 @@ fun CommunityDetailScreen(navController: NavController, stableId: String, token:
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.2f)
+                    .fillMaxHeight(0.1f)
             ) {
-                // Image of the community group
-                Image(
-                    painter = rememberAsyncImagePainter(community.pictureUrl),
-                    contentDescription = community.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-                // Transparent box as overlay over the image
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                        .background(MaterialTheme.colorScheme.primary)
                 )
                 // Row for the back button, title, and info button
                 Row(
@@ -369,19 +368,21 @@ fun CommunityDetailScreen(navController: NavController, stableId: String, token:
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
                     // Title of the community group
                     Text(
                         text = community.name,
-                        fontSize = 20.sp,
+                        style = headerTextStyleVerySmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     // Info button to show details about the community
                     IconButton(onClick = { showDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Info,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = stringResource(R.string.info)
                         )
                     }
@@ -409,6 +410,8 @@ fun CommunityDetailScreen(navController: NavController, stableId: String, token:
                         ) {
                             Text(
                                 text = community.description,
+                                style = generalTextStyle,
+                                color = Color.Black,
                                 modifier = Modifier.padding(end = 8.dp)
                             )
                         }
@@ -439,8 +442,8 @@ fun CommunityDetailScreen(navController: NavController, stableId: String, token:
                     }
                 },
                 confirmButton = {
-                    Button(onClick = { showDialog = false }) {
-                        Text(text = stringResource(R.string.close))
+                    Button(onClick = { showDialog = false }, shape = RectangleShape) {
+                        Text(text = stringResource(R.string.close), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             )
@@ -525,6 +528,7 @@ fun MessageBox(stableId: String, token: String) {
                     Text(
                         text = date,
                         style = generalTextStyleBold,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
@@ -545,25 +549,36 @@ fun MessageBox(stableId: String, token: String) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
                 value = newMessage,
                 onValueChange = { newMessage = it },
+                singleLine = true,
                 modifier = Modifier.weight(1f),
                 placeholder = { Text(text = stringResource(R.string.enter_you_message)) }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {
-                if (newMessage.isNotBlank()) {
-                    coroutineScope.launch {
-                        sendMessage(newMessage)
-                        newMessage = ""
+            Button(
+                onClick = {
+                    if (newMessage.isNotBlank()) {
+                        coroutineScope.launch {
+                            sendMessage(newMessage)
+                            newMessage = ""
+                        }
                     }
-                }
-            }) {
-                Text(text = stringResource(R.string.publish))
+                },
+                modifier = Modifier.size(48.dp),
+                contentPadding = PaddingValues(0.dp), // Remove default padding
+                shape = RoundedCornerShape(50)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = stringResource(R.string.publish),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }
@@ -574,7 +589,7 @@ fun MessageCard(message: Message) {
     val backgroundColor = if (message.senderId == UserSession.userId) {
         MaterialTheme.colorScheme.primary // Green color
     } else {
-        MaterialTheme.colorScheme.surface // Default color
+        MaterialTheme.colorScheme.onBackground // Default color
     }
 
     val displayAlias = if (message.senderId == UserSession.userId) {
@@ -590,24 +605,48 @@ fun MessageCard(message: Message) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(12.dp),
         contentAlignment = alignment
     ) {
-        Card(
-            modifier = Modifier
-                .widthIn(min = 100.dp, max = (0.75f * LocalConfiguration.current.screenWidthDp).dp)
-                .padding(horizontal = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        Column(
+            horizontalAlignment = if (message.senderId == UserSession.userId) Alignment.End else Alignment.Start
         ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = displayAlias, style = generalTextStyle, modifier = Modifier.align(Alignment.CenterVertically))
-                    Text(text = formattedTime, style = generalTextStyle, modifier = Modifier.align(Alignment.CenterVertically))
-                }
-                Text(text = message.content, style = generalTextStyle)
+            // Row for name and time
+            Row(
+                horizontalArrangement = if (message.senderId == UserSession.userId) Arrangement.End else Arrangement.Start,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    text = formattedTime,
+                    style = generalTextStyleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = displayAlias,
+                    style = generalTextStyleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            // Message box
+            Card(
+                modifier = Modifier
+                    .widthIn(min = 100.dp, max = (0.75f * LocalConfiguration.current.screenWidthDp).dp)
+                    .padding(top = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = backgroundColor)
+            ) {
+                Text(
+                    text = message.content,
+                    style = generalTextStyle.copy(
+                        color = if (backgroundColor == MaterialTheme.colorScheme.onBackground) {
+                            MaterialTheme.colorScheme.secondary
+                        } else {
+                            generalTextStyle.color
+                        }
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                )
             }
         }
     }

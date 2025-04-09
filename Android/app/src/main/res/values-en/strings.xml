@@ -108,7 +108,7 @@
     <string name="add_new_community">New community</string>
     <string name="info">Info</string>
     <string name="close">Close</string>
-    <string name="enter_you_message">Enter your message</string>
+    <string name="enter_you_message">Enter your message...</string>
     <string name="error">Error</string>
     <string name="input_fields_cannot_be_empty">The input fields cannot be empty</string>
     <string name="ok">OK</string>
