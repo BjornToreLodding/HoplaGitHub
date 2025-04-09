@@ -13,9 +13,6 @@ struct HikesDetails: View {
         ScrollView {
             VStack(spacing: 16) {
                 
-                // 1. Title
-                HikeTitleView(hike: hike)
-                
                 // 2. Image
                 HikeImageView(hike: hike)
                 
@@ -75,22 +72,6 @@ struct HikesDetails: View {
 }
 
 
-
-// Title of struct
-struct HikeTitleView: View {
-    let hike: Hike
-    
-    var body: some View {
-        VStack {
-            Text(hike.name)
-                .font(.title)
-                .bold()
-                .padding()
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 40)
-    }
-}
 
 // Image section
 struct HikeImageView: View {

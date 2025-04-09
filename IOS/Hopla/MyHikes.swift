@@ -16,12 +16,12 @@ struct MyHike: Codable, Identifiable {
     let trailId: String? // ✅ Optional TrailId
     let length: Double
     let duration: Double
-    let pictureUrl: String?
-    let title: String // ✅ Matches `title` in API
+    var pictureUrl: String?
+    var title: String // ✅ Matches `title` in API
     var comment: String // ✅ Matches `comment` instead of `description`
     let horseName: String? // ✅ Matches `horseName`
     let trailButton: Bool // ✅ Matches API `trailButton`
-
+    
     // Custom initializer from dictionary (in case of manual parsing)
     init(from dictionary: [String: Any]) {
         self.id = dictionary["id"] as? String ?? UUID().uuidString
@@ -38,8 +38,6 @@ struct MyHike: Codable, Identifiable {
 }
 
 
-
-
 // MARK: - API Response Model
 struct MyHikeResponse: Codable {
     let userHikes: [MyHike]
@@ -51,66 +49,66 @@ struct MyHikeResponse: Codable {
 class MyHikeViewModel: ObservableObject {
     @Published var myHikes: [MyHike] = []
     @Published var isLoading = false
-    @Published var rawApiResponse: String = "" // ✅ Add this property
-
+    @Published var rawApiResponse: String = ""
+    
     private var cancellable: AnyCancellable?
     private var currentPage: Int = 1
     private let pageSize = 4
     private var hasMorePages = true
-
+    
     func fetchMyHikes() {
         guard !isLoading else { return }
         guard hasMorePages else { return }
-
+        
         isLoading = true
-
+        
         guard let token = TokenManager.shared.getToken(),
               let userId = TokenManager.shared.getUserId() else {
             print("❌ No token or user ID found.")
             return
         }
-
+        
         let urlString = "https://hopla.onrender.com/userhikes/user?userId=\(userId)&pageNumber=\(currentPage)&pageSize=\(pageSize)"
         print("📤 Final request URL:", urlString)
-
+        
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             isLoading = false
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
-
+            
             defer {
                 DispatchQueue.main.async {
                     self.isLoading = false
                 }
             }
-
+            
             if let data = data {
                 DispatchQueue.main.async {
                     self.rawApiResponse = String(data: data, encoding: .utf8) ?? "No data" // ✅ Store response
                     print("📡 Raw API Response:", self.rawApiResponse)
                 }
             }
-
+            
             if let error = error {
                 print("❌ Request error:", error.localizedDescription)
                 return
             }
-
+            
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200,
                   let data = data else {
                 print("❌ Invalid response or status code")
                 return
             }
-
+            
             do {
                 let decodedResponse = try JSONDecoder().decode(MyHikeResponse.self, from: data)
                 DispatchQueue.main.async {
@@ -150,24 +148,27 @@ struct MyHikes: View {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.myHikes.indices, id: \.self) { index in
                             let myHike = viewModel.myHikes[index]
+                            
                             NavigationLink(destination: MyHikesDetails(hike: myHike, myHikes: $viewModel.myHikes)) {
                                 MyHikePostContainer(
+                                    trailName: myHike.trailName,
+                                    title: myHike.title,
                                     imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
-                                    comment: myHike.trailName,
+                                    comment: myHike.comment,
                                     length: myHike.length,
                                     duration: myHike.duration,
                                     colorScheme: colorScheme
                                 )
                             }
-                            .buttonStyle(PlainButtonStyle()) // ✅ Removes default button styling
+                            .buttonStyle(PlainButtonStyle())
+
+                            // 🔥 Trigger next page when reaching the last hike
                             .onAppear {
                                 if index == viewModel.myHikes.count - 1 {
-                                    // User scrolled to last hike
                                     viewModel.fetchMyHikes()
                                 }
                             }
                         }
-                        
                     }
                     .padding()
                     
@@ -182,12 +183,31 @@ struct MyHikes: View {
         .navigationTitle("My Hikes")
         .onAppear {
             viewModel.fetchMyHikes() // Use ViewModel to fetch data
+            print("📡 Fresh API Data:", viewModel.rawApiResponse)
         }
     }
+    
+    private func hikeNavigationLink(for myHike: MyHike) -> some View {
+        NavigationLink(destination: MyHikesDetails(hike: myHike, myHikes: $viewModel.myHikes)) {
+            MyHikePostContainer(
+                trailName: myHike.trailName,
+                title: myHike.title,
+                imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
+                comment: myHike.comment,
+                length: myHike.length,
+                duration: myHike.duration,
+                colorScheme: colorScheme
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
 }
 
 // MARK: - PostContainer View
 struct MyHikePostContainer: View {
+    var trailName: String
+    var title: String
     var imageName: String
     var comment: String
     var length: Double
@@ -226,6 +246,15 @@ struct MyHikePostContainer: View {
             }
             
             // Hike Details
+            Text(title)
+                .font(.title)
+                .bold()
+                .padding(.bottom, 2)
+            
+            Text("Trail Name: \(trailName)")
+                .font(.headline)
+                .padding(.bottom, 2)
+            
             Text(comment)
                 .font(.headline)
                 .padding(.top, 5)

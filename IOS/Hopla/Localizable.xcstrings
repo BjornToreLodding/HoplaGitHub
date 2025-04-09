@@ -1172,6 +1172,15 @@
     "Title: %@" : {
 
     },
+    "Trail name" : {
+
+    },
+    "Trail name: %@" : {
+
+    },
+    "Trail Name: %@" : {
+
+    },
     "Type a message..." : {
       "localizations" : {
         "nb" : {
