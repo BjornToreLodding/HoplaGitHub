@@ -54,6 +54,7 @@ import androidx.core.app.ActivityCompat
 import com.example.hopla.apiService.createNewHike
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.PrimaryBlack
+import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.Coordinate
 import com.example.hopla.universalData.Horse
@@ -200,7 +201,7 @@ fun NewTripScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(75.dp)
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.tertiary)
                 .align(Alignment.BottomCenter),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -220,10 +221,10 @@ fun NewTripScreen() {
                     ) {
                         val minutes = (time / 60).toInt()
                         val seconds = (time % 60).toInt()
+                        Text(text = stringResource(R.string.time), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                         Text(
-                            text = String.format("%02d:%02d", minutes, seconds)
+                            text = String.format("%02d:%02d", minutes, seconds), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary
                         )
-                        Text(text = stringResource(R.string.time))
                     }
                 }
                 Box(
@@ -252,17 +253,17 @@ fun NewTripScreen() {
                             }
                         },
                         shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
-                        modifier = Modifier.size(80.dp),
+                        modifier = Modifier.size(90.dp),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary, // Background color
-                            contentColor = PrimaryBlack // Text color
+                            contentColor = MaterialTheme.colorScheme.onPrimary // Text color
                         )
                     ) {
                         Text(
                             text = if (isRunning) stringResource(R.string.stop) else stringResource(
                                 R.string.start
-                            )
+                            ), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -274,8 +275,8 @@ fun NewTripScreen() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = String.format("%.2f km", distance))
-                        Text(text = stringResource(R.string.distance))
+                        Text(text = stringResource(R.string.distance), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(text = String.format("%.2f km", distance), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
