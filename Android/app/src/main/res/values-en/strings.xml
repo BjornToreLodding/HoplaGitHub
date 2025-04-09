@@ -186,5 +186,7 @@
     <string name="duration2">Duration</string>
     <string name="trail">Trail</string>
     <string name="horse">Horse</string>
+    <string name="follow_trail">Follow trail</string>
+    <string name="give_assessment">Give assessment:</string>
 
 </resources>

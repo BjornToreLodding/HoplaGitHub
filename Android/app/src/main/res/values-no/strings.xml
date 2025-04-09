@@ -186,5 +186,7 @@
     <string name="duration2">Varighet</string>
     <string name="trail">Løype</string>
     <string name="horse">Hest</string>
+    <string name="follow_trail">Følg løype</string>
+    <string name="give_assessment">Gi vurdering:</string>
 
 </resources>

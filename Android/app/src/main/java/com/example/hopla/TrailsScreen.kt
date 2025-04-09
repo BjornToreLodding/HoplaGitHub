@@ -99,6 +99,7 @@ import com.example.hopla.apiService.removeFavoriteTrail
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
+import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.headerTextStyleSmall
@@ -107,6 +108,7 @@ import com.example.hopla.universalData.ContentBoxInfo
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.MapScreen
 import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.Trail
 import com.example.hopla.universalData.TrailFilter
@@ -922,7 +924,6 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
                 .height(60.dp)
                 .background(MaterialTheme.colorScheme.primary)
         ) {
@@ -997,38 +998,6 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
-                            // Make the icons in the pictures buttons
-                            IconButton(
-                                onClick = {
-                                    currentImageIndex = (currentImageIndex - 1 + images.size) % images.size
-                                },
-                                modifier = Modifier
-                                    .align(Alignment.CenterStart)
-                                    .padding(start = 8.dp)
-                            ) {
-                                // Click left icon
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
-                                    contentDescription = "Left Arrow",
-                                    tint = MaterialTheme.colorScheme.onPrimary
-                                )
-                            }
-                            // Make the icons in the pictures buttons
-                            IconButton(
-                                onClick = {
-                                    currentImageIndex = (currentImageIndex + 1) % images.size
-                                },
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .padding(end = 8.dp)
-                            ) {
-                                // Click right icon
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                                    contentDescription = "Right Arrow",
-                                    tint = MaterialTheme.colorScheme.onPrimary
-                                )
-                            }
                         }
                         // Description below pictures
                         Box(
@@ -1069,11 +1038,12 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.3f)
-                            .background(MaterialTheme.colorScheme.onBackground)
-                            .clickable { navController.navigate("start_trip_map/${contentBoxInfo.id}") },
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable { navController.navigate("start_trip_map/${contentBoxInfo.id}") }
+                            .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = stringResource(R.string.start_trip), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+                        Text(text = stringResource(R.string.follow_trail), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     // New updates clickable box
@@ -1081,11 +1051,12 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .fillMaxHeight(0.2f)
                             .fillMaxWidth(0.7f)
-                            .background(MaterialTheme.colorScheme.onBackground)
-                            .clickable { showGiveReview = true },
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable { showGiveReview = true }
+                            .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = stringResource(R.string.new_updates), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+                        Text(text = stringResource(R.string.new_updates), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
 
                 }
@@ -1103,17 +1074,18 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .wrapContentHeight()
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.onBackground),
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(8.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        Text(text = contentBoxInfo.description, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(start = 8.dp))
+                        Text(text = contentBoxInfo.description, style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 8.dp))
                     }
                     // Assessment box with star rating set
                     Box(
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.onBackground),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -1123,7 +1095,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = stringResource(R.string.assessment), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
+                            Text(text = stringResource(R.string.assessment), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                             Row {
                                 repeat(5) { index ->
                                     Icon(
@@ -1140,7 +1112,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.onBackground),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -1150,7 +1122,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = stringResource(R.string.my_assessment), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
+                            Text(text = stringResource(R.string.give_assessment), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                             StarRating(trailId = contentBoxInfo.id, rating = userRating, onRatingChanged = { userRating = it })
                         }
                     }
@@ -1159,7 +1131,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.onBackground),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ) {
                         // Inner, clickable box for latest update
@@ -1168,7 +1140,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 .height(30.dp)
                                 .fillMaxWidth()
                                 .padding(4.dp)
-                                .background(MaterialTheme.colorScheme.onBackground)
+                                .background(MaterialTheme.colorScheme.primary)
                                 .clickable {
                                     showMessageBox = true
                                     coroutineScope.launch {
@@ -1177,7 +1149,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = stringResource(R.string.latest_update_about_the_route), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary)
+                            Text(text = stringResource(R.string.latest_update_about_the_route), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                 }
