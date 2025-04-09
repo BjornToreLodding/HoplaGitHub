@@ -1,6 +1,8 @@
 
 
 
+
+
 # **OBS**
 
 **BT** har oppdatert kun trails/all med filters. Trenger tilbakemelding om dette er greit, før jeg endrer de andre endpointene i /trails :-)
@@ -19,7 +21,7 @@ POST /stables/create -\> Form data istede for raw data for bilder?
 
 Backend: :green_book: Lagd :yellow_circle: Delvis laget :red_circle: Ikke lagd
 
-Android: :alien: Lagt inn :grimacing: Delvis lagt inn :red_car: Ikke lagt inn
+Android: :alien: Lagt inn :grimacing: Delvis lagt inn :alien: Ikke lagt inn
 
 iOs: :green_apple: Lagt inn :banana: Delvis lagt inn :apple: Ikke lagt inn
 
@@ -749,7 +751,7 @@ Android: Lagt til løyper første side, mangler om logget inn bruker har likt l�
 </td>
 <td>
 
-## **:green_book: :alien: :apple: GET /trails/all**
+## **:green_book: :alien: :green_apple: GET /trails/all**
 
 (Alle disse sidene skal displaye lister på samme måte)
 
@@ -957,7 +959,7 @@ https://hopla.onrender.com/trails/relations?friends=true&following=true&pagenumb
 </td>
 <td>
 
-## **:green_book: :alien: :gree_apple: POST/DELETE trails/favorite**
+## **:green_book: :alien: :green_apple: POST/DELETE trails/favorite**
 
 Trykke av/på hjerte på løyper (legge de til eller slette de som favoritt)
 
@@ -991,7 +993,7 @@ Response:
 </td>
 <td>
 
-## **:green_apple: :red_car: :apple: Get /feed**
+## **:green_apple: :alien: :green_apple: Get /feed**
 
 Alle innlegg her skal sorteres etter at det nyeste vises øverst
 
@@ -1053,7 +1055,7 @@ Response:
 }
 ```
 
-**Hjem -\> (ikon 2 personer) **:green_apple: :red_car: :apple:**
+**Hjem -\> (ikon 2 personer) **:green_apple: :alien: :apple:**
 
 * Samme som over, men alle løyper og kommentarer som hentes må være venn eller følge med brukeren som er logget in
 * Også hente for venner:
@@ -1069,7 +1071,7 @@ GET https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horse
 
 Response: Se feed alt
 
-**Hjem -\> Hjerte **:green_apple: :red_car: :apple:**
+**Hjem -\> Hjerte **:green_apple: :alien: :apple:**
 
 * Oppdateringer og kommentarer på løyper man har likt
 
@@ -1082,7 +1084,7 @@ GET http https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,
 
 Response: Se feed alt
 
-**Hjem -\> Område **:green_apple: :red_car: :apple:**
+**Hjem -\> Område **:green_apple: :alien: :apple:**
 
 * Samme som første bare at det er en viss avstand fra brukeren på alt som vises her  
 
@@ -1095,7 +1097,7 @@ GET https://hopla.onrender.com/feed/all?userlat=60&userlong=10&radius=120
 
 Response: Se feed alt
 
-**Hjem -\> Populært siste 30 dager **:green_apple: :red_car: :apple:**
+**Hjem -\> Populært siste 30 dager **:green_apple: :alien: :apple:**
 
 * Samme som første bare sortert etter likes
 
@@ -1108,7 +1110,7 @@ GET http https://hopla.onrender.com/feed/all?sort=likes
 
 Response: Se feed alt
 
-## **:green_book: :red_car: :apple: POST reactions
+## **:green_book: :alien: :apple: POST reactions**
 
 Denne setter reaksjonen til Like som standard, men kan enkelt utvides til flere reaksjonstyper.  
 Har også tilrettelagt for dette i database og backend hvis Hopla ønsker å utvide dette senere  
@@ -1915,7 +1917,7 @@ Response:
 <td></td>
 <td>
 
-## **:green_book: :red_car: :apple: POST userhikes/create (ny tur knapp)**
+## **:green_book: :alien: :apple: POST userhikes/create (ny tur knapp)**
 
 Denne generer en liste koordinater, sammen med tid og distanse fra bruker trykker på start til stopp.\
 Da kan brukeren velge å bare trykke lagre eller fylle inn mer informasjon:
@@ -1963,7 +1965,7 @@ Response:
 }
 ```
 
-## **:green_book: :red_car: :apple: PUT userhikes/{userHikeId} redigere informasjon om en tur**
+## **:green_book: :alien: :apple: PUT userhikes/{userHikeId} redigere informasjon om en tur**
 
 Endpoint der informasjonen over skal kunne redigeres i ettertid.\
 Hvis public her også må det lages en løype av den.
@@ -1998,7 +2000,7 @@ Respons:
 }
 ```
 
-## **:green_book: :red_car: :apple: POST trails/create lage ny løype**
+## **:green_book: :alien: :apple: POST trails/create lage ny løype**
 
 For å lage dette må man bruke en UserHike (tur) som man Oppgraderer til Trail (Løype).\
 Her må man sende med multipart/form-data. Det bare høres litt vanskelig ut,\
@@ -2192,7 +2194,7 @@ Response:
 }
 ```
 
-## **:green_book:** :red_car: **:apple: GET /userhikes/coordinates(/mock)/{userHikeId}**
+## **:green_book:** :alien: **:apple: GET /userhikes/coordinates(/mock)/{userHikeId}**
 
 postman:
 ```http
@@ -2202,10 +2204,10 @@ GEt https://hopla.onrender.com/userhikes/coordinates/mock/{userHikeId}
 
 Eksempel:
 ```http
-GET https://hopla.onrender.com/userhikes/coordinates/12345678-0000-0000-0011-123456780002 
+GET https://hopla.onrender.com/userhikes/coordinates/12345678-0000-0000-0011-123456780002  
 //OSB: Ingen av testdataene har koordinater
 //Derfor har jeg også laget denne:
-GET https://hopla.onrender.com/userhikes/coordinates/mock/12345678-0000-0000-0011-123456780002 
+GET https://hopla.onrender.com/userhikes/coordinates/mock/12345678-0000-0000-0011-123456780002  
 //Denne returnerer 500 koordinater som lager turen som en sirkel.
 ```
 

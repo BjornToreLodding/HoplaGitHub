@@ -91,12 +91,13 @@ public class EntityFeedController : ControllerBase
         // 🌟 Løyper brukeren har likt
         if (options.OnlyLikedTrails)
         {
-            var likedTrailIds = await _context.EntityReactions
-                .Where(r => r.UserId == userId && r.EntityName == "Trail")
-                .Select(r => r.EntityId)
+            var favoriteTrailIds = await _context.TrailFavorites
+                .Where(f => f.UserId == userId)
+                .Select(f => f.TrailId)
                 .ToListAsync();
 
-            query = query.Where(f => likedTrailIds.Contains(f.EntityId));
+            query = query.Where(f => favoriteTrailIds.Contains(f.EntityId));
+
         }
 
         // 🔀 Sortering

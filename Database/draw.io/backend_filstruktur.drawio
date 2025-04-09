@@ -1,0 +1,106 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.8">
+  <diagram name="Page-1" id="YV_wqj0qXKr9a0WY93KK">
+    <mxGraphModel dx="646" dy="755" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-3" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="203" as="sourcePoint" />
+            <mxPoint x="3" y="16" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-4" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="22" as="sourcePoint" />
+            <mxPoint x="23" y="22" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-5" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="36" as="sourcePoint" />
+            <mxPoint x="23" y="36" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-6" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="50" as="sourcePoint" />
+            <mxPoint x="23" y="50" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-7" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="189" as="sourcePoint" />
+            <mxPoint x="23" y="189" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-8" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="2.5" y="203" as="sourcePoint" />
+            <mxPoint x="23" y="203" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-10" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="175" as="sourcePoint" />
+            <mxPoint x="23" y="175" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-11" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="161" as="sourcePoint" />
+            <mxPoint x="23" y="161" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-12" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="147" as="sourcePoint" />
+            <mxPoint x="23" y="147" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-13" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="133" as="sourcePoint" />
+            <mxPoint x="23" y="133" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-14" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="64" as="sourcePoint" />
+            <mxPoint x="23" y="64" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-15" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="78" as="sourcePoint" />
+            <mxPoint x="23" y="78" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-16" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="92" as="sourcePoint" />
+            <mxPoint x="23" y="92" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-17" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="106" as="sourcePoint" />
+            <mxPoint x="23" y="106" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-18" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="3" y="119" as="sourcePoint" />
+            <mxPoint x="23" y="119" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-2" value="&lt;div style=&quot;line-height: 116%;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 116%;&quot;&gt;&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Config/&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 116%;&quot;&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Controllers/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Data/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;DTOs/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Events/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;EventsHandler/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Helpers/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Interfaces/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Migrations/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Mock/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Modes/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Seed/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Services/&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Settings/&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="17" width="86" height="213" as="geometry" />
+        </mxCell>
+        <mxCell id="bmNKXIFuTTA_kWB7FWuC-1" value="&lt;font style=&quot;line-height: 116%;&quot;&gt;Root/&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry width="30" height="18" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

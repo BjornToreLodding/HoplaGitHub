@@ -1148,26 +1148,35 @@ public class TrailController : ControllerBase
         };
 
         // Hent koordinater og lag 50 punkter
+       // 1. Parse lat/lng fra csv, dropp timestamp
         var parsed = CoordinateHelper.ParseLatLngOnly(hikeDetails.CoordinatesCsv);
+
+        // 2. Downsample til 50 punkter for preview
         var reduced = CoordinateHelper.DownsampleCoordinates(parsed, 50);
+
+        // 3. Lag CSV: 50 punkter
         var reducedCsv = CoordinateHelper.ToCsv(reduced);
 
+        // 4. Lag CSV: alle punkter
+        var fullCsv = CoordinateHelper.ToCsv(parsed); // Ikke bruk raw `hikeDetails.CoordinatesCsv`, men parsed+toCsv
 
+        // 5. Lag TrailDetail
         var trailDetails = new TrailDetail
         {
             Id = trail.Id,
-            Description = dto?.Description ?? "Ukjent", //hikeDetails.Description,
+            Description = dto?.Description ?? "Ukjent",
             LatMin = hikeDetails.LatMin,
             LatMax = hikeDetails.LatMax,
             LongMin = hikeDetails.LongMin,
             LongMax = hikeDetails.LongMax,
-            PreviewCoordinatesCsv = reducedCsv //50koordinater
+            PreviewCoordinatesCsv = reducedCsv
         };
 
+        // 6. Lag TrailAllCoordinate
         var trailAllCoordinates = new TrailAllCoordinate
         {
             Id = trail.Id,
-            CoordinatesCsv = hikeDetails.CoordinatesCsv // full csv med offset beholdes
+            CoordinatesCsv = fullCsv // Bruk renset, timestamp-fri csv
         };
 
 
