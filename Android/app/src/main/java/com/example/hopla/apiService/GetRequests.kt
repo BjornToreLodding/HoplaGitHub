@@ -55,7 +55,15 @@ suspend fun fetchHorses(userId: String, token: String): List<Horse> {
         val responseBody: String = response.bodyAsText()
         Log.d("fetchHorses", "Response Code: ${response.status.value}")
         Log.d("fetchHorses", "Response Body: $responseBody")
-        response.body()
+
+        if (response.status == HttpStatusCode.NotFound) {
+            Log.w("fetchHorses", "No horses found for userId: $userId")
+            emptyList() // Return an empty list if 404
+        } else if (response.status == HttpStatusCode.OK) {
+            response.body() // Deserialize and return the list of horses
+        } else {
+            throw Exception("Unexpected response: ${response.status}")
+        }
     }
 }
 
