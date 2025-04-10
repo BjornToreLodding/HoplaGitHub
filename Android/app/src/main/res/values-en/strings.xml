@@ -191,5 +191,7 @@
     <string name="no_image_selected">No image selected</string>
     <string name="updates2">Updates</string>
     <string name="ride_trail">Ride trail</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
 
 </resources>

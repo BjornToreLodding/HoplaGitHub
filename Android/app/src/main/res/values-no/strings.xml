@@ -191,5 +191,7 @@
     <string name="no_image_selected">Ingen bilde valgt</string>
     <string name="updates2">Oppdateringer</string>
     <string name="ride_trail">Ri løype</string>
+    <string name="today">I dag</string>
+    <string name="yesterday">I går</string>
 
 </resources>

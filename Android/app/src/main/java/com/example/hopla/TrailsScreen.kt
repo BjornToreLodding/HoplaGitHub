@@ -101,10 +101,8 @@ import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
-import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.generalTextStyleSmall
 import com.example.hopla.ui.theme.headerTextStyleSmall
-import com.example.hopla.ui.theme.headerTextStyleVerySmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.ContentBoxInfo
 import com.example.hopla.universalData.ImagePicker
@@ -119,6 +117,8 @@ import com.example.hopla.universalData.UserSession
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.util.Calendar
 import java.util.Locale
 
 @Composable
@@ -1200,11 +1200,10 @@ private fun TrailUpdates(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(start = 16.dp, end = 16.dp)
+                    .padding(16.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Box(
                         modifier = Modifier.fillMaxWidth()
@@ -1231,33 +1230,58 @@ private fun TrailUpdates(
                         textAlign = TextAlign.Center,
                     )
 
+                    // Group updates by date
+                    val groupedUpdates = trailUpdates.groupBy { update ->
+                        val updateDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(update.createdAt)
+                        val today = Calendar.getInstance()
+                        val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+
+                        when {
+                            updateDate != null && updateDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() -> stringResource(R.string.today)
+                            updateDate != null && updateDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == yesterday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() -> stringResource(R.string.yesterday)
+                            else -> SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(updateDate ?: "")
+                        }
+                    }
+
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(trailUpdates) { update ->
-                            Card(
-                                shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(4.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column(
+                        groupedUpdates.forEach { (date, updates) ->
+                            item {
+                                // Display the date header
+                                Text(
+                                    text = date,
+                                    style = generalTextStyleSmall,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier
-                                        .padding(12.dp)
-                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp)
+                                        .fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            items(updates) { update ->
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    elevation = CardDefaults.cardElevation(4.dp),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground),
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = update.comment,
-                                        style = generalTextStyle,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                    )
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(12.dp)
+                                            .fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = update.comment,
+                                            style = generalTextStyle,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                        )
 
-                                    if (update.pictureUrl.isNotEmpty()) {
-                                        update.pictureUrl.let { imageUrl ->
+                                        if (update.pictureUrl != "https://hopla.imgix.net/main-review.jpg?w=400&h=300&fit=crop") {
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Image(
-                                                painter = rememberAsyncImagePainter(model = imageUrl),
+                                                painter = rememberAsyncImagePainter(model = update.pictureUrl),
                                                 contentDescription = null,
                                                 contentScale = ContentScale.Crop,
                                                 modifier = Modifier
@@ -1266,28 +1290,28 @@ private fun TrailUpdates(
                                                     .clip(RoundedCornerShape(8.dp))
                                             )
                                         }
-                                    }
 
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text(
-                                            text = "User: ${update.alias}",
-                                            style = generalTextStyleSmall,
-                                            color = MaterialTheme.colorScheme.secondary
-                                        )
-                                        Text(
-                                            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
-                                                SimpleDateFormat(
-                                                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "User: ${update.alias}",
+                                                style = generalTextStyleSmall,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+                                            Text(
+                                                text = SimpleDateFormat(
+                                                    "HH:mm",
                                                     Locale.getDefault()
-                                                ).parse(update.createdAt)
-                                            ),
-                                            style = generalTextStyleSmall,
-                                            color = MaterialTheme.colorScheme.secondary
-                                        )
+                                                ).format(
+                                                    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(update.createdAt) ?: ""
+                                                ),
+                                                style = generalTextStyleSmall,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+                                        }
                                     }
                                 }
                             }
