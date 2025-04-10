@@ -9,19 +9,23 @@ using HoplaBackend.Interfaces;
 namespace HoplaBackend.Models;
 public class TrailReview : IEntityWithUser
 {
-    public Guid Id { get; set; } // Unikt Id (IKKE samme som Trail.Id)
+    public Guid Id { get; set; } // Unique ID (NOT the same as Trail.Id)
 
-    public Guid TrailId { get; set; } // FK til Trail
+    public Guid TrailId { get; set; } // Foreign key to Trail
     public Trail Trail { get; set; } = null!;
 
-    public Guid UserId { get; set; }
+    public Guid UserId { get; set; } // Foreign key to User
     public User User { get; set; } = null!;
-    public string Comment { get; set; } = string.Empty;
-    public string PictureUrl { get; set; } = string.Empty;
-    public TrailConditionType Condition { get; set; } = TrailConditionType.Ukjent;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    public string Comment { get; set; } = string.Empty; // The review text
+
+    public string? PictureUrl { get; set; } // Optional picture
+
+    public TrailConditionType Condition { get; set; } = TrailConditionType.Ukjent; // Default to unknown
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set automatically when created
 }
+
 
 public enum TrailConditionType
 {
