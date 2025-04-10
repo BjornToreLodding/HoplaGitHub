@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.twotone.Star
@@ -75,6 +76,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -171,16 +173,17 @@ fun TrailsScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(bottom = 8.dp)
+            .height(32.dp)
+            .background(MaterialTheme.colorScheme.background),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (!isRouteClicked) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(32.dp)
                     .background(MaterialTheme.colorScheme.primary)
-                    .padding(vertical = 8.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -216,11 +219,13 @@ fun TrailsScreen(navController: NavController) {
                                 if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !isFiltersClicked && !showOnlyFavorites)) Color.White.copy(
                                     alpha = 0.5f
                                 ) else Color.Transparent,
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RectangleShape
                             )
+                            .padding(horizontal = 16.dp)
+                            .size(32.dp)
                     ) {
                         Icon(
-                            imageVector = if (isMapClicked) Icons.AutoMirrored.Outlined.List else Icons.Outlined.Home,
+                            imageVector = if (isMapClicked) Icons.AutoMirrored.Outlined.List else Icons.Outlined.Language,
                             tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
@@ -273,8 +278,10 @@ fun TrailsScreen(navController: NavController) {
                         modifier = Modifier
                             .background(
                                 if (isCloseByClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RectangleShape
                             )
+                            .padding(horizontal = 16.dp)
+                            .size(32.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.LocationOn,
@@ -313,8 +320,10 @@ fun TrailsScreen(navController: NavController) {
                         modifier = Modifier
                             .background(
                                 if (isFavoriteClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RectangleShape
                             )
+                            .padding(horizontal = 16.dp)
+                            .size(32.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.FavoriteBorder,
@@ -352,8 +361,10 @@ fun TrailsScreen(navController: NavController) {
                         modifier = Modifier
                             .background(
                                 if (isFollowingClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RectangleShape
                             )
+                            .padding(horizontal = 16.dp)
+                            .size(32.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
@@ -378,8 +389,10 @@ fun TrailsScreen(navController: NavController) {
                                 modifier = Modifier
                                     .background(
                                         if (isFiltersClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
-                                        shape = RoundedCornerShape(8.dp)
+                                        shape = RectangleShape
                                     )
+                                    .padding(horizontal = 16.dp)
+                                    .size(32.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.KeyboardArrowDown,

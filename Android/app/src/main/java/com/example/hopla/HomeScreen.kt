@@ -82,6 +82,7 @@ fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Un
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .height(32.dp)
             .background(MaterialTheme.colorScheme.primary),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally

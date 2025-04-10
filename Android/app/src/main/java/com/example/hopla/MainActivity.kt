@@ -20,6 +20,7 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.AddRoad
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
@@ -270,7 +271,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         Screen.NewTrip -> Icon(Icons.Outlined.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        Screen.Trails -> Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Screen.Trails -> Icon(Icons.Outlined.AddRoad, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         Screen.Community -> Icon(Icons.Outlined.Face, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
