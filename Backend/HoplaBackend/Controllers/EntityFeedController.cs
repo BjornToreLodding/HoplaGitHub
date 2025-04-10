@@ -90,7 +90,7 @@ public class EntityFeedController : ControllerBase
 
         // 🌟 Løyper brukeren har likt
         if (options.OnlyLikedTrails)
-        {
+                {
             var favoriteTrailIds = await _context.TrailFavorites
                 .Where(f => f.UserId == userId)
                 .Select(f => f.TrailId)
@@ -131,10 +131,10 @@ public class EntityFeedController : ControllerBase
                 EntityType.Trail => await BuildTrailDto(entry, likedEntityIds),
                 EntityType.UserHike => await BuildUserHikeDto(entry, likedEntityIds),
                 EntityType.TrailReview => await BuildTrailReviewDto(entry, likedEntityIds),
-                EntityType.TrailRating => await BuildTrailRatingDto(entry, likedEntityIds),
+                //EntityType.TrailRating => await BuildTrailRatingDto(entry, likedEntityIds),
                 EntityType.Horse => await BuildHorseDto(entry, likedEntityIds),
                 EntityType.Stable => await BuildStableDto(entry, likedEntityIds),
-                EntityType.StableMessage => await BuildStableMessageDto(entry, likedEntityIds),
+                //EntityType.StableMessage => await BuildStableMessageDto(entry, likedEntityIds),
                 _ => null
             };
 
