@@ -29,19 +29,19 @@ public static class SystemSettingMock
             // 🖼️ Bildeinnstillinger i CSV-format
             // Hentes vanligvis eks. på følgende måte:
             //PictureUrl = PictureHelper.BuildPictureUrl(entry.PictureUrl, "FeedPicture"),
-            new SystemSetting { Key = "UserProfilePictureList",     Value = "64,64,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "UserProfilePictureSelect",   Value = "200,200,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "UserProfileUserHikes",       Value = "900,350,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "HorsePictureList",           Value = "64,64,crop,default-horse.jpg", Type = "csv" },
-            new SystemSetting { Key = "HorsePictureSelect",         Value = "200,200,crop,default-horse.jpg", Type = "csv" },
-            new SystemSetting { Key = "TrailPicture",               Value = "1020,420,crop,default.jpg", Type = "csv" }, // fyll heller enn crop
+            new SystemSetting { Key = "UserProfilePictureList",     Value = "64,64,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "UserProfilePictureSelect",   Value = "200,200,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "UserProfileUserHikes",       Value = "900,350,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "HorsePictureList",           Value = "64,64,crop,main-horse.jpg", Type = "csv" },
+            new SystemSetting { Key = "HorsePictureSelect",         Value = "200,200,crop,main-horse.jpg", Type = "csv" },
+            new SystemSetting { Key = "TrailPicture",               Value = "1020,420,crop,main.jpg", Type = "csv" }, // fyll heller enn crop
             //new SystemSetting { Key = "TrailPicture",             Value = "400,300,crop", Type = "csv" }, // fyll heller enn crop
-            new SystemSetting { Key = "TrailReviewPicture",         Value = "400,300,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "StablePicture",              Value = "300,300,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "StableMessagePicture",       Value = "300,300,crop.jpg", Type = "csv" },
-            new SystemSetting { Key = "UserHikePicture",            Value = "400,300,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "FeedPicture",                Value = "538,391,crop,default.jpg", Type = "csv" },
-            new SystemSetting { Key = "UserProfileWebPage",         Value = "64,64,crop,default.jpg", Type = "csv" },
+            new SystemSetting { Key = "TrailReviewPicture",         Value = "400,300,crop,main-review.jpg.jpg", Type = "csv" },
+            new SystemSetting { Key = "StablePicture",              Value = "300,300,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "StableMessagePicture",       Value = "300,300,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "UserHikePicture",            Value = "400,300,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "FeedPicture",                Value = "538,391,crop,main.jpg", Type = "csv" },
+            new SystemSetting { Key = "UserProfileWebPage",         Value = "64,64,crop,main.jpg", Type = "csv" },
             
             //new SystemSetting { Key = "MaxAPICallsPerMinute", Value = "100", Type = "int" },
             //new SystemSetting { Key = "CacheDuration", Value = "300", Type = "int" },
