@@ -3,7 +3,6 @@ package com.example.hopla
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -37,6 +36,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Favorite
@@ -102,7 +102,9 @@ import com.example.hopla.ui.theme.StarColor
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
+import com.example.hopla.ui.theme.generalTextStyleSmall
 import com.example.hopla.ui.theme.headerTextStyleSmall
+import com.example.hopla.ui.theme.headerTextStyleVerySmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.ContentBoxInfo
 import com.example.hopla.universalData.ImagePicker
@@ -1198,14 +1200,27 @@ private fun TrailUpdates(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
-                        .padding(16.dp)
                 ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        IconButton(
+                            onClick = onDismissRequest,
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.close),
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+
                     Text(
                         text = stringResource(R.string.updates2),
                         style = headerTextStyleSmall,
@@ -1238,17 +1253,19 @@ private fun TrailUpdates(
                                         color = MaterialTheme.colorScheme.secondary,
                                     )
 
-                                    update.pictureUrl.let { imageUrl ->
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Image(
-                                            painter = rememberAsyncImagePainter(model = imageUrl),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(180.dp)
-                                                .clip(RoundedCornerShape(8.dp))
-                                        )
+                                    if (update.pictureUrl.isNotEmpty()) {
+                                        update.pictureUrl.let { imageUrl ->
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Image(
+                                                painter = rememberAsyncImagePainter(model = imageUrl),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(180.dp)
+                                                    .clip(RoundedCornerShape(8.dp))
+                                            )
+                                        }
                                     }
 
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -1258,7 +1275,7 @@ private fun TrailUpdates(
                                     ) {
                                         Text(
                                             text = "User: ${update.alias}",
-                                            style = generalTextStyleBold,
+                                            style = generalTextStyleSmall,
                                             color = MaterialTheme.colorScheme.secondary
                                         )
                                         Text(
@@ -1268,7 +1285,7 @@ private fun TrailUpdates(
                                                     Locale.getDefault()
                                                 ).parse(update.createdAt)
                                             ),
-                                            style = generalTextStyleBold,
+                                            style = generalTextStyleSmall,
                                             color = MaterialTheme.colorScheme.secondary
                                         )
                                     }
