@@ -534,9 +534,7 @@ fun TrailsScreen(navController: NavController) {
             }
         } else {
             if (showOnlyFavorites) {
-                trails.filter { it.isFavorite == true }
-            } else {
-                trails
+                trails.filter { it.isFavorite }
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -566,16 +564,14 @@ fun TrailsScreen(navController: NavController) {
                             info = ContentBoxInfo(
                                 id = trail.id,
                                 title = trail.name,
-                                imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
-                                    R.drawable.stockimg1
-                                ),
-                                isFavorite = trail.isFavorite ?: false,
+                                imageResource = listOf(trail.pictureUrl),
+                                isFavorite = trail.isFavorite,
                                 starRating = trail.averageRating,
                                 description = trail.description ?: "N/A",
                                 filters = trail.filters?.map { it.value } ?: emptyList()
                             ),
                             onHeartClick = {
-                                val newState = !(trail.isFavorite ?: false)
+                                val newState = !trail.isFavorite
                                 trails = trails.toMutableList().apply {
                                     this[index] = trail.copy(isFavorite = newState)
                                 }
@@ -584,10 +580,8 @@ fun TrailsScreen(navController: NavController) {
                                 selectedContentBoxInfo = ContentBoxInfo(
                                     id = trail.id,
                                     title = trail.name,
-                                    imageResource = if (trail.pictureUrl != null) listOf(trail.pictureUrl) else listOf(
-                                        R.drawable.stockimg1
-                                    ),
-                                    isFavorite = trail.isFavorite ?: false,
+                                    imageResource = listOf(trail.pictureUrl),
+                                    isFavorite = trail.isFavorite,
                                     starRating = trail.averageRating,
                                     description = trail.description ?: "N/A",
                                     filters = trail.filters?.map { it.value } ?: emptyList()
@@ -914,7 +908,7 @@ fun ReviewDialog(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, onBackClick: () -> Unit) {
-    var currentImageIndex by remember { mutableIntStateOf(0) }
+    val currentImageIndex by remember { mutableIntStateOf(0) }
     var userRating by remember { mutableIntStateOf(0) }
     var showMessageBox by remember { mutableStateOf(false) }
     var trailUpdates by remember { mutableStateOf<List<TrailUpdate>>(emptyList()) }
@@ -1167,7 +1161,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     }
 
     if (showMessageBox) {
-        TrailUpdates(showMessageBox, trailUpdates, onDismissRequest = { showMessageBox = false })
+        TrailUpdates(showMessageBox = showMessageBox, trailUpdates, onDismissRequest = { showMessageBox = false })
     }
 
     if (showGiveReview) {

@@ -14,20 +14,16 @@
     <string name="mode">Modus</string>
     <string name="light">Lys</string>
     <string name="dark">Mørk</string>
-
     <string name="home">Hjem</string>
     <string name="routes">Ruter</string>
     <string name="map">Kart</string>
     <string name="stables">Staller</string>
     <string name="profile">Profil</string>
-
     <string name="back">Tilbake</string>
     <string name="change_profile_picture">Endre profilbilde</string>
-
     <string name="my_trips">Mine turer</string>
     <string name="friends">Venner</string>
     <string name="following">Følger</string>
-
     <string name="username">Brukernavn</string>
     <string name="password">Passord</string>
     <string name="create_user">Opprett bruker</string>
@@ -40,20 +36,17 @@
     <string name="current_password">Nåværende passord</string>
     <string name="new_password">Nytt passord</string>
     <string name="confirm_password">Bekreft passord</string>
-
     <string name="send_a_report">Send en rapport</string>
     <string name="report">Rapport</string>
     <string name="title">Tittel</string>
     <string name="send">Send</string>
     <string name="confirm">Bekreft</string>
-
     <string name="start_trip">Start tur</string>
     <string name="new_updates">Ny oppdatering</string>
     <string name="easy_trip_for_everyone_Parking">Enkel tur for alle. Parkering</string>
     <string name="assessment">Vurdering:</string>
     <string name="my_assessment">Min vurdering:</string>
     <string name="latest_update_about_the_route">Nyeste oppdatering om ruten</string>
-
     <string name="all">Alt</string>
     <string name="area">Område</string>
     <string name="popular">Populært</string>
@@ -64,12 +57,10 @@
     <string name="position">Posisjon</string>
     <string name="liked">Liker</string>
     <string name="not_liked">Ikke likt</string>
-
     <string name="start">Start</string>
     <string name="stop">Stopp</string>
     <string name="time">Tid</string>
     <string name="distance">Distanse</string>
-
     <string name="trip_summary">Tur sammendrag</string>
     <string name="trip_name">Navn på turen</string>
     <string name="description">Beskrivelse</string>
@@ -79,11 +70,9 @@
     <string name="verification_explanation">Sjekk mailen din for å verifisere kontoen din</string>
     <string name="confirm_logout">Trykk bekreft for å logge ut</string>
     <string name="search">Søk</string>
-    
     <string name="gravel">Grus</string>
     <string name="parking">Parkering</string>
     <string name="asphalt">Asfalt</string>
-
     <string name="comment">Kommentar: </string>
     <string name="publish" tools:ignore="Typos">Publiser</string>
     <string name="dateString">Dato</string>
@@ -192,5 +181,4 @@
     <string name="ride_trail">Ri løype</string>
     <string name="today">I dag</string>
     <string name="yesterday">I går</string>
-
 </resources>
