@@ -3,6 +3,7 @@ package com.example.hopla
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -34,15 +35,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
@@ -110,7 +108,6 @@ import com.example.hopla.universalData.ContentBoxInfo
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.MapScreen
 import com.example.hopla.universalData.ReportDialog
-import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.SearchBar
 import com.example.hopla.universalData.Trail
 import com.example.hopla.universalData.TrailFilter
@@ -817,11 +814,10 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
 @Composable
 fun ReviewDialog(
     onDismiss: () -> Unit,
-    onConfirm: (Bitmap, String) -> Unit
+    onConfirm: (Bitmap?, String) -> Unit // Allow null for the image
 ) {
     var message by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
     Dialog(onDismissRequest = onDismiss) {
@@ -863,11 +859,11 @@ fun ReviewDialog(
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
-                        Image(
-                            painter = rememberAsyncImagePainter(model = R.drawable.logo1),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
+                        Text(
+                            text = stringResource(R.string.no_image_selected),
+                            style = generalTextStyle,
+                            color = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
                 }
@@ -888,8 +884,8 @@ fun ReviewDialog(
                     onValueChange = { message = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp) // Fixed height for the TextField
-                        .verticalScroll(scrollState) // Scroll content inside the TextField
+                        .height(150.dp)
+                        .verticalScroll(scrollState)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -902,9 +898,7 @@ fun ReviewDialog(
                         Text(text = stringResource(R.string.cancel))
                     }
                     Button(onClick = {
-                        imageBitmap?.let { bitmap ->
-                            onConfirm(bitmap, message)
-                        }
+                        onConfirm(imageBitmap, message) // Pass null if no image is selected
                     }) {
                         Text(text = stringResource(R.string.confirm))
                     }
@@ -1056,7 +1050,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                             .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = stringResource(R.string.follow_trail), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(text = stringResource(R.string.ride_trail), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     // New updates clickable box
@@ -1213,7 +1207,7 @@ private fun TrailUpdates(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.latest_update_about_the_route),
+                        text = stringResource(R.string.updates2),
                         style = headerTextStyleSmall,
                         color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier

@@ -188,5 +188,8 @@
     <string name="horse">Hest</string>
     <string name="follow_trail">Følg løype</string>
     <string name="give_assessment">Gi vurdering:</string>
+    <string name="no_image_selected">Ingen bilde valgt</string>
+    <string name="updates2">Oppdateringer</string>
+    <string name="ride_trail">Ri løype</string>
 
 </resources>

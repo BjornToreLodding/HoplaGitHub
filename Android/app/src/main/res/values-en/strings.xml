@@ -188,5 +188,8 @@
     <string name="horse">Horse</string>
     <string name="follow_trail">Follow trail</string>
     <string name="give_assessment">Give assessment:</string>
+    <string name="no_image_selected">No image selected</string>
+    <string name="updates2">Updates</string>
+    <string name="ride_trail">Ride trail</string>
 
 </resources>

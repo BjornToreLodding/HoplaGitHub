@@ -485,7 +485,7 @@ suspend fun addFavoriteTrail(token: String, trailId: String): String {
 }
 
 // Add update about trail
-suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, message: String): String {
+suspend fun postTrailReview(token: String, image: Bitmap?, trailId: String, message: String): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -496,23 +496,24 @@ suspend fun postTrailReview(token: String, image: Bitmap, trailId: String, messa
         }
     }
 
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-    val imageBytes = byteArrayOutputStream.toByteArray()
+    val formData = formData {
+        append("TrailId", trailId)
+        append("Message", message)
+        image?.let { bitmap ->
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val imageBytes = byteArrayOutputStream.toByteArray()
+            append("Image", imageBytes, Headers.build {
+                append(HttpHeaders.ContentType, "image/jpeg")
+                append(HttpHeaders.ContentDisposition, "filename=\"review.jpg\"")
+            })
+        }
+    }
 
     val response: HttpResponse = httpClient.use { client ->
-        client.post(apiUrl+"trails/review") {
+        client.post(apiUrl + "trails/review") {
             header("Authorization", "Bearer $token")
-            setBody(MultiPartFormDataContent(
-                formData {
-                    append("Image", imageBytes, Headers.build {
-                        append(HttpHeaders.ContentType, "image/jpeg")
-                        append(HttpHeaders.ContentDisposition, "filename=\"review.jpg\"")
-                    })
-                    append("TrailId", trailId)
-                    append("Message", message)
-                }
-            ))
+            setBody(MultiPartFormDataContent(formData))
         }
     }
 
