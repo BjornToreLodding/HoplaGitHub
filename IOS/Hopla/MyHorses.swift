@@ -151,7 +151,7 @@ struct Horse: Identifiable, Decodable {
     var name: String
     var breed: String?
     var age: Int?
-    let horsePictureUrl: String?
+    var horsePictureUrl: String?
     var dob: DateOfBirth?
     
     enum CodingKeys: String, CodingKey {

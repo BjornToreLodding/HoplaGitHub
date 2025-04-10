@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct CoordinateMyHikes: Codable {
-    //var id: UUID { UUID() } // For SwiftUI's Identifiable
     let lat: Double
     let lng: Double
 }
@@ -20,8 +19,6 @@ struct TrailResponse: Codable {
 }
 
 
-
-
 struct MyHikesDetails: View {
     @Binding var myHikes: [MyHike]
     @StateObject private var viewModel = MyHikeViewModel()
@@ -31,6 +28,7 @@ struct MyHikesDetails: View {
     @State private var updatedTitle: String
     @State var hike: MyHike
     @State private var coordinates: [CoordinateMyHikes] = []
+    @State private var trailResponse: TrailResponse? = nil
 
     
     init(hike: MyHike, myHikes: Binding<[MyHike]>) {
@@ -113,22 +111,26 @@ struct MyHikesDetails: View {
                 Text("Distance: \(String(format: "%.2f km", hike.length))")
                 Text("Duration: \(String(format: "%02d:%02d", Int(hike.duration) / 60, Int(hike.duration) % 60))")
                 
-                if hike.trailButton && !coordinates.isEmpty {
-                    MapWithRouteView(coordinates: coordinates, trailButton: hike.trailButton)
+                
+                let hasCoordinates = !coordinates.isEmpty
+                let hasTrailCoords = trailResponse?.allCoords.isEmpty == false
+
+                if hasCoordinates || hasTrailCoords {
+                    
+                    MapWithRouteView(coordinates: coordinates, trailButton: hike.trailButton, trailResponse: trailResponse)
                         .frame(height: 300)
                         .cornerRadius(12)
+                } else {
+                    Text("KART FUNKER IKKE")
                 }
-
-
             }
             .padding()
             .onAppear {
-                viewModel.fetchMyHikes()
-                fetchUpdatedHikeDetails()
-
-                if hike.trailButton {
-                    fetchCoordinates()
+                if myHikes.isEmpty {
+                    viewModel.fetchMyHikes() // ✅ Fetch only if needed
                 }
+                fetchUpdatedHikeDetails()
+                fetchCoordinates()
             }
         }
         .navigationTitle("Hike Details")
@@ -230,7 +232,8 @@ struct MyHikesDetails: View {
                     print("❌ Failed to decode updated hike:", error.localizedDescription)
                 }
             }
-        }.resume()
+        }
+        .resume()
     }
     
     private func fetchCoordinates() {
@@ -265,10 +268,11 @@ struct MyHikesDetails: View {
                         }
                     } else {
                         // Decode coordinates for trails/prepare (id, distance, allCoords)
-                        let trailResponse = try JSONDecoder().decode(TrailResponse.self, from: data)
+                        let response = try JSONDecoder().decode(TrailResponse.self, from: data)
                         DispatchQueue.main.async {
-                            self.coordinates = trailResponse.allCoords.map { CoordinateMyHikes(lat: $0.lat, lng: $0.lng) }
-                            print("✅ Coordinates fetched for trails/prepare:", self.coordinates)
+                            self.trailResponse = response
+                            self.coordinates = response.allCoords
+                            print("✅ TrailResponse fetched:", response)
                         }
                     }
                 } catch {
