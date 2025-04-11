@@ -15,7 +15,7 @@ import Foundation
 class ProfileViewModel: ObservableObject {
     @Published var userProfile: UserProfile?
     @Published var selectedImage: UIImage?
-
+    
     
     func uploadProfileImage(image: UIImage, entityId: String, table: String, token: String) async {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
@@ -72,29 +72,29 @@ class ProfileViewModel: ObservableObject {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/users/profile")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("Invalid response")
                 return
             }
-
+            
             if httpResponse.statusCode == 200 {
                 let user = try JSONDecoder().decode(UserProfile.self, from: data)
-
+                
                 DispatchQueue.main.async {
                     var finalDescription = user.description ?? TokenManager.shared.getUserDescription()
-
+                    
                     if let serverDescription = user.description, !serverDescription.isEmpty {
                         TokenManager.shared.saveUserDescription(serverDescription)
                     }
-
+                    
                     self.userProfile = UserProfile(
                         alias: user.alias,
                         name: user.name,
@@ -104,7 +104,7 @@ class ProfileViewModel: ObservableObject {
                         description: finalDescription,
                         dob: user.dob
                     )
-
+                    
                     print("Final User Profile:", self.userProfile ?? "No data")
                 }
             } else {
@@ -114,9 +114,9 @@ class ProfileViewModel: ObservableObject {
             print("Error fetching user profile:", error.localizedDescription)
         }
     }
-
-
-
+    
+    
+    
     
     // Function to update user info
     func updateUserInfo(token: String, userId: String) async {
@@ -222,18 +222,26 @@ struct Profile: View {
             ScrollView {
                 // Settings button in the top-right corner
                 HStack {
-                    Spacer()
-                    NavigationLink(destination: Settings(navigationPath: $navigationPath, viewModel: profileViewModel)) {
-                        Image(systemName: "gearshape")
+                    NavigationLink(destination: FriendRequests()) {
+                        Image(systemName: "bell.fill")
                             .font(.system(size: 24))
                             .padding()
+                            .padding(.leading, 10)
                             .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
-                    .padding(.trailing, 20)
-                    .padding(.top, 20)
+                    
+                    Spacer()
+                    
+                    NavigationLink(destination: Settings(navigationPath: $navigationPath, viewModel: profileViewModel)) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 24))
+                            .padding()
+                            .padding(.trailing, 10)
+                            .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                    }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                
                 VStack {
                     if let user = loginViewModel.userProfile { // If data on user is available
                         // Profile Image Section
@@ -241,7 +249,7 @@ struct Profile: View {
                             Circle()
                                 .frame(width: 200, height: 200)
                                 .foregroundColor(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                                
+                            
                             
                             if let selectedImage = profileViewModel.selectedImage {
                                 Image(uiImage: selectedImage)
@@ -249,7 +257,7 @@ struct Profile: View {
                                     .scaledToFill()
                                     .frame(width: 180, height: 180)
                                     .clipShape(Circle())
-                                    
+                                
                             } else if let pictureUrl = loginViewModel.userProfile?.pictureUrl, let url = URL(string: pictureUrl) {
                                 AsyncImage(url: url) { image in
                                     image.resizable()
@@ -266,7 +274,7 @@ struct Profile: View {
                                     .scaledToFill()
                                     .frame(width: 180, height: 180)
                                     .clipShape(Circle())
-                                    
+                                
                             }
                         }
                         
@@ -363,9 +371,9 @@ struct Profile: View {
                                     .frame(width: 360)
                                     .multilineTextAlignment(.center)
                                     .onAppear {
-                                            print("UserProfile: \(String(describing: profileViewModel.userProfile))")
-                                        }
-
+                                        print("UserProfile: \(String(describing: profileViewModel.userProfile))")
+                                    }
+                                
                                 
                                 Rectangle()
                                     .frame(width: 360, height: 3)
@@ -429,7 +437,7 @@ struct Profile: View {
                                     .onAppear {
                                         print("Fetched description:", profileViewModel.userProfile?.description ?? "No description found")
                                     }
-
+                                
                                 
                                 Rectangle()
                                     .frame(width: 360, height: 3)
