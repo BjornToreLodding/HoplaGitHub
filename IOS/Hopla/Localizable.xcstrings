@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "@%@" : {
+
+    },
     "%@:" : {
 
     },
@@ -564,6 +567,9 @@
           }
         }
       }
+    },
+    "Friend Requests" : {
+
     },
     "Friends" : {
       "localizations" : {
