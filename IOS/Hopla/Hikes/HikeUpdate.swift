@@ -95,7 +95,7 @@ struct HikeUpdate: View {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        URLSession.shared.dataTask(with: request) { data, response, error in // 👈 FIXED this line
+        URLSession.shared.dataTask(with: request) { data, response, error in 
             defer { DispatchQueue.main.async { self.isLoading = false } }
 
             if let error = error {

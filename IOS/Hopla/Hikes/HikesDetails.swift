@@ -227,7 +227,7 @@ struct HikeButtonsView: View {
             .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
             .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
             
-            NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
+            NavigationLink(destination: AddNewUpdateView(trailId: hike.id)) {
                 Text("New update")
                     .frame(width: 120, height: 50)
             }
