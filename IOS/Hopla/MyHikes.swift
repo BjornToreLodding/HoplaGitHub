@@ -19,8 +19,8 @@ struct MyHike: Codable, Identifiable {
     var pictureUrl: String?
     var title: String // ✅ Matches `title` in API
     var comment: String // ✅ Matches `comment` instead of `description`
-    let horseName: String? // ✅ Matches `horseName`
-    let trailButton: Bool // ✅ Matches API `trailButton`
+    var horseName: String? // ✅ Matches `horseName`
+    var trailButton: Bool // ✅ Matches API `trailButton`
     
     // Custom initializer from dictionary (in case of manual parsing)
     init(from dictionary: [String: Any]) {

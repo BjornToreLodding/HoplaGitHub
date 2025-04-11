@@ -1052,6 +1052,9 @@
         }
       }
     },
+    "Select Filters" : {
+
+    },
     "Select Image" : {
       "localizations" : {
         "nb" : {
@@ -1210,6 +1213,9 @@
 
     },
     "Updated on: %@" : {
+
+    },
+    "Upgrade to Trail" : {
 
     },
     "Upload" : {

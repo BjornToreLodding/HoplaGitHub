@@ -78,14 +78,24 @@ struct HikeUpdate: View {
 
     // ✅ Fetch Trail Updates Function
     private func fetchTrailUpdates() {
+        guard let token = TokenManager.shared.getToken() else {
+            print("❌ No token found")
+            return // ✅ You don’t need `completion` unless you're using it elsewhere
+        }
+
         guard let url = URL(string: "https://hopla.onrender.com/trails/updates?trailId=\(trailId)") else {
             print("❌ Invalid URL")
             return
         }
 
+        print("🔍 Fetching from URL: \(url)")
         isLoading = true
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in // 👈 FIXED this line
             defer { DispatchQueue.main.async { self.isLoading = false } }
 
             if let error = error {
@@ -93,9 +103,14 @@ struct HikeUpdate: View {
                 return
             }
 
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                print("❌ Invalid response or status code")
-                return
+            if let httpResponse = response as? HTTPURLResponse {
+                print("📡 Status code:", httpResponse.statusCode)
+                if httpResponse.statusCode != 200 {
+                    if let data = data, let errorBody = String(data: data, encoding: .utf8) {
+                        print("🧾 Response body:", errorBody)
+                    }
+                    return
+                }
             }
 
             if let data = data {
