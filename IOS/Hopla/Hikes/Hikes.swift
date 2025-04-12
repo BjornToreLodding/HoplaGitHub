@@ -8,6 +8,8 @@
 import SwiftUI
 import Foundation
 import CoreLocation
+import GoogleMaps
+
 
 
 // MARK: - Hike Model
@@ -52,9 +54,11 @@ enum FilterOption: String, CaseIterable, Identifiable {
     
     var id: String { self.rawValue }
     
-    var systemImage: String {
+    // Add the parameter to check if the map view is active
+    func systemImage(isMapViewActive: Bool) -> String {
         switch self {
-        case .map: return "map"
+        case .map:
+            return isMapViewActive ? "list.dash" : "map"
         case .location: return "location"
         case .heart: return "heart"
         case .star: return "star"
@@ -62,6 +66,7 @@ enum FilterOption: String, CaseIterable, Identifiable {
         }
     }
 }
+
 
 //MARK: - The filters of the hikes
 struct TrailFilter: Identifiable, Codable {
@@ -85,7 +90,7 @@ enum FilterValue: Codable {
     case stringArray([String])
     case int(Int)
     case bool(Bool)  // Added the bool case
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         
@@ -101,7 +106,7 @@ enum FilterValue: Codable {
             throw DecodingError.typeMismatch(FilterValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unknown FilterValue"))
         }
     }
-
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -114,6 +119,17 @@ enum FilterValue: Codable {
         case .bool(let value):  // Encode Bool if needed
             try container.encode(value)
         }
+    }
+}
+
+//MARK: - To view hikes on a map
+struct HikeMapView: View {
+    let hikes: [Hike]
+    @StateObject private var locationManager = LocationManager()
+
+    var body: some View {
+        MapContainerView(hikes: hikes, locationManager: locationManager)
+            .edgesIgnoringSafeArea(.all)
     }
 }
 
@@ -417,13 +433,14 @@ struct Hikes: View {
     @ObservedObject var viewModel: HikeService
     @State private var trailFilters: [TrailFilter] = []
     @State private var selectedOptions: [String: Any] = [:]
-    
+    @State private var isMapViewActive: Bool = false
+
     
     var body: some View {
         VStack(spacing: 0) {
             filterBar
             searchBar
-            
+
             if isShowingFilterOptions {
                 makeFilterDropdownBar(
                     trailFilters: trailFilters,
@@ -432,20 +449,17 @@ struct Hikes: View {
                     applyAction: applySelectedFilters
                 )
             }
-            
+
             if isLoading && hikes.isEmpty {
                 ProgressView("Loading Hikes...")
+                    .padding()
             } else if filteredHikes().isEmpty {
                 Text("No hikes found.")
                     .foregroundColor(.gray)
                     .padding()
             } else {
-                if isLoading && hikes.isEmpty {
-                    ProgressView("Loading Hikes...")
-                } else if filteredHikes().isEmpty {
-                    Text("No hikes found.")
-                        .foregroundColor(.gray)
-                        .padding()
+                if isMapViewActive {
+                    HikeMapView(hikes: filteredHikes()) // ✅ use filtered hikes
                 } else {
                     hikeList
                 }
@@ -458,11 +472,14 @@ struct Hikes: View {
         .onChange(of: locationManager.userLocation) { newLocation in
             userLocation = newLocation
         }
-        .onChange(of: selectedFilter) { newFilter in
-            handleFilterChange(newFilter)
+        .onChange(of: selectedFilter) { newValue in
+            if newValue == .map {
+                isMapViewActive.toggle()
+            }
         }
         .navigationBarHidden(true)
     }
+
     
     func fetchTrailFilters() {
         trailFilters = [
@@ -585,20 +602,29 @@ struct Hikes: View {
             )
         ]
     }
-
-
+    
+    
     
     private func applySelectedFilters() {
         // Apply logic here
         print("Filters applied: \(selectedOptions)")
         // You might want to refilter hikes based on selectedOptions
     }
-
+    
     
     private func handleFilterChange(_ filter: FilterOption) {
         switch filter {
         case .map:
-            resetAndFetch()
+            resetAndFetch() // ✅ Call side-effect function outside
+
+            if isMapViewActive {
+                HikeMapView(hikes: hikes) // ✅ Return a View
+            } else {
+                List(hikes) { hike in
+                    hikeList // ✅ This must return a view
+                }
+            }
+
         case .location:
             if let location = userLocation {
                 fetchHikesByLocation(location)
@@ -775,7 +801,7 @@ struct Hikes: View {
             .padding()
         }
     }
-
+    
     
     
     
@@ -974,12 +1000,19 @@ struct Hikes: View {
     
     private var filterBar: some View {
         HStack {
-            SwiftUI.Picker("Filter", selection: $selectedFilter) {
-                ForEach(FilterOption.allCases, id: \.self) { option in
-                    Image(systemName: option.systemImage).tag(option)
+            ForEach(FilterOption.allCases, id: \.self) { option in
+                Button(action: {
+                    if option == .map {
+                        isMapViewActive.toggle() // Toggle between map and list
+                    }
+                    selectedFilter = option
+                    handleFilterChange(option)
+                }) {
+                    Image(systemName: option.systemImage(isMapViewActive: isMapViewActive))
+                        .foregroundColor(selectedFilter == option ? .blue : .gray)
+                        .padding()
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
         }
         .frame(height: 30)
         .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
@@ -1104,6 +1137,53 @@ struct StarRating: View {
                     .onTapGesture {
                         rating = index  // Update rating on tap
                     }
+            }
+        }
+    }
+}
+
+//MARK: - The map view
+struct MapContainerView: UIViewRepresentable {
+    let hikes: [Hike]
+    @ObservedObject var locationManager: LocationManager
+
+    func makeUIView(context: Context) -> GMSMapView {
+        let mapView = GMSMapView(frame: .zero)
+        mapView.isMyLocationEnabled = true
+        mapView.settings.myLocationButton = true
+        return mapView
+    }
+
+    func updateUIView(_ mapView: GMSMapView, context: Context) {
+        guard let userLocation = locationManager.userLocation else { return }
+
+        let camera = GMSCameraPosition.camera(
+            withLatitude: userLocation.coordinate.latitude,
+            longitude: userLocation.coordinate.longitude,
+            zoom: 12
+        )
+        mapView.animate(to: camera)
+
+        mapView.clear() // Clear previous markers
+
+        // 🔵 Show user path if you want
+        let path = GMSMutablePath()
+        for coordinate in locationManager.coordinates {
+            path.add(CLLocationCoordinate2D(latitude: coordinate.lat, longitude: coordinate.long))
+        }
+
+        let polyline = GMSPolyline(path: path)
+        polyline.strokeWidth = 5
+        polyline.strokeColor = .blue
+        polyline.map = mapView
+
+        // 🟢 Add hike markers
+        for hike in hikes {
+            if let lat = hike.latitude, let long = hike.longitude {
+                let marker = GMSMarker()
+                marker.position = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                marker.title = hike.name
+                marker.map = mapView
             }
         }
     }
