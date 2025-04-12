@@ -47,8 +47,8 @@ class HomeViewModel: ObservableObject {
                 print("❌ Missing latitude/longitude for location filter")
                 return
             }
-        case "hand.thumpsup":
-            urlString = "https://hopla.onrender.com/feed/all?sort=likes"
+        case "hand.thumbsup":
+            urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&sort=likes"
         default:
             urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horse"
         }

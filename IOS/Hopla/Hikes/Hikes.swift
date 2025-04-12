@@ -21,8 +21,8 @@ struct Hike: Codable, Identifiable, Equatable {
     let averageRating: Int
     var isFavorite: Bool
     let distance: Double?
-    let latitude: Double?
-    let longitude: Double?
+    var latitude: Double?
+    var longitude: Double?
     let filters: [HikeFilter]?
 
     enum CodingKeys: String, CodingKey {
@@ -43,9 +43,25 @@ struct Hike: Codable, Identifiable, Equatable {
         distance = try? container.decode(Double.self, forKey: .distance)
         filters = try? container.decode([HikeFilter].self, forKey: .filters)
 
+        // Decode latMean/longMean if available
         latitude = try? container.decode(Double.self, forKey: .latMean)
         longitude = try? container.decode(Double.self, forKey: .longMean)
+
+        // If latMean/longMean are missing, attempt to decode from raw keys
+        if latitude == nil || longitude == nil {
+            let raw = try decoder.singleValueContainer().decode([String: AnyDecodable].self)
+
+            if let lat = raw["latitude"]?.value as? Double {
+                latitude = lat
+            }
+
+            if let lon = raw["longitude"]?.value as? Double {
+                longitude = lon
+            }
+        }
     }
+
+
     
     // Custom encoding below
     func encode(to encoder: Encoder) throws {
@@ -63,7 +79,57 @@ struct Hike: Codable, Identifiable, Equatable {
         try container.encodeIfPresent(latitude, forKey: .latMean)
         try container.encodeIfPresent(longitude, forKey: .longMean)
     }
+    
+    init(
+        id: String,
+        name: String,
+        description: String? = nil,
+        pictureUrl: String,
+        averageRating: Int,
+        isFavorite: Bool,
+        distance: Double? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil,
+        filters: [HikeFilter]? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.pictureUrl = pictureUrl
+        self.averageRating = averageRating
+        self.isFavorite = isFavorite
+        self.distance = distance
+        self.latitude = latitude
+        self.longitude = longitude
+        self.filters = filters
+    }
+
 }
+
+struct AnyDecodable: Decodable {
+    let value: Any
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        if let int = try? container.decode(Int.self) {
+            value = int
+        } else if let double = try? container.decode(Double.self) {
+            value = double
+        } else if let string = try? container.decode(String.self) {
+            value = string
+        } else if let bool = try? container.decode(Bool.self) {
+            value = bool
+        } else if let nested = try? container.decode([String: AnyDecodable].self) {
+            value = nested
+        } else if let array = try? container.decode([AnyDecodable].self) {
+            value = array
+        } else {
+            value = ()
+        }
+    }
+}
+
 
 
 
@@ -175,6 +241,7 @@ struct HikeMapView: View {
             }
     }
 }
+
 
 
 
@@ -551,15 +618,19 @@ struct Hikes: View {
         }
         .onAppear {
             userLocation = locationManager.userLocation
-            fetchHikes()
+            if isMapViewActive {
+                loadTrailsOnMap() // ✅ Uses /trails/map
+            } else {
+                fetchHikes() // ✅ Uses /trails/all
+            }
         }
         .onChange(of: locationManager.userLocation) { newLocation in
             userLocation = newLocation
         }
         .onChange(of: selectedFilter) { newValue in
             if newValue == .map {
-                isMapViewActive.toggle()
-                loadTrailsOnMap()
+                isMapViewActive = true
+                loadTrailsOnMap() // ✅ This uses /trails/map
             }
         }
         .navigationBarHidden(true)
@@ -778,8 +849,6 @@ struct Hikes: View {
             print("❌ User location is nil in loadTrailsOnMap")
             return
         }
-        
-        print("📡 Fetching trails for map with user location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
 
         HikeService.shared.fetchTrailsForMap(
             latitude: location.coordinate.latitude,
@@ -787,12 +856,10 @@ struct Hikes: View {
             zoomLevel: 14
         ) { trails in
             print("✅ Fetched \(trails.count) trails for map")
-            self.hikes = trails // This should trigger SwiftUI to re-render
+            self.hikes = trails // ✅ Replace only with map-compatible hikes
         }
     }
 
-
-    
     
     func handleToggleFavorite(for hike: Hike) {
         viewModel.toggleFavorite(for: hike) { success in
@@ -1293,16 +1360,19 @@ struct MapContainerView: UIViewRepresentable {
 
         var bounds = GMSCoordinateBounds()
         for hike in hikes {
-            if let lat = hike.latitude, let long = hike.longitude {
-                let position = CLLocationCoordinate2D(latitude: lat, longitude: long)
-                bounds = bounds.includingCoordinate(position)
-
-                let marker = GMSMarker(position: position)
-                marker.title = hike.name
-                marker.map = mapView
-
-                print("✅ Marker added for \(hike.name) at \(lat), \(long)")
+            guard let lat = hike.latitude, let lon = hike.longitude else {
+                print("❌ Skipping hike without coordinates: \(hike.name)")
+                continue
             }
+
+            let position = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+            bounds = bounds.includingCoordinate(position)
+
+            let marker = GMSMarker(position: position)
+            marker.title = hike.name
+            marker.map = mapView
+
+            print("✅ Marker added for \(hike.name) at \(lat), \(lon)")
         }
 
         if hikes.count > 0 {
