@@ -24,7 +24,47 @@ struct Hike: Codable, Identifiable, Equatable {
     let latitude: Double?
     let longitude: Double?
     let filters: [HikeFilter]?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, pictureUrl, averageRating, isFavorite, distance, filters
+        case latMean
+        case longMean
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        description = try? container.decode(String.self, forKey: .description)
+        pictureUrl = try container.decode(String.self, forKey: .pictureUrl)
+        averageRating = try container.decode(Int.self, forKey: .averageRating)
+        isFavorite = try container.decode(Bool.self, forKey: .isFavorite)
+        distance = try? container.decode(Double.self, forKey: .distance)
+        filters = try? container.decode([HikeFilter].self, forKey: .filters)
+
+        latitude = try? container.decode(Double.self, forKey: .latMean)
+        longitude = try? container.decode(Double.self, forKey: .longMean)
+    }
+    
+    // Custom encoding below
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(description, forKey: .description)
+        try container.encode(pictureUrl, forKey: .pictureUrl)
+        try container.encode(averageRating, forKey: .averageRating)
+        try container.encode(isFavorite, forKey: .isFavorite)
+        try container.encodeIfPresent(distance, forKey: .distance)
+        try container.encodeIfPresent(filters, forKey: .filters)
+
+        try container.encodeIfPresent(latitude, forKey: .latMean)
+        try container.encodeIfPresent(longitude, forKey: .longMean)
+    }
 }
+
 
 
 // MARK: - Filters for Hikes
@@ -124,14 +164,18 @@ enum FilterValue: Codable {
 
 //MARK: - To view hikes on a map
 struct HikeMapView: View {
-    let hikes: [Hike]
+    @Binding var hikes: [Hike]
     @StateObject private var locationManager = LocationManager()
 
     var body: some View {
         MapContainerView(hikes: hikes, locationManager: locationManager)
             .edgesIgnoringSafeArea(.all)
+            .onAppear {
+                print("🗺️ HikeMapView appeared with \(hikes.count) hikes")
+            }
     }
 }
+
 
 
 // MARK: - Fetching Hikes from Backend
@@ -414,6 +458,50 @@ class HikeService: ObservableObject {
             }
         }.resume()
     }
+    
+    //MARK: - To fetch coordinates and show on map
+    func fetchTrailsForMap(latitude: Double, longitude: Double, zoomLevel: Int, completion: @escaping ([Hike]) -> Void) {
+        guard let token = TokenManager.shared.getToken() else {
+            print("❌ No token found")
+            return
+        }
+
+        let urlString = "https://hopla.onrender.com/trails/map?latitude=\(latitude)&longitude=\(longitude)&zoomlevel=\(zoomLevel)"
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Error fetching map trails: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("❌ No data received")
+                return
+            }
+
+            do {
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("📜 Raw JSON Data:\n", jsonString)
+                }
+                let hikes = try JSONDecoder().decode([Hike].self, from: data)
+                DispatchQueue.main.async {
+                    completion(hikes)
+                }
+            } catch {
+                print("❌ Error decoding map trails: \(error.localizedDescription)")
+                completion([])
+            }
+        }.resume()
+    }
+
 }
 
 
@@ -458,11 +546,7 @@ struct Hikes: View {
                     .foregroundColor(.gray)
                     .padding()
             } else {
-                if isMapViewActive {
-                    HikeMapView(hikes: filteredHikes()) // ✅ use filtered hikes
-                } else {
-                    hikeList
-                }
+                hikeDisplay
             }
         }
         .onAppear {
@@ -475,11 +559,20 @@ struct Hikes: View {
         .onChange(of: selectedFilter) { newValue in
             if newValue == .map {
                 isMapViewActive.toggle()
+                loadTrailsOnMap()
             }
         }
         .navigationBarHidden(true)
     }
-
+    
+    @ViewBuilder
+    private var hikeDisplay: some View {
+        if isMapViewActive {
+            HikeMapView(hikes: $hikes)
+        } else {
+            hikeList
+        }
+    }
     
     func fetchTrailFilters() {
         trailFilters = [
@@ -618,7 +711,7 @@ struct Hikes: View {
             resetAndFetch() // ✅ Call side-effect function outside
 
             if isMapViewActive {
-                HikeMapView(hikes: hikes) // ✅ Return a View
+                HikeMapView(hikes: $hikes) // ✅ Return a View
             } else {
                 List(hikes) { hike in
                     hikeList // ✅ This must return a view
@@ -678,6 +771,27 @@ struct Hikes: View {
             }
         }
     }
+    
+    //MARK: - Loading trails on map
+    func loadTrailsOnMap() {
+        guard let location = locationManager.userLocation else {
+            print("❌ User location is nil in loadTrailsOnMap")
+            return
+        }
+        
+        print("📡 Fetching trails for map with user location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+
+        HikeService.shared.fetchTrailsForMap(
+            latitude: location.coordinate.latitude,
+            longitude: location.coordinate.longitude,
+            zoomLevel: 14
+        ) { trails in
+            print("✅ Fetched \(trails.count) trails for map")
+            self.hikes = trails // This should trigger SwiftUI to re-render
+        }
+    }
+
+
     
     
     func handleToggleFavorite(for hike: Hike) {
@@ -1155,18 +1269,18 @@ struct MapContainerView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: GMSMapView, context: Context) {
-        guard let userLocation = locationManager.userLocation else { return }
+        guard let userLocation = locationManager.userLocation else {
+            print("❌ No user location available.")
+            return
+        }
 
-        let camera = GMSCameraPosition.camera(
-            withLatitude: userLocation.coordinate.latitude,
-            longitude: userLocation.coordinate.longitude,
-            zoom: 12
-        )
-        mapView.animate(to: camera)
+        print("📍 updateUIView called. Number of hikes: \(hikes.count)")
+        for hike in hikes {
+            print("➡️ Hike:", hike.name, hike.latitude ?? 0, hike.longitude ?? 0)
+        }
 
-        mapView.clear() // Clear previous markers
+        mapView.clear()
 
-        // 🔵 Show user path if you want
         let path = GMSMutablePath()
         for coordinate in locationManager.coordinates {
             path.add(CLLocationCoordinate2D(latitude: coordinate.lat, longitude: coordinate.long))
@@ -1177,14 +1291,24 @@ struct MapContainerView: UIViewRepresentable {
         polyline.strokeColor = .blue
         polyline.map = mapView
 
-        // 🟢 Add hike markers
+        var bounds = GMSCoordinateBounds()
         for hike in hikes {
             if let lat = hike.latitude, let long = hike.longitude {
-                let marker = GMSMarker()
-                marker.position = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                let position = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                bounds = bounds.includingCoordinate(position)
+
+                let marker = GMSMarker(position: position)
                 marker.title = hike.name
                 marker.map = mapView
+
+                print("✅ Marker added for \(hike.name) at \(lat), \(long)")
             }
+        }
+
+        if hikes.count > 0 {
+            let update = GMSCameraUpdate.fit(bounds, withPadding: 50)
+            mapView.animate(with: update)
+            print("🎯 Camera updated to fit bounds")
         }
     }
 }
