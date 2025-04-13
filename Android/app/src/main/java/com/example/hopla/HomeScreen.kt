@@ -65,6 +65,7 @@ import com.example.hopla.universalData.FeedItem
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDateTime
+import com.example.hopla.universalData.getCurrentLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
