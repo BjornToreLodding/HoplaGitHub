@@ -75,6 +75,8 @@ import com.example.hopla.profile.ProfileScreen
 import com.example.hopla.profile.SettingsScreen
 import com.example.hopla.profile.UserHorsesScreen
 import com.example.hopla.profile.UsersProfileScreen
+import com.example.hopla.trails.TrailsScreen
+import com.example.hopla.trails.UpdateScreen
 import com.example.hopla.ui.theme.HoplaTheme
 import com.example.hopla.ui.theme.ThemeViewModel
 import com.example.hopla.ui.theme.generalTextStyle
