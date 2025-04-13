@@ -59,6 +59,8 @@ import com.example.hopla.community.AddCommunityScreen
 import com.example.hopla.community.CommunityDetailScreen
 import com.example.hopla.community.CommunityScreen
 import com.example.hopla.home.HomeScreen
+import com.example.hopla.login.CheckLoginState
+import com.example.hopla.login.LoginScreen
 import com.example.hopla.newTrip.NewTripScreen
 import com.example.hopla.profile.AddNewType
 import com.example.hopla.profile.FollowingScreen

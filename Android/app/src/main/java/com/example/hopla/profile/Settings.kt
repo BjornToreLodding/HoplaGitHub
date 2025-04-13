@@ -47,7 +47,7 @@ import com.example.hopla.R
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.UserViewModel
-import com.example.hopla.saveLoginState
+import com.example.hopla.login.saveLoginState
 import com.example.hopla.ui.theme.ThemeViewModel
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle

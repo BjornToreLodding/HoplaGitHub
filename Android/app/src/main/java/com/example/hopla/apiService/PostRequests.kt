@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.hopla.R
-import com.example.hopla.saveLoginState
+import com.example.hopla.login.saveLoginState
 import com.example.hopla.universalData.CreateTrailRequest
 import com.example.hopla.universalData.ErrorResponse
 import com.example.hopla.universalData.HorseRequest
