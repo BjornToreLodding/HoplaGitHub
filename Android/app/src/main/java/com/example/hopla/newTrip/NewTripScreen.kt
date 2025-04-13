@@ -1,9 +1,5 @@
-package com.example.hopla
+package com.example.hopla.newTrip
 
-//noinspection UsingMaterialAndMaterial3Libraries
-//noinspection UsingMaterialAndMaterial3Libraries
-//noinspection UsingMaterialAndMaterial3Libraries
-//noinspection UsingMaterialAndMaterial3Libraries
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,32 +8,22 @@ import android.graphics.Bitmap
 import android.location.Location
 import android.os.Looper
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -48,18 +34,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import com.example.hopla.BottomBarViewModel
+import com.example.hopla.R
 import com.example.hopla.apiService.createNewHike
 import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.universalData.Coordinate
 import com.example.hopla.universalData.Horse
-import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.NewHike
 import com.example.hopla.universalData.UserSession
 import com.google.android.gms.location.LocationCallback
@@ -76,6 +62,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @SuppressLint("DefaultLocale")
@@ -90,7 +77,6 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
     var tripNotes by remember { mutableStateOf("") }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     var horses by remember { mutableStateOf(listOf<String>()) }
-    var expanded by remember { mutableStateOf(false) }
     var selectedHorse by remember { mutableStateOf("") }
     var selectedHorseId by remember { mutableStateOf<String?>(null) }
     var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
@@ -229,9 +215,15 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                     ) {
                         val minutes = (time / 60).toInt()
                         val seconds = (time % 60).toInt()
-                        Text(text = stringResource(R.string.time), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                         Text(
-                            text = String.format("%02d:%02d", minutes, seconds), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary
+                            text = stringResource(R.string.time),
+                            style = generalTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text(
+                            text = String.format("%02d:%02d", minutes, seconds),
+                            style = generalTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -246,11 +238,20 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                                 showDialog = true
                             } else {
                                 isRunning = !isRunning
-                                val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(
-                                    java.util.Date()
+                                val currentTime = SimpleDateFormat(
+                                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                                    Locale.getDefault()
+                                ).format(
+                                    Date()
                                 )
-                                val distanceStr = String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
-                                val durationStr = String.format(Locale.GERMANY, "%02d,%02d", (time / 60).toInt(), (time % 60).toInt()) // e.g., "5,45"
+                                val distanceStr =
+                                    String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
+                                val durationStr = String.format(
+                                    Locale.GERMANY,
+                                    "%02d,%02d",
+                                    (time / 60).toInt(),
+                                    (time % 60).toInt()
+                                ) // e.g., "5,45"
 
                                 newHike = NewHike(
                                     StartetAt = currentTime,
@@ -283,8 +284,16 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = stringResource(R.string.distance), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
-                        Text(text = String.format("%.2f km", distance), style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            text = stringResource(R.string.distance),
+                            style = generalTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text(
+                            text = String.format("%.2f km", distance),
+                            style = generalTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
             }
@@ -312,14 +321,16 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                     showDialog = false
                     val minutes = (time / 60).toInt()
                     val seconds = (time % 60).toInt()
-                    val distanceStr = String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
-                    val durationStr = String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds) // e.g., "5,45"
+                    val distanceStr =
+                        String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
+                    val durationStr =
+                        String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds) // e.g., "5,45"
                     newHike = newHike?.copy(
                         Distance = distanceStr,
                         Duration = durationStr,
                         Coordinates = coordinates,
-                        Title = if (tripName.isNotEmpty()) tripName else null,
-                        Description = if (tripNotes.isNotEmpty()) tripNotes else null,
+                        Title = tripName.ifEmpty { null },
+                        Description = tripNotes.ifEmpty { null },
                         HorseId = selectedHorseId
                     )
                     time = 0.0
@@ -344,104 +355,5 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                 }
             }
         )
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun AlertDialogContent(
-    tripName: String,
-    onTripNameChange: (String) -> Unit,
-    tripNotes: String,
-    onTripNotesChange: (String) -> Unit,
-    horses: List<String>,
-    selectedHorse: String,
-    onHorseSelected: (String) -> Unit,
-    selectedImage: Bitmap?,
-    onImageSelected: (Bitmap?) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column {
-        TextField(
-            value = tripName,
-            onValueChange = onTripNameChange,
-            singleLine = true,
-            label = { Text(text = stringResource(R.string.trip_name), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-        Box(
-            modifier = Modifier
-                .height(200.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                TextField(
-                    value = tripNotes,
-                    onValueChange = onTripNotesChange,
-                    label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            TextField(
-                readOnly = true,
-                value = if (selectedHorse.isEmpty()) "No Horse Selected" else selectedHorse,
-                onValueChange = {},
-                label = { Text("Select Horse") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                DropdownMenuItem(
-                    onClick = {
-                        onHorseSelected("")
-                        expanded = false
-                    }
-                ) {
-                    Text("No Horse Selected", color = MaterialTheme.colorScheme.onSurface)
-                }
-                horses.forEach { horse ->
-                    DropdownMenuItem(
-                        onClick = {
-                            onHorseSelected(horse)
-                            expanded = false
-                        }
-                    ) {
-                        Text(horse, color = MaterialTheme.colorScheme.secondary)
-                    }
-                }
-            }
-        }
-        ImagePicker(
-            onImageSelected = onImageSelected,
-            text = stringResource(R.string.add_image)
-        )
-        selectedImage?.let { bitmap ->
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(50.dp)
-                    .padding(top = 16.dp)
-            )
-        }
     }
 }

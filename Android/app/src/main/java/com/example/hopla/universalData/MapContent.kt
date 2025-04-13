@@ -47,7 +47,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
-import com.example.hopla.AlertDialogContent
+import com.example.hopla.newTrip.AlertDialogContent
 import com.example.hopla.R
 import com.example.hopla.apiService.createNewHike
 import com.example.hopla.apiService.fetchHorses
