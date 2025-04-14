@@ -20,13 +20,6 @@ class LoginViewModel: ObservableObject {
         let email: String
         let password: String
     }
-    
-    public struct DOB: Codable {
-        let year: Int
-        let month: Int
-        let day: Int
-    }
-
 
     struct LoginResponse: Codable {
         let token: String
@@ -38,16 +31,6 @@ class LoginViewModel: ObservableObject {
         let description: String?
         let dob: DOB?  // Changed from String? to DOB
         let redirect: String?
-    }
-
-    public struct UserProfile: Codable {
-        let alias: String
-        let name: String
-        let email: String
-        let pictureUrl: String?
-        let telephone: String?
-        let description: String?
-        let dob: DOB?  // Changed from String? to DOB
     }
 
 
@@ -177,6 +160,4 @@ class LoginViewModel: ObservableObject {
             }
         }.resume()
     }
-    
-    
 }

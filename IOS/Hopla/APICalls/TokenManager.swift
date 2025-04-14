@@ -118,6 +118,4 @@ class TokenManager {
         print("Retrieved Description from UserDefaults:", storedDescription ?? "No description stored")
         return storedDescription
     }
-
-
 }

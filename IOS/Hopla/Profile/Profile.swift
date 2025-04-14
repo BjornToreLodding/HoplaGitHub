@@ -10,12 +10,46 @@ import PhotosUI // To select photos
 import UIKit
 import Foundation
 
+public struct DOB: Codable {
+    var year: Int
+    var month: Int
+    var day: Int
+
+    enum CodingKeys: String, CodingKey {
+        case year = "year"
+        case month = "month"
+        case day = "day"
+    }
+}
+
+
+public struct UserProfile: Codable {
+    var alias: String
+    var name: String
+    var email: String
+    var pictureUrl: String?
+    var telephone: String?
+    var description: String?
+    var dob: DOB?
+
+    enum CodingKeys: String, CodingKey {
+        case alias = "alias"
+        case name = "name"
+        case email = "email"
+        case pictureUrl = "pictureUrl"
+        case telephone = "telephone"
+        case description = "description"
+        case dob = "dob"
+    }
+}
+
+
 
 
 class ProfileViewModel: ObservableObject {
-    @Published var userProfile: UserProfile?
+    @Published var userProfile: UserProfile?            // Original profile from the server
+    @Published var draftProfile: UserProfile?             // Editable draft profile
     @Published var selectedImage: UIImage?
-    
     
     func uploadProfileImage(image: UIImage, entityId: String, table: String, token: String) async {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
@@ -57,7 +91,7 @@ class ProfileViewModel: ObservableObject {
                 let uploadResponse = try JSONDecoder().decode(UploadResponse.self, from: data)
                 print("Uploaded file saved at: \(uploadResponse.filePath)")
                 DispatchQueue.main.async {
-                    self.selectedImage = image // Update UI
+                    self.selectedImage = image // Update UI with the new image
                 }
             } else {
                 print("Upload failed with response: \(String(data: data, encoding: .utf8) ?? "No response")")
@@ -89,13 +123,13 @@ class ProfileViewModel: ObservableObject {
                 let user = try JSONDecoder().decode(UserProfile.self, from: data)
                 
                 DispatchQueue.main.async {
+                    // Use the description from the server if available
                     var finalDescription = user.description ?? TokenManager.shared.getUserDescription()
-                    
                     if let serverDescription = user.description, !serverDescription.isEmpty {
                         TokenManager.shared.saveUserDescription(serverDescription)
                     }
                     
-                    self.userProfile = UserProfile(
+                    let fetchedProfile = UserProfile(
                         alias: user.alias,
                         name: user.name,
                         email: user.email,
@@ -105,6 +139,9 @@ class ProfileViewModel: ObservableObject {
                         dob: user.dob
                     )
                     
+                    // When re-fetching from the server, update both copies.
+                    self.userProfile = fetchedProfile
+                    self.draftProfile = fetchedProfile
                     print("Final User Profile:", self.userProfile ?? "No data")
                 }
             } else {
@@ -115,40 +152,37 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
-    
-    
-    
-    // Function to update user info
-    func updateUserInfo(token: String, userId: String) async {
+    // Updated: Use the current draftProfile for the update, and then update both local copies.
+    func updateUserInfo(token: String, userId: String, loginVM: LoginViewModel) async {
         let url = URL(string: "https://hopla.onrender.com/users/update")!
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        guard let userProfile = userProfile else { return } // Ensure userProfile exists
+        guard let draft = draftProfile else { return }
         
-        let alias = userProfile.alias
-        let name = userProfile.name
-        let telephone = userProfile.telephone ?? ""
-        let description = userProfile.description ?? ""
-        let year = userProfile.dob?.year ?? 0
-        let month = userProfile.dob?.month ?? 0
-        let day = userProfile.dob?.day ?? 0
+        // Build the payload using the data from the draft profile.
+        let alias = draft.alias
+        let name = draft.name
+        let email = draft.email
+        let telephone = draft.telephone ?? ""
+        let description = draft.description ?? ""
         
-        let dobDictionary: [String: Any] = [
-            "Year": year,
-            "Month": month,
-            "Day": day
+        var body: [String: Any] = [
+            "alias": alias,
+            "name": name,
+            "email": email,
+            "telephone": telephone,
+            "description": description
         ]
         
-        let body: [String: Any] = [
-            "Alias": alias,
-            "Name": name,
-            "Telephone": telephone,
-            "Description": description,
-            "DOB": dobDictionary
-        ]
+        // Include DOB if provided.
+        if let dob = draft.dob {
+            body["year"] = dob.year
+            body["month"] = dob.month
+            body["day"] = dob.day
+        }
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
@@ -157,22 +191,21 @@ class ProfileViewModel: ObservableObject {
             let (data, response) = try await URLSession.shared.data(for: request)
             
             if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
-                print("User info updated successfully.")
-                
-                // Decode response data
-                let updatedUser: UserProfile = try JSONDecoder().decode(UserProfile.self, from: data)
-                
+                print("User info updated successfully. Updating local version...")
+                // Instead of re-fetching (which could override the draft with stale data),
+                // update the local versions with the current draft.
                 DispatchQueue.main.async {
-                    self.userProfile = updatedUser // Ensure ProfileViewModel has this property
+                    self.userProfile = self.draftProfile  // Use the draft (latest version)
+                    loginVM.userProfile = self.draftProfile
                 }
             } else {
-                print("Update failed with response: \(String(data: data, encoding: .utf8) ?? "No response")")
+                let errorMessage = String(data: data, encoding: .utf8) ?? "No response"
+                print("Update failed with response: \(errorMessage)")
             }
         } catch {
             print("Error updating user info: \(error.localizedDescription)")
         }
     }
-    
 }
 
 struct UploadResponse: Decodable {
@@ -183,38 +216,44 @@ struct UploadResponse: Decodable {
 struct Profile: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject var vm: ViewModel
-    
+
     @ObservedObject var loginViewModel: LoginViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
-    
+    @State private var editingField: String? = nil
+
     // Holds the information about the photo selected from the photo picker
     @State private var selectedItem: PhotosPickerItem? = nil
     // Stores the actual UIImage to display in the profile view
     @State private var profileImage: UIImage? = nil
     @State private var isShowingCamera = false // Camera
-    @State private var username: String = "" // Username
-    @State private var email: String = "" // Email
-    //@State private var navigationPath = NavigationPath()
     @Binding var navigationPath: NavigationPath
     // State variables for the DatePicker selection
     @State private var selectedYear: Int = 2000
     @State private var selectedMonth: Int = 1
     @State private var selectedDay: Int = 1
-    
+
     enum SourceType {
         case camera
         case library
     }
-    
-    // The initializer should ensure that all state properties are initialized
+
+    // The initializer ensures that all state properties are initialized
     init(profileViewModel: ProfileViewModel, loginViewModel: LoginViewModel, navigationPath: Binding<NavigationPath>) {
         self.profileViewModel = profileViewModel
         self.loginViewModel = loginViewModel
-        self._vm = StateObject(wrappedValue: ViewModel(profileViewModel: profileViewModel)) // Initialize ViewModel with profileViewModel
-        self._navigationPath = navigationPath // Bind navigationPath
+        self._vm = StateObject(wrappedValue: ViewModel(profileViewModel: profileViewModel))
+        self._navigationPath = navigationPath
     }
-    
-    
+
+    private func saveUpdate() {
+        if let token = TokenManager.shared.getToken(),
+           let userId = TokenManager.shared.getUserId() {
+            Task {
+                await profileViewModel.updateUserInfo(token: token, userId: userId, loginVM: loginViewModel)
+            }
+        }
+    }
+
     var body: some View {
         ZStack {
             AdaptiveColor.background.color(for: colorScheme)
@@ -229,9 +268,9 @@ struct Profile: View {
                             .padding(.leading, 10)
                             .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
-                    
+
                     Spacer()
-                    
+
                     NavigationLink(destination: Settings(navigationPath: $navigationPath, viewModel: profileViewModel)) {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 24))
@@ -241,15 +280,14 @@ struct Profile: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                
+
                 VStack {
-                    if let user = loginViewModel.userProfile { // If data on user is available
-                        // Profile Image Section
+                    // Display the profile image section (unchanged)
+                    if let user = profileViewModel.userProfile {
                         ZStack {
                             Circle()
                                 .frame(width: 200, height: 200)
                                 .foregroundColor(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                            
                             
                             if let selectedImage = profileViewModel.selectedImage {
                                 Image(uiImage: selectedImage)
@@ -257,8 +295,7 @@ struct Profile: View {
                                     .scaledToFill()
                                     .frame(width: 180, height: 180)
                                     .clipShape(Circle())
-                                
-                            } else if let pictureUrl = loginViewModel.userProfile?.pictureUrl, let url = URL(string: pictureUrl) {
+                            } else if let pictureUrl = user.pictureUrl, let url = URL(string: pictureUrl) {
                                 AsyncImage(url: url) { image in
                                     image.resizable()
                                 } placeholder: {
@@ -267,17 +304,16 @@ struct Profile: View {
                                 .scaledToFill()
                                 .frame(width: 180, height: 180)
                                 .clipShape(Circle())
-                                
                             } else {
                                 Image(systemName: "person.crop.circle.fill")
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 180, height: 180)
                                     .clipShape(Circle())
-                                
                             }
                         }
-                        
+
+                        // Buttons for image picker
                         HStack {
                             Button("Camera") {
                                 vm.source = .camera
@@ -290,12 +326,11 @@ struct Profile: View {
                         }
                         .sheet(isPresented: $vm.showPicker) {
                             ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image, showImagePicker: $isShowingCamera)
-                            // Ensure the profileImage is updated when vm.image changes
                                 .onChange(of: vm.image) { newImage in
                                     profileImage = newImage
                                 }
                         }
-                        
+
                         Button("Upload") {
                             if let image = vm.image, let token = TokenManager.shared.getToken(), let userId = TokenManager.shared.getUserId() {
                                 Task {
@@ -306,7 +341,8 @@ struct Profile: View {
                             }
                         }
                         .underline()
-                        // Buttons for Navigation
+
+                        // Navigation Buttons (unchanged)
                         HStack(spacing: 10) {
                             NavigationLink(destination: MyHikes()) {
                                 Text("My hikes")
@@ -314,7 +350,6 @@ struct Profile: View {
                                     .frame(width: 180, height: 50)
                                     .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                                     .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-                                
                             }
                             
                             NavigationLink(destination: MyHorses()) {
@@ -323,7 +358,6 @@ struct Profile: View {
                                     .frame(width: 180, height: 50)
                                     .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                                     .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-                                
                             }
                         }
                         HStack(spacing: 10) {
@@ -333,7 +367,6 @@ struct Profile: View {
                                     .frame(width: 180, height: 50)
                                     .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                                     .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-                                
                             }
                             
                             NavigationLink(destination: FollowingView()) {
@@ -342,199 +375,91 @@ struct Profile: View {
                                     .frame(width: 180, height: 50)
                                     .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                                     .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-                                
                             }
                         }
                         
-                        
-                        // Profile Info Section
+                        // Profile Info Section: Bind to draftProfile for editing.
                         ZStack {
-                            Rectangle()
-                                .frame(width: 380, height: 600)
-                                .foregroundColor(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                                .padding(.top, 20)
-                            
-                            VStack {
-                                Rectangle()
-                                    .frame(width: 360, height: 3)
-                                    .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                    .padding(.top, 10)
+                            VStack(spacing: 12) {
+                                // Username Field
+                                EditableProfileField(
+                                    title: "Username",
+                                    fieldId: "alias",
+                                    value: Binding(
+                                        get: { profileViewModel.draftProfile?.alias ?? "" },
+                                        set: { profileViewModel.draftProfile?.alias = $0 }
+                                    ),
+                                    editingField: $editingField,
+                                    onSave: { _ in saveUpdate() }
+                                )
                                 
-                                Text("Username")
-                                    .font(.custom("ArialNova", size: 16))
-                                    .frame(width: 360, height: 30)
-                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                                // Email Field
+                                EditableProfileField(
+                                    title: "Email",
+                                    fieldId: "email",
+                                    value: Binding(
+                                        get: { profileViewModel.draftProfile?.email ?? "" },
+                                        set: { profileViewModel.draftProfile?.email = $0 }
+                                    ),
+                                    editingField: $editingField,
+                                    onSave: { _ in saveUpdate() }
+                                )
                                 
-                                Text(profileViewModel.userProfile?.alias ?? "Unknown Alias")
-                                    .font(.custom("ArialNova-Light", size: 16))
-                                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                                    .frame(width: 360)
-                                    .multilineTextAlignment(.center)
-                                    .onAppear {
-                                        print("UserProfile: \(String(describing: profileViewModel.userProfile))")
+                                // Name Field
+                                EditableProfileField(
+                                    title: "Name",
+                                    fieldId: "name",
+                                    value: Binding(
+                                        get: { profileViewModel.draftProfile?.name ?? "" },
+                                        set: { profileViewModel.draftProfile?.name = $0 }
+                                    ),
+                                    editingField: $editingField,
+                                    onSave: { _ in saveUpdate() }
+                                )
+                                
+                                // Telephone Field
+                                EditableProfileField(
+                                    title: "Telephone",
+                                    fieldId: "telephone",
+                                    value: Binding(
+                                        get: { profileViewModel.draftProfile?.telephone ?? "" },
+                                        set: { profileViewModel.draftProfile?.telephone = $0 }
+                                    ),
+                                    editingField: $editingField,
+                                    onSave: { _ in saveUpdate() }
+                                )
+                                
+                                // Description Field
+                                EditableProfileField(
+                                    title: "Description",
+                                    fieldId: "description",
+                                    value: Binding(
+                                        get: { profileViewModel.draftProfile?.description ?? "" },
+                                        set: { profileViewModel.draftProfile?.description = $0 }
+                                    ),
+                                    editingField: $editingField,
+                                    onSave: { _ in saveUpdate() }
+                                )
+                                
+                                // Date of Birth Field
+                                EditableDOBField(
+                                    dob: Binding(
+                                        get: { profileViewModel.draftProfile?.dob ?? DOB(year: 2000, month: 1, day: 1) },
+                                        set: { profileViewModel.draftProfile?.dob = $0 }
+                                    ),
+                                    editingField: $editingField,
+                                    onSave: { newDOB in
+                                        saveUpdate()
                                     }
-                                
-                                
-                                Rectangle()
-                                    .frame(width: 360, height: 3)
-                                    .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                
-                                Text("Email")
-                                    .font(.custom("ArialNova", size: 16))
-                                    .frame(width: 360, height: 30)
-                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                                
-                                Text(profileViewModel.userProfile?.email ?? "Unknown Email")
-                                    .font(.custom("ArialNova-Light", size: 16))
-                                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                                    .frame(width: 360)
-                                    .multilineTextAlignment(.center)
-                                
-                                Rectangle()
-                                    .frame(width: 360, height: 3)
-                                    .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                
-                                Text("Name")
-                                    .font(.custom("ArialNova", size: 16))
-                                    .frame(width: 360, height: 30)
-                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                                
-                                Text(profileViewModel.userProfile?.name ?? "Unknown Name")
-                                    .font(.custom("ArialNova-Light", size: 16))
-                                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                                    .frame(width: 360)
-                                    .multilineTextAlignment(.center)
-                                
-                                Rectangle()
-                                    .frame(width: 360, height: 3)
-                                    .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                
-                                Text("Telephone")
-                                    .font(.custom("ArialNova", size: 16))
-                                    .frame(width: 360, height: 30)
-                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                                
-                                Text(profileViewModel.userProfile?.telephone ?? "Not provided")
-                                    .font(.custom("ArialNova-Light", size: 16))
-                                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                                    .frame(width: 360)
-                                    .multilineTextAlignment(.center)
-                                
-                                Rectangle()
-                                    .frame(width: 360, height: 3)
-                                    .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                
-                                Text("Description")
-                                    .font(.custom("ArialNova", size: 16))
-                                    .frame(width: 360, height: 30)
-                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                                
-                                Text(profileViewModel.userProfile?.description ?? "No description provided")
-                                    .font(.custom("ArialNova-Light", size: 16))
-                                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                                    .frame(width: 360)
-                                    .multilineTextAlignment(.center)
-                                    .onAppear {
-                                        print("Fetched description:", profileViewModel.userProfile?.description ?? "No description found")
-                                    }
-                                
-                                
-                                Rectangle()
-                                    .frame(width: 360, height: 3)
-                                    .foregroundColor(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                
-                                Text("Date of Birth")
-                                    .font(.custom("ArialNova", size: 16))
-                                    .frame(width: 360, height: 30)
-                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                                
-                                
-                                
-                                // DatePicker for updating DOB
-                                VStack {
-                                    Text("Select New Date of Birth")
-                                        .font(.custom("ArialNova", size: 16))
-                                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                                    
-                                    HStack {
-                                        // Year Picker
-                                        SwiftUI.Picker("Year", selection: $selectedYear) {
-                                            ForEach(1900..<2024, id: \.self) { year in
-                                                Text("\(year)").tag(year)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .frame(width: 100)
-                                        
-                                        // Month Picker
-                                        SwiftUI.Picker("Month", selection: $selectedMonth) {
-                                            ForEach(1..<13, id: \.self) { month in
-                                                Text("\(month)").tag(month)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .frame(width: 70)
-                                        
-                                        // Day Picker
-                                        SwiftUI.Picker("Day", selection: $selectedDay) {
-                                            ForEach(1..<32, id: \.self) { day in
-                                                Text("\(day)").tag(day)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .frame(width: 60)
-                                    }
-                                    
-                                    // Button to update DOB
-                                    Button(action: {
-                                        guard let userProfile = profileViewModel.userProfile else { return }
-                                        
-                                        let updatedProfile = UserProfile(
-                                            alias: userProfile.alias,
-                                            name: userProfile.name,
-                                            email: userProfile.email,
-                                            pictureUrl: userProfile.pictureUrl,
-                                            telephone: userProfile.telephone,
-                                            description: userProfile.description,
-                                            dob: DOB(year: selectedYear, month: selectedMonth, day: selectedDay)
-                                        )
-                                        
-                                        profileViewModel.userProfile = updatedProfile // Reassign to trigger UI updates
-                                        
-                                        Task {
-                                            await profileViewModel.updateUserInfo(token: "YourAuthToken", userId: "YourUserId")
-                                        }
-                                    }) {
-                                        Text("Update DOB")
-                                            .font(.custom("ArialNova-Light", size: 16))
-                                            .frame(width: 200, height: 40)
-                                            .background(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
-                                            .foregroundColor(.white)
-                                            .cornerRadius(8)
-                                    }
-                                    .padding(.top, 20)
-                                }
-                                .onAppear {
-                                    // Perform the logic when the view appears
-                                    if let userProfile = profileViewModel.userProfile, let dob = userProfile.dob {
-                                        selectedYear = dob.year
-                                        selectedMonth = dob.month
-                                        selectedDay = dob.day
-                                    } else {
-                                        selectedYear = 2000 // Default year
-                                        selectedMonth = 1
-                                        selectedDay = 1
-                                    }
-                                }
-                                
-                                ChangePassword()
+                                )
                             }
-                            
+                            .padding()
                         }
                         .onAppear {
                             Task {
                                 await profileViewModel.fetchUserProfile()
                             }
+                            print("📡 Fetching user profile...")
                         }
                         
                         Spacer()
@@ -542,17 +467,163 @@ struct Profile: View {
                     } else {
                         Text("Loading profile...")
                             .onAppear {
-                                loginViewModel.fetchUserProfile()
+                                Task {
+                                    await profileViewModel.fetchUserProfile()
+                                }
                             }
                     }
-                    
                 }
-                
             }
         }
         .sheet(isPresented: $vm.showPicker) {
             ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image, showImagePicker: $isShowingCamera)
         }
-        
     }
 }
+
+
+struct EditableProfileField: View {
+    let title: String
+    let fieldId: String
+    @Binding var value: String
+    // Global state to track which field is being edited
+    @Binding var editingField: String?
+    
+    // Temporary value holder during editing
+    @State private var tempValue: String = ""
+    
+    // Callback triggered when the field is saved.
+    var onSave: (String) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.custom("ArialNova", size: 16))
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: .light))
+            
+            HStack {
+                if editingField == fieldId {
+                    // Editing Mode: show a TextField and a Save button
+                    TextField("Enter \(title)", text: $tempValue)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(maxWidth: 200)
+                    Button(action: {
+                        // Update the bound value and fire onSave callback
+                        value = tempValue
+                        onSave(tempValue)
+                        editingField = nil
+                    }) {
+                        Image(systemName: "checkmark.circle")
+                            .foregroundColor(.green)
+                    }
+                } else {
+                    // Display Mode: show the saved value and an edit pencil
+                    Text(value.isEmpty ? "Not provided" : value)
+                        .font(.custom("ArialNova-Light", size: 16))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Button(action: {
+                        // Only enable edit if no field is active
+                        if editingField == nil {
+                            tempValue = value
+                            editingField = fieldId
+                        }
+                    }) {
+                        Image(systemName: "pencil")
+                            .foregroundColor(editingField == nil ? .blue : .gray)
+                    }
+                    .disabled(editingField != nil)
+                }
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: .light))
+        .cornerRadius(8)
+    }
+}
+
+struct EditableDOBField: View {
+    let title: String = "Date of Birth"
+    @Binding var dob: DOB
+    @Binding var editingField: String?
+    var onSave: (DOB) -> Void
+
+    // Local state for the picker values
+    @State private var tempYear: Int = 2000
+    @State private var tempMonth: Int = 1
+    @State private var tempDay: Int = 1
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.custom("ArialNova", size: 16))
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: .light))
+            if editingField == "dob" {
+                HStack {
+                    // Year Picker
+                    SwiftUI.Picker("Year", selection: $tempYear) {
+                        ForEach(1900..<2024, id: \.self) { year in
+                            Text("\(year)").tag(year)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 100)
+                    // Month Picker
+                    SwiftUI.Picker("Month", selection: $tempMonth) {
+                        ForEach(1..<13, id: \.self) { month in
+                            Text("\(month)").tag(month)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 70)
+                    // Day Picker
+                    SwiftUI.Picker("Day", selection: $tempDay) {
+                        ForEach(1..<32, id: \.self) { day in
+                            Text("\(day)").tag(day)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 60)
+                    
+                    Button(action: {
+                        // Create new DOB and save it
+                        let newDOB = DOB(year: tempYear, month: tempMonth, day: tempDay)
+                        dob = newDOB
+                        onSave(newDOB)
+                        editingField = nil
+                    }) {
+                        Image(systemName: "checkmark.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+                .onAppear {
+                    // Initialize temporary state with the current DOB
+                    tempYear = dob.year
+                    tempMonth = dob.month
+                    tempDay = dob.day
+                }
+            } else {
+                // Display mode: show DOB text and a pencil button
+                HStack {
+                    Text("\(dob.year)-\(dob.month)-\(dob.day)")
+                        .font(.custom("ArialNova-Light", size: 16))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Button(action: {
+                        if editingField == nil {
+                            editingField = "dob"
+                        }
+                    }) {
+                        Image(systemName: "pencil")
+                            .foregroundColor(editingField == nil ? .blue : .gray)
+                    }
+                    .disabled(editingField != nil)
+                }
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: .light))
+        .cornerRadius(8)
+    }
+}
+
