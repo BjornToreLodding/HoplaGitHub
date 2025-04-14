@@ -24,8 +24,8 @@ public struct DOB: Codable {
 
 
 public struct UserProfile: Codable {
-    var alias: String
-    var name: String
+    var alias: String?
+    var name: String?
     var email: String
     var pictureUrl: String?
     var telephone: String?
@@ -123,34 +123,30 @@ class ProfileViewModel: ObservableObject {
                 let user = try JSONDecoder().decode(UserProfile.self, from: data)
                 
                 DispatchQueue.main.async {
-                    // Use the description from the server if available
-                    var finalDescription = user.description ?? TokenManager.shared.getUserDescription()
-                    if let serverDescription = user.description, !serverDescription.isEmpty {
-                        TokenManager.shared.saveUserDescription(serverDescription)
-                    }
-                    
+                    // Directly use the values from user without fallback
                     let fetchedProfile = UserProfile(
                         alias: user.alias,
                         name: user.name,
                         email: user.email,
                         pictureUrl: user.pictureUrl,
                         telephone: user.telephone,
-                        description: finalDescription,
+                        description: user.description,
                         dob: user.dob
                     )
                     
-                    // When re-fetching from the server, update both copies.
+                    // Update both original and draft copies
                     self.userProfile = fetchedProfile
                     self.draftProfile = fetchedProfile
-                    print("Final User Profile:", self.userProfile ?? "No data")
+                    print("Fetched profile:", self.userProfile ?? "No data")
                 }
             } else {
-                print("Failed to retrieve user profile. Status Code:", httpResponse.statusCode)
+                print("Failed to retrieve profile. Status Code:", httpResponse.statusCode)
             }
         } catch {
             print("Error fetching user profile:", error.localizedDescription)
         }
     }
+
     
     // Updated: Use the current draftProfile for the update, and then update both local copies.
     func updateUserInfo(token: String, userId: String, loginVM: LoginViewModel) async {
@@ -452,12 +448,16 @@ struct Profile: View {
                                         saveUpdate()
                                     }
                                 )
+                                
+                                ChangePassword(loginViewModel: LoginViewModel())
                             }
                             .padding()
+                            
                         }
                         .onAppear {
                             Task {
                                 await profileViewModel.fetchUserProfile()
+                                loginViewModel.userProfile = profileViewModel.draftProfile
                             }
                             print("📡 Fetching user profile...")
                         }
@@ -469,6 +469,7 @@ struct Profile: View {
                             .onAppear {
                                 Task {
                                     await profileViewModel.fetchUserProfile()
+                                    loginViewModel.userProfile = profileViewModel.draftProfile
                                 }
                             }
                     }

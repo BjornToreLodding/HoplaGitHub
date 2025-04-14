@@ -2,12 +2,15 @@ import SwiftUI
 
 struct ChangePassword: View {
     @Environment(\.colorScheme) var colorScheme
-    @State private var isShowingSheet = false // True when clicking on text
+    @State private var isShowingSheet = false // When clicking on text
     @State private var oldPassword = ""
     @State private var newPassword = ""
     @State private var confirmPassword = ""
-    @State private var errorMessage = ""
+    @State private var localErrorMessage = ""
     
+    // We inject the view model so that we can call changePassword.
+    @ObservedObject var loginViewModel: LoginViewModel
+
     var body: some View {
         VStack {
             Text("Change password")
@@ -16,13 +19,13 @@ struct ChangePassword: View {
                 .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 .underline(true)
                 .padding(.top, 10)
-                .onTapGesture { // When clicking on change password
-                    resetFields() // Reset fields when opening
-                    isShowingSheet = true // Show sheet
+                .onTapGesture {
+                    resetFields()  // Reset fields
+                    isShowingSheet = true  // Show change password sheet
                 }
         }
         .sheet(isPresented: $isShowingSheet, onDismiss: {
-            resetFields() // Reset fields when closing
+            resetFields()
         }) {
             VStack(spacing: 20) {
                 Text("Change Password")
@@ -40,19 +43,29 @@ struct ChangePassword: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
+                if !localErrorMessage.isEmpty {
+                    Text(localErrorMessage)
                         .foregroundColor(.red)
                         .font(.caption)
                 }
                 
                 Button("Submit") {
                     if newPassword == confirmPassword {
-                        // Here you would add authentication to verify old password and update the new one
-                        print("Password changed successfully!")
-                        isShowingSheet = false
+                        // Call the changePassword async method.
+                        Task {
+                            await loginViewModel.changePassword(oldPassword: oldPassword,
+                                                                newPassword: newPassword,
+                                                                confirmPassword: confirmPassword)
+                            // Optionally, you could check if errorMessage is still nil
+                            if loginViewModel.errorMessage == nil {
+                                isShowingSheet = false
+                            } else {
+                                // Show the error message in this view as well.
+                                localErrorMessage = loginViewModel.errorMessage ?? "Unknown error"
+                            }
+                        }
                     } else {
-                        errorMessage = "New passwords do not match!"
+                        localErrorMessage = "New passwords do not match!"
                     }
                 }
                 .padding()
@@ -69,15 +82,11 @@ struct ChangePassword: View {
         }
     }
     
-    // Resets all input fields
+    // Helper: resets all input fields
     private func resetFields() {
         oldPassword = ""
         newPassword = ""
         confirmPassword = ""
-        errorMessage = ""
+        localErrorMessage = ""
     }
-}
-
-#Preview {
-    ChangePassword()
 }

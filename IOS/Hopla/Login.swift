@@ -170,69 +170,69 @@ struct Login: View {
                     
                     Spacer()
                     
-                        .sheet(isPresented: $isShowingSignUp, onDismiss: {
-                            resetTextFields()
-                        }) {
-                            VStack(spacing: 20) {
-                                Text("Enter your email address")
-                                    .font(.headline)
-                                
-                                TextField("Enter email address", text: $newEmail)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding()
-                                
-                                Text("Enter a password")
-                                    .font(.headline)
-                                
-                                SecureField("Password", text: $newPassword)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding()
-                                
-                                Text("Confirm password")
-                                    .font(.headline)
-                                
-                                SecureField("Confirm password", text: $confirmNewPassword)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding()
-                                
-                                // Show warning if passwords do not match
-                                if let warning = passwordMismatchWarning {
-                                    Text(warning)
-                                        .foregroundColor(.red)
-                                        .font(.caption)
-                                }
-                                
-                                Text("Enter username")
-                                    .font(.headline)
-                                
-                                TextField("Username", text: $username)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding()
-                                
-                                Button(action: {
-                                    if newPassword == confirmNewPassword {
-                                        password = newPassword
-                                        isLoggedIn = true
-                                        passwordMismatchWarning = nil // Clear warning if passwords match
-                                    } else {
-                                        passwordMismatchWarning = "Passwords do not match!"
-                                    }
-                                }) {
-                                    Text("Join now")
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .frame(width: 200, height: 50)
-                                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                                        .cornerRadius(8)
-                                }
-                                
-                                Button("Cancel") {
-                                    isShowingSignUp = false
-                                }
+                    .sheet(isPresented: $isShowingSignUp, onDismiss: {
+                        resetTextFields()
+                    }) {
+                        VStack(spacing: 20) {
+                            Text("Register New Account")
+                                .font(.headline)
+                            
+                            TextField("Enter email address", text: $newEmail)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding()
+                            
+                            SecureField("Enter password", text: $newPassword)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+                            
+                            SecureField("Confirm password", text: $confirmNewPassword)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+                            
+                            // Show warning if passwords do not match
+                            if let warning = passwordMismatchWarning {
+                                Text(warning)
+                                    .foregroundColor(.red)
+                                    .font(.caption)
+                            }
+                            
+                            TextField("Enter username", text: $username)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding()
+                            
+                            Button(action: {
+                                if newPassword == confirmNewPassword {
+                                    // Call the register function; note that the registration endpoint only needs email and password.
+                                    viewModel.register(email: newEmail, password: newPassword) { success, message in
+                                        if success {
+                                            // Optionally, show an alert or message informing the user to confirm their email.
+                                            passwordMismatchWarning = nil
+                                            // Dismiss sign up sheet (you might also clear the fields)
+                                            isShowingSignUp = false
+                                        } else {
+                                            passwordMismatchWarning = message
+                                        }
+                                    }
+                                } else {
+                                    passwordMismatchWarning = "Passwords do not match!"
+                                }
+                            }) {
+                                Text("Join now")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200, height: 50)
+                                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                    .cornerRadius(8)
+                            }
+                            
+                            Button("Cancel") {
+                                isShowingSignUp = false
                             }
                             .padding()
                         }
+                        .padding()
+                    }
+
                 }
                 .onAppear {
                     DispatchQueue.main.async {

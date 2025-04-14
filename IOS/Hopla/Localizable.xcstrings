@@ -393,6 +393,7 @@
 
     },
     "Enter a password" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -462,6 +463,9 @@
         }
       }
     },
+    "Enter password" : {
+
+    },
     "Enter topic" : {
       "localizations" : {
         "nb" : {
@@ -493,6 +497,7 @@
       }
     },
     "Enter your email address" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -997,6 +1002,9 @@
     "Rating:" : {
 
     },
+    "Register New Account" : {
+
+    },
     "Report an Issue" : {
       "localizations" : {
         "nb" : {
@@ -1247,6 +1255,7 @@
 
     },
     "Username" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
