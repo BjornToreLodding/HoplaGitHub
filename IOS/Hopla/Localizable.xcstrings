@@ -153,6 +153,9 @@
         }
       }
     },
+    "Change email" : {
+
+    },
     "Change password" : {
       "localizations" : {
         "nb" : {
@@ -413,6 +416,9 @@
         }
       }
     },
+    "Enter current password" : {
+
+    },
     "Enter email address" : {
       "localizations" : {
         "nb" : {
@@ -442,6 +448,9 @@
           }
         }
       }
+    },
+    "Enter new email" : {
+
     },
     "Enter new password" : {
       "localizations" : {
@@ -1264,6 +1273,9 @@
           }
         }
       }
+    },
+    "Write the new email and your current password to change your email." : {
+
     },
     "Year" : {
       "localizations" : {

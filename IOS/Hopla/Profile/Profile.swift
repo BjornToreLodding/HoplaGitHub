@@ -448,6 +448,7 @@ struct Profile: View {
                                         saveUpdate()
                                     }
                                 )
+                                ChangeEmail(loginViewModel: LoginViewModel())
                                 
                                 ChangePassword(loginViewModel: LoginViewModel())
                             }
@@ -627,4 +628,90 @@ struct EditableDOBField: View {
         .cornerRadius(8)
     }
 }
+
+//MARK: - Change email
+struct ChangeEmail: View {
+    @Environment(\.colorScheme) var colorScheme
+    @State private var isShowingSheet = false  // Controls popup visibility
+    @State private var newEmail = ""
+    @State private var currentPassword = ""
+    @State private var localErrorMessage = ""
+    
+    // Inject the view model so that we can call changeEmail.
+    @ObservedObject var loginViewModel: LoginViewModel
+
+    var body: some View {
+        VStack {
+            Text("Change email")
+                .font(.custom("ArialNova", size: 16))
+                .frame(width: 360, height: 30)
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                .underline(true)
+                .padding(.top, 10)
+                .onTapGesture {
+                    resetFields()
+                    isShowingSheet = true
+                }
+        }
+        .sheet(isPresented: $isShowingSheet, onDismiss: {
+            resetFields()
+        }) {
+            VStack(spacing: 20) {
+                Text("Write the new email and your current password to change your email.")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .padding()
+
+                TextField("Enter new email", text: $newEmail)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                
+                SecureField("Enter current password", text: $currentPassword)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                if !localErrorMessage.isEmpty {
+                    Text(localErrorMessage)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                }
+                
+                Button("Submit") {
+                    // Validate a simple email format or non-empty if desired.
+                    if newEmail.isEmpty || currentPassword.isEmpty {
+                        localErrorMessage = "All fields must be filled out!"
+                    } else {
+                        Task {
+                            await loginViewModel.changeEmail(newEmail: newEmail, password: currentPassword)
+                            // Check whether an error was set.
+                            if loginViewModel.errorMessage == nil {
+                                isShowingSheet = false
+                            } else {
+                                localErrorMessage = loginViewModel.errorMessage ?? "Unknown error"
+                            }
+                        }
+                    }
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                
+                Button("Cancel") {
+                    isShowingSheet = false
+                }
+                .padding()
+            }
+            .padding()
+        }
+    }
+    
+    // Helper function to clear fields
+    private func resetFields() {
+        newEmail = ""
+        currentPassword = ""
+        localErrorMessage = ""
+    }
+}
+
 

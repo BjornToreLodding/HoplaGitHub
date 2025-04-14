@@ -271,5 +271,60 @@ class LoginViewModel: ObservableObject {
                 }
             }
         }
+    
+    //MARK: - Change email
+    func changeEmail(newEmail: String, password: String) async {
+        // Ensure we have an authentication token.
+        guard let token = TokenManager.shared.getToken() else {
+            DispatchQueue.main.async {
+                self.errorMessage = "User token not available."
+            }
+            return
+        }
+        
+        // Set the change email endpoint.
+        guard let url = URL(string: "https://hopla.onrender.com/users/change-email") else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Invalid change email URL."
+            }
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST" // Use POST as specified
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Build the JSON body with the given keys.
+        let body: [String: Any] = [
+            "NewEmail": newEmail,
+            "Password": password
+        ]
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            request.httpBody = jsonData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
+                DispatchQueue.main.async {
+                    self.successMessage = "Change email request sent! Check your new email for a verification link."
+                    self.errorMessage = nil
+                }
+            } else {
+                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                DispatchQueue.main.async {
+                    self.errorMessage = "Email change failed: \(errorMsg)"
+                    self.successMessage = nil
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = "Error: \(error.localizedDescription)"
+                self.successMessage = nil
+            }
+        }
+    }
 }
 
