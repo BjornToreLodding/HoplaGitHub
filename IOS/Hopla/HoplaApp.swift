@@ -20,6 +20,7 @@ struct HoplaApp: App {
     
     @State private var navigationPath = NavigationPath()
     @StateObject private var locationManager = LocationManager()
+    @StateObject private var myHikeVM = MyHikeViewModel()
     
     
     var body: some Scene {
@@ -46,6 +47,7 @@ struct HoplaApp: App {
                             .environmentObject(vm)
                             .environmentObject(loginViewModel)
                             .environmentObject(locationManager)
+                            .environmentObject(myHikeVM)
                     } else {
                         Login(viewModel: LoginViewModel(), loginViewModel: loginViewModel)
                     }

@@ -132,18 +132,14 @@ class MyHikeViewModel: ObservableObject {
 
 // MARK: - MyHikes View
 struct MyHikes: View {
+    @EnvironmentObject var viewModel: MyHikeViewModel
     @Environment(\.colorScheme) var colorScheme
-    @StateObject private var viewModel = MyHikeViewModel() // Use ViewModel
-    
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background
                 AdaptiveColor.background.color(for: colorScheme)
                     .ignoresSafeArea(edges: .all)
-                
-                // ScrollView with Hikes
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.myHikes.indices, id: \.self) { index in
@@ -153,7 +149,8 @@ struct MyHikes: View {
                                 MyHikePostContainer(
                                     trailName: myHike.trailName,
                                     title: myHike.title,
-                                    imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
+                                    imageName: myHike.pictureUrl ??
+                                        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
                                     comment: myHike.comment,
                                     length: myHike.length,
                                     duration: myHike.duration,
@@ -161,9 +158,8 @@ struct MyHikes: View {
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
-
-                            // 🔥 Trigger next page when reaching the last hike
                             .onAppear {
+                                // If this is the last hike, attempt to fetch more
                                 if index == viewModel.myHikes.count - 1 {
                                     viewModel.fetchMyHikes()
                                 }
@@ -171,7 +167,6 @@ struct MyHikes: View {
                         }
                     }
                     .padding()
-                    
                     if viewModel.isLoading {
                         ProgressView("Loading more hikes...")
                             .padding()
@@ -182,27 +177,13 @@ struct MyHikes: View {
         }
         .navigationTitle("My Hikes")
         .onAppear {
-            viewModel.fetchMyHikes() // Use ViewModel to fetch data
-            print("📡 Fresh API Data:", viewModel.rawApiResponse)
+            viewModel.fetchMyHikes()
         }
     }
-    
-    private func hikeNavigationLink(for myHike: MyHike) -> some View {
-        NavigationLink(destination: MyHikesDetails(hike: myHike, myHikes: $viewModel.myHikes)) {
-            MyHikePostContainer(
-                trailName: myHike.trailName,
-                title: myHike.title,
-                imageName: myHike.pictureUrl ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
-                comment: myHike.comment,
-                length: myHike.length,
-                duration: myHike.duration,
-                colorScheme: colorScheme
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
 }
+
+
+
 
 // MARK: - PostContainer View
 struct MyHikePostContainer: View {

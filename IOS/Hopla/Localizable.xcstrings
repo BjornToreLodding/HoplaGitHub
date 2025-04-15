@@ -678,6 +678,9 @@
         }
       }
     },
+    "Horse: %@" : {
+
+    },
     "Horses: %lld" : {
       "localizations" : {
         "nb" : {
@@ -1103,7 +1106,13 @@
         }
       }
     },
+    "Select a Horse" : {
+
+    },
     "Select Filters" : {
+
+    },
+    "Select Horse" : {
 
     },
     "Select Image" : {
@@ -1115,6 +1124,9 @@
           }
         }
       }
+    },
+    "Selected Horse: %@" : {
+
     },
     "Send" : {
       "localizations" : {

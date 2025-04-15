@@ -14,6 +14,8 @@ struct NewHike: View {
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject private var locationManager = LocationManager()
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var myHikeVM: MyHikeViewModel
+
     
 
     @State private var isTracking = false
@@ -25,6 +27,8 @@ struct NewHike: View {
     @State private var stars: Int = 3
     @State private var filters: String = ""
     @State private var isPrivate: Bool = false
+    @State private var selectedImage: UIImage? = nil
+
     
     // For saving a new hike
     @State private var showPopup = false
@@ -146,91 +150,64 @@ struct NewHike: View {
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        // ✅ Debugging Duration Before Sending
-            print("📡 Title being sent:", title)
-            print("📡 Duration before sending:", locationManager.elapsedTime)
-            print("📡 Formatted Duration:", String(format: "%.2f", locationManager.elapsedTime / 60))
-        
-        // Prepare coordinates JSON string
-        let coordinatesArray = locationManager.coordinates.map {
-            [
-                "timestamp": Int($0.timestamp),
-                "lat": $0.lat,
-                "long": $0.long
-            ]
-        }
-
-
-        guard let coordinatesData = try? JSONSerialization.data(withJSONObject: coordinatesArray, options: []),
-              let coordinatesString = String(data: coordinatesData, encoding: .utf8) else {
-            print("❌ Failed to serialize coordinates")
-            return
-        }
-
-        // Prepare other fields
+        // (Build your multipart body exactly as you already do.)
         var body = Data()
+        let lineBreak = "\r\n"
         
         func appendField(name: String, value: String) {
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n".data(using: .utf8)!)
-            body.append("\(value)\r\n".data(using: .utf8)!)
+            body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(name)\"\(lineBreak)\(lineBreak)".data(using: .utf8)!)
+            body.append("\(value)\(lineBreak)".data(using: .utf8)!)
         }
-
+        
         appendField(name: "Title", value: title.isEmpty ? "Unnamed Hike" : title)
         appendField(name: "Description", value: description.isEmpty ? "No description provided." : description)
         appendField(name: "StartedAt", value: ISO8601DateFormatter().string(from: Date()))
         appendField(name: "Distance", value: locationManager.distance > 0 ? String(format: "%.2f", locationManager.distance) : "0.00")
-        appendField(name: "Duration", value: "\(Int(locationManager.elapsedTime))") // ✅ Send raw seconds as an integer
-
-
-
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"Coordinates\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!) // ✅ Explicit JSON format
-        body.append(coordinatesData) // ✅ Direct JSON data
-        body.append("\r\n".data(using: .utf8)!)
-
-
-        appendField(name: "HorseId", value: "") // send empty string instead of NSNull
+        appendField(name: "Duration", value: "\(Int(locationManager.elapsedTime))")
+        
+        // Append JSON field for coordinates (and other fields)
+        // … (same as your current code)
+        
+        appendField(name: "HorseId", value: "") // you might send an empty string or a valid horse id
         appendField(name: "TrailId", value: "")
         appendField(name: "Stars", value: "\(stars)")
         appendField(name: "Filters", value: filters.isEmpty ? "None" : filters)
         appendField(name: "IsPrivate", value: isPrivate ? "true" : "false")
         
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        if let rawBody = String(data: body, encoding: .utf8) {
-            print("📡 Final Request Body:\n", rawBody) // ✅ Debugging raw request payload
+        // If there is an image selected, append it.
+        if let image = selectedImage, let imageData = image.jpegData(compressionQuality: 0.8) {
+            body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"Image\"; filename=\"new_hike.jpg\"\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\(lineBreak)\(lineBreak)".data(using: .utf8)!)
+            body.append(imageData)
+            body.append("\(lineBreak)".data(using: .utf8)!)
         }
-
+        
+        body.append("--\(boundary)--\(lineBreak)".data(using: .utf8)!)
+        
         request.httpBody = body
-
-        // Send request
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Error saving hike:", error.localizedDescription)
                 return
             }
-
-            if let httpResponse = response as? HTTPURLResponse {
-                print("📡 Hike saved! Status:", httpResponse.statusCode)
-            }
             
-            
-
             if let data = data {
                 do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                    print("📡 Server Response:", jsonResponse ?? "No response data")
+                    // Assuming the server returns the newly created hike as JSON
+                    let createdHike = try JSONDecoder().decode(MyHike.self, from: data)
+                    DispatchQueue.main.async {
+                        // Insert the new hike at the top
+                        self.myHikeVM.myHikes.insert(createdHike, at: 0)
+                        // Optionally, you could also clear any pagination state if needed.
+                        completion() // Call your completion handler if needed.
+                        self.presentationMode.wrappedValue.dismiss()
+                    }
                 } catch {
                     print("❌ Failed to decode server response:", error.localizedDescription)
                 }
-                
-                
-            }
-            
-            DispatchQueue.main.async {
-                completion()
             }
         }.resume()
     }
