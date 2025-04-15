@@ -9,6 +9,7 @@ import SwiftUI
 struct Settings: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var loginViewModel: LoginViewModel
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login status
     @AppStorage("isEnglishSelected") private var isEnglishSelected = false
@@ -114,8 +115,12 @@ struct Settings: View {
                     .scrollContentBackground(.hidden) // Hide default Form background
                     .foregroundColor(AdaptiveColor.text.color(for: colorScheme))
                     .sheet(isPresented: $showPasswordConfirmation) {
-                        PasswordConfirmationView(password: $password, isLoggedIn: $isLoggedIn, showPasswordConfirmation: $showPasswordConfirmation)
+                        PasswordConfirmationView(password: $password,
+                                                 isLoggedIn: $isLoggedIn,
+                                                 showPasswordConfirmation: $showPasswordConfirmation,
+                                                 loginViewModel: loginViewModel)
                     }
+
                 }
                 .navigationBarBackButtonHidden(true) // Hides the default back button
                 .preferredColorScheme(isDarkMode ? .dark : .light)
@@ -163,6 +168,9 @@ struct Settings: View {
         @Binding var showPasswordConfirmation: Bool
         @FocusState private var isPasswordFieldFocused: Bool
         
+        // Accept the loginViewModel to perform deletion.
+        @ObservedObject var loginViewModel: LoginViewModel
+
         var body: some View {
             VStack(spacing: 20) {
                 Text("Confirm Deletion")
@@ -175,10 +183,10 @@ struct Settings: View {
                     .focused($isPasswordFieldFocused)
                 
                 Button("Delete User", role: .destructive) {
-                    verifyPassword()
+                    verifyPasswordAndDelete()
                 }
                 .padding()
-                .disabled(password.isEmpty) // Disable button if password is empty
+                .disabled(password.isEmpty)
                 
                 Button("Cancel") {
                     showPasswordConfirmation = false
@@ -187,21 +195,23 @@ struct Settings: View {
             }
             .padding()
             .onAppear {
-                isPasswordFieldFocused = true // Auto-focus the password field
+                isPasswordFieldFocused = true
             }
         }
         
-        // Function to verify the password
-        private func verifyPassword() {
-            let correctPassword = "test" // Replace with actual password check
-            if password == correctPassword {
-                isLoggedIn = false // Log out the user
-                showPasswordConfirmation = false // Close the popup
-            } else {
-                print("Something went wrong...")
+        // Instead of static checking, we call deleteUser on the view model.
+        private func verifyPasswordAndDelete() {
+            Task {
+                await loginViewModel.deleteUser(password: password)
+                if loginViewModel.errorMessage == nil {
+                    // On successful deletion, mark user as logged out and dismiss the sheet.
+                    isLoggedIn = false
+                    showPasswordConfirmation = false
+                }
             }
         }
     }
+
     
     
     // Custom Report Issue Form

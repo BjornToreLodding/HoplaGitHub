@@ -267,7 +267,7 @@ struct Profile: View {
 
                     Spacer()
 
-                    NavigationLink(destination: Settings(navigationPath: $navigationPath, viewModel: profileViewModel)) {
+                    NavigationLink(destination: Settings(loginViewModel: LoginViewModel(), navigationPath: $navigationPath, viewModel: profileViewModel)) {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 24))
                             .padding()

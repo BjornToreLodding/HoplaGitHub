@@ -373,6 +373,57 @@ class LoginViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Delete (Soft Delete) User
+    func deleteUser(password: String) async {
+        guard let token = TokenManager.shared.getToken() else {
+            DispatchQueue.main.async {
+                self.errorMessage = "User token not available."
+            }
+            return
+        }
+        
+        guard let url = URL(string: "https://hopla.onrender.com/users/delete") else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Invalid delete URL."
+            }
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = ["Password": password]
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            request.httpBody = jsonData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
+                DispatchQueue.main.async {
+                    self.successMessage = "User successfully marked as deleted."
+                    self.errorMessage = nil
+                    // Optionally, log out the user:
+                    self.isLoggedIn = false
+                }
+            } else {
+                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                DispatchQueue.main.async {
+                    self.errorMessage = "Delete user failed: \(errorMsg)"
+                    self.successMessage = nil
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = "Error: \(error.localizedDescription)"
+                self.successMessage = nil
+            }
+        }
+    }
+
 
 }
 
