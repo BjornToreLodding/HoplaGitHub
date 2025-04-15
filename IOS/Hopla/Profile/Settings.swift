@@ -57,6 +57,7 @@ struct Settings: View {
                         }
                         
                         // Send a Report Button
+                        // Inside your Settings view's Form or VStack:
                         Button(action: {
                             showReportSheet = true
                         }) {
@@ -65,6 +66,7 @@ struct Settings: View {
                         .sheet(isPresented: $showReportSheet) {
                             ReportIssueView(showReportSheet: $showReportSheet)
                         }
+
                         
                         // Log out button
                         Button(action: {
@@ -207,6 +209,7 @@ struct Settings: View {
         @Binding var showReportSheet: Bool
         @State private var reportTopic: String = ""
         @State private var reportDescription: String = ""
+        @StateObject private var reportViewModel = ReportViewModel()
         
         var body: some View {
             NavigationView {
@@ -215,20 +218,32 @@ struct Settings: View {
                         .font(.headline)
                         .padding()
                     
-                    // Topic TextField
+                    // Topic field (e.g., report category)
                     TextField("Enter topic", text: $reportTopic)
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
                         .padding(.horizontal)
                     
-                    // Description TextEditor
+                    // Description field (report message)
                     TextEditor(text: $reportDescription)
                         .frame(height: 150)
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
                         .padding(.horizontal)
+                    
+                    // Display potential errors or success messages:
+                    if let error = reportViewModel.errorMessage {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .padding(.horizontal)
+                    }
+                    if let success = reportViewModel.successMessage {
+                        Text(success)
+                            .foregroundColor(.green)
+                            .padding(.horizontal)
+                    }
                     
                     HStack {
                         Button("Cancel") {
@@ -240,26 +255,41 @@ struct Settings: View {
                         .cornerRadius(10)
                         
                         Button("Submit") {
-                            submitReport()
+                            Task {
+                                // Ensure both topic and description are filled.
+                                guard !reportTopic.isEmpty, !reportDescription.isEmpty else {
+                                    reportViewModel.errorMessage = "Please fill out both fields."
+                                    return
+                                }
+                                
+                                // Use TokenManager to get the current user's profile ID:
+                                guard let entityId = TokenManager.shared.getUserId() else {
+                                    reportViewModel.errorMessage = "Unable to retrieve profile ID."
+                                    return
+                                }
+                                
+                                // For now, EntityName is "Profile". In future, you can adapt this.
+                                await reportViewModel.submitReport(entityId: entityId,
+                                                                   entityName: "Profile",
+                                                                   category: reportTopic,
+                                                                   message: reportDescription)
+                                // Close the sheet on success:
+                                if reportViewModel.successMessage != nil {
+                                    showReportSheet = false
+                                }
+                            }
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(10)
-                        .disabled(reportTopic.isEmpty || reportDescription.isEmpty) // Disable if empty
+                        .disabled(reportTopic.isEmpty || reportDescription.isEmpty)
                     }
                     .padding()
                 }
                 .navigationBarTitle("Send a Report", displayMode: .inline)
             }
-        }
-        
-        // Function to handle submission
-        private func submitReport() {
-            // Replace with actual email
-            print("Report submitted: \(reportTopic) - \(reportDescription)")
-            showReportSheet = false // Close the sheet
         }
     }
 }
