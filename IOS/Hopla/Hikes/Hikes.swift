@@ -228,6 +228,18 @@ enum FilterValue: Codable {
     }
 }
 
+struct MapTrail: Codable, Identifiable {
+    let id: String
+    let name: String
+    let latMean: Double?
+    let longMean: Double?
+    
+    // If you want properties with more intuitive names:
+    var latitude: Double? { latMean }
+    var longitude: Double? { longMean }
+}
+
+
 //MARK: - To view hikes on a map
 struct HikeMapView: View {
     @Binding var hikes: [Hike]
@@ -527,7 +539,7 @@ class HikeService: ObservableObject {
     }
     
     //MARK: - To fetch coordinates and show on map
-    func fetchTrailsForMap(latitude: Double, longitude: Double, zoomLevel: Int, completion: @escaping ([Hike]) -> Void) {
+    func fetchTrailsForMap(latitude: Double, longitude: Double, zoomLevel: Int, completion: @escaping ([MapTrail]) -> Void) {
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found")
             return
@@ -556,11 +568,11 @@ class HikeService: ObservableObject {
 
             do {
                 if let jsonString = String(data: data, encoding: .utf8) {
-                    print("📜 Raw JSON Data:\n", jsonString)
+                    print("📜 Raw Map JSON Data:\n", jsonString)
                 }
-                let hikes = try JSONDecoder().decode([Hike].self, from: data)
+                let mapTrails = try JSONDecoder().decode([MapTrail].self, from: data)
                 DispatchQueue.main.async {
-                    completion(hikes)
+                    completion(mapTrails)
                 }
             } catch {
                 print("❌ Error decoding map trails: \(error.localizedDescription)")
@@ -568,6 +580,7 @@ class HikeService: ObservableObject {
             }
         }.resume()
     }
+
     
     //MARK: - Fetch filtered hikes
     func fetchFilteredHikes(selectedOptions: [String: Any], completion: @escaping (Result<HikeResponse, Error>) -> Void) {
@@ -652,6 +665,7 @@ struct Hikes: View {
     @State private var trailFilters: [TrailFilter] = []
     @State private var selectedOptions: [String: Any] = [:]
     @State private var isMapViewActive: Bool = false
+    @State private var mapTrails: [MapTrail] = []
 
     
     var body: some View {
@@ -695,19 +709,28 @@ struct Hikes: View {
         .onAppear {
             userLocation = locationManager.userLocation
             if isMapViewActive {
-                loadTrailsOnMap() // ✅ Uses /trails/map
+                // Update mapTrails instead of hikes
+                if let location = userLocation {
+                    HikeService.shared.fetchTrailsForMap(
+                        latitude: location.coordinate.latitude,
+                        longitude: location.coordinate.longitude,
+                        zoomLevel: 14
+                    ) { mapResults in
+                        self.mapTrails = mapResults
+                    }
+                }
             } else {
-                fetchHikes() // ✅ Uses /trails/all
+                fetchHikes() // Regular fetching for list view
             }
-        }
-        .onChange(of: locationManager.userLocation) { newLocation in
-            userLocation = newLocation
         }
         .onChange(of: selectedFilter) { newValue in
             if newValue == .map {
                 isMapViewActive = true
-                loadTrailsOnMap() // ✅ This uses /trails/map
+                loadTrailsOnMap() // This updates mapTrails
             }
+        }
+        .onChange(of: locationManager.userLocation) { newLocation in
+            userLocation = newLocation
         }
         .navigationBarHidden(true)
     }
@@ -715,7 +738,7 @@ struct Hikes: View {
     @ViewBuilder
     private var hikeDisplay: some View {
         if isMapViewActive {
-            HikeMapView(hikes: $hikes)
+            MapTrailsView(trails: $mapTrails)
         } else {
             hikeList
         }
@@ -984,9 +1007,9 @@ struct Hikes: View {
             latitude: location.coordinate.latitude,
             longitude: location.coordinate.longitude,
             zoomLevel: 14
-        ) { trails in
-            print("✅ Fetched \(trails.count) trails for map")
-            self.hikes = trails // ✅ Replace only with map-compatible hikes
+        ) { mapResults in
+            print("✅ Fetched \(mapResults.count) trails for map")
+            self.mapTrails = mapResults  // Assign to mapTrails (of type [MapTrail])
         }
     }
 
@@ -1539,6 +1562,64 @@ struct MapContainerView: UIViewRepresentable {
         }
 
         if hikes.count > 0 {
+            let update = GMSCameraUpdate.fit(bounds, withPadding: 50)
+            mapView.animate(with: update)
+            print("🎯 Camera updated to fit bounds")
+        }
+    }
+}
+
+//MARK: - To display trails as pins on map
+struct MapTrailsView: View {
+    @Binding var trails: [MapTrail]
+    @StateObject private var locationManager = LocationManager()
+
+    var body: some View {
+        MapContainerViewMap(trails: trails, locationManager: locationManager)
+            .edgesIgnoringSafeArea(.all)
+            .onAppear {
+                print("🗺️ MapTrailsView appeared with \(trails.count) trails")
+            }
+    }
+}
+
+struct MapContainerViewMap: UIViewRepresentable {
+    let trails: [MapTrail]
+    @ObservedObject var locationManager: LocationManager
+
+    func makeUIView(context: Context) -> GMSMapView {
+        let mapView = GMSMapView(frame: .zero)
+        mapView.isMyLocationEnabled = true
+        mapView.settings.myLocationButton = true
+        return mapView
+    }
+
+    func updateUIView(_ mapView: GMSMapView, context: Context) {
+        guard let _ = locationManager.userLocation else {
+            print("❌ No user location available.")
+            return
+        }
+
+        mapView.clear()
+        var bounds = GMSCoordinateBounds()
+
+        for trail in trails {
+            guard let lat = trail.latitude, let lon = trail.longitude else {
+                print("❌ Skipping trail without coordinates: \(trail.name)")
+                continue
+            }
+
+            let position = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+            bounds = bounds.includingCoordinate(position)
+
+            let marker = GMSMarker(position: position)
+            marker.title = trail.name
+            marker.map = mapView
+
+            print("✅ Marker added for \(trail.name) at \(lat), \(lon)")
+        }
+
+        if trails.count > 0 {
             let update = GMSCameraUpdate.fit(bounds, withPadding: 50)
             mapView.animate(with: update)
             print("🎯 Camera updated to fit bounds")
