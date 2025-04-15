@@ -107,7 +107,13 @@ struct Login: View {
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding()
                             
+                            let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // To clear whitespaces
+                            
                             Button("Send") {
+                                Task {
+                                    await viewModel.resetPasswordRequest(email: normalizedEmail)
+                                }
+                                // Optionally, clear the email field and dismiss the sheet.
                                 resetEmail()
                                 isShowingForgottenPassword = false
                             }

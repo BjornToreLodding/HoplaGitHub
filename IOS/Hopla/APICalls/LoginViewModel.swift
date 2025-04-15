@@ -326,5 +326,53 @@ class LoginViewModel: ObservableObject {
             }
         }
     }
+    
+    //MARK: - Reset password, send mail to reset
+    func resetPasswordRequest(email: String) async {
+        guard let url = URL(string: "https://hopla.onrender.com/users/reset-password-request") else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Invalid URL for reset password."
+            }
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Normalize the email
+        let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        
+        let body: [String: Any] = [
+            "Email": normalizedEmail
+        ]
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            request.httpBody = jsonData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
+                DispatchQueue.main.async {
+                    self.successMessage = "Reset password email sent! Please check your email for instructions."
+                    self.errorMessage = nil
+                }
+            } else {
+                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                DispatchQueue.main.async {
+                    self.errorMessage = "Reset password failed: \(errorMsg)"
+                    self.successMessage = nil
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = "Error: \(error.localizedDescription)"
+                self.successMessage = nil
+            }
+        }
+    }
+
+
 }
 
