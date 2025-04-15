@@ -568,7 +568,70 @@ class HikeService: ObservableObject {
             }
         }.resume()
     }
-
+    
+    //MARK: - Fetch filtered hikes
+    func fetchFilteredHikes(selectedOptions: [String: Any], completion: @escaping (Result<HikeResponse, Error>) -> Void) {
+        guard var urlComponents = URLComponents(string: "https://hopla.onrender.com/trails/all") else {
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            return
+        }
+        
+        var queryItems: [URLQueryItem] = []
+        for (key, value) in selectedOptions {
+            if let stringValue = value as? String {
+                queryItems.append(URLQueryItem(name: key, value: stringValue))
+            } else if let boolValue = value as? Bool {
+                queryItems.append(URLQueryItem(name: key, value: boolValue ? "true" : "false"))
+            } else if let intValue = value as? Int {
+                queryItems.append(URLQueryItem(name: key, value: "\(intValue)"))
+            } else if let setValue = value as? Set<String> {
+                queryItems.append(URLQueryItem(name: key, value: setValue.joined(separator: ",")))
+            }
+        }
+        
+        if !queryItems.isEmpty {
+            urlComponents.queryItems = queryItems
+        }
+        
+        guard let url = urlComponents.url else {
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not build filtered URL"])))
+            return
+        }
+        
+        // Debug: Print the URL
+        print("Filtered URL: \(url.absoluteString)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        if let token = TokenManager.shared.getToken() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async { completion(.failure(error)) }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                }
+                return
+            }
+            
+            do {
+                let decodedResponse = try JSONDecoder().decode(HikeResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(decodedResponse))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }.resume()
+    }
 }
 
 
@@ -597,13 +660,26 @@ struct Hikes: View {
             searchBar
 
             if isShowingFilterOptions {
-                makeFilterDropdownBar(
-                    trailFilters: trailFilters,
-                    selectedOptions: $selectedOptions,
-                    isShowing: $isShowingFilterOptions,
-                    applyAction: applySelectedFilters
-                )
-            }
+                        makeFilterDropdownBar(
+                            trailFilters: trailFilters,
+                            selectedOptions: $selectedOptions,
+                            isShowing: $isShowingFilterOptions,
+                            applyAction: {
+                                // When "Apply Filters" is tapped, fetch filtered hikes.
+                                HikeService.shared.fetchFilteredHikes(selectedOptions: selectedOptions) { result in
+                                    switch result {
+                                    case .success(let response):
+                                        //self.hikes = response.trails
+                                        self.hikes = filteredHikes()
+                                    case .failure(let error):
+                                        print("Error applying filters: \(error.localizedDescription)")
+                                    }
+                                }
+                                // Dismiss the filter view.
+                                isShowingFilterOptions = false
+                            }
+                        )
+                    }
 
             if isLoading && hikes.isEmpty {
                 ProgressView("Loading Hikes...")
@@ -767,6 +843,60 @@ struct Hikes: View {
         ]
     }
     
+    // This function returns only the hikes that match every filter in selectedOptions.
+    func filterHikesLocally(selectedOptions: [String: Any], hikes: [Hike]) -> [Hike] {
+        return hikes.filter { hike in
+            // Ensure that for every filter in selectedOptions, the hike's filters array contains a matching value.
+            guard let hikeFilters = hike.filters else {
+                return false
+            }
+            
+            // For each selected option key/value in the dictionary:
+            for (key, selectedValue) in selectedOptions {
+                // Find the hike filter with the matching name (case-insensitive).
+                guard let filter = hikeFilters.first(where: { $0.name.lowercased() == key.lowercased() }) else {
+                    // If the hike does not even have that filter, consider it a non-match.
+                    return false
+                }
+                
+                // Depending on the type of selectedValue, check for a match:
+                if let selectedStr = selectedValue as? String {
+                    // For enum filters: split the filter's value (which might be comma separated)
+                    let values = filter.value
+                        .split(separator: ",")
+                        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+                    if !values.contains(selectedStr.lowercased()) {
+                        return false
+                    }
+                } else if let selectedSet = selectedValue as? Set<String> {
+                    // For multiEnum filters: check that at least one of the selected options is included.
+                    let values = filter.value
+                        .split(separator: ",")
+                        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+                    let matches = selectedSet.contains { selected in
+                        values.contains(selected.lowercased())
+                    }
+                    if !matches {
+                        return false
+                    }
+                } else if let selectedBool = selectedValue as? Bool {
+                    // Convert filter's value (as string) to a Bool by comparing with "true".
+                    let filterBool = (filter.value.lowercased() == "true")
+                    if filterBool != selectedBool {
+                        return false
+                    }
+                } else if let selectedInt = selectedValue as? Int {
+                    if Int(filter.value) != selectedInt {
+                        return false
+                    }
+                }
+            }
+            // If every selected option is satisfied, then include this hike.
+            return true
+        }
+    }
+
+    
     
     
     private func applySelectedFilters() {
@@ -898,14 +1028,16 @@ struct Hikes: View {
         }
     }
     
+    //MARK: - The filter selection for hikes
     func makeFilterDropdownBar(
         trailFilters: [TrailFilter],
         selectedOptions: Binding<[String: Any]>,
         isShowing: Binding<Bool>,
         applyAction: @escaping () -> Void
     ) -> some View {
-        ScrollView {  // Added ScrollView for vertical scrolling
+        ScrollView {
             VStack(alignment: .leading, spacing: 12) {
+                // For each filter, display the UI...
                 ForEach(trailFilters) { filter in
                     VStack(alignment: .leading) {
                         Text(filter.displayName).bold()
@@ -916,21 +1048,27 @@ struct Hikes: View {
                                 get: {
                                     selectedOptions.wrappedValue[filter.name] as? Bool ?? false
                                 },
-                                set: {
-                                    selectedOptions.wrappedValue[filter.name] = $0
-                                })) {
-                                    Text("Yes")
+                                set: { newVal in
+                                    selectedOptions.wrappedValue[filter.name] = newVal
                                 }
+                            )) {
+                                Text("Yes")
+                            }
                             
                         case .enumType:
                             SwiftUI.Picker("Choose", selection: Binding(
-                                get: { selectedOptions.wrappedValue[filter.name] as? String ?? "" },
-                                set: { selectedOptions.wrappedValue[filter.name] = $0 })) {
-                                    ForEach(filter.options, id: \.self) { option in
-                                        Text(option)
-                                    }
+                                get: {
+                                    selectedOptions.wrappedValue[filter.name] as? String ?? ""
+                                },
+                                set: { newVal in
+                                    selectedOptions.wrappedValue[filter.name] = newVal
                                 }
-                                .pickerStyle(SegmentedPickerStyle())
+                            )) {
+                                ForEach(filter.options, id: \.self) { option in
+                                    Text(option)
+                                }
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
                             
                         case .multiEnum:
                             VStack(alignment: .leading) {
@@ -957,7 +1095,9 @@ struct Hikes: View {
                             Stepper(
                                 value: Binding(
                                     get: { selectedOptions.wrappedValue[filter.name] as? Int ?? 0 },
-                                    set: { selectedOptions.wrappedValue[filter.name] = $0 }
+                                    set: { newVal in
+                                        selectedOptions.wrappedValue[filter.name] = newVal
+                                    }
                                 ),
                                 in: 0...10
                             ) {
@@ -967,8 +1107,21 @@ struct Hikes: View {
                     }
                 }
                 
+                // Clear All button
+                Button("Clear All Filters") {
+                    selectedOptions.wrappedValue.removeAll()
+                }
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(8)
+                .foregroundColor(.black)
+                
+                // Apply Filters button.
                 Button("Apply Filters") {
+                    print("Selected Options: \(selectedOptions.wrappedValue)")
+                    // Call the apply action (this may use your network call or local filter)
                     applyAction()
+                    // Dismiss the dropdown view.
                     isShowing.wrappedValue = false
                 }
                 .padding()
@@ -982,6 +1135,7 @@ struct Hikes: View {
             .padding()
         }
     }
+
     
     
     
@@ -1162,20 +1316,29 @@ struct Hikes: View {
     // MARK: - Filtering
     
     private func filteredHikes() -> [Hike] {
+        // Start with all hikes.
         var filtered = hikes
         
+        // First, filter by search text (if any).
         if !searchText.isEmpty {
             filtered = filtered.filter {
                 $0.name.lowercased().contains(searchText.lowercased())
             }
         }
         
+        // Optionally, if using the heart filter you might filter for favorites.
         if selectedFilter == .heart {
             filtered = filtered.filter { $0.isFavorite }
         }
         
+        // Then filter by the selected options, if any:
+        if !selectedOptions.isEmpty {
+            filtered = filterHikesLocally(selectedOptions: selectedOptions, hikes: filtered)
+        }
+        
         return filtered
     }
+
     
     // MARK: - UI
     
