@@ -86,7 +86,14 @@ struct AddNewUpdateView: View {
         var body = Data()
         let lineBreak = "\r\n"
 
-        // 1) Image part (if any) – same as before...
+        // 1) Image part (if any)
+        if let imageData = image?.jpegData(compressionQuality: 0.8) {
+            body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"Image\"; filename=\"update.jpg\"\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\(lineBreak)\(lineBreak)".data(using: .utf8)!)
+            body.append(imageData)
+            body.append("\(lineBreak)".data(using: .utf8)!)
+        }
 
         // 2) TrailId
         body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
