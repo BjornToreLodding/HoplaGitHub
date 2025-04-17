@@ -7,7 +7,7 @@ struct HikesDetails: View {
     let trailFilters: [TrailFilter]
     
     @State private var userRating: Int = 0
-
+    
     
     var body: some View {
         ScrollView {
@@ -37,7 +37,7 @@ struct HikesDetails: View {
                             .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to the right
                     }
                     .padding(.horizontal)
-
+                    
                     HStack {
                         Text("My rating:")
                             .frame(maxWidth: .infinity, alignment: .leading) // Aligns to the left
@@ -52,21 +52,21 @@ struct HikesDetails: View {
                 
                 // 8. Update box
                 NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
-                    Text("Newest updates on trail")
-                        .frame(alignment: .center)
-                        .padding(.horizontal)
-                        .padding(.vertical)
-                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                        .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                    Text("View Updates")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
-
+                
                 Spacer()
             }
             .padding(.top)
             .onAppear {
-                        print("Trail filters:", trailFilters.map { $0.name })
-                        print("Hike filters:", hike.filters?.map { $0.id } ?? [])
-                    }
+                print("Trail filters:", trailFilters.map { $0.name })
+                print("Hike filters:", hike.filters?.map { $0.id } ?? [])
+            }
         }
         .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
         .navigationBarTitleDisplayMode(.inline)
@@ -108,7 +108,7 @@ struct HikeFiltersView: View {
     @Environment(\.colorScheme) var colorScheme
     let hike: Hike
     let trailFilters: [TrailFilter]
-
+    
     var body: some View {
         ZStack {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -139,22 +139,22 @@ struct HikeFiltersView: View {
         )
     }
     
-
+    
     private var filterChips: some View {
         let matchingFilters: [(TrailFilter, HikeFilter)] = {
             guard let hikeFilters = hike.filters else { return [] }
-
+            
             // ✅ You can print here
             print("Hike filters:", hikeFilters.map { $0.id })
             print("Trail filters:", trailFilters.map { $0.id })
-
+            
             return hikeFilters.compactMap { hikeFilter in
                 trailFilters.first(where: { $0.id == hikeFilter.id }).map { trailFilter in
                     (trailFilter, hikeFilter)
                 }
             }
         }()
-
+        
         return Group {
             ForEach(matchingFilters.filter { shouldDisplay($0.0) }, id: \.0.id) { (trailFilter, hikeFilter) in
                 let values = getValues(from: trailFilter, using: hikeFilter)
@@ -169,20 +169,20 @@ struct HikeFiltersView: View {
             }
         }
     }
-
-
-
-
     
-
+    
+    
+    
+    
+    
     // MARK: - Helpers
-
+    
     /// Only show "Difficulty" and "SurfaceType" filters
     private func shouldDisplay(_ filter: TrailFilter) -> Bool {
         let ignored = ["Custom13", "Custom14"]
         return !ignored.contains(filter.name)
     }
-
+    
     /// Extract displayed values based on the filter type
     private func getValues(from trailFilter: TrailFilter, using hikeFilter: HikeFilter) -> [String] {
         switch trailFilter.type {
@@ -202,14 +202,10 @@ struct HikeFiltersView: View {
         case .int:
             return ["\(trailFilter.displayName): \(hikeFilter.value)"]
         }
-
+        
         return []
     }
-
-
 }
-
-
 
 
 // Hikes button

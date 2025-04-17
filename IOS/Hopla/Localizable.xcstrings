@@ -908,9 +908,6 @@
         }
       }
     },
-    "Newest updates on trail" : {
-
-    },
     "No details available" : {
       "localizations" : {
         "nb" : {
@@ -1288,6 +1285,9 @@
           }
         }
       }
+    },
+    "View Updates" : {
+
     },
     "Write the new email and your current password to change your email." : {
 
