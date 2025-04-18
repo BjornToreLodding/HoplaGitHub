@@ -71,50 +71,127 @@ class HorseDetailsViewModel: ObservableObject {
 }
 
 
-
 struct HorseDetails: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var vm = HorseDetailsViewModel()
     var horseId: String
     
     var body: some View {
-        VStack(spacing: 20) {
-            if let horse = vm.horse {
-                // Name
-                Text(horse.name)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Custom header with back arrow and horse name
+                HeaderViewHorseDetails(
+                    name: vm.horse?.name ?? "",
+                    colorScheme: colorScheme,
+                    onBack: { dismiss() }
+                )
+                .frame(height: 40)
                 
-                // Horse Image
-                if let urlString = horse.horsePictureUrl, !urlString.isEmpty, let url = URL(string: urlString) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        
+                        if let horse = vm.horse {
+                            // Circular image
+                            if let urlString = horse.horsePictureUrl,
+                               let url = URL(string: urlString) {
+                                AsyncImage(url: url) { phase in
+                                    switch phase {
+                                    case .success(let image):
+                                        image.resizable().scaledToFill()
+                                    case .failure:
+                                        Image(systemName: "photo").resizable()
+                                    case .empty:
+                                        ProgressView()
+                                    @unknown default:
+                                        EmptyView()
+                                    }
+                                }
+                                .frame(width: 200, height: 200)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                            } else {
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 200, height: 200)
+                                    .clipShape(Circle())
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            let breedText = horse.breed ?? "Unknown"
+                            Text("Breed: \(breedText)")
+                                .font(.title2)
+                                .foregroundStyle(
+                                    AdaptiveColor(light: .textLightBackground,
+                                                  dark:  .textDarkBackground)
+                                    .color(for: colorScheme)
+                                )
+                            
+                            
+                            
+                            Text("Age: \(horse.age ?? 0) years old")
+                                .font(.title3)
+                                .foregroundStyle(
+                                    AdaptiveColor(light: .textLightBackground,
+                                                  dark: .textDarkBackground)
+                                    .color(for: colorScheme)
+                                )
+                        } else {
+                            ProgressView()
+                                .padding()
+                        }
                     }
-                } else {
-                    // Show placeholder
-                    Image(systemName: "photo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
+                    .padding()
                 }
-                // Breed
-                Text("Breed: \(horse.breed ?? "Unknown")")
-                    .font(.title2)
-                    .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                
-                // Age
-                Text("Age: \(horse.age ?? 0) years old")
-                    .font(.title3)
-                    .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-            }  else {
-                ProgressView()
+                .frame(maxWidth: .infinity)
+                .background(
+                    AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                        .color(for: colorScheme)
+                        .ignoresSafeArea()
+                )
             }
+            .onAppear { vm.fetchHorseDetails(horseId: horseId) }
+            .navigationBarBackButtonHidden(true)
         }
-        .onAppear {
-            vm.fetchHorseDetails(horseId: horseId)
+    }
+    
+    // MARK: - Header
+    struct HeaderViewHorseDetails: View {
+        let name: String
+        let colorScheme: ColorScheme
+        let onBack: () -> Void
+        
+        var body: some View {
+            ZStack {
+                AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                    .color(for: colorScheme)
+                    .frame(maxWidth: .infinity)
+                
+                // Centered Title
+                Text(name)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                // Back button aligned leading
+                HStack {
+                    Button(action: onBack) {
+                        Image(systemName: "arrow.left")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(
+                                AdaptiveColor(light: .lightModeTextOnGreen,
+                                              dark: .darkModeTextOnGreen)
+                                .color(for: colorScheme)
+                            )
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+            }
         }
     }
 }
-

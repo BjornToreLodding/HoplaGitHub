@@ -318,8 +318,8 @@ struct HorseRowView: View {
             }
         }
         .padding()
-        .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+        .frame(width: 370, height: 100, alignment: .leading)
+        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
     }
 }
 

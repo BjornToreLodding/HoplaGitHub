@@ -330,7 +330,7 @@ struct Profile: View {
                         // Navigation Buttons (unchanged)
                         HStack(spacing: 10) {
                             NavigationLink(destination: MyHikes()) {
-                                Text("My hikes")
+                                Text("My activity")
                                     .font(.custom("ArialNova", size: 20))
                                     .frame(width: 180, height: 50)
                                     .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))

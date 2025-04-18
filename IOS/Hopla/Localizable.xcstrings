@@ -852,6 +852,7 @@
       }
     },
     "My hikes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
