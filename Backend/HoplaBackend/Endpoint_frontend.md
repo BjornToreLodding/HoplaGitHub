@@ -3,6 +3,8 @@
 
 
 
+
+
 # **OBS**
 
 **BT** har oppdatert kun trails/all med filters. Trenger tilbakemelding om dette er greit, før jeg endrer de andre endpointene i /trails :-)
@@ -627,7 +629,7 @@ curl -X GET "https://hopla.onrender.com/userhikes/user?userId=[Guid]&pageNumber=
 </td>
 <td>
 
-## **:green_book: :alien: :apple: PUT /upload**
+## **:green_book: :alien: :green_apple: PUT /upload**
 
 Profil -\> Endre profilbilde
 
@@ -670,7 +672,7 @@ Response:
 
 Profil -\> Bytte brukernavn
 
-## **:green_book: :alien: :apple: PUT /users/update**
+## **:green_book: :alien: :green_apple: PUT /users/update**
 
 Body:
 
@@ -696,7 +698,7 @@ Response:
 
 Profil -\> Bytte epost
 
-## **:green_book: :alien: :apple: POST /users/change-email**
+## **:green_book: :alien: :green_apple: POST /users/change-email**
 
 body:
 
@@ -721,7 +723,7 @@ Response trinn1:
 
 Profil -\> bytte passord
 
-## **:green_book: :alien: :apple: PUT /users/change-password**
+## **:green_book: :alien: :green_apple: PUT /users/change-password**
 
 body:
 
@@ -1110,7 +1112,7 @@ GET http https://hopla.onrender.com/feed/all?sort=likes
 
 Response: Se feed alt
 
-## **:green_book: :alien: :apple: POST reactions**
+## **:green_book: :alien: :green_apple: POST reactions**
 
 Denne setter reaksjonen til Like som standard, men kan enkelt utvides til flere reaksjonstyper.  
 Har også tilrettelagt for dette i database og backend hvis Hopla ønsker å utvide dette senere  
@@ -1147,7 +1149,7 @@ Spørsmål: finnes det en epost jeg kan teste glemt passord på? Eller er det "n
 </td>
 <td>
 
-## **:green_book: :alien: :apple: POST /users/register**
+## **:green_book: :alien: :green_apple: POST /users/register**
 
 :alien: :apple: Opprett bruker:
 
@@ -1219,7 +1221,7 @@ Body:
 Brukerinformasjon oppdatert.
 ```
 
-## **:green_book: :alien: :apple: POST /users/reset-password-request**
+## **:green_book: :alien: :green_apple: POST /users/reset-password-request**
 
 Glemt passord
 
@@ -1280,7 +1282,7 @@ Passord tilbakestilt. Du kan nå logge inn med ditt nye passord.
 </td>
 <td>
 
-## **:green_book: :alien: :apple: POST /userreports/create**
+## **:green_book: :alien: :green_apple: POST /userreports/create**
 
 Profil -\> Innstillinger -\> Send en rapport (skal også legges inn: innlegg(hjem), løyper, profiler, community)
 
@@ -1319,7 +1321,7 @@ Response:
 }
 ```
 
-## **:green_book: :alien: :apple: PATCH /users/delete**
+## **:green_book: :alien: :green_apple: PATCH /users/delete**
 
 Profil -\> Innstillinger -\> Slett bruker
 
@@ -1353,7 +1355,7 @@ Responce Body:
 </td>
 <td>
 
-## **:green_book: :alien: :apple: GET /trailfilters/all**
+## **:green_book: :alien: :green_apple: GET /trailfilters/all**
 
 Endpoint som henter alle filtere i databasen. Da er det lettere å endre i senere tid hvis Hopla vil legge til nye/slette enn å hardkode navnene.
 
@@ -1874,7 +1876,7 @@ Oversikt over hva som brukes i hvilken situasjon
 <td></td>
 <td>
 
-## **:green_book: :alien: :apple: GET /userrelations/requests**
+## **:green_book: :alien: :green_apple: GET /userrelations/requests**
 
 **Trenger også her et POST endpoint der bruker kan godkjenne eller slette forespørseler. Endre fra request til enten NONE eller FRIENDS**
 
@@ -1917,7 +1919,7 @@ Response:
 <td></td>
 <td>
 
-## **:green_book: :alien: :apple: POST userhikes/create (ny tur knapp)**
+## **:green_book: :alien: :green_apple: POST userhikes/create (ny tur knapp)**
 
 Denne generer en liste koordinater, sammen med tid og distanse fra bruker trykker på start til stopp.\
 Da kan brukeren velge å bare trykke lagre eller fylle inn mer informasjon:
@@ -1965,7 +1967,7 @@ Response:
 }
 ```
 
-## **:green_book: :alien: :apple: PUT userhikes/{userHikeId} redigere informasjon om en tur**
+## **:green_book: :alien: :green_apple: PUT userhikes/{userHikeId} redigere informasjon om en tur**
 
 Endpoint der informasjonen over skal kunne redigeres i ettertid.\
 Hvis public her også må det lages en løype av den.
@@ -2087,7 +2089,7 @@ Resonse:
 Ok
 ```
 
-## **:green_book: :alien:  :apple: GET /trails/updates**
+## **:green_book: :alien:  :green_apple: GET /trails/updates**
 
 nye oppdateringer om løypen
 
@@ -2194,7 +2196,7 @@ Response:
 }
 ```
 
-## **:green_book:** :alien: **:apple: GET /userhikes/coordinates(/mock)/{userHikeId}**
+## **:green_book:** :alien: **:green_apple: GET /userhikes/coordinates(/mock)/{userHikeId}**
 
 postman:
 ```http
