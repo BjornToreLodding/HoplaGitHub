@@ -1268,6 +1268,7 @@
 
     },
     "Type a message..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1276,6 +1277,9 @@
           }
         }
       }
+    },
+    "Type a message…" : {
+
     },
     "Updated on: %@" : {
 

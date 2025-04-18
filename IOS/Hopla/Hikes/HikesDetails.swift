@@ -1,75 +1,168 @@
 import SwiftUI
 
 struct HikesDetails: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.presentationMode) var presentationMode
     let hike: Hike
     let trailFilters: [TrailFilter]
     
     @State private var userRating: Int = 0
     
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // ─── Custom Header ──────────────────────────────────────────
+                ZStack {
+                    AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                        .color(for: colorScheme)
+                        .frame(maxWidth: .infinity)
+                    
+                    // Centered title
+                    Text(hike.name)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    // Leading back arrow
+                    HStack {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "arrow.left")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .foregroundStyle(
+                                    AdaptiveColor(light: .lightModeTextOnGreen,
+                                                  dark: .darkModeTextOnGreen)
+                                        .color(for: colorScheme)
+                                )
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                }
+                .frame(height: 40)
+                
+                // ─── Scrollable Content ────────────────────────────────────
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // 2. Image
+                        HikeImageView(hike: hike)
+                        
+                        // 3. Filters
+                        HikeFiltersView(hike: hike, trailFilters: trailFilters)
+                        
+                        // 4. Buttons
+                        HikeButtonsView(hike: hike)
+                        
+                        // 5. Description
+                        Text("Description of trail")
+                            .frame(width: 370, height: 70)
+                            .background(
+                                AdaptiveColor(light: .lightPostBackground,
+                                              dark:  .darkPostBackground)
+                                    .color(for: colorScheme)
+                            )
+                            .foregroundStyle(
+                                AdaptiveColor(light: .textLightBackground,
+                                              dark:  .textDarkBackground)
+                                    .color(for: colorScheme)
+                            )
+                        
+                        // 6. Rating
+                        VStack {
+                            HStack {
+                                Text("Rating:")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                StarRating(rating: .constant(hike.averageRating))
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .padding(.horizontal)
+                            
+                            HStack {
+                                Text("My rating:")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                StarRating(rating: $userRating)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .padding(.horizontal)
+                        }
+                        .frame(width: 370, height: 70)
+                        .background(
+                            AdaptiveColor(light: .lightPostBackground,
+                                          dark:  .darkPostBackground)
+                                .color(for: colorScheme)
+                        )
+                        .foregroundStyle(
+                            AdaptiveColor(light: .textLightBackground,
+                                          dark:  .textDarkBackground)
+                                .color(for: colorScheme)
+                        )
+                        
+                        // 8. Update box
+                        NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
+                            Text("View Updates")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    AdaptiveColor(light: .lightGreen,
+                                                  dark:  .darkGreen)
+                                        .color(for: colorScheme)
+                                )
+                                .foregroundStyle(
+                                    AdaptiveColor(light: .lightModeTextOnGreen,
+                                                  dark:  .darkModeTextOnGreen)
+                                        .color(for: colorScheme)
+                                )
+                                .cornerRadius(8)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.top)
+                    .onAppear {
+                        print("Trail filters:", trailFilters.map { $0.name })
+                        print("Hike filters:", hike.filters?.map { $0.id } ?? [])
+                    }
+                }
+                .background(
+                    AdaptiveColor(light: .mainLightBackground,
+                                  dark:  .mainDarkBackground)
+                        .color(for: colorScheme)
+                )
+            }
+            .navigationBarBackButtonHidden(true)
+        }
+    }
+}
+    
+
+
+
+struct CustomBackButtonHikesDetails: View {
+    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
+    
+    var colorScheme: ColorScheme
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                
-                // 2. Image
-                HikeImageView(hike: hike)
-                
-                // 3. Filters
-                HikeFiltersView(hike: hike, trailFilters: trailFilters)
-                
-                // 4. Buttons
-                HikeButtonsView(hike: hike)
-                
-                // 5. Description
-                Text("Description of trail")
-                    .frame(width: 370, height: 70)
-                    .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                    .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                
-                // 6. Rating
-                VStack {
-                    HStack {
-                        Text("Rating:")
-                            .frame(maxWidth: .infinity, alignment: .leading) // Aligns to the left
-                        StarRating(rating: .constant(hike.averageRating))
-                            .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to the right
-                    }
-                    .padding(.horizontal)
-                    
-                    HStack {
-                        Text("My rating:")
-                            .frame(maxWidth: .infinity, alignment: .leading) // Aligns to the left
-                        StarRating(rating: $userRating)
-                            .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to the right
-                    }
-                    .padding(.horizontal)
+        VStack {
+            HStack {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "arrow.left")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                 }
-                .frame(width: 370, height: 70)
-                .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                
-                // 8. Update box
-                NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
-                    Text("View Updates")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                
+                .position(x: 25, y: 20)
                 Spacer()
             }
-            .padding(.top)
-            .onAppear {
-                print("Trail filters:", trailFilters.map { $0.name })
-                print("Hike filters:", hike.filters?.map { $0.id } ?? [])
-            }
+            Spacer()
         }
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

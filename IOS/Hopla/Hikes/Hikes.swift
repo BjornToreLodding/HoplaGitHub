@@ -706,6 +706,7 @@ struct Hikes: View {
                 hikeDisplay
             }
         }
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
         .onAppear {
             userLocation = locationManager.userLocation
             if isMapViewActive {
@@ -1377,11 +1378,12 @@ struct Hikes: View {
                 }) {
                     Image(systemName: option.systemImage(isMapViewActive: isMapViewActive))
                         .foregroundColor(selectedFilter == option ? .blue : .gray)
+                        .bold()
                         .padding()
                 }
             }
         }
-        .frame(height: 30)
+        .frame(width: 420, height: 30)
         .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
     }
     
