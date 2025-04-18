@@ -200,8 +200,10 @@ struct FollowingDetails: View {
                     Text(description)
                         .padding()
                         .frame(width: 370)
-                        .foregroundStyle(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 }
+                
             )
         } else {
             return AnyView(EmptyView()) // Return empty view if no description
@@ -223,7 +225,7 @@ struct FollowingDetails: View {
                             
                             Text("Length: \(String(format: "%.2f", hike.length)) km | Duration: \(String(format: "%.2f", hike.duration)) min")
                                 .font(.caption)
-                                .foregroundColor(.gray)
+                                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -239,69 +241,53 @@ struct FollowingDetails: View {
     
     //MARK: - Add friend/following buttons
     private func actionButtonsView(for following: FollowingInfo) -> some View {
-        // Use the existing RelationViewModel for managing relations
-        let relationVM = RelationViewModel() // Use RelationViewModel to change the relation status
-        let vm = FollowingDetailsViewModel() // Use FollowingDetailsViewModel to fetch and display the following details
+        let relationVM = RelationViewModel()
+        let vm = FollowingDetailsViewModel()
 
-        // Helper function to return the appropriate button title based on the current relation status
         func buttonTitle(for status: PersonStatus) -> String {
             switch status {
-            case .none: return "Follow"
-            case .pending: return "Request Pending"
-            case .friends: return "Unfriend"
+            case .none:      return "Follow"
+            case .pending:   return "Request Pending"
+            case .friends:   return "Unfriend"
             case .following: return "Unfollow"
-            case .block: return "Unblock"
+            case .block:     return "Unblock"
             }
         }
+
+        // pick your button background based on light/dark
+        let bgColor = AdaptiveColor(
+            light: .lightPostBackground,
+            dark:  .darkPostBackground
+        ).color(for: colorScheme)
+
+        // pick your text color based on light/dark
+        let textColor = AdaptiveColor(
+            light: .textLightBackground,
+            dark:  .textDarkBackground
+        ).color(for: colorScheme)
 
         return VStack {
-            // Follow / Unfollow / Friend request / Unfriend button based on the relation status
-            Button(buttonTitle(for: following.relationStatus)) {
+            Button(action: {
                 switch following.relationStatus {
                 case .none:
-                    // Follow
                     relationVM.changeRelation(to: .following, for: following.id) { success in
-                        if success {
-                            // Reload the following details after the relation change
-                            vm.fetchFollowingDetails(userId: following.id)
-                        }
+                        if success { vm.fetchFollowingDetails(userId: following.id) }
                     }
                 case .pending:
-                    // Accept or Deny Friend Request
                     relationVM.changeRelation(to: .friends, for: following.id) { success in
-                        if success {
-                            // Reload the following details after the relation change
-                            vm.fetchFollowingDetails(userId: following.id)
-                        }
+                        if success { vm.fetchFollowingDetails(userId: following.id) }
                     }
-                case .friends:
-                    // Unfriend
+                case .friends, .following, .block:
                     relationVM.changeRelation(to: .none, for: following.id) { success in
-                        if success {
-                            // Reload the following details after the relation change
-                            vm.fetchFollowingDetails(userId: following.id)
-                        }
-                    }
-                case .following:
-                    // Unfollow
-                    relationVM.changeRelation(to: .none, for: following.id) { success in
-                        if success {
-                            // Reload the following details after the relation change
-                            vm.fetchFollowingDetails(userId: following.id)
-                        }
-                    }
-                case .block:
-                    // Unblock
-                    relationVM.changeRelation(to: .none, for: following.id) { success in
-                        if success {
-                            // Reload the following details after the relation change
-                            vm.fetchFollowingDetails(userId: following.id)
-                        }
+                        if success { vm.fetchFollowingDetails(userId: following.id) }
                     }
                 }
+            }) {
+                Text(buttonTitle(for: following.relationStatus))
+                    .foregroundColor(textColor)
             }
             .buttonStyle(.borderedProminent)
+            .tint(bgColor)
         }
     }
-
 }

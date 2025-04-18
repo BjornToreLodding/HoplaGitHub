@@ -322,7 +322,8 @@ struct FriendRowView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, minHeight: 80, alignment: .leading)
-        .background(Color.white.opacity(0.8))
+        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
         .cornerRadius(10)
         .shadow(radius: 2)
         .padding(.horizontal)

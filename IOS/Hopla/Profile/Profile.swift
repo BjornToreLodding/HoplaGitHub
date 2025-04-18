@@ -606,6 +606,7 @@ func fieldContainer<Content: View>(
 
 
 struct EditableProfileField: View {
+    @Environment(\.colorScheme) var colorScheme
     let title: String
     let fieldId: String
     @Binding var value: String
@@ -622,7 +623,7 @@ struct EditableProfileField: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.custom("ArialNova", size: 16))
-                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: .light))
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             
             HStack {
                 if editingField == fieldId {
@@ -660,12 +661,12 @@ struct EditableProfileField: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: .light))
         .cornerRadius(8)
     }
 }
 
 struct EditableDOBField: View {
+    @Environment(\.colorScheme) var colorScheme
     let title: String = "Date of Birth"
     @Binding var dob: DOB
     @Binding var editingField: String?
@@ -680,7 +681,7 @@ struct EditableDOBField: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.custom("ArialNova", size: 16))
-                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: .light))
+                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             if editingField == "dob" {
                 HStack {
                     // Year Picker
@@ -745,7 +746,7 @@ struct EditableDOBField: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: .light))
+        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
         .cornerRadius(8)
     }
 }

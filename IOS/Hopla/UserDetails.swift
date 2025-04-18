@@ -295,7 +295,8 @@ struct UserDetails: View {
                     Text(description)
                         .padding()
                         .frame(width: 370)
-                        .background(Color.white)
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 }
             )
         } else {
@@ -318,11 +319,12 @@ struct UserDetails: View {
                             
                             Text("Length: \(String(format: "%.2f", hike.length)) km | Duration: \(String(format: "%.2f", hike.duration)) min")
                                 .font(.caption)
-                                .foregroundStyle(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
+                                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
                 }
                 .padding()
@@ -336,66 +338,52 @@ struct UserDetails: View {
     //MARK: - Buttons relationships
     private func actionButtonsView(for user: UserInfo) -> some View {
         let relationVM = RelationViewModel()
-        let vm = UserDetailsViewModel()  // Use UserDetailsViewModel here for fetching user details
+        let vm = UserDetailsViewModel()
 
         func buttonTitle(for status: PersonStatus) -> String {
             switch status {
-            case .none: return "Add Friend"
-            case .pending: return "Friend Request Pending"
-            case .friends: return "Unfriend"
+            case .none:      return "Add Friend"
+            case .pending:   return "Friend Request Pending"
+            case .friends:   return "Unfriend"
             case .following: return "Unfollow"
-            case .block: return "Unblock"
+            case .block:     return "Unblock"
             }
         }
+
+        // Adaptive background and text
+        let bgColor = AdaptiveColor(
+            light: .lightPostBackground,
+            dark:  .darkPostBackground
+        ).color(for: colorScheme)
+
+        let textColor = AdaptiveColor(
+            light: .textLightBackground,
+            dark:  .textDarkBackground
+        ).color(for: colorScheme)
 
         return VStack {
-            Button(buttonTitle(for: user.relationStatus)) {
+            Button(action: {
                 switch user.relationStatus {
                 case .none:
-                    // Add Friend
                     relationVM.changeRelation(to: .pending, for: user.id) { success in
-                        if success {
-                            // Reload the user details after the relation change
-                            vm.fetchUserDetails(userId: user.id)
-                        }
+                        if success { vm.fetchUserDetails(userId: user.id) }
                     }
                 case .pending:
-                    // Accept or Deny Friend Request
                     relationVM.changeRelation(to: .friends, for: user.id) { success in
-                        if success {
-                            // Reload the user details after the relation change
-                            vm.fetchUserDetails(userId: user.id)
-                        }
+                        if success { vm.fetchUserDetails(userId: user.id) }
                     }
-                case .friends:
-                    // Remove Friend
+                case .friends, .following, .block:
                     relationVM.changeRelation(to: .none, for: user.id) { success in
-                        if success {
-                            // Reload the user details after the relation change
-                            vm.fetchUserDetails(userId: user.id)
-                        }
-                    }
-                case .following:
-                    // Unfollow
-                    relationVM.changeRelation(to: .none, for: user.id) { success in
-                        if success {
-                            // Reload the user details after the relation change
-                            vm.fetchUserDetails(userId: user.id)
-                        }
-                    }
-                case .block:
-                    // Unblock
-                    relationVM.changeRelation(to: .none, for: user.id) { success in
-                        if success {
-                            // Reload the user details after the relation change
-                            vm.fetchUserDetails(userId: user.id)
-                        }
+                        if success { vm.fetchUserDetails(userId: user.id) }
                     }
                 }
+            }) {
+                Text(buttonTitle(for: user.relationStatus))
+                    .foregroundColor(textColor)
             }
             .buttonStyle(.borderedProminent)
+            .tint(bgColor)
         }
     }
-
 }
 

@@ -225,6 +225,7 @@ struct FriendsDetails: View {
                 Text("Horses: \(friend.horseCount ?? 0)")
             }
         }
+        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
         .padding()
     }
 
@@ -235,11 +236,13 @@ struct FriendsDetails: View {
                 VStack(alignment: .leading) {
                     Text("Description:")
                         .font(.headline)
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     
                     Text(description)
                         .padding()
                         .frame(width: 370)
-                        .background(Color.white)
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 }
             )
         } else {
@@ -262,11 +265,12 @@ struct FriendsDetails: View {
                             
                             Text("Length: \(String(format: "%.2f", hike.length)) km | Duration: \(String(format: "%.2f", hike.duration)) min")
                                 .font(.caption)
-                                .foregroundColor(.gray)
+                                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
                 }
                 .padding()
@@ -278,66 +282,55 @@ struct FriendsDetails: View {
     
     //MARK: - Add friend/following buttons
     private func actionButtonsView(for friend: FriendInfo) -> some View {
-        // Use the existing vm (FriendDetailsViewModel)
-        
-        // Helper function to return the appropriate button title based on the current relation status
+        // Use your existing RelationViewModel & vm
+        let relationVM = RelationViewModel()
+        let vm = FriendDetailsViewModel()
+
         func buttonTitle(for status: PersonStatus) -> String {
             switch status {
-            case .none: return "Add Friend"
-            case .pending: return "Friend Request Pending"
-            case .friends: return "Unfriend"
+            case .none:      return "Add Friend"
+            case .pending:   return "Friend Request Pending"
+            case .friends:   return "Unfriend"
             case .following: return "Unfollow"
-            case .block: return "Unblock"
+            case .block:     return "Unblock"
             }
         }
 
+        // Adaptive backgrounds
+        let bgColor = AdaptiveColor(
+            light: .lightPostBackground,
+            dark:  .darkPostBackground
+        ).color(for: colorScheme)
+
+        // Adaptive text
+        let textColor = AdaptiveColor(
+            light: .textLightBackground,
+            dark:  .textDarkBackground
+        ).color(for: colorScheme)
+
         return VStack {
-            // Add Friend / Pending / Remove Friend / Unfriend button based on the relation status
-            Button(buttonTitle(for: friend.relationStatus)) {
+            Button(action: {
                 switch friend.relationStatus {
                 case .none:
-                    // Add Friend
                     relationVM.changeRelation(to: .pending, for: friend.id) { success in
-                        if success {
-                            // Use the existing `vm` to reload the friend details after the relation change
-                            vm.fetchFriendDetails(friendId: friend.id)
-                        }
+                        if success { vm.fetchFriendDetails(friendId: friend.id) }
                     }
                 case .pending:
-                    // Accept Friend Request
                     relationVM.changeRelation(to: .friends, for: friend.id) { success in
-                        if success {
-                            // Reload the friend details after the relation change
-                            vm.fetchFriendDetails(friendId: friend.id)
-                        }
+                        if success { vm.fetchFriendDetails(friendId: friend.id) }
                     }
-                case .friends:
-                    // Remove Friend / Unfriend
+                case .friends, .following, .block:
                     relationVM.changeRelation(to: .none, for: friend.id) { success in
-                        if success {
-                            // Reload the friend details after the relation change
-                            vm.fetchFriendDetails(friendId: friend.id)
-                        }
-                    }
-                case .following:
-                    // Unfollow
-                    relationVM.changeRelation(to: .none, for: friend.id) { success in
-                        if success {
-                            // Reload the friend details after the relation change
-                            vm.fetchFriendDetails(friendId: friend.id)
-                        }
-                    }
-                case .block:
-                    // Unblock
-                    relationVM.changeRelation(to: .none, for: friend.id) { success in
-                        if success {
-                            // Reload the friend details after the relation change
-                            vm.fetchFriendDetails(friendId: friend.id)
-                        }
+                        if success { vm.fetchFriendDetails(friendId: friend.id) }
                     }
                 }
+            }) {
+                Text(buttonTitle(for: friend.relationStatus))
+                    .foregroundColor(textColor)
             }
             .buttonStyle(.borderedProminent)
+            .tint(bgColor)
         }
     }
+
 }

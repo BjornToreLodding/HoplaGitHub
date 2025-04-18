@@ -13,8 +13,8 @@ import CoreLocation
 struct HoplaApp: App {
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isDarkMode") private var isDarkMode = false
-    @StateObject var vm = ViewModel(profileViewModel: ProfileViewModel()) 
-    @StateObject private var loginViewModel = LoginViewModel() // Create an instance
+    @StateObject var vm = ViewModel(profileViewModel: ProfileViewModel())
+    @StateObject private var loginViewModel = LoginViewModel()
     @Environment(\.colorScheme) var colorScheme
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
@@ -22,24 +22,32 @@ struct HoplaApp: App {
     @StateObject private var locationManager = LocationManager()
     @StateObject private var myHikeVM = MyHikeViewModel()
     
-    
     var body: some Scene {
         WindowGroup {
             ZStack {
-                AdaptiveColor.background.color(for: colorScheme)
+                // Full-screen main background
+                AdaptiveColor.background
+                    .color(for: colorScheme)
                     .ignoresSafeArea(edges: .all)
                 
                 VStack(spacing: 0) {
                     if isLoggedIn {
-                        VStack {
+                        // Custom logo bar
+                        HStack {
+                            Spacer()
                             Image("logo_white_without_background")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100, height: 40)
-                                .padding(.bottom, 5)
+                                .frame(width: 100, height: 50)
+                            Spacer()
                         }
                         .frame(maxWidth: .infinity)
-                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                        .frame(height: 60)
+                        .background(
+                            // Switch green shade based on your isDarkMode flag directly
+                            AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                                .color(for: isDarkMode ? .dark : .light)
+                        )
                     }
                     
                     if isLoggedIn {
@@ -56,7 +64,6 @@ struct HoplaApp: App {
             .onAppear {
                 setupNavigationBar(for: colorScheme)
                 setupTabBarAppearance(for: colorScheme)
-                
                 if let lat = locationManager.latitude, let lon = locationManager.longitude {
                     print("Current Location - Latitude: \(lat), Longitude: \(lon)")
                 } else {
@@ -72,7 +79,6 @@ struct HoplaApp: App {
     }
 }
 
-
 struct MainTabView: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var navigationPath: NavigationPath
@@ -82,43 +88,27 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             NavigationStack { Home() }
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
-                }
-            
+                .tabItem { Image(systemName: "house"); Text("Home") }
             NavigationStack { Hikes(viewModel: HikeService()) }
-                .tabItem {
-                    Image(systemName: "map")
-                    Text("Hikes")
-                }
-            
+                .tabItem { Image(systemName: "map"); Text("Hikes") }
             NavigationStack { NewHike() }
-                .tabItem {
-                    Image(systemName: "plus.circle")
-                    Text("New Hike")
-                }
-            
+                .tabItem { Image(systemName: "plus.circle"); Text("New Hike") }
             NavigationStack { Community() }
-                .tabItem {
-                    Image(systemName: "person.2.circle")
-                    Text("Community")
-                }
-            
+                .tabItem { Image(systemName: "person.2.circle"); Text("Community") }
             NavigationStack {
                 Profile(
-                    profileViewModel: ProfileViewModel(), loginViewModel: LoginViewModel(),
-                    
+                    profileViewModel: ProfileViewModel(),
+                    loginViewModel: LoginViewModel(),
                     navigationPath: $navigationPath
                 )
             }
-            .tabItem {
-                Image(systemName: "person")
-                Text("Profile")
-            }
+            .tabItem { Image(systemName: "person"); Text("Profile") }
         }
         .tint(colorScheme == .dark ? .white : .black)
-        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+        .background(
+            AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                .color(for: colorScheme)
+        )
     }
 }
 
