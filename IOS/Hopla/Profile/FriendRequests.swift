@@ -16,7 +16,7 @@ struct FriendRequest: Identifiable, Decodable {
 
 class FriendRequestViewModel: ObservableObject {
     @Published var friendRequests: [FriendRequest] = []
-
+    
     func fetchFriendRequests() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -27,7 +27,7 @@ class FriendRequestViewModel: ObservableObject {
             print("Invalid URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -67,12 +67,12 @@ class FriendRequestViewModel: ObservableObject {
         case .block:
             url = "https://hopla.onrender.com/userrelations/block/\(request.id)"
         }
-
+        
         guard let requestUrl = URL(string: url) else {
             print("Invalid URL")
             return
         }
-
+        
         var urlRequest = URLRequest(url: requestUrl)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -82,7 +82,7 @@ class FriendRequestViewModel: ObservableObject {
                 print("Error with the action: \(error.localizedDescription)")
                 return
             }
-
+            
             DispatchQueue.main.async {
                 // Remove the friend request from the list after performing the action
                 self.friendRequests.removeAll { $0.id == request.id }
@@ -97,58 +97,102 @@ enum FriendAction {
 }
 
 struct FriendRequests: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel = FriendRequestViewModel()
-
+    
     var body: some View {
-        NavigationView {
-            List(viewModel.friendRequests) { request in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(request.fromUserName)
-                            .font(.headline)
-                        Text("@\(request.fromUserAlias)")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Custom header
+                ZStack {
+                    AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                        .color(for: colorScheme)
+                        .frame(maxWidth: .infinity)
+                    Text("Friend Requests")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "arrow.left")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .foregroundStyle(
+                                    AdaptiveColor(light: .lightModeTextOnGreen,
+                                                  dark: .darkModeTextOnGreen)
+                                    .color(for: colorScheme)
+                                )
+                        }
+                        Spacer()
                     }
-
-                    Spacer()
-
-                    HStack(spacing: 8) {
-                        Button(action: {
-                            viewModel.handleAction(for: request, action: .add)
-                        }) {
-                            Image(systemName: "plus.app.fill")
-                                .font(.system(size: 24))
-                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                        }
-
-                        Button(action: {
-                            viewModel.handleAction(for: request, action: .decline)
-                        }) {
-                            Image(systemName: "x.square.fill")
-                                .font(.system(size: 24))
-                                
-                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                        }
-
-                        Button(action: {
-                            viewModel.handleAction(for: request, action: .block)
-                        }) {
-                            Image(systemName: "hand.raised.fill")
-                                .font(.system(size: 24))
-                                
-                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                        }
-                    }
-                    .padding(.horizontal)
+                    .padding(.horizontal, 16)
                 }
-                .padding()
+                .frame(height: 40)
+                
+                // List of requests
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(viewModel.friendRequests) { request in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(request.fromUserName)
+                                        .font(.headline)
+                                    Text("@\(request.fromUserAlias)")
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                                Spacer()
+                                HStack(spacing: 8) {
+                                    Button { viewModel.handleAction(for: request, action: .add) } label: {
+                                        Image(systemName: "plus.app.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(
+                                                AdaptiveColor(light: .textLightBackground,
+                                                              dark: .textDarkBackground)
+                                                .color(for: colorScheme)
+                                            )
+                                    }
+                                    Button { viewModel.handleAction(for: request, action: .decline) } label: {
+                                        Image(systemName: "x.square.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(
+                                                AdaptiveColor(light: .textLightBackground,
+                                                              dark: .textDarkBackground)
+                                                .color(for: colorScheme)
+                                            )
+                                    }
+                                    Button { viewModel.handleAction(for: request, action: .block) } label: {
+                                        Image(systemName: "hand.raised.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(
+                                                AdaptiveColor(light: .textLightBackground,
+                                                              dark: .textDarkBackground)
+                                                .color(for: colorScheme)
+                                            )
+                                    }
+                                }
+                            }
+                            .frame(width: 370)
+                            .padding()
+                            .background(
+                                AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground)
+                                    .color(for: colorScheme)
+                            )
+                            .cornerRadius(10)
+                            .shadow(radius: 1)
+                        }
+                    }
+                    .padding(.vertical, 12)
+                }
+                .background(
+                    AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                        .color(for: colorScheme)
+                )
+                .onAppear { viewModel.fetchFriendRequests() }
             }
-            .navigationTitle("Friend Requests")
-            .onAppear {
-                viewModel.fetchFriendRequests()
-            }
+            .navigationBarBackButtonHidden(true)
         }
     }
 }

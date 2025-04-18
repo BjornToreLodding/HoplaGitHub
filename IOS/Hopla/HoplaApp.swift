@@ -32,7 +32,7 @@ struct HoplaApp: App {
                 VStack(spacing: 0) {
                     if isLoggedIn {
                         VStack {
-                            Image("LogoUtenBakgrunn")
+                            Image("logo_white_without_background")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 100, height: 40)
