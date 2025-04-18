@@ -227,6 +227,12 @@ struct Profile: View {
     @State private var selectedYear: Int = 2000
     @State private var selectedMonth: Int = 1
     @State private var selectedDay: Int = 1
+    @State private var isShowingImageForm = false
+    @State private var selectedSource: SourceType? = nil
+    @State private var tempSelectedImage: UIImage? = nil
+
+
+
 
     enum SourceType {
         case camera
@@ -309,34 +315,12 @@ struct Profile: View {
                             }
                         }
 
-                        // Buttons for image picker
-                        HStack {
-                            Button("Camera") {
-                                vm.source = .camera
-                                vm.showPhotoPicker()
-                            }
-                            Button("Photos") {
-                                vm.source = .library
-                                vm.showPhotoPicker()
-                            }
-                        }
-                        .sheet(isPresented: $vm.showPicker) {
-                            ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image, showImagePicker: $isShowingCamera)
-                                .onChange(of: vm.image) { newImage in
-                                    profileImage = newImage
-                                }
-                        }
-
-                        Button("Upload") {
-                            if let image = vm.image, let token = TokenManager.shared.getToken(), let userId = TokenManager.shared.getUserId() {
-                                Task {
-                                    await profileViewModel.uploadProfileImage(image: image, entityId: userId, table: "Users", token: token)
-                                }
-                            } else {
-                                print("Image, token, or user ID is missing.")
-                            }
+                        // Main button to open the form
+                        Button("Change Profile Picture") {
+                            isShowingImageForm = true
                         }
                         .underline()
+                        .padding(.bottom)
 
                         // Navigation Buttons (unchanged)
                         HStack(spacing: 10) {
@@ -378,76 +362,89 @@ struct Profile: View {
                         ZStack {
                             VStack(spacing: 12) {
                                 // Username Field
-                                EditableProfileField(
-                                    title: "Username",
-                                    fieldId: "alias",
-                                    value: Binding(
-                                        get: { profileViewModel.draftProfile?.alias ?? "" },
-                                        set: { profileViewModel.draftProfile?.alias = $0 }
-                                    ),
-                                    editingField: $editingField,
-                                    onSave: { _ in saveUpdate() }
-                                )
+                                fieldContainer(colorScheme: colorScheme) {
+                                    EditableProfileField(
+                                        title: "Username",
+                                        fieldId: "alias",
+                                        value: Binding(
+                                            get: { profileViewModel.draftProfile?.alias ?? "" },
+                                            set: { profileViewModel.draftProfile?.alias = $0 }
+                                        ),
+                                        editingField: $editingField,
+                                        onSave: { _ in saveUpdate() }
+                                    )
+                                }
                                 
                                 // Email Field
-                                EditableProfileField(
-                                    title: "Email",
-                                    fieldId: "email",
-                                    value: Binding(
-                                        get: { profileViewModel.draftProfile?.email ?? "" },
-                                        set: { profileViewModel.draftProfile?.email = $0 }
-                                    ),
-                                    editingField: $editingField,
-                                    onSave: { _ in saveUpdate() }
-                                )
+                                fieldContainer(colorScheme: colorScheme) {
+                                    EditableProfileField(
+                                        title: "Email",
+                                        fieldId: "email",
+                                        value: Binding(
+                                            get: { profileViewModel.draftProfile?.email ?? "" },
+                                            set: { profileViewModel.draftProfile?.email = $0 }
+                                        ),
+                                        editingField: $editingField,
+                                        onSave: { _ in saveUpdate() }
+                                    )
+                                }
                                 
-                                // Name Field
-                                EditableProfileField(
-                                    title: "Name",
-                                    fieldId: "name",
-                                    value: Binding(
-                                        get: { profileViewModel.draftProfile?.name ?? "" },
-                                        set: { profileViewModel.draftProfile?.name = $0 }
-                                    ),
-                                    editingField: $editingField,
-                                    onSave: { _ in saveUpdate() }
-                                )
+                                fieldContainer(colorScheme: colorScheme) {
+                                    // Name Field
+                                    EditableProfileField(
+                                        title: "Name",
+                                        fieldId: "name",
+                                        value: Binding(
+                                            get: { profileViewModel.draftProfile?.name ?? "" },
+                                            set: { profileViewModel.draftProfile?.name = $0 }
+                                        ),
+                                        editingField: $editingField,
+                                        onSave: { _ in saveUpdate() }
+                                    )
+                                }
                                 
                                 // Telephone Field
-                                EditableProfileField(
-                                    title: "Telephone",
-                                    fieldId: "telephone",
-                                    value: Binding(
-                                        get: { profileViewModel.draftProfile?.telephone ?? "" },
-                                        set: { profileViewModel.draftProfile?.telephone = $0 }
-                                    ),
-                                    editingField: $editingField,
-                                    onSave: { _ in saveUpdate() }
-                                )
+                                fieldContainer(colorScheme: colorScheme) {
+                                    EditableProfileField(
+                                        title: "Telephone",
+                                        fieldId: "telephone",
+                                        value: Binding(
+                                            get: { profileViewModel.draftProfile?.telephone ?? "" },
+                                            set: { profileViewModel.draftProfile?.telephone = $0 }
+                                        ),
+                                        editingField: $editingField,
+                                        onSave: { _ in saveUpdate() }
+                                    )
+                                }
                                 
                                 // Description Field
-                                EditableProfileField(
-                                    title: "Description",
-                                    fieldId: "description",
-                                    value: Binding(
-                                        get: { profileViewModel.draftProfile?.description ?? "" },
-                                        set: { profileViewModel.draftProfile?.description = $0 }
-                                    ),
-                                    editingField: $editingField,
-                                    onSave: { _ in saveUpdate() }
-                                )
+                                fieldContainer(colorScheme: colorScheme) {
+                                    EditableProfileField(
+                                        title: "Description",
+                                        fieldId: "description",
+                                        value: Binding(
+                                            get: { profileViewModel.draftProfile?.description ?? "" },
+                                            set: { profileViewModel.draftProfile?.description = $0 }
+                                        ),
+                                        editingField: $editingField,
+                                        onSave: { _ in saveUpdate() }
+                                    )
+                                }
                                 
                                 // Date of Birth Field
-                                EditableDOBField(
-                                    dob: Binding(
-                                        get: { profileViewModel.draftProfile?.dob ?? DOB(year: 2000, month: 1, day: 1) },
-                                        set: { profileViewModel.draftProfile?.dob = $0 }
-                                    ),
-                                    editingField: $editingField,
-                                    onSave: { newDOB in
-                                        saveUpdate()
-                                    }
-                                )
+                                fieldContainer(colorScheme: colorScheme) {
+                                    EditableDOBField(
+                                        dob: Binding(
+                                            get: { profileViewModel.draftProfile?.dob ?? DOB(year: 2000, month: 1, day: 1) },
+                                            set: { profileViewModel.draftProfile?.dob = $0 }
+                                        ),
+                                        editingField: $editingField,
+                                        onSave: { newDOB in
+                                            saveUpdate()
+                                        }
+                                    )
+                                }
+                                
                                 ChangeEmail(loginViewModel: LoginViewModel())
                                 
                                 ChangePassword(loginViewModel: LoginViewModel())
@@ -477,11 +474,129 @@ struct Profile: View {
                 }
             }
         }
-        .sheet(isPresented: $vm.showPicker) {
-            ImagePicker(sourceType: vm.source == .library ? .photoLibrary : .camera, selectedImage: $vm.image, showImagePicker: $isShowingCamera)
+        .sheet(isPresented: $isShowingImageForm) {
+            VStack(spacing: 20) {
+                Text("New Profile Picture")
+                    .font(.title2)
+                    .bold()
+                    .padding(.top)
+
+                HStack(spacing: 30) {
+                    Button("Camera") {
+                        selectedSource = .camera
+                        vm.source = .camera
+                        vm.showPhotoPicker()
+                    }
+
+                    Button("Photos") {
+                        selectedSource = .library
+                        vm.source = .library
+                        vm.showPhotoPicker()
+                    }
+                }
+
+                // Image picker sheet triggers inside the form
+                .sheet(isPresented: $vm.showPicker) {
+                  ImagePicker(
+                    sourceType: selectedSource == .library ? .photoLibrary : .camera,
+                    selectedImage: $tempSelectedImage, // ← bind *temp* only
+                    showImagePicker: $isShowingCamera
+                  )
+                  .onChange(of: tempSelectedImage) { _ in
+                    // as soon as the user taps “Done” in the picker,
+                    // dismiss the picker sheet automatically:
+                    vm.showPicker = false
+                  }
+                }
+                
+                if let tempImage = tempSelectedImage {
+                    ZStack {
+                        // Outer circle background
+                        Circle()
+                            .frame(width: 200, height: 200)
+                            .foregroundColor(
+                                AdaptiveColor(light: .lightPostBackground,
+                                              dark: .darkPostBackground)
+                                  .color(for: colorScheme)
+                            )
+
+                        // The picked image inset a bit
+                        Image(uiImage: tempImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 180, height: 180)
+                            .clipShape(Circle())
+                    }
+                    .padding(.vertical)
+                }
+
+                HStack {
+                    Button("Cancel") {
+                      tempSelectedImage = nil
+                      selectedSource      = nil
+                      vm.showPicker       = false    // in case it’s still open
+                      isShowingImageForm  = false    // dismiss the “New Profile Picture” form
+                    }
+
+                    Spacer()
+
+                    Button("Save") {
+                      guard
+                        let image   = tempSelectedImage,
+                        let token   = TokenManager.shared.getToken(),
+                        let userId  = TokenManager.shared.getUserId()
+                      else {
+                        print("Nothing selected or missing credentials.")
+                        return
+                      }
+
+                      Task {
+                        await profileViewModel.uploadProfileImage(
+                          image: image,
+                          entityId: userId,
+                          table: "Users",
+                          token: token
+                        )
+                        // only now update your UI/model:
+                        profileViewModel.selectedImage = image
+
+                        // clear and dismiss:
+                        tempSelectedImage   = nil
+                        selectedSource      = nil
+                        isShowingImageForm  = false
+                      }
+                    }
+                    .bold()
+                }
+                .padding(.horizontal)
+
+                Spacer()
+            }
+            .padding()
         }
     }
 }
+
+@ViewBuilder
+func fieldContainer<Content: View>(
+    colorScheme: ColorScheme,
+    @ViewBuilder content: () -> Content
+) -> some View {
+    content()
+        .padding()
+        .background(
+            AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground)
+                .color(for: colorScheme)
+        )
+        .cornerRadius(10)
+        .shadow(radius: 2)
+        .foregroundColor(
+            AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground)
+                .color(for: colorScheme)
+        )
+}
+
+
 
 
 struct EditableProfileField: View {

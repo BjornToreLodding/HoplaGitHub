@@ -176,6 +176,9 @@
         }
       }
     },
+    "Change Profile Picture" : {
+
+    },
     "Choose" : {
 
     },
@@ -898,6 +901,9 @@
         }
       }
     },
+    "New Profile Picture" : {
+
+    },
     "New update" : {
       "localizations" : {
         "nb" : {
@@ -1270,9 +1276,6 @@
 
     },
     "Upgrade to Trail" : {
-
-    },
-    "Upload" : {
 
     },
     "Username" : {
