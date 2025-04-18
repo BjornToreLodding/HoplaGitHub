@@ -610,56 +610,119 @@ struct MyHikesDetails: View {
             print("❌ No token found.")
             return
         }
-        
+
         guard let url = URL(string: "https://hopla.onrender.com/trails/create/\(hike.id)") else {
             print("❌ Invalid URL")
             return
         }
-        
+
+        print("Attempting to upgrade hike with ID: \(hike.id)")
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        guard let jsonBody = try? JSONSerialization.data(withJSONObject: formData, options: []) else {
+
+        // Create the multipart/form-data request
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+        let lineBreak = "\r\n"
+
+        // Prepare the image (if selected)
+        if let selectedImage = selectedImage, let imageData = selectedImage.jpegData(compressionQuality: 0.8) {
+            body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"Image\"; filename=\"vakkertur.jpg\"\(lineBreak)".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\(lineBreak)\(lineBreak)".data(using: .utf8)!)
+            body.append(imageData)
+            body.append("\(lineBreak)".data(using: .utf8)!)
+        }
+
+        // Prepare the JSON data
+        let dataJson: [String: Any] = [
+            "UserHikeId": hike.id,
+            "name": updatedTrailname,
+            "filters": [
+                ["filterDefinitionId": "3a6e859e-d3fc-40dc-bc2c-4ad81263f8f2", "value": "Grus"],
+                ["filterDefinitionId": "edc35fcf-2d98-4b6c-9617-8800f5a65b49", "value": "3"],
+                ["filterDefinitionId": "b558af34-ecfc-4204-bba3-d6c1b4161f84", "value": "true"]
+            ]
+        ]
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dataJson, options: []) else {
             print("❌ Failed to encode JSON")
             return
         }
+
+        let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
+        body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"dataJson\"\(lineBreak)\(lineBreak)".data(using: .utf8)!)
+        body.append("\(jsonString)\(lineBreak)".data(using: .utf8)!)
+
+        // End the multipart/form-data body
+        body.append("--\(boundary)--\(lineBreak)".data(using: .utf8)!)
         
-        request.httpBody = jsonBody
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+        request.httpBody = body
+
+        // Send the request
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Error creating trail:", error.localizedDescription)
                 return
             }
-            
-            if let data = data {
-                do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("📡 Server response:", jsonResponse)
-                } catch {
-                    print("❌ Failed to decode response:", error.localizedDescription)
+
+            // Ensure there's data to process
+            guard let data = data else {
+                print("❌ No data received")
+                return
+            }
+
+            // Log the HTTP response status code
+            if let httpResponse = response as? HTTPURLResponse {
+                print("📡 HTTP Response Status Code: \(httpResponse.statusCode)")
+            } else {
+                print("❌ Failed to get HTTP response")
+            }
+
+            // Attempt to print the raw response
+            if let rawResponse = String(data: data, encoding: .utf8) {
+                print("📡 Raw Response: \(rawResponse)")  // Log the raw response for debugging
+
+                // If the response is plain text (non-JSON), handle accordingly
+                if rawResponse.contains("success") {
+                    DispatchQueue.main.async {
+                        self.hike.trailButton = false  // Disable the upgrade button after successful creation
+                    }
+                    return
+                }
+            } else {
+                print("❌ Failed to convert response data to string.")
+            }
+
+            // Attempt to decode the response based on expected format (JSON)
+            do {
+                // If the response is a JSON object, attempt to decode it
+                let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                print("📡 Server response:", jsonResponse)  // Print the parsed JSON
+
+                // Now you can handle the decoded response. For example:
+                if let responseDict = jsonResponse as? [String: Any], let success = responseDict["success"] as? Bool, success {
+                    DispatchQueue.main.async {
+                        self.hike.trailButton = false  // Disable the upgrade button after successful creation
+                    }
+                } else {
+                    print("❌ Failed to upgrade the hike.")
+                }
+            } catch {
+                // If the response can't be decoded into JSON, handle the error here
+                print("❌ Failed to decode response: \(error.localizedDescription)")
+
+                // Optionally handle non-JSON responses (e.g., plain text or HTML)
+                if let rawResponse = String(data: data, encoding: .utf8) {
+                    print("❌ Response is not JSON. Raw response: \(rawResponse)")
                 }
             }
         }.resume()
     }
-    /*
-     func fetchTrailFilters() {
-     guard let url = URL(string: "https://hopla.onrender.com/trailfilters/all") else { return }
-     URLSession.shared.dataTask(with: url) { data, response, error in
-     if let data = data {
-     do {
-     let filters = try JSONDecoder().decode([TrailFilter].self, from: data)
-     DispatchQueue.main.async {
-     self.trailFilters = filters
-     }
-     } catch {
-     print("Decoding error: \(error)")
-     }
-     }
-     }.resume()
-     }
-     */
 }
 
