@@ -38,11 +38,11 @@ struct HoplaApp: App {
                             Image("logo_white_without_background")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100, height: 50)
+                                .frame(width: 100, height: 40)
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(height: 60)
+                        .frame(height: 50)
                         .background(
                             // Switch green shade based on your isDarkMode flag directly
                             AdaptiveColor(light: .lightGreen, dark: .darkGreen)
