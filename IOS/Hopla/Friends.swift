@@ -53,12 +53,12 @@ struct Post: Identifiable, Decodable {
 }
 
 // Enum for relation status
-enum PersonStatus: String, Decodable {
-    case friend = "FRIENDS" // WITH AN "S"!!!! :(
-    case following = "FOLLOWING"
-    case none = "NONE"
-    case pending = "PENDING"
-    case unknown
+enum PersonStatus: String, Codable {
+  case none     = "NONE"
+  case pending  = "PENDING"
+  case following = "FOLLOWING"
+  case friends  = "FRIENDS"
+  case block    = "BLOCK"
 }
 
 
@@ -390,7 +390,7 @@ struct AddFriendPage: View {
 
                     Spacer()
 
-                    if user.relationStatus == .friend {
+                    if user.relationStatus == .friends {
                         Text("Friend")
                             .padding(8)
                             .background(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme))
@@ -440,10 +440,6 @@ struct AddFriendPage: View {
 
     
 }
-
-
-
-
 
 
 func addUserToFriends(_ friend: Friend) {

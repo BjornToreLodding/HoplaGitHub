@@ -18,12 +18,7 @@ struct Hike: Codable, Identifiable, Equatable {
     var name: String
     var description: String?
     let pictureUrl: String
-
-    // ← change to Double and var
-    var averageRating: Double
-    // ← new
-    var ratingCount: Int?
-
+    let averageRating: Int
     var isFavorite: Bool
     let distance: Double?
     var latitude: Double?
@@ -31,59 +26,66 @@ struct Hike: Codable, Identifiable, Equatable {
     let filters: [HikeFilter]?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, description, pictureUrl
-        case averageRating, ratingCount, isFavorite, distance, filters
-        case latMean, longMean
+        case id, name, description, pictureUrl, averageRating, isFavorite, distance, filters
+        case latMean
+        case longMean
     }
 
-    // You can keep your custom decoder/encoder if you need the lat/long fallback,
-    // just add ratingCount to both sides:
     init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        id             = try c.decode(String.self,   forKey: .id)
-        name           = try c.decode(String.self,   forKey: .name)
-        description    = try? c.decode(String.self,   forKey: .description)
-        pictureUrl     = try c.decode(String.self,   forKey: .pictureUrl)
-        averageRating  = try c.decode(Double.self,   forKey: .averageRating)
-        ratingCount = try c.decodeIfPresent(Int.self, forKey: .ratingCount)
-        isFavorite     = try c.decode(Bool.self,     forKey: .isFavorite)
-        distance       = try? c.decode(Double.self,  forKey: .distance)
-        filters        = try? c.decode([HikeFilter].self, forKey: .filters)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        latitude  = try? c.decode(Double.self, forKey: .latMean)
-        longitude = try? c.decode(Double.self, forKey: .longMean)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        description = try? container.decode(String.self, forKey: .description)
+        pictureUrl = try container.decode(String.self, forKey: .pictureUrl)
+        averageRating = try container.decode(Int.self, forKey: .averageRating)
+        isFavorite = try container.decode(Bool.self, forKey: .isFavorite)
+        distance = try? container.decode(Double.self, forKey: .distance)
+        filters = try? container.decode([HikeFilter].self, forKey: .filters)
 
-        // your raw fallback for "latitude"/"longitude" if needed…
+        // Decode latMean/longMean if available
+        latitude = try? container.decode(Double.self, forKey: .latMean)
+        longitude = try? container.decode(Double.self, forKey: .longMean)
+
+        // If latMean/longMean are missing, attempt to decode from raw keys
         if latitude == nil || longitude == nil {
             let raw = try decoder.singleValueContainer().decode([String: AnyDecodable].self)
-            if let lat = raw["latitude"]?.value as? Double { latitude = lat }
-            if let lon = raw["longitude"]?.value as? Double { longitude = lon }
+
+            if let lat = raw["latitude"]?.value as? Double {
+                latitude = lat
+            }
+
+            if let lon = raw["longitude"]?.value as? Double {
+                longitude = lon
+            }
         }
     }
 
-    func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(id,             forKey: .id)
-        try c.encode(name,           forKey: .name)
-        try c.encodeIfPresent(description, forKey: .description)
-        try c.encode(pictureUrl,     forKey: .pictureUrl)
-        try c.encode(averageRating,  forKey: .averageRating)
-        try c.encode(ratingCount,    forKey: .ratingCount)
-        try c.encode(isFavorite,     forKey: .isFavorite)
-        try c.encodeIfPresent(distance, forKey: .distance)
-        try c.encodeIfPresent(filters,  forKey: .filters)
-        try c.encodeIfPresent(latitude,  forKey: .latMean)
-        try c.encodeIfPresent(longitude, forKey: .longMean)
-    }
 
-    // your convenience initializer:
+    
+    // Custom encoding below
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(description, forKey: .description)
+        try container.encode(pictureUrl, forKey: .pictureUrl)
+        try container.encode(averageRating, forKey: .averageRating)
+        try container.encode(isFavorite, forKey: .isFavorite)
+        try container.encodeIfPresent(distance, forKey: .distance)
+        try container.encodeIfPresent(filters, forKey: .filters)
+
+        try container.encodeIfPresent(latitude, forKey: .latMean)
+        try container.encodeIfPresent(longitude, forKey: .longMean)
+    }
+    
     init(
         id: String,
         name: String,
         description: String? = nil,
         pictureUrl: String,
-        averageRating: Double,
-        ratingCount: Int? = nil,
+        averageRating: Int,
         isFavorite: Bool,
         distance: Double? = nil,
         latitude: Double? = nil,
@@ -95,15 +97,14 @@ struct Hike: Codable, Identifiable, Equatable {
         self.description = description
         self.pictureUrl = pictureUrl
         self.averageRating = averageRating
-        self.ratingCount   = ratingCount
-        self.isFavorite    = isFavorite
-        self.distance      = distance
-        self.latitude      = latitude
-        self.longitude     = longitude
-        self.filters       = filters
+        self.isFavorite = isFavorite
+        self.distance = distance
+        self.latitude = latitude
+        self.longitude = longitude
+        self.filters = filters
     }
-}
 
+}
 
 struct AnyDecodable: Decodable {
     let value: Any
@@ -1442,7 +1443,7 @@ struct HikeCard: View {
                     Text(hike.name)
                         .font(.headline)
                     Spacer()
-                    StarDisplay(rating: hike.averageRating)
+                    StarRating(rating: .constant(hike.averageRating))
                         .frame(width: 100)
                 }
                 .padding(.horizontal)
@@ -1507,29 +1508,6 @@ struct StarRating: View {
         }
     }
 }
-
-// MARK: - Read‑only star display (for averages)
-struct StarDisplay: View {
-    let rating: Double
-
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(1...5, id: \.self) { i in
-                Image(
-                    systemName:
-                        rating >= Double(i)
-                        ? "star.fill"
-                        : (rating >= Double(i) - 0.5
-                           ? "star.leadinghalf.fill"
-                           : "star")
-                )
-                .foregroundColor(.yellow)
-            }
-        }
-    }
-}
-
-
 
 //MARK: - The map view
 struct MapContainerView: UIViewRepresentable {

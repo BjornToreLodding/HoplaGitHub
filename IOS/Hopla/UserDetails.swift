@@ -106,6 +106,70 @@ class UserDetailsViewModel: ObservableObject {
     }
 }
 
+class RelationViewModel: ObservableObject {
+    private let baseURL = "https://hopla.onrender.com/userrelations"
+
+    func changeRelation(to status: PersonStatus, for userId: String, completion: @escaping (Bool)->Void = { _ in }) {
+        guard let token = TokenManager.shared.getToken() else {
+            completion(false); return
+        }
+
+        var method: String
+        var url = URL(string: baseURL)!
+        var body: [String: Any]?
+
+        switch status {
+        case .none:
+            method = "DELETE"
+            url = URL(string: "\(baseURL)?TargetUserId=\(userId)")!
+        case .pending:
+            method = "POST"
+            body = ["TargetUserId": userId, "Status": "PENDING"]
+        case .following:
+            method = "POST"
+            body = ["TargetUserId": userId, "Status": "FOLLOWING"]
+        case .friends:
+            method = "PUT"
+            body = ["TargetUserId": userId, "Status": "FRIENDS"]
+        case .block:
+            method = "PUT"
+            body = ["TargetUserId": userId, "Status": "BLOCK"]
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        if let body = body {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        }
+
+        URLSession.shared.dataTask(with: request) { _, response, error in
+            if let error = error {
+                print("Request error:", error.localizedDescription)
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+                return
+            }
+
+            // After the relation change is successful, reload the user details
+            DispatchQueue.main.async {
+                completion(true)
+            }
+        }.resume()
+    }
+}
+
+
 // MARK: - Header
 struct UserDetailsHeader: View {
     var user: UserInfo?
@@ -152,6 +216,8 @@ struct UserDetails: View {
                                 // Profile Picture
                                 profilePictureView(user: user)
                                 
+                                actionButtonsView(for: user)
+                                
                                 // User details in a white box
                                 userDetailsBox(user: user)
                                 
@@ -162,7 +228,7 @@ struct UserDetails: View {
                                 hikesView(user: user)
                                 
                                 // Action buttons (Follow, Add Friend)
-                                actionButtonsView(user: user)
+                                actionButtonsView(for: user)
                             }
                         }
                         .navigationBarBackButtonHidden(true)
@@ -266,33 +332,70 @@ struct UserDetails: View {
         }
     }
     
-    private func actionButtonsView(user: UserInfo) -> some View {
-        VStack {
-            if user.relationStatus == .pending {
-                Button(action: {
-                    vm.followUser(userId: user.id)
-                }) {
-                    Text("Follow")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(AdaptiveColor(light: .blue, dark: .green).color(for: colorScheme))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+    
+    //MARK: - Buttons relationships
+    private func actionButtonsView(for user: UserInfo) -> some View {
+        let relationVM = RelationViewModel()
+        let vm = UserDetailsViewModel()  // Use UserDetailsViewModel here for fetching user details
+
+        func buttonTitle(for status: PersonStatus) -> String {
+            switch status {
+            case .none: return "Add Friend"
+            case .pending: return "Friend Request Pending"
+            case .friends: return "Unfriend"
+            case .following: return "Unfollow"
+            case .block: return "Unblock"
+            }
+        }
+
+        return VStack {
+            Button(buttonTitle(for: user.relationStatus)) {
+                switch user.relationStatus {
+                case .none:
+                    // Add Friend
+                    relationVM.changeRelation(to: .pending, for: user.id) { success in
+                        if success {
+                            // Reload the user details after the relation change
+                            vm.fetchUserDetails(userId: user.id)
+                        }
+                    }
+                case .pending:
+                    // Accept or Deny Friend Request
+                    relationVM.changeRelation(to: .friends, for: user.id) { success in
+                        if success {
+                            // Reload the user details after the relation change
+                            vm.fetchUserDetails(userId: user.id)
+                        }
+                    }
+                case .friends:
+                    // Remove Friend
+                    relationVM.changeRelation(to: .none, for: user.id) { success in
+                        if success {
+                            // Reload the user details after the relation change
+                            vm.fetchUserDetails(userId: user.id)
+                        }
+                    }
+                case .following:
+                    // Unfollow
+                    relationVM.changeRelation(to: .none, for: user.id) { success in
+                        if success {
+                            // Reload the user details after the relation change
+                            vm.fetchUserDetails(userId: user.id)
+                        }
+                    }
+                case .block:
+                    // Unblock
+                    relationVM.changeRelation(to: .none, for: user.id) { success in
+                        if success {
+                            // Reload the user details after the relation change
+                            vm.fetchUserDetails(userId: user.id)
+                        }
+                    }
                 }
-                .padding()
             }
-            Button(action: {
-                // Add friend logic
-            }) {
-                Text("Add Friend")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-            .padding()
+            .buttonStyle(.borderedProminent)
         }
     }
+
 }
 

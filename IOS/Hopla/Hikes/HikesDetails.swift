@@ -1,22 +1,10 @@
 import SwiftUI
 
-//MARK: - For the user rating
-struct RateRequest: Codable {
-  let TrailId: String
-  let Rating: Int
-}
-
-
 struct HikesDetails: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
-    @State private var hike: Hike
-      let trailFilters: [TrailFilter]
-
-      init(hike: Hike, trailFilters: [TrailFilter]) {
-        _hike = State(initialValue: hike)
-        self.trailFilters = trailFilters
-      }
+    let hike: Hike
+    let trailFilters: [TrailFilter]
     
     @State private var userRating: Int = 0
     
@@ -42,18 +30,21 @@ struct HikesDetails: View {
                 
                 // 6. Rating
                 VStack {
-                  HStack {
-                    Text("Rating:")
-                      StarDisplay(rating: hike.averageRating)
-                  }
-                  .padding(.horizontal)
-
-                  HStack {
-                    Text("My rating:")
-                      StarRating(rating: $userRating)
-                          .onChange(of: userRating) { _ in submitRating() }
-                  }
-                  .padding(.horizontal)
+                    HStack {
+                        Text("Rating:")
+                            .frame(maxWidth: .infinity, alignment: .leading) // Aligns to the left
+                        StarRating(rating: .constant(hike.averageRating))
+                            .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to the right
+                    }
+                    .padding(.horizontal)
+                    
+                    HStack {
+                        Text("My rating:")
+                            .frame(maxWidth: .infinity, alignment: .leading) // Aligns to the left
+                        StarRating(rating: $userRating)
+                            .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to the right
+                    }
+                    .padding(.horizontal)
                 }
                 .frame(width: 370, height: 70)
                 .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
@@ -80,89 +71,6 @@ struct HikesDetails: View {
         .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
         .navigationBarTitleDisplayMode(.inline)
     }
-    
-    //MARK: - To submit rating
-    private func submitRating() {
-        // 1) Only accept 1–5
-        guard (1...5).contains(userRating) else { return }
-
-        // 2) Grab token & URL
-        guard let token = TokenManager.shared.getToken(),
-              let url   = URL(string: "https://hopla.onrender.com/trails/rate") else {
-            print("❌ No token or bad URL")
-            return
-        }
-
-        // 3) Optimistic local update
-        let oldCount = hike.ratingCount ?? 0
-        let total    = hike.averageRating * Double(oldCount)
-        let newCount = oldCount + 1
-
-        hike.ratingCount   = newCount
-        hike.averageRating = (total + Double(userRating)) / Double(newCount)
-
-        // 4) Build request
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json; charset=utf-8",
-                         forHTTPHeaderField: "Content-Type")
-
-        let payload = ["TrailId": hike.id, "Rating": userRating] as [String: Any]
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-            print("▶️ JSON →", String(data: request.httpBody!, encoding: .utf8)!)
-        } catch {
-            print("❌ Couldn’t serialize JSON:", error)
-            return
-        }
-
-        // 5) Send & reconcile
-        URLSession.shared.dataTask(with: request) { data, resp, err in
-            DispatchQueue.main.async {
-                if let err = err {
-                    print("❌ Rate failed:", err)
-                    return
-                }
-                guard let http = resp as? HTTPURLResponse else {
-                    print("❌ No HTTP response")
-                    return
-                }
-                print("📡 Rate status:", http.statusCode)
-                if (200...299).contains(http.statusCode) {
-                    fetchTrailDetails()
-                } else {
-                    let msg = data.flatMap { String(data: $0, encoding: .utf8) } ?? "<no body>"
-                    print("Server error:", msg)
-                }
-            }
-        }.resume()
-    }
-
-    
-    //MARK: - To fetch details on a trail
-    private func fetchTrailDetails() {
-      guard let token = TokenManager.shared.getToken() else { return }
-      guard let url   = URL(string: "https://hopla.onrender.com/trails/\(hike.id)") else { return }
-
-      var req = URLRequest(url: url)
-      req.httpMethod = "GET"
-      req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
-      URLSession.shared.dataTask(with: req) { data, resp, err in
-        guard
-          err == nil,
-          let data = data,
-          let updated = try? JSONDecoder().decode(Hike.self, from: data)
-        else { return }
-
-        DispatchQueue.main.async {
-          self.hike = updated
-        }
-      }
-      .resume()
-    }
-
 }
 
 

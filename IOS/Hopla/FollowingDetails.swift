@@ -17,6 +17,8 @@ struct FollowingInfo: Identifiable, Decodable {
     var horseCount: Int?      // Add horseCount
     var userHikes: [Post]?
     
+    var relationStatus: PersonStatus
+    
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case name = "name"
@@ -26,8 +28,11 @@ struct FollowingInfo: Identifiable, Decodable {
         case friendsCount = "friendsCount"    // Add mapping
         case horseCount = "horseCount"        // Add mapping
         case userHikes = "userHikes"
+        case relationStatus 
     }
 }
+
+
 
 // MARK: - Header
 struct FollowingDetailsHeader: View {
@@ -118,6 +123,8 @@ struct FollowingDetails: View {
                             ScrollView {
                                 // Profile Picture
                                 profilePictureView(following: following)
+                                
+                                actionButtonsView(for: following)
                                 
                                 // Following details in a white box
                                 followingDetailsBox(following: following)
@@ -229,4 +236,72 @@ struct FollowingDetails: View {
             return AnyView(EmptyView()) // Return empty view if no hikes
         }
     }
+    
+    //MARK: - Add friend/following buttons
+    private func actionButtonsView(for following: FollowingInfo) -> some View {
+        // Use the existing RelationViewModel for managing relations
+        let relationVM = RelationViewModel() // Use RelationViewModel to change the relation status
+        let vm = FollowingDetailsViewModel() // Use FollowingDetailsViewModel to fetch and display the following details
+
+        // Helper function to return the appropriate button title based on the current relation status
+        func buttonTitle(for status: PersonStatus) -> String {
+            switch status {
+            case .none: return "Follow"
+            case .pending: return "Request Pending"
+            case .friends: return "Unfriend"
+            case .following: return "Unfollow"
+            case .block: return "Unblock"
+            }
+        }
+
+        return VStack {
+            // Follow / Unfollow / Friend request / Unfriend button based on the relation status
+            Button(buttonTitle(for: following.relationStatus)) {
+                switch following.relationStatus {
+                case .none:
+                    // Follow
+                    relationVM.changeRelation(to: .following, for: following.id) { success in
+                        if success {
+                            // Reload the following details after the relation change
+                            vm.fetchFollowingDetails(userId: following.id)
+                        }
+                    }
+                case .pending:
+                    // Accept or Deny Friend Request
+                    relationVM.changeRelation(to: .friends, for: following.id) { success in
+                        if success {
+                            // Reload the following details after the relation change
+                            vm.fetchFollowingDetails(userId: following.id)
+                        }
+                    }
+                case .friends:
+                    // Unfriend
+                    relationVM.changeRelation(to: .none, for: following.id) { success in
+                        if success {
+                            // Reload the following details after the relation change
+                            vm.fetchFollowingDetails(userId: following.id)
+                        }
+                    }
+                case .following:
+                    // Unfollow
+                    relationVM.changeRelation(to: .none, for: following.id) { success in
+                        if success {
+                            // Reload the following details after the relation change
+                            vm.fetchFollowingDetails(userId: following.id)
+                        }
+                    }
+                case .block:
+                    // Unblock
+                    relationVM.changeRelation(to: .none, for: following.id) { success in
+                        if success {
+                            // Reload the following details after the relation change
+                            vm.fetchFollowingDetails(userId: following.id)
+                        }
+                    }
+                }
+            }
+            .buttonStyle(.borderedProminent)
+        }
+    }
+
 }

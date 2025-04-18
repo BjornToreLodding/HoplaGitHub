@@ -146,6 +146,7 @@ struct FriendsDetailsHeader: View {
 struct FriendsDetails: View {
     var friendId: String
     @StateObject private var vm = FriendDetailsViewModel()
+    @StateObject private var relationVM = RelationViewModel()
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
@@ -160,6 +161,8 @@ struct FriendsDetails: View {
                             ScrollView {
                                 // Profile Picture
                                 profilePictureView(friend: friend)
+                                
+                                actionButtonsView(for: friend)
                                 
                                 // Friend details in a white box
                                 friendDetailsBox(friend: friend)
@@ -272,6 +275,69 @@ struct FriendsDetails: View {
             return AnyView(EmptyView()) // Return empty view if no hikes
         }
     }
+    
+    //MARK: - Add friend/following buttons
+    private func actionButtonsView(for friend: FriendInfo) -> some View {
+        // Use the existing vm (FriendDetailsViewModel)
+        
+        // Helper function to return the appropriate button title based on the current relation status
+        func buttonTitle(for status: PersonStatus) -> String {
+            switch status {
+            case .none: return "Add Friend"
+            case .pending: return "Friend Request Pending"
+            case .friends: return "Unfriend"
+            case .following: return "Unfollow"
+            case .block: return "Unblock"
+            }
+        }
+
+        return VStack {
+            // Add Friend / Pending / Remove Friend / Unfriend button based on the relation status
+            Button(buttonTitle(for: friend.relationStatus)) {
+                switch friend.relationStatus {
+                case .none:
+                    // Add Friend
+                    relationVM.changeRelation(to: .pending, for: friend.id) { success in
+                        if success {
+                            // Use the existing `vm` to reload the friend details after the relation change
+                            vm.fetchFriendDetails(friendId: friend.id)
+                        }
+                    }
+                case .pending:
+                    // Accept Friend Request
+                    relationVM.changeRelation(to: .friends, for: friend.id) { success in
+                        if success {
+                            // Reload the friend details after the relation change
+                            vm.fetchFriendDetails(friendId: friend.id)
+                        }
+                    }
+                case .friends:
+                    // Remove Friend / Unfriend
+                    relationVM.changeRelation(to: .none, for: friend.id) { success in
+                        if success {
+                            // Reload the friend details after the relation change
+                            vm.fetchFriendDetails(friendId: friend.id)
+                        }
+                    }
+                case .following:
+                    // Unfollow
+                    relationVM.changeRelation(to: .none, for: friend.id) { success in
+                        if success {
+                            // Reload the friend details after the relation change
+                            vm.fetchFriendDetails(friendId: friend.id)
+                        }
+                    }
+                case .block:
+                    // Unblock
+                    relationVM.changeRelation(to: .none, for: friend.id) { success in
+                        if success {
+                            // Reload the friend details after the relation change
+                            vm.fetchFriendDetails(friendId: friend.id)
+                        }
+                    }
+                }
+            }
+            .buttonStyle(.borderedProminent)
+        }
+    }
 }
-
-
