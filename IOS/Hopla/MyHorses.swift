@@ -196,31 +196,35 @@ struct MyHorses: View {
         ZStack {
             VStack(spacing: 0) {
                 HeaderView(colorScheme: colorScheme)
+                
                 NavigationStack {
-                    
                     ZStack {
                         AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
                             .color(for: colorScheme)
                             .edgesIgnoringSafeArea(.all)
-                        
                         HorseListView(vm: vm, colorScheme: colorScheme)
                     }
-                    .toolbar {  // Move toolbar directly inside NavigationView
-                        ToolbarItem(placement: .bottomBar) {
-                            AddHorseButton(showAddHorseSheet: $showAddHorseSheet, colorScheme: colorScheme)
-                        }
-                    }
-                    
-                }
-                .sheet(isPresented: $showAddHorseSheet) {
-                    AddHorseView(vm: vm)
                 }
                 .navigationBarBackButtonHidden(true)
             }
-            .onAppear {
-                vm.fetchHorses()
-            }
+            .onAppear { vm.fetchHorses() }
+            
+            // Custom back button
             CustomBackButton(colorScheme: colorScheme)
+            
+            // Floating Add button
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    AddHorseButton(showAddHorseSheet: $showAddHorseSheet, colorScheme: colorScheme)
+                        .padding(.bottom, 30)
+                        .padding(.trailing, 20)
+                }
+            }
+        }
+        .sheet(isPresented: $showAddHorseSheet) {
+            AddHorseView(vm: vm)
         }
     }
 }
@@ -325,24 +329,30 @@ struct HorseRowView: View {
 struct AddHorseButton: View {
     @Binding var showAddHorseSheet: Bool
     var colorScheme: ColorScheme
-    
+
     var body: some View {
         Button(action: { showAddHorseSheet = true }) {
-            Image(systemName: "plus")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 30, height: 30)
-                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                .padding(20)
-                .background(
-                    Circle()
-                        .fill(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                        .frame(width: 60, height: 60)
-                        .shadow(radius: 3)
-                )
+            ZStack {
+                // Green circle background
+                Circle()
+                    .fill(
+                        AdaptiveColor(light: .lightGreen,
+                                      dark: .darkGreen)
+                            .color(for: colorScheme)
+                    )
+                    .frame(width: 60, height: 60)
+                    .shadow(radius: 3)
+
+                // White plus
+                Image(systemName: "plus")
+                    .font(.system(size: 30, weight: .bold))
+                    .foregroundColor(.white)
+            }
         }
     }
 }
+
+
 
 // MARK: - Custom Back Button
 struct CustomBackButton: View {

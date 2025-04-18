@@ -838,6 +838,9 @@
         }
       }
     },
+    "My activity" : {
+
+    },
     "My friends" : {
       "localizations" : {
         "nb" : {
@@ -859,6 +862,7 @@
       }
     },
     "My Hikes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {

@@ -231,11 +231,21 @@ struct Friends: View {
                 HStack {
                     Spacer()
                     NavigationLink(destination: AddFriendPage()) {
-                        Image(systemName: "plus.circle.fill")
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                            .foregroundColor(AdaptiveColor(light: .lightGreen, dark: .darkGreen)
-                                                .color(for: colorScheme))
+                        ZStack {
+                            // Green circle background
+                            Circle()
+                                .fill(
+                                    AdaptiveColor(light: .lightGreen,
+                                                  dark: .darkGreen)
+                                        .color(for: colorScheme)
+                                )
+                                .frame(width: 60, height: 60)
+                            
+                            // White plus
+                            Image(systemName: "plus")
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                     }
                     .padding(.bottom, 30)
                     .padding(.trailing, 20)

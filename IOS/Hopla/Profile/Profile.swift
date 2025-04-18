@@ -316,11 +316,16 @@ struct Profile: View {
                         }
 
                         // Main button to open the form
-                        Button("Change Profile Picture") {
+                        Button(action: {
                             isShowingImageForm = true
+                        }) {
+                            // underline the Text, not the Button
+                            Text("Change Profile Picture")
+                                .underline()
+                                .font(.custom("ArialNova-Light", size: 16))
                         }
-                        .underline()
                         .padding(.bottom)
+
 
                         // Navigation Buttons (unchanged)
                         HStack(spacing: 10) {
@@ -594,6 +599,7 @@ func fieldContainer<Content: View>(
             AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground)
                 .color(for: colorScheme)
         )
+        .font(.custom("ArialNova", size: 16))
 }
 
 

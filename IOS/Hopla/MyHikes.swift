@@ -136,49 +136,69 @@ struct MyHikes: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                AdaptiveColor.background.color(for: colorScheme)
-                    .ignoresSafeArea(edges: .all)
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(viewModel.myHikes.indices, id: \.self) { index in
-                            let myHike = viewModel.myHikes[index]
-                            
-                            NavigationLink(destination: MyHikesDetails(hike: myHike, myHikes: $viewModel.myHikes)) {
-                                MyHikePostContainer(
-                                    trailName: myHike.trailName,
-                                    title: myHike.title,
-                                    imageName: myHike.pictureUrl ??
-                                        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
-                                    comment: myHike.comment,
-                                    length: myHike.length,
-                                    duration: myHike.duration,
-                                    colorScheme: colorScheme
-                                )
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .onAppear {
-                                // If this is the last hike, attempt to fetch more
-                                if index == viewModel.myHikes.count - 1 {
-                                    viewModel.fetchMyHikes()
+        ZStack {
+            VStack(spacing: 0) {
+                // Custom header matches MyHorses
+                HeaderViewMyHikes(colorScheme: colorScheme)
+
+                NavigationStack {
+                    ZStack {
+                        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                            .color(for: colorScheme)
+                            .edgesIgnoringSafeArea(.all)
+                        ScrollView {
+                            LazyVStack(spacing: 10) {
+                                ForEach(viewModel.myHikes.indices, id: \.self) { index in
+                                    let hike = viewModel.myHikes[index]
+                                    NavigationLink(destination: MyHikesDetails(hike: hike, myHikes: $viewModel.myHikes)) {
+                                        MyHikePostContainer(
+                                            trailName: hike.trailName,
+                                            title: hike.title,
+                                            imageName: hike.pictureUrl ?? "",
+                                            comment: hike.comment,
+                                            length: hike.length,
+                                            duration: hike.duration,
+                                            colorScheme: colorScheme
+                                        )
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    .onAppear {
+                                        if index == viewModel.myHikes.count - 1 {
+                                            viewModel.fetchMyHikes()
+                                        }
+                                    }
                                 }
+                            }
+                            .padding()
+                            if viewModel.isLoading {
+                                ProgressView("Loading more hikes...")
+                                    .padding()
                             }
                         }
                     }
-                    .padding()
-                    if viewModel.isLoading {
-                        ProgressView("Loading more hikes...")
-                            .padding()
-                    }
                 }
+                .navigationBarBackButtonHidden(true)
             }
-            .padding(.top, 20)
+            .onAppear {
+                viewModel.fetchMyHikes()
+            }
+            // Custom back button overlay
+            CustomBackButton(colorScheme: colorScheme)
         }
-        .navigationTitle("My Hikes")
-        .onAppear {
-            viewModel.fetchMyHikes()
-        }
+    }
+}
+
+struct HeaderViewMyHikes: View {
+    var colorScheme: ColorScheme
+    
+    var body: some View {
+        Text("My activity")
+            .font(.title)
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+            .foregroundColor(.white)
     }
 }
 
@@ -248,7 +268,7 @@ struct MyHikePostContainer: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(AdaptiveColor.background.color(for: colorScheme))
+        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
         .cornerRadius(10)
         .shadow(radius: 5)
     }

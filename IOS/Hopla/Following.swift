@@ -192,12 +192,24 @@ struct FollowingView: View {
                 HStack {
                     Spacer()
                     NavigationLink(destination: AddFollowingPage()) {
-                        Image(systemName: "plus.circle.fill")
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                            .foregroundStyle(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                            .padding()
+                        ZStack {
+                            // Green circle background
+                            Circle()
+                                .fill(
+                                    AdaptiveColor(light: .lightGreen,
+                                                  dark: .darkGreen)
+                                        .color(for: colorScheme)
+                                )
+                                .frame(width: 60, height: 60)
+                            
+                            // White plus
+                            Image(systemName: "plus")
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                     }
+                    .padding(.bottom, 30)
+                    .padding(.trailing, 20)
                 }
             }
         }

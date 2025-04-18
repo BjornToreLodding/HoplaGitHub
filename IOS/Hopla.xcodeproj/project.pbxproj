@@ -11,6 +11,7 @@
 		7EFB2EEC1D385BEE46CA8ECB /* Pods_Hopla.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0C1E8C9DB5888B62F90ED5C /* Pods_Hopla.framework */; };
 		B7267AD72D77461B00A9A81A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B7267AD62D77461B00A9A81A /* KeychainAccess */; };
 		B7267B742D774EA000A9A81A /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B7267B732D774EA000A9A81A /* KeychainSwift */; };
+		B74A113C2DB2790B005516B1 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B74A113B2DB2790B005516B1 /* KeychainSwift */; };
 		B76402B22D808C4D00822457 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B76402B12D808C4D00822457 /* KeychainSwift */; };
 		B77813642D787E9200517150 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B77813632D787E9200517150 /* KeychainAccess */; };
 		B7E5F3892D7EE752003ECADD /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B7E5F3882D7EE752003ECADD /* KeychainAccess */; };
@@ -92,6 +93,7 @@
 				B76402B22D808C4D00822457 /* KeychainSwift in Frameworks */,
 				B7267AD72D77461B00A9A81A /* KeychainAccess in Frameworks */,
 				7EFB2EEC1D385BEE46CA8ECB /* Pods_Hopla.framework in Frameworks */,
+				B74A113C2DB2790B005516B1 /* KeychainSwift in Frameworks */,
 				B7E5F3892D7EE752003ECADD /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -790,6 +792,11 @@
 			productName = KeychainAccess;
 		};
 		B7267B732D774EA000A9A81A /* KeychainSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7267B722D774EA000A9A81A /* XCRemoteSwiftPackageReference "keychain-swift" */;
+			productName = KeychainSwift;
+		};
+		B74A113B2DB2790B005516B1 /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B7267B722D774EA000A9A81A /* XCRemoteSwiftPackageReference "keychain-swift" */;
 			productName = KeychainSwift;
