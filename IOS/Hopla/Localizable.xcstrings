@@ -40,6 +40,17 @@
         }
       }
     },
+    "Accept that Hopla may collect statistics about usage patterns – such as which pages you visit and how often – so that we can further develop the app and provide you with better insights.\n" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Godkjenn at Hopla kan samle inn statistikk om bruksmønstre – for eksempel hvilke sider du besøker og hvor ofte – slik at vi kan videreutvikle appen og gi deg bedre innsikt."
+          }
+        }
+      }
+    },
     "Add a Horse" : {
       "localizations" : {
         "nb" : {
@@ -90,8 +101,25 @@
         }
       }
     },
+    "Allow collection of statistics" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillat innsamling av statistikk"
+          }
+        }
+      }
+    },
     "Apply Filters" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bruk filtere"
+          }
+        }
+      }
     },
     "Are you sure you want to delete %@?" : {
       "localizations" : {
@@ -154,7 +182,14 @@
       }
     },
     "Change email" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre e-post"
+          }
+        }
+      }
     },
     "Change password" : {
       "localizations" : {
@@ -177,16 +212,44 @@
       }
     },
     "Change Profile Picture" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endre profilbilde"
+          }
+        }
+      }
     },
     "Choose" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg"
+          }
+        }
+      }
     },
     "Clear All Filters" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nullstill alle filtere"
+          }
+        }
+      }
     },
     "Comment: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommentar: %@"
+          }
+        }
+      }
     },
     "Community" : {
       "comment" : "Community tab",
@@ -200,10 +263,24 @@
       }
     },
     "Condition" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tilstand"
+          }
+        }
+      }
     },
     "Condition: %lld" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tilstand: %lld"
+          }
+        }
+      }
     },
     "Confirm Deletion" : {
       "localizations" : {
@@ -246,7 +323,14 @@
       }
     },
     "Create a New Update" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny oppdatering"
+          }
+        }
+      }
     },
     "Dark Mode" : {
       "localizations" : {
@@ -319,7 +403,14 @@
       }
     },
     "Description of trail" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beskrivelse av løype"
+          }
+        }
+      }
     },
     "Description:" : {
       "localizations" : {
@@ -341,19 +432,15 @@
         }
       }
     },
-    "Distance" : {
-      "extractionState" : "stale",
+    "Distance: %@" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Distanse"
+            "value" : "Distanse: %@"
           }
         }
       }
-    },
-    "Distance: %@" : {
-
     },
     "Done" : {
       "localizations" : {
@@ -366,7 +453,14 @@
       }
     },
     "Duration: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varighet: %@"
+          }
+        }
+      }
     },
     "Duration: %@ min" : {
       "localizations" : {
@@ -399,15 +493,11 @@
       }
     },
     "Enter %@" : {
-
-    },
-    "Enter a password" : {
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skriv et passord"
+            "value" : "Skriv %@"
           }
         }
       }
@@ -423,7 +513,14 @@
       }
     },
     "Enter current password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv nåværende passord"
+          }
+        }
+      }
     },
     "Enter email address" : {
       "localizations" : {
@@ -456,7 +553,14 @@
       }
     },
     "Enter new email" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn ny e-post"
+          }
+        }
+      }
     },
     "Enter new password" : {
       "localizations" : {
@@ -479,7 +583,14 @@
       }
     },
     "Enter password" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn passord"
+          }
+        }
+      }
     },
     "Enter topic" : {
       "localizations" : {
@@ -491,28 +602,7 @@
         }
       }
     },
-    "Enter username" : {
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv brukernavn"
-          }
-        }
-      }
-    },
     "Enter your email" : {
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv e-posten din"
-          }
-        }
-      }
-    },
-    "Enter your email address" : {
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -543,7 +633,14 @@
       }
     },
     "Fill in Details" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fyll inn detaljer"
+          }
+        }
+      }
     },
     "Filter" : {
       "localizations" : {
@@ -556,10 +653,24 @@
       }
     },
     "Filters" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtere"
+          }
+        }
+      }
     },
     "Filters:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtere:"
+          }
+        }
+      }
     },
     "Follow" : {
       "localizations" : {
@@ -602,7 +713,14 @@
       }
     },
     "Friend Requests" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venneforespørsler"
+          }
+        }
+      }
     },
     "Friends" : {
       "localizations" : {
@@ -628,7 +746,14 @@
 
     },
     "Hike Details" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detaljer om tur"
+          }
+        }
+      }
     },
     "Hikes" : {
       "localizations" : {
@@ -682,7 +807,14 @@
       }
     },
     "Horse: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hest: %@"
+          }
+        }
+      }
     },
     "Horses: %lld" : {
       "localizations" : {
@@ -747,7 +879,14 @@
       }
     },
     "Loading filters..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laster inn filtere…"
+          }
+        }
+      }
     },
     "Loading Hikes..." : {
       "localizations" : {
@@ -780,7 +919,14 @@
       }
     },
     "Loading updates..." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laster inn oppdateringer…"
+          }
+        }
+      }
     },
     "Loading..." : {
       "localizations" : {
@@ -826,7 +972,14 @@
 
     },
     "Message" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melding"
+          }
+        }
+      }
     },
     "Month" : {
       "localizations" : {
@@ -839,7 +992,14 @@
       }
     },
     "My activity" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min aktivitet"
+          }
+        }
+      }
     },
     "My friends" : {
       "localizations" : {
@@ -847,28 +1007,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mine venner"
-          }
-        }
-      }
-    },
-    "My hikes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mine turer"
-          }
-        }
-      }
-    },
-    "My Hikes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mine turer"
           }
         }
       }
@@ -884,7 +1022,14 @@
       }
     },
     "My rating:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min vurdering:"
+          }
+        }
+      }
     },
     "Name" : {
       "localizations" : {
@@ -907,7 +1052,14 @@
       }
     },
     "New Profile Picture" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nytt profilbilde"
+          }
+        }
+      }
     },
     "New update" : {
       "localizations" : {
@@ -930,7 +1082,14 @@
       }
     },
     "No hikes found." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen løyper funnet."
+          }
+        }
+      }
     },
     "No image selected" : {
       "localizations" : {
@@ -943,7 +1102,14 @@
       }
     },
     "No updates found for this trail." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen oppdateringer funnet for denne løypen."
+          }
+        }
+      }
     },
     "Not a member? Sign up" : {
       "localizations" : {
@@ -975,6 +1141,20 @@
         }
       }
     },
+    "Password must be at least 9 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passord må inneholde minst 9 tegn, inkludert minst 1 stor bokstav, 1 liten bokstav, 1 nummer og 1 spesialtegn (!*#)"
+          }
+        }
+      }
+    },
+    "Password must be at least 9 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special symbol." : {
+
+    },
     "Pending" : {
       "localizations" : {
         "nb" : {
@@ -996,6 +1176,16 @@
       }
     },
     "Pick Image" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg bilde"
+          }
+        }
+      }
+    },
+    "Please check your mail to validate your account." : {
 
     },
     "Private Group" : {
@@ -1009,7 +1199,14 @@
       }
     },
     "Private Hike?" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privat løype?"
+          }
+        }
+      }
     },
     "Profile" : {
       "comment" : "Profile tab",
@@ -1023,10 +1220,24 @@
       }
     },
     "Rating:" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vurdering:"
+          }
+        }
+      }
     },
     "Register New Account" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrer ny bruker"
+          }
+        }
+      }
     },
     "Report an Issue" : {
       "localizations" : {
@@ -1049,10 +1260,24 @@
       }
     },
     "Save Hike" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lagre tur"
+          }
+        }
+      }
     },
     "Save or Fill in Details" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lagre eller fyll inn detaljer"
+          }
+        }
+      }
     },
     "Search following..." : {
       "localizations" : {
@@ -1115,13 +1340,34 @@
       }
     },
     "Select a Horse" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg hest"
+          }
+        }
+      }
     },
     "Select Filters" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg filtere"
+          }
+        }
+      }
     },
     "Select Horse" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg hest"
+          }
+        }
+      }
     },
     "Select Image" : {
       "localizations" : {
@@ -1134,7 +1380,14 @@
       }
     },
     "Selected Horse: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valgt hest: %@"
+          }
+        }
+      }
     },
     "Send" : {
       "localizations" : {
@@ -1177,7 +1430,14 @@
       }
     },
     "Stars: %lld" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stjerner: %lld"
+          }
+        }
+      }
     },
     "Start" : {
       "localizations" : {
@@ -1199,8 +1459,25 @@
         }
       }
     },
+    "Statistics Collection" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Innsamling av statistikk"
+          }
+        }
+      }
+    },
     "Stop" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopp"
+          }
+        }
+      }
     },
     "Submit" : {
       "localizations" : {
@@ -1213,7 +1490,14 @@
       }
     },
     "Submit Update" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send inn oppdatering"
+          }
+        }
+      }
     },
     "The app must reload to apply language change" : {
       "localizations" : {
@@ -1235,40 +1519,77 @@
         }
       }
     },
-    "Time" : {
-      "extractionState" : "stale",
+    "Time: %@" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tid"
+            "value" : "Tid: %@"
           }
         }
       }
     },
-    "Time: %@" : {
-
-    },
     "Title" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tittel:"
+          }
+        }
+      }
     },
     "Title: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tittel: %@"
+          }
+        }
+      }
     },
     "Trail name" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Løypenavn"
+          }
+        }
+      }
     },
     "Trail name: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Løypenavn: %@"
+          }
+        }
+      }
     },
     "Trail Name: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Løypenavn: %@"
+          }
+        }
+      }
     },
     "Trail Updates" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oppdatering om løype"
+          }
+        }
+      }
     },
-    "Type a message..." : {
-      "extractionState" : "stale",
+    "Type a message…" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1278,31 +1599,51 @@
         }
       }
     },
-    "Type a message…" : {
-
-    },
     "Updated on: %@" : {
-
-    },
-    "Upgrade to Trail" : {
-
-    },
-    "Username" : {
-      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brukernavn"
+            "value" : "Oppdatert: %@"
           }
         }
       }
     },
+    "Upgrade to Trail" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oppgrader til løype"
+          }
+        }
+      }
+    },
+    "User created successfully" : {
+
+    },
     "View Updates" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se oppdateringer"
+          }
+        }
+      }
+    },
+    "We collect anonymous usage data to help improve Hopla—no personal info is ever shared." : {
 
     },
     "Write the new email and your current password to change your email." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv inn din nye e-post og ditt nåværende passord for å endre e-posten din."
+          }
+        }
+      }
     },
     "Year" : {
       "localizations" : {
@@ -1315,7 +1656,14 @@
       }
     },
     "Yes" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ja"
+          }
+        }
+      }
     },
     "You will be logged out of your account." : {
       "localizations" : {

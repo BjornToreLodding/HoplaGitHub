@@ -20,12 +20,25 @@ struct Login: View {
     @State private var confirmNewPassword: String = "" // When creating a new user
     @State private var newEmail: String = "" // // When creating a new user
     @State private var passwordMismatchWarning: String? = nil // Check if password is the same
+    @State private var allowStatistics = false
+    @State private var isShowingStatsInfo = false
+    @State private var showSignUpSuccessAlert = false
     
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
     
     //@StateObject private var viewModel = LoginViewModel()
     @ObservedObject var viewModel: LoginViewModel
     @ObservedObject var loginViewModel: LoginViewModel
+    
+    // Convenience computed property
+        private var isSignUpFormValid: Bool {
+            return
+                !newEmail.isEmpty &&
+                isValidEmail(newEmail) &&
+                isValidPassword(newPassword) &&
+                newPassword == confirmNewPassword &&
+                allowStatistics
+        }
 
     
     var body: some View {
@@ -176,68 +189,111 @@ struct Login: View {
                     
                     Spacer()
                     
-                    .sheet(isPresented: $isShowingSignUp, onDismiss: {
-                        resetTextFields()
-                    }) {
-                        VStack(spacing: 20) {
-                            Text("Register New Account")
-                                .font(.headline)
-                            
-                            TextField("Enter email address", text: $newEmail)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            SecureField("Enter password", text: $newPassword)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            SecureField("Confirm password", text: $confirmNewPassword)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            // Show warning if passwords do not match
-                            if let warning = passwordMismatchWarning {
-                                Text(warning)
-                                    .foregroundColor(.red)
-                                    .font(.caption)
-                            }
-                            
-                            TextField("Enter username", text: $username)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
-                            
-                            Button(action: {
-                                if newPassword == confirmNewPassword {
-                                    // Call the register function; note that the registration endpoint only needs email and password.
-                                    viewModel.register(email: newEmail, password: newPassword) { success, message in
-                                        if success {
-                                            // Optionally, show an alert or message informing the user to confirm their email.
+                        .sheet(isPresented: $isShowingSignUp, onDismiss: {
+                                            // reset everything
+                                            newEmail = ""
+                                            newPassword = ""
+                                            confirmNewPassword = ""
+                                            allowStatistics = false
                                             passwordMismatchWarning = nil
-                                            // Dismiss sign up sheet (you might also clear the fields)
-                                            isShowingSignUp = false
-                                        } else {
-                                            passwordMismatchWarning = message
+                                        }) {
+                                            VStack(spacing: 16) {
+                                                Text("Register New Account")
+                                                    .font(.headline)
+
+                                                TextField("Enter email address", text: $newEmail)
+                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                                                SecureField("Enter password", text: $newPassword)
+                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                                                SecureField("Confirm password", text: $confirmNewPassword)
+                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                                                Text("Password must be at least 9 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special symbol.")
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                                    .multilineTextAlignment(.center)
+
+                                                if let warning = passwordMismatchWarning {
+                                                    Text(warning)
+                                                        .foregroundColor(.red)
+                                                        .font(.caption)
+                                                        .multilineTextAlignment(.center)
+                                                }
+
+                                                // ——— checkbox + info ———
+                                                HStack {
+                                                    Button { allowStatistics.toggle() }
+                                                    label: {
+                                                        Image(systemName: allowStatistics ? "checkmark.square" : "square")
+                                                    }
+
+                                                    Text("Allow collection of statistics")
+                                                        .font(.caption)
+
+                                                    Spacer()
+
+                                                    Button { isShowingStatsInfo = true }
+                                                    label: {
+                                                        Image(systemName: "questionmark.circle")
+                                                    }
+                                                    .alert("Statistics Collection", isPresented: $isShowingStatsInfo) {
+                                                        Button("OK", role: .cancel) { }
+                                                    } message: {
+                                                        Text("We collect anonymous usage data to help improve Hopla—no personal info is ever shared.")
+                                                    }
+                                                }
+                                                .padding(.horizontal)
+
+                                                // ——— Join now ———
+                                                Button {
+                                                    // final sanity check
+                                                    guard isValidPassword(newPassword) else {
+                                                        passwordMismatchWarning = "Password doesn’t meet requirements."
+                                                        return
+                                                    }
+                                                    guard newPassword == confirmNewPassword else {
+                                                        passwordMismatchWarning = "Passwords do not match!"
+                                                        return
+                                                    }
+
+                                                    viewModel.register(email: newEmail, password: newPassword) { success, message in
+                                                        if success {
+                                                            // dismiss + show confirmation
+                                                            isShowingSignUp = false
+                                                            showSignUpSuccessAlert = true
+                                                        } else {
+                                                            passwordMismatchWarning = message
+                                                        }
+                                                    }
+                                                } label: {
+                                                    Text("Join now")
+                                                        .foregroundColor(.white)
+                                                        .frame(width: 200, height: 50)
+                                                        .background(
+                                                            // conditional color
+                                                            isSignUpFormValid
+                                                                ? AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme)
+                                                                : Color.gray
+                                                        )
+                                                        .cornerRadius(8)
+                                                }
+                                                .disabled(!isSignUpFormValid)
+
+                                                Button("Cancel") {
+                                                    isShowingSignUp = false
+                                                }
+                                                .padding(.top, 8)
+                                            }
+                                            .padding()
                                         }
-                                    }
-                                } else {
-                                    passwordMismatchWarning = "Passwords do not match!"
-                                }
-                            }) {
-                                Text("Join now")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .frame(width: 200, height: 50)
-                                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                                    .cornerRadius(8)
-                            }
-                            
-                            Button("Cancel") {
-                                isShowingSignUp = false
-                            }
-                            .padding()
-                        }
-                        .padding()
-                    }
+                                        // ← show alert on main screen
+                                        .alert("User created successfully", isPresented: $showSignUpSuccessAlert) {
+                                            Button("OK", role: .cancel) { }
+                                        } message: {
+                                            Text("Please check your mail to validate your account.")
+                                        }
 
                 }
                 .onAppear {
@@ -276,6 +332,13 @@ struct Login: View {
         let emailFormat = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let predicate = NSPredicate(format: "SELF MATCHES %@", emailFormat)
         return predicate.evaluate(with: email)
+    }
+    
+    private func isValidPassword(_ password: String) -> Bool {
+        // ≥9 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special
+        let passwordFormat = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{9,}$"
+        let predicate = NSPredicate(format: "SELF MATCHES %@", passwordFormat)
+        return predicate.evaluate(with: password)
     }
 
 }
