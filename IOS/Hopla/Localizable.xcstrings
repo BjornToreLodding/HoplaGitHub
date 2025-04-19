@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "(Save) - not working" : {
+
+    },
     "@%@" : {
 
     },
@@ -754,6 +757,9 @@
           }
         }
       }
+    },
+    "Hike saved to My Activity" : {
+
     },
     "Hikes" : {
       "localizations" : {

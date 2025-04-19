@@ -22,19 +22,6 @@ struct MyHike: Codable, Identifiable {
     var horseName: String? // ✅ Matches `horseName`
     var trailButton: Bool // ✅ Matches API `trailButton`
     
-    // Custom initializer from dictionary (in case of manual parsing)
-    init(from dictionary: [String: Any]) {
-        self.id = dictionary["id"] as? String ?? UUID().uuidString
-        self.trailName = dictionary["trailName"] as? String ?? "Unnamed"
-        self.trailId = dictionary["trailId"] as? String
-        self.length = Double(dictionary["length"] as? String ?? "0") ?? 0.0
-        self.duration = Double(dictionary["duration"] as? String ?? "0") ?? 0.0
-        self.pictureUrl = dictionary["pictureUrl"] as? String
-        self.title = dictionary["title"] as? String ?? "Unnamed Hike"
-        self.comment = dictionary["comment"] as? String ?? "No description provided"
-        self.horseName = dictionary["horseName"] as? String
-        self.trailButton = dictionary["trailButton"] as? Bool ?? false
-    }
 }
 
 
@@ -62,6 +49,7 @@ class MyHikeViewModel: ObservableObject {
         self.currentPage   = 1
         self.hasMorePages  = true
         self.myHikes       = []
+        self.fetchedIds.removeAll() 
         fetchMyHikes()
       }
     
@@ -79,11 +67,11 @@ class MyHikeViewModel: ObservableObject {
         
         let urlString = """
           https://hopla.onrender.com/userhikes/user?
-          userId=\(userId)
-          &pageNumber=\(currentPage)
+          pageNumber=\(currentPage)
           &pageSize=\(pageSize)
           """
           .replacingOccurrences(of: "\n", with: "")
+
 
         print("📤 Final request URL:", urlString)
         

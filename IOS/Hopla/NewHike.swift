@@ -9,12 +9,18 @@ import SwiftUI
 import GoogleMaps
 import GooglePlaces
 
+struct CreateHikeResponse: Decodable {
+    let id: String
+}
+
 
 struct NewHike: View {
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject private var locationManager = LocationManager()
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var myHikeVM: MyHikeViewModel
+    @State private var showSaveConfirmation = false
+
     
     
     
@@ -66,7 +72,7 @@ struct NewHike: View {
                     
                     // ✅ Move .alert outside
                     .alert("Save or Fill in Details", isPresented: $showPopup) {
-                        Button("Save") {
+                        Button("(Save) - not working") {
                             saveHike {
                                 DispatchQueue.main.async {
                                     locationManager.elapsedTime = 0 // ✅ Reset elapsed time
@@ -83,8 +89,16 @@ struct NewHike: View {
                     
                     // ✅ Move .sheet outside
                     .sheet(isPresented: $showDetailForm) {
-                        FillHikeDetailsView(locationManager: locationManager)
+                      FillHikeDetailsView(
+                        locationManager: locationManager,
+                        showSaveConfirmation: $showSaveConfirmation
+                      )
                     }
+                    .alert("Hike saved to My Activity", isPresented: $showSaveConfirmation) {
+                            Button("OK", role: .cancel) {
+                              presentationMode.wrappedValue.dismiss()
+                            }
+                          }
                     
                     Text(String(format: "%.4f km", locationManager.distance))
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -197,16 +211,16 @@ struct NewHike: View {
             guard let data = data else { return }
             
             do {
-                let created = try JSONDecoder().decode(MyHike.self, from: data)
+                let resp = try JSONDecoder().decode(CreateHikeResponse.self, from: data)
+                print("✅ Created hike id:", resp.id)
                 DispatchQueue.main.async {
-                    // use `created` here
-                    self.myHikeVM.myHikes.insert(created, at: 0)
+                    // Instead of inserting a half‑baked MyHike, just reload the full list
                     self.myHikeVM.reloadHikes()
                     completion()
-                    self.presentationMode.wrappedValue.dismiss()
+                    self.showSaveConfirmation = true
                 }
             } catch {
-                print("❌ Decoding error:", error)
+                print("❌ Decoding create response:", error)
             }
         }
         .resume()
@@ -222,6 +236,7 @@ struct FillHikeDetailsView: View {
     
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
+    @Binding var showSaveConfirmation: Bool
     
     
     @State private var title = ""
@@ -253,7 +268,8 @@ struct FillHikeDetailsView: View {
                             locationManager.elapsedTime = 0 // ✅ Reset elapsed time
                             locationManager.distance = 0 // ✅ Reset distance
                         }
-                        presentationMode.wrappedValue.dismiss() // ✅ Only dismiss when saving
+                        showSaveConfirmation = true
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
                 .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
@@ -337,30 +353,32 @@ struct FillHikeDetailsView: View {
         request.httpBody = body
         
         // Send request
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
-                print("❌ Error saving hike:", error.localizedDescription)
+                print("❌ Error saving hike:", error)
                 return
             }
-            // 1️⃣ Make sure we actually got Data back
             guard let data = data else { return }
-
+            
+            // DEBUG
+            if let jsonStr = String(data: data, encoding: .utf8) {
+                print("📡 Raw response JSON:\n", jsonStr)
+            }
+            
             do {
-                // 2️⃣ Decode the newly created hike
-                let createdHike = try JSONDecoder().decode(MyHike.self, from: data)
-
+                let resp = try JSONDecoder().decode(CreateHikeResponse.self, from: data)
+                print("✅ Created hike id:", resp.id)
                 DispatchQueue.main.async {
-                    // 3️⃣ Insert it at the top of your list
-                    self.myHikeVM.myHikes.insert(createdHike, at: 0)
-                    // 4️⃣ Reset pagination and re‐fetch page 1 to avoid duplicates
+                    // reload the full hikes list
                     self.myHikeVM.reloadHikes()
-                    // 5️⃣ Now run your completion handler and dismiss
                     completion()
                     self.presentationMode.wrappedValue.dismiss()
+                    
                 }
             } catch {
-                print("❌ Decoding error:", error.localizedDescription)
+                print("❌ Decoding create response:", error)
             }
-        }.resume()
+        }
+        .resume()
     }
 }
