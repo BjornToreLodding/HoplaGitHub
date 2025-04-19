@@ -27,19 +27,21 @@ struct Friend: Identifiable, Decodable {
 // MARK: - User Model (All Users)
 struct User: Identifiable, Decodable {
     var id: String
-    var name: String
-    var alias: String
+    var name: String?
+    var alias: String?
     var profilePictureUrl: String?
     var relationStatus: PersonStatus?
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case alias
-        case profilePictureUrl
-        case relationStatus
+        case id               // matches "id"
+        case name             // matches "name"
+        case alias            // matches "alias"
+        case profilePictureUrl = "pictureUrl"  // matches "pictureUrl"
+        case relationStatus   // optional, may be missing
     }
 }
+
+
 
 
 
@@ -134,22 +136,34 @@ class FriendViewModel: ObservableObject {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
-                print("Invalid response or status code")
+            if let http = response as? HTTPURLResponse {
+                print("🔔 fetchAllUsers statusCode:", http.statusCode)
+            }
+            guard let data = data else {
+                print("No data returned")
                 return
+            }
+            if let raw = String(data: data, encoding: .utf8) {
+                print("🔍 fetchAllUsers raw JSON →", raw)
             }
 
             do {
-                let users = try JSONDecoder().decode([User].self, from: data)
+                let decoder = JSONDecoder()
+                // If your JSON uses snake_case or camelCase → uncomment:
+                // decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+                let users = try decoder.decode([User].self, from: data)
                 DispatchQueue.main.async {
                     self.allUsers = users
                 }
+                print("✅ Decoded users:", users)
             } catch {
-                print("Error decoding all users:", error.localizedDescription)
+                print("❌ Error decoding all users:", error)
             }
-        }.resume()
+        }
+        .resume()
     }
+
 
     func addFriend(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
@@ -203,56 +217,63 @@ struct Friends: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                FriendsHeaderView(colorScheme: colorScheme)
-                searchBar
-                    .frame(maxWidth: .infinity)
-                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                NavigationStack {
+        NavigationStack {
+            ZStack {
+                // 1) Your main content
+                VStack(spacing: 0) {
+                    FriendsHeaderView(colorScheme: colorScheme)
+                    searchBar
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                                .color(for: colorScheme)
+                        )
+                    
+                    // 2) Friends list fills the rest
                     ZStack {
+                        // 1) Get a Color view from your AdaptiveColor
                         AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
-                            .color(for: colorScheme)
-                            .edgesIgnoringSafeArea(.all)
-                        
+                            .color(for: colorScheme)      // ← now this is a SwiftUI Color
+                            .ignoresSafeArea()            // ← valid on Color (a View)
+
+                        // 2) Your actual list on top of that background
                         FriendListView(vm: vm, colorScheme: colorScheme)
                     }
-                }
-                .navigationBarBackButtonHidden(true)
-            }
-            .onAppear {
-                vm.fetchFriends()
-            }
-            CustomBackButton(colorScheme: colorScheme)
-            
-            // Add Friend button at the bottom-right corner
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    NavigationLink(destination: AddFriendPage()) {
-                        ZStack {
-                            // Green circle background
-                            Circle()
-                                .fill(
-                                    AdaptiveColor(light: .lightGreen,
-                                                  dark: .darkGreen)
-                                        .color(for: colorScheme)
-                                )
-                                .frame(width: 60, height: 60)
-                            
-                            // White plus
-                            Image(systemName: "plus")
-                                .font(.system(size: 30, weight: .bold))
-                                .foregroundColor(.white)
-                        }
+                    .onAppear {
+                        vm.fetchFriends()
                     }
-                    .padding(.bottom, 30)
-                    .padding(.trailing, 20)
+                }
+                
+                // 3) Custom back button (still works)
+                CustomBackButton(colorScheme: colorScheme)
+                
+                // 4) Floating Add‑Friend button
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        NavigationLink(destination: AddFriendPage()) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                                            .color(for: colorScheme)
+                                    )
+                                    .frame(width: 60, height: 60)
+                                Image(systemName: "plus")
+                                    .font(.system(size: 30, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .padding(.bottom, 30)
+                        .padding(.trailing, 20)
+                    }
                 }
             }
+            .navigationBarBackButtonHidden(true)
         }
     }
+
 
     private var searchBar: some View {
         HStack {
@@ -341,9 +362,14 @@ struct AddFriendPage: View {
         if searchText.isEmpty {
             return vm.allUsers
         } else {
-            return vm.allUsers.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+            return vm.allUsers.filter {
+                $0.name?
+                    .localizedCaseInsensitiveContains(searchText)
+                ?? false
+            }
         }
     }
+
 
     var body: some View {
         ZStack {
@@ -395,7 +421,7 @@ struct AddFriendPage: View {
                 HStack {
                     ProfileImageView(urlString: user.profilePictureUrl)
 
-                    Text(user.name)
+                    Text(user.name ?? "No name")
                         .font(.headline)
                         .padding(.leading, 10)
 
