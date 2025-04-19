@@ -56,6 +56,15 @@ class MyHikeViewModel: ObservableObject {
     private let pageSize = 4
     private var hasMorePages = true
     
+    private var fetchedIds = Set<String>()
+    
+    func reloadHikes() {
+        self.currentPage   = 1
+        self.hasMorePages  = true
+        self.myHikes       = []
+        fetchMyHikes()
+      }
+    
     func fetchMyHikes() {
         guard !isLoading else { return }
         guard hasMorePages else { return }
@@ -68,7 +77,14 @@ class MyHikeViewModel: ObservableObject {
             return
         }
         
-        let urlString = "https://hopla.onrender.com/userhikes/user?userId=\(userId)&pageNumber=\(currentPage)&pageSize=\(pageSize)"
+        let urlString = """
+          https://hopla.onrender.com/userhikes/user?
+          userId=\(userId)
+          &pageNumber=\(currentPage)
+          &pageSize=\(pageSize)
+          """
+          .replacingOccurrences(of: "\n", with: "")
+
         print("📤 Final request URL:", urlString)
         
         guard let url = URL(string: urlString) else {
@@ -82,6 +98,7 @@ class MyHikeViewModel: ObservableObject {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            defer { DispatchQueue.main.async { self?.isLoading = false } }
             guard let self = self else { return }
             
             defer {
@@ -110,20 +127,31 @@ class MyHikeViewModel: ObservableObject {
             }
             
             do {
-                let decodedResponse = try JSONDecoder().decode(MyHikeResponse.self, from: data)
-                DispatchQueue.main.async {
-                    if decodedResponse.userHikes.isEmpty {
+                    let resp = try JSONDecoder().decode(MyHikeResponse.self, from: data)
+                    DispatchQueue.main.async {
+                      let page = resp.userHikes
+                      
+                      // Reverse the batch so within it newest→oldest
+                      let reversed = page.reversed()
+                      
+                      // Filter out anything whose id we've already inserted
+                      let newOnes = reversed.filter { self.fetchedIds.insert($0.id).inserted }
+
+                      if newOnes.isEmpty {
                         self.hasMorePages = false
-                    } else {
-                        self.myHikes.append(contentsOf: decodedResponse.userHikes)
+                      } else {
+                        if self.currentPage == 1 {
+                          self.myHikes = newOnes
+                        } else {
+                          self.myHikes.append(contentsOf: newOnes)
+                        }
                         self.currentPage += 1
+                      }
                     }
-                    print("✅ Total Hikes:", self.myHikes.count)
-                }
-            } catch {
-                print("❌ Error decoding:", error.localizedDescription)
-            }
-        }.resume()
+                  } catch {
+                    print("Decoding error:", error)
+                  }        }
+        .resume()
     }
 }
 
@@ -134,13 +162,13 @@ class MyHikeViewModel: ObservableObject {
 struct MyHikes: View {
     @EnvironmentObject var viewModel: MyHikeViewModel
     @Environment(\.colorScheme) var colorScheme
-
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
                 // Custom header matches MyHorses
                 HeaderViewMyHikes(colorScheme: colorScheme)
-
+                
                 NavigationStack {
                     ZStack {
                         AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
@@ -180,7 +208,10 @@ struct MyHikes: View {
                 .navigationBarBackButtonHidden(true)
             }
             .onAppear {
-                viewModel.fetchMyHikes()
+                // only load if we haven’t already
+                if viewModel.myHikes.isEmpty {
+                    viewModel.fetchMyHikes()
+                }
             }
             // Custom back button overlay
             CustomBackButton(colorScheme: colorScheme)
