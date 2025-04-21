@@ -43,6 +43,39 @@ public struct UserProfile: Codable {
     }
 }
 
+// 1) Define an update‐only struct
+struct UpdateUserDto: Encodable {
+  var alias: String
+  var name:  String
+  var email: String
+  var telephone:   String?
+  var description: String?
+  var year:  Int?
+  var month: Int?
+  var day:   Int?
+
+  enum CodingKeys: String, CodingKey {
+    case alias, name, email, telephone, description, year, month, day
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var c = encoder.container(keyedBy: CodingKeys.self)
+    try c.encode(alias, forKey: .alias)
+    try c.encode(name,  forKey: .name)
+    try c.encode(email, forKey: .email)
+    if let tel = telephone, !tel.isEmpty {
+      try c.encode(tel, forKey: .telephone)
+    }
+    if let desc = description, !desc.isEmpty {
+      try c.encode(desc, forKey: .description)
+    }
+    if let y = year, let m = month, let d = day {
+      try c.encode(y, forKey: .year)
+      try c.encode(m, forKey: .month)
+      try c.encode(d, forKey: .day)
+    }
+  }
+}
 
 
 
@@ -158,50 +191,41 @@ class ProfileViewModel: ObservableObject {
         
         guard let draft = draftProfile else { return }
         
-        // Build the payload using the data from the draft profile.
-        let alias = draft.alias
-        let name = draft.name
-        let email = draft.email
-        let telephone = draft.telephone ?? ""
-        let description = draft.description ?? ""
-        
-        var body: [String: Any] = [
-            "alias": alias,
-            "name": name,
-            "email": email,
-            "telephone": telephone,
-            "description": description
-        ]
-        
-        // Include DOB if provided.
-        if let dob = draft.dob {
-            body["year"] = dob.year
-            body["month"] = dob.month
-            body["day"] = dob.day
-        }
-        
+        // 2) Build the DTO (use empty or default values as needed)
+        let dto = UpdateUserDto(
+          alias:       draft.alias       ?? "",
+          name:        draft.name        ?? "",
+          email:       draft.email,
+          telephone:   draft.telephone,
+          description: draft.description,
+          year:        draft.dob?.year,
+          month:       draft.dob?.month,
+          day:         draft.dob?.day
+        )
+
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            // 3) Encode with JSONEncoder
+            let encoder = JSONEncoder()
+            encoder.keyEncodingStrategy = .convertToSnakeCase // if your API wants snake_case
+            let jsonData = try encoder.encode(dto)
+            print("➡️ PUT payload:", String(data: jsonData, encoding: .utf8)!)
             request.httpBody = jsonData
             
             let (data, response) = try await URLSession.shared.data(for: request)
-            
-            if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
-                print("User info updated successfully. Updating local version...")
-                // Instead of re-fetching (which could override the draft with stale data),
-                // update the local versions with the current draft.
-                DispatchQueue.main.async {
-                    self.userProfile = self.draftProfile  // Use the draft (latest version)
-                    loginVM.userProfile = self.draftProfile
-                }
-            } else {
-                let errorMessage = String(data: data, encoding: .utf8) ?? "No response"
-                print("Update failed with response: \(errorMessage)")
+            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+                let body = String(data: data, encoding: .utf8) ?? "<no body>"
+                print("❌ Update failed — status: \((response as? HTTPURLResponse)?.statusCode ?? -1), body: \(body)")
+                return
             }
+            
+            try await Task.sleep(nanoseconds: 500_000_000)   // 0.5s
+            await fetchUserProfile()
+
         } catch {
-            print("Error updating user info: \(error.localizedDescription)")
+            print("Encoding error:", error)
         }
     }
+
 }
 
 struct UploadResponse: Decodable {
