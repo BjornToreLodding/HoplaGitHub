@@ -184,4 +184,8 @@
     <string name="error_while_loading">En feil skjedde mens postene ble hentet. Prøv igjen senere!</string>
     <string name="no_posts">Ingen poster er tilgjengelig for øyeblikket</string>
     <string name="info_updated">Brukerinformasjonen er oppdatert</string>
+    <string name="no_horse_chosen">Ingen hest valgt</string>
+    <string name="choose_horse">Velg hest</string>
+    <string name="save_trip">Lagre tur</string>
+    <string name="save_now_or_later">Fyll inn informasjon nå, eller trykk lagre for å fylle inn senere</string>
 </resources>

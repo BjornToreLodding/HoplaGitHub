@@ -1,10 +1,11 @@
 package com.example.hopla.newTrip
 
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hopla.R
 import com.example.hopla.ui.theme.generalTextStyle
+import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.universalData.ImagePicker
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -51,6 +53,18 @@ fun AlertDialogContent(
     var expanded by remember { mutableStateOf(false) }
 
     Column {
+        Text(
+            text = stringResource(R.string.save_trip),
+            style = headerTextStyleSmall,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Text(
+            text = stringResource(R.string.save_now_or_later),
+            style = generalTextStyle,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         TextField(
             value = tripName,
             onValueChange = onTripNameChange,
@@ -68,7 +82,6 @@ fun AlertDialogContent(
         )
         Box(
             modifier = Modifier
-                .height(200.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -85,20 +98,19 @@ fun AlertDialogContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp)
+                        .padding(bottom = 16.dp)
                 )
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
         ) {
             TextField(
                 readOnly = true,
-                value = selectedHorse.ifEmpty { "No Horse Selected" },
+                value = selectedHorse.ifEmpty { stringResource(R.string.no_horse_chosen) },
                 onValueChange = {},
-                label = { Text("Select Horse") },
+                label = { Text(stringResource(R.string.choose_horse)) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 },
@@ -116,7 +128,7 @@ fun AlertDialogContent(
                         expanded = false
                     }
                 ) {
-                    Text("No Horse Selected", color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.no_horse_chosen), color = MaterialTheme.colorScheme.onSurface)
                 }
                 horses.forEach { horse ->
                     DropdownMenuItem(

@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -86,9 +87,15 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     LaunchedEffect(Unit) {
-        val fetchedHorses = fetchHorses("", UserSession.token)
-        horses = fetchedHorses.map { it.name }
-        horseMap = fetchedHorses.associateBy { it.name }
+        try {
+            val fetchedHorses = fetchHorses("", UserSession.token)
+            horses = fetchedHorses.map { it.name }
+            horseMap = fetchedHorses.associateBy { it.name }
+        } catch (e: Exception) {
+            Log.e("NewTripScreen", "Error fetching horses: ${e.message}", e)
+            horses = emptyList()
+            horseMap = emptyMap()
+        }
     }
 
     LaunchedEffect(isRunning) {
@@ -345,13 +352,13 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                             Log.d("NewTripScreen", "Create Hike Response: $response")
                         }
                     }
-                }) {
-                    Text(text = stringResource(R.string.save))
+                }, shape = RectangleShape ) {
+                    Text(text = stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("Cancel")
+                Button(onClick = { showDialog = false }, shape = RectangleShape) {
+                    Text(stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         )
