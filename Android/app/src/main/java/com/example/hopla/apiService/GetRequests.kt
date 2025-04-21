@@ -24,6 +24,7 @@ import com.example.hopla.universalData.UserRelationRequest
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -306,6 +307,11 @@ suspend fun fetchTrailsRelations(token: String, pageNumber: Int): TrailsResponse
 // Trail on the map
 suspend fun fetchTrailsOnMap(token: String, latitude: Double, longitude: Double, zoomLevel: Int): List<MapTrail> {
     val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
@@ -454,6 +460,12 @@ suspend fun fetchStables(token: String, search: String, userid: String, latitude
                 ignoreUnknownKeys = true
             })
         }
+        install(HttpTimeout) {
+            Log.d("HttpTimeout", "Timeout settings: requestTimeout=60s, connectTimeout=60s, socketTimeout=60s")
+            requestTimeoutMillis = 120_000 // 60 seconds
+            connectTimeoutMillis = 120_000 // 60 seconds
+            socketTimeoutMillis = 120_000 // 60 seconds
+        }
     }
     return httpClient.use { client ->
         try {
@@ -556,6 +568,11 @@ suspend fun fetchFeed(
     sortByLikes: Boolean = false
 ): FeedResponse? {
     val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true

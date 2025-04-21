@@ -28,6 +28,7 @@ import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.apiUrl
 import io.ktor.client.*
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -293,6 +294,11 @@ fun handleLogin(
                         isLenient = true
                         encodeDefaults = true
                     })
+                }
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 120_000 // 120 seconds
+                    connectTimeoutMillis = 120_000 // 120 seconds
+                    socketTimeoutMillis = 120_000 // 120 seconds
                 }
             }
             try {
