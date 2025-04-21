@@ -79,58 +79,75 @@ extension AdaptiveColor {
 }
 
 // MARK: - Color Scheme for Navigation Bar
-func setupNavigationBar(for colorScheme: ColorScheme) {
+func setupNavigationBar(forDarkMode darkMode: Bool) {
     let appearance = UINavigationBarAppearance()
     
-    // Set background color based on the color scheme (light/dark)
-    let backgroundColor = colorScheme == .dark ? UIColor(Color.darkGreen) : UIColor(Color.lightGreen)
-
-    // Ensure the navbar has a solid color (not transparent)
-    appearance.backgroundEffect = nil // This removes any blur effect and sets a solid background color
+    // 1) Solid background
+    appearance.configureWithOpaqueBackground()
+    appearance.backgroundEffect = nil
+    appearance.backgroundColor = UIColor(
+        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+            .color(for: darkMode ? .dark : .light)
+    )
     
-    // Set title text color based on the color scheme
-    appearance.titleTextAttributes = [
-        .foregroundColor: colorScheme == .dark ? UIColor.white : UIColor.black
-    ]
+    // 2) Title colors
+    let titleColor = darkMode ? UIColor.white : UIColor.black
+    appearance.titleTextAttributes   = [.foregroundColor: titleColor]
+    appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
     
-    // Set large title text color if you use large titles
-    appearance.largeTitleTextAttributes = [
-        .foregroundColor: colorScheme == .dark ? UIColor.white : UIColor.black
-    ]
-
-    // Apply the appearance to all navigation bars
+    // 3) Remove shadow if you like
+    appearance.shadowColor = nil
+    
+    // 4) Apply it everywhere
     UINavigationBar.appearance().standardAppearance = appearance
-    UINavigationBar.appearance().scrollEdgeAppearance = appearance
-    UINavigationBar.appearance().compactAppearance = appearance
-
-    // For iOS 15+ where navigation bars are more customizable
+    UINavigationBar.appearance().scrollEdgeAppearance  = appearance
+    UINavigationBar.appearance().compactAppearance     = appearance
     if #available(iOS 15.0, *) {
         UINavigationBar.appearance().compactScrollEdgeAppearance = appearance
     }
+    
+    // 5) Tint (bar button items)
+    UINavigationBar.appearance().tintColor = titleColor
 }
 
+
 // MARK: - Tab Bar Colors
-func setupTabBarAppearance(for colorScheme: ColorScheme) {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        
-        // **Tab Bar Background Color**
-        appearance.backgroundColor = UIColor(
-            AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme)
-        )
-
-        // **Selected and Unselected Tab Item Colors**
-        let selectedColor = colorScheme == .dark ? UIColor.black : UIColor.black
-        let unselectedColor = colorScheme == .dark ? UIColor.lightGray : UIColor(Color.mainLightBackground)
-
-        appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedColor]
-
-        appearance.stackedLayoutAppearance.normal.iconColor = unselectedColor
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: unselectedColor]
-
-        UITabBar.appearance().standardAppearance = appearance
+func setupTabBarAppearance(forDarkMode darkMode: Bool) {
+    let appearance = UITabBarAppearance()
+    appearance.configureWithOpaqueBackground()
+    
+    // 1) Background
+    // dynamic background
+      let dynamicBG = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+          ? UIColor(Color.darkGreen)    // make sure you have a UIColor init for your SwiftUI Color
+          : UIColor(Color.lightGreen)
+      }
+      appearance.backgroundColor = dynamicBG
+    
+    // 2) Selected vs. unselected colors
+    let selectedColor   = darkMode ? UIColor.black : UIColor.black
+    let unselectedColor = darkMode ? UIColor.white : UIColor.white
+    
+    // Apply to all the item layouts
+    let layouts = [
+      appearance.stackedLayoutAppearance,
+      appearance.inlineLayoutAppearance,
+      appearance.compactInlineLayoutAppearance
+    ]
+    for layout in layouts {
+        layout.selected.iconColor             = selectedColor
+        layout.selected.titleTextAttributes   = [.foregroundColor: selectedColor]
+        layout.normal.iconColor               = unselectedColor
+        layout.normal.titleTextAttributes     = [.foregroundColor: unselectedColor]
+    }
+    
+    // 3) Tint fallback (just in case)
+    UITabBar.appearance().tintColor = selectedColor
+    
+    // 4) Install
+    UITabBar.appearance().standardAppearance      = appearance
+    if #available(iOS 15.0, *) {
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
-
-
+}

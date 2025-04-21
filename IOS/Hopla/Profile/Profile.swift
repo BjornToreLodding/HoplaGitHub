@@ -347,6 +347,8 @@ struct Profile: View {
                             Text("Change Profile Picture")
                                 .underline()
                                 .font(.custom("ArialNova-Light", size: 16))
+                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                            
                         }
                         .padding(.bottom)
 

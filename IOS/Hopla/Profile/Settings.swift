@@ -145,8 +145,8 @@ struct Settings: View {
             }
         }
         .onAppear {
-            setupNavigationBar(for: colorScheme)
-            setupTabBarAppearance(for: colorScheme)
+            setupNavigationBar(forDarkMode: isDarkMode)
+            setupTabBarAppearance(forDarkMode: isDarkMode)
         }
     }
     

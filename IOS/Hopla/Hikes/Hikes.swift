@@ -1413,6 +1413,7 @@ struct HikeCard: View {
     @Binding var likedHikes: [String]
     var toggleFavoriteAction: (Hike) -> Void
     @ObservedObject var viewModel: HikeService  // This works now
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationLink(destination: HikesDetails(hike: hike, trailFilters: trailFilters)) {
@@ -1452,6 +1453,7 @@ struct HikeCard: View {
                 HStack {
                     Text(hike.name)
                         .font(.headline)
+                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     Spacer()
                     StarRating(rating: .constant(hike.averageRating))
                         .frame(width: 100)
@@ -1464,13 +1466,15 @@ struct HikeCard: View {
                         Text("Filters:")
                             .font(.subheadline)
                             .bold()
+                            .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         ForEach(filters, id: \.id) { filter in
                             HStack {
                                 Text("\(filter.displayName):")
                                     .font(.caption)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                                 Text(displayValue(for: filter))
                                     .font(.caption)
+                                    .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                             }
                         }
                     }
