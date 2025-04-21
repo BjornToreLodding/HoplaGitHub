@@ -15,12 +15,13 @@ struct HomePost: Identifiable, Decodable {
     let title: String
     let description: String
     let pictureUrl: String?
-    let userAlias: String
-    let userProfilePicture: String
+    let userAlias: String?
+    let userProfilePicture: String?
     let likes: Int
     let isLikedByUser: Bool
     let createdAt: String
 }
+
 
 
 class HomeViewModel: ObservableObject {
@@ -35,7 +36,7 @@ class HomeViewModel: ObservableObject {
         var urlString: String
         switch filter {
         case "globe":
-            urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horse"
+            urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses"
         case "person.2":
             urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&onlyFriendsAndFollowing=true"
         case "point.bottomleft.forward.to.point.topright.scurvepath":
@@ -50,7 +51,7 @@ class HomeViewModel: ObservableObject {
         case "hand.thumbsup":
             urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses&sort=likes"
         default:
-            urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horse"
+            urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses"
         }
 
         guard let url = URL(string: urlString) else {
@@ -277,7 +278,7 @@ struct PostContainer: View {
         VStack(alignment: .leading, spacing: 8) {
             // Header
             HStack {
-                AsyncImage(url: URL(string: post.userProfilePicture)) { image in
+                AsyncImage(url: URL(string: post.userProfilePicture ?? "")) { image in
                     image.resizable()
                 } placeholder: {
                     ProgressView()
@@ -285,7 +286,7 @@ struct PostContainer: View {
                 .frame(width: 40, height: 40)
                 .clipShape(Circle())
 
-                Text(post.userAlias)
+                Text(post.userAlias ?? "Unknown user")
                     .font(.headline)
                     .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 

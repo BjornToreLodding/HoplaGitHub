@@ -255,8 +255,6 @@ struct HikeMapView: View {
 }
 
 
-
-
 // MARK: - Fetching Hikes from Backend
 class HikeService: ObservableObject {
     static let shared = HikeService()
@@ -581,6 +579,7 @@ class HikeService: ObservableObject {
         }.resume()
     }
 
+    
     
     //MARK: - Fetch filtered hikes
     func fetchFilteredHikes(selectedOptions: [String: Any], completion: @escaping (Result<HikeResponse, Error>) -> Void) {

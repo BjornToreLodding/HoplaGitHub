@@ -43,17 +43,6 @@
         }
       }
     },
-    "Accept that Hopla may collect statistics about usage patterns – such as which pages you visit and how often – so that we can further develop the app and provide you with better insights.\n" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Godkjenn at Hopla kan samle inn statistikk om bruksmønstre – for eksempel hvilke sider du besøker og hvor ofte – slik at vi kan videreutvikle appen og gi deg bedre innsikt."
-          }
-        }
-      }
-    },
     "Add a Horse" : {
       "localizations" : {
         "nb" : {
