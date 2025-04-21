@@ -101,4 +101,5 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
     testImplementation(libs.kotlin.test)
     testImplementation(libs.jetbrains.kotlinx.coroutines.test)
+    testImplementation("org.robolectric:robolectric:4.10")
 }

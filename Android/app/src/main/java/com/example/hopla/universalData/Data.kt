@@ -56,7 +56,7 @@ data class User(
     val name: String? = null,
     val alias: String? = null,
     val pictureUrl: String,
-    val telephone: Int? = null,
+    val telephone: String? = null,
     val description: String? = null,
     val dob: DateOfBirth? = null,
     val redirect: String

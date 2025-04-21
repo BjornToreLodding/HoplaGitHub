@@ -40,32 +40,35 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-suspend fun fetchHorses(userId: String, token: String): List<Horse> {
-    val httpClient = HttpClient {
+// Fetch a list of horses from the database and return as a list
+suspend fun fetchHorses(
+    userId: String,
+    token: String,
+    httpClient: HttpClient = HttpClient {
         install(ContentNegotiation) {
             json()
         }
     }
+): List<Horse> {
     return httpClient.use { client ->
         val response: HttpResponse = client.get(apiUrl + "horses/userhorses?userid=$userId") {
             headers {
                 append("Authorization", "Bearer $token")
             }
         }
+
         val responseBody: String = response.bodyAsText()
         Log.d("fetchHorses", "Response Code: ${response.status.value}")
         Log.d("fetchHorses", "Response Body: $responseBody")
 
-        if (response.status == HttpStatusCode.NotFound) {
-            Log.w("fetchHorses", "No horses found for userId: $userId")
-            emptyList() // Return an empty list if 404
-        } else if (response.status == HttpStatusCode.OK) {
-            response.body() // Deserialize and return the list of horses
-        } else {
-            throw Exception("Unexpected response: ${response.status}")
+        return when (response.status) {
+            HttpStatusCode.NotFound -> emptyList()
+            HttpStatusCode.OK -> response.body()
+            else -> throw Exception("Unexpected response: ${response.status}")
         }
     }
 }
+
 
 suspend fun fetchHorseDetails(horseId: String, token: String): HorseDetail {
     val httpClient = HttpClient {

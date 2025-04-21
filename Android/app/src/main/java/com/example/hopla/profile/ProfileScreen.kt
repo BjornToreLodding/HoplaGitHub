@@ -407,7 +407,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", phone)
                     if (statusCode == 200) {
-                        UserSession.telephone = phone.toIntOrNull()
+                        UserSession.telephone = phone?.toIntOrNull()?.toString()
                     }
                     responseMessage = message
                     showResponseDialog = true

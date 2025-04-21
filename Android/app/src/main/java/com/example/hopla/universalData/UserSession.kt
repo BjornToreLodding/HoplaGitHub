@@ -7,7 +7,7 @@ object UserSession {
     var name: String? = ""
     var alias: String? = ""
     var profilePictureURL: String = ""
-    var telephone: Int? = null
+    var telephone: String? = null
     var description: String? = ""
     var dob: DateOfBirth? = null
     var redirect: String = ""
