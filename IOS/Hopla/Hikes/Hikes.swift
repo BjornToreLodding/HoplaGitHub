@@ -1429,14 +1429,23 @@ struct HikeCard: View {
                     .frame(height: 150)
                     .clipped()
                     
-                    // Heart icon
-                    Button(action: {
-                        toggleFavoriteAction(hike) // ✅ Trigger API + UI update
-                    }) {
-                        Image(systemName: hike.isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(hike.isFavorite ? .red : .gray)
-                            .padding(10)
+                    // Heart button
+                    Button {
+                        toggleFavoriteAction(hike)
+                    } label: {
+                        ZStack {
+                            // Black “stroke” heart, slightly larger
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: 26))
+                                .foregroundColor(.black)
+                            // Colored fill heart on top
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(hike.isFavorite ? .red : .gray)
+                        }
+                        .padding(10)
                     }
+
                 }
                 
                 // Hike name and rating
