@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -59,14 +62,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.hopla.R
+import com.example.hopla.apiService.addFavoriteTrail
 import com.example.hopla.apiService.fetchTrailUpdates
 import com.example.hopla.apiService.postTrailReview
 import com.example.hopla.apiService.rateTrail
+import com.example.hopla.apiService.removeFavoriteTrail
+import com.example.hopla.ui.theme.HeartColor
+import com.example.hopla.ui.theme.PrimaryWhite
 import com.example.hopla.ui.theme.StarColor
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
@@ -86,7 +94,7 @@ import java.util.Locale
 @Composable
 fun ReviewDialog(
     onDismiss: () -> Unit,
-    onConfirm: (Bitmap?, String) -> Unit // Allow null for the image
+    onConfirm: (Bitmap?, String) -> Unit
 ) {
     var message by remember { mutableStateOf("") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -191,6 +199,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
     var showGiveReview by remember { mutableStateOf(false) }
+    var isFavorite by remember { mutableStateOf(contentBoxInfo.isFavorite) }
 
     val images = contentBoxInfo.imageResource.toList()
 
@@ -277,6 +286,33 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
+
+                            // Add like/dislike button in the top-right corner
+                            IconButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        try {
+                                            if (isFavorite) {
+                                                removeFavoriteTrail(token, contentBoxInfo.id)
+                                            } else {
+                                                addFavoriteTrail(token, contentBoxInfo.id)
+                                            }
+                                            isFavorite = !isFavorite
+                                        } catch (e: Exception) {
+                                            Log.e("RouteClicked", "Error updating favorite status", e)
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                                    contentDescription = null,
+                                    tint = if (isFavorite) HeartColor else PrimaryWhite
+                                )
+                            }
                         }
                         // Description below pictures
                         Box(

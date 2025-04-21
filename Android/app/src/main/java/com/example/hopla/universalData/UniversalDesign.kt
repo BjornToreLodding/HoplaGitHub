@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +39,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -278,6 +280,7 @@ fun ReportDialog(
 ) {
     var reportTitle by remember { mutableStateOf("") }
     var reportText by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     AlertDialog(
@@ -298,7 +301,11 @@ fun ReportDialog(
                                 value = reportTitle,
                                 onValueChange = { reportTitle = it },
                                 label = { Text(text = stringResource(R.string.title), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
+                                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
+                                )
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             androidx.compose.material.TextField(
@@ -307,7 +314,11 @@ fun ReportDialog(
                                 label = { Text(text = stringResource(R.string.report), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp) // Set a fixed height for the text field
+                                    .height(200.dp),
+                                colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
+                                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
+                                )
                             )
                         }
                     }
@@ -315,23 +326,41 @@ fun ReportDialog(
             }
         },
         confirmButton = {
-            Button(onClick = {
-                coroutineScope.launch {
-                    val reportRequest = UserReportRequest(
-                        EntityId = entityId,
-                        EntityName = entityName,
-                        Category = reportTitle,
-                        Message = reportText
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        loading = true
+                        try {
+                            val reportRequest = UserReportRequest(
+                                EntityId = entityId,
+                                EntityName = entityName,
+                                Category = reportTitle,
+                                Message = reportText
+                            )
+                            createUserReport(token, reportRequest)
+                            onDismiss()
+                        } catch (e: Exception) {
+                            Log.e("ReportDialog", "Error sending report: ${e.message}")
+                        } finally {
+                            loading = false
+                        }
+                    }
+                },
+                enabled = !loading, // Disable button while loading
+                shape = RectangleShape
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(16.dp)
                     )
-                    createUserReport(token, reportRequest)
-                    onDismiss()
+                } else {
+                    Text(text = stringResource(R.string.send), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                 }
-            }) {
-                Text(text = stringResource(R.string.send), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(onClick = onDismiss, shape = RectangleShape) {
                 Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
@@ -366,7 +395,7 @@ fun DateOfBirthPicker(
     selectedYear: Int,
     onDateSelected: (Int, Int, Int) -> Unit,
     onSave: suspend () -> Unit,
-    textColor: Color = MaterialTheme.colorScheme.secondary // Add textColor parameter
+    textColor: Color = MaterialTheme.colorScheme.secondary
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -386,7 +415,7 @@ fun DateOfBirthPicker(
         stringResource(R.string.december)
     )
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    val years = (1925..currentYear).toList()
+    val years = (1925..currentYear).toList().reversed()
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -502,6 +531,10 @@ fun EditableTextField(
             maxLines = maxLines,
             textStyle = MaterialTheme.typography.bodySmall.copy(color = textColor), // Apply textColor
             modifier = Modifier.fillMaxWidth(),
+            colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+            ),
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,

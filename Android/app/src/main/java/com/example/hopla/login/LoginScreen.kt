@@ -118,35 +118,6 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // REMOVE BEFORE FINISHING -> auto login
-            Button(
-                onClick = {
-                    username = "test@test.no"
-                    password = "Hopla2025!"
-                    handleLogin(
-                        username = username,
-                        password = password,
-                        context = context,
-                        coroutineScope = coroutineScope,
-                        onLogin = {
-                            onLogin()
-                            navController.navigate("profile")
-                        },
-                        setErrorMessage = { errorMessage = it },
-                        setShowErrorDialog = { showErrorDialog = it },
-                        setIsLoading = { isLoading = it }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = "Auto-Fill and Login",
-                    style = buttonTextStyle
-                )
-            }
-
             Image(
                 painter = painterResource(id = logoResource),
                 contentDescription = "App Logo",

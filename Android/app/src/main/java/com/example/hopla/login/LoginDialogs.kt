@@ -67,7 +67,7 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
                     style = generalTextStyle,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
+                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp), shape = RectangleShape) {
                     Text(
                         text = stringResource(R.string.ok),
                         style = buttonTextStyle

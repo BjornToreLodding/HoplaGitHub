@@ -14,6 +14,8 @@ import com.example.hopla.universalData.ChangePasswordResponse
 import com.example.hopla.universalData.UserRelationChangeRequest
 import com.example.hopla.universalData.UserRelationResponse
 import com.example.hopla.universalData.apiUrl
+import io.ktor.client.network.sockets.ConnectTimeoutException
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 
@@ -108,44 +110,45 @@ suspend fun updateUserInfo(
                 encodeDefaults = true
             })
         }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 180_000 // 180 seconds
+            connectTimeoutMillis = 180_000 // 180 seconds
+            socketTimeoutMillis = 180_000 // 180 seconds
+        }
     }
 
     val requestBody = mutableMapOf(
         "Alias" to alias,
         "Name" to name
     )
-    phone?.let {
-        requestBody["Telephone"] = it
-    }
-    description?.let {
-        requestBody["Description"] = it
-    }
-    password?.let {
-        requestBody["Password"] = it
-    }
-    year?.let {
-        requestBody["Year"] = it.toString()
-    }
-    month?.let {
-        requestBody["Month"] = it.toString()
-    }
-    day?.let {
-        requestBody["Day"] = it.toString()
-    }
+    phone?.let { requestBody["Telephone"] = it }
+    description?.let { requestBody["Description"] = it }
+    password?.let { requestBody["Password"] = it }
+    year?.let { requestBody["Year"] = it.toString() }
+    month?.let { requestBody["Month"] = it.toString() }
+    day?.let { requestBody["Day"] = it.toString() }
 
     Log.d("updateUserInfo", "Request Body: $requestBody")
 
-    val response: HttpResponse = httpClient.use { client ->
-        client.put(apiUrl + "users/update") {
-            header("Authorization", "Bearer $token")
-            contentType(ContentType.Application.Json)
-            setBody(requestBody)
+    return try {
+        val response: HttpResponse = httpClient.use { client ->
+            client.put(apiUrl + "users/update") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(requestBody)
+            }
         }
-    }
 
-    val responseBody: String = response.bodyAsText()
-    Log.d("updateUserInfo", "Response: $responseBody")
-    return response.status.value to responseBody
+        val responseBody: String = response.bodyAsText()
+        Log.d("updateUserInfo", "Response: $responseBody")
+        response.status.value to responseBody
+    } catch (e: ConnectTimeoutException) {
+        Log.e("updateUserInfo", "Connection timeout", e)
+        -1 to "Connection timeout: ${e.message}"
+    } catch (e: Exception) {
+        Log.e("updateUserInfo", "Error updating user info", e)
+        -1 to "An error occurred: ${e.message}"
+    }
 }
 
 //-------------------------PUT requests for relations between users-------------------------

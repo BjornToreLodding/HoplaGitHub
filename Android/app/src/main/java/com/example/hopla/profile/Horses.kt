@@ -290,7 +290,6 @@ fun HorseItem(horse: Horse, navController: NavController) {
     }
 }
 
-
 @Composable
 fun DetailRow(label: String, value: String) {
     Row(

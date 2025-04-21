@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -211,13 +212,13 @@ fun ConfirmDialog(title: String, message: String, onConfirm: () -> Unit, onDismi
         title = { Text(title) },
         text = { Text(message) },
         confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(text = stringResource(R.string.confirm), style = buttonTextStyle)
+            Button(onClick = onConfirm, shape = RectangleShape) {
+                Text(text = stringResource(R.string.confirm), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
+            Button(onClick = onDismiss, shape = RectangleShape) {
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     )
@@ -241,18 +242,22 @@ fun PasswordConfirmDialog(
                     value = password,
                     onValueChange = onPasswordChange,
                     label = { Text(stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                    ),
                 )
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(password) }) {
-                Text(stringResource(R.string.confirm), style = buttonTextStyle)
+            Button(onClick = { onConfirm(password) }, shape = RectangleShape) {
+                Text(stringResource(R.string.confirm), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle)
+            Button(onClick = onDismiss, shape = RectangleShape) {
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     )

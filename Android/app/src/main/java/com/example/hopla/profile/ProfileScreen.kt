@@ -2,6 +2,7 @@ package com.example.hopla.profile
 
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,7 +67,6 @@ import com.example.hopla.apiService.uploadProfilePicture
 import com.example.hopla.ui.theme.HeartColor
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
-import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
@@ -359,6 +360,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var successMessage = stringResource(R.string.info_updated)
 
     Box(
         modifier = modifier
@@ -385,9 +387,12 @@ fun UserChanges(modifier: Modifier = Modifier) {
                         username, UserSession.name ?: "")
                     if (statusCode == 200) {
                         UserSession.alias = username
+                        responseMessage = successMessage
+                        showResponseDialog = true
+                    } else {
+                        responseMessage = message
+                        showResponseDialog = true
                     }
-                    responseMessage = message
-                    showResponseDialog = true
                 },
             )
 
@@ -408,9 +413,12 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", phone)
                     if (statusCode == 200) {
                         UserSession.telephone = phone?.toIntOrNull()?.toString()
+                        responseMessage = successMessage
+                        showResponseDialog = true
+                    } else {
+                        responseMessage = message
+                        showResponseDialog = true
                     }
-                    responseMessage = message
-                    showResponseDialog = true
                 },
                 isPhone = true
             )
@@ -424,9 +432,12 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", name)
                     if (statusCode == 200) {
                         UserSession.name = name
+                        responseMessage = successMessage
+                        showResponseDialog = true
+                    } else {
+                        responseMessage = message
+                        showResponseDialog = true
                     }
-                    responseMessage = message
-                    showResponseDialog = true
                 }
             )
 
@@ -439,9 +450,12 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", description = description)
                     if (statusCode == 200) {
                         UserSession.description = description
+                        responseMessage = successMessage
+                        showResponseDialog = true
+                    } else {
+                        responseMessage = message
+                        showResponseDialog = true
                     }
-                    responseMessage = message
-                    showResponseDialog = true
                 },
                 singleLine = false,
                 maxLines = 5
@@ -474,9 +488,12 @@ fun UserChanges(modifier: Modifier = Modifier) {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", year = dob?.year, month = dob?.month, day = dob?.day)
                     if (statusCode == 200) {
                         UserSession.dob = dob
+                        responseMessage = successMessage
+                        showResponseDialog = true
+                    } else {
+                        responseMessage = message
+                        showResponseDialog = true
                     }
-                    responseMessage = message
-                    showResponseDialog = true
                 }
             )
         }
@@ -564,10 +581,10 @@ fun UserChanges(modifier: Modifier = Modifier) {
     if (showResponseDialog) {
         AlertDialog(
             onDismissRequest = { showResponseDialog = false },
-            text = { Text(text = responseMessage) },
+            text = { Text(text = responseMessage, style = generalTextStyleBold, color = MaterialTheme.colorScheme.secondary) },
             confirmButton = {
-                Button(onClick = { showResponseDialog = false }) {
-                    Text(text = stringResource(R.string.close))
+                Button(onClick = { showResponseDialog = false }, shape = RectangleShape) {
+                    Text(text = stringResource(R.string.close), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         )
@@ -589,6 +606,7 @@ fun AddNewType(
     var users by remember { mutableStateOf<List<OtherUsers>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
+    var isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -679,6 +697,7 @@ fun AddNewType(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
                     coroutineScope.launch {
+                        isLoading = true
                         try {
                             val horseRequest = HorseRequest(
                                 Name = name,
@@ -694,12 +713,26 @@ fun AddNewType(
                             navController.popBackStack()  // Navigate only after successful response
                         } catch (e: Exception) {
                             Log.e("createHorse", "Error creating horse", e)
+                        } finally {
+                            isLoading = false // Stop loading
                         }
                     }
-                }, shape = RectangleShape ) {
-                    Text(text = stringResource(R.string.add), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                },
+                    shape = RectangleShape
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.add),
+                            style = buttonTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
-
             }
             else -> {
                 Column(

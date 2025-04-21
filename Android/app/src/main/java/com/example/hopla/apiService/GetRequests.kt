@@ -46,6 +46,11 @@ suspend fun fetchHorses(
     userId: String,
     token: String,
     httpClient: HttpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
         install(ContentNegotiation) {
             json()
         }
@@ -121,6 +126,11 @@ suspend fun fetchFollowing(token: String): List<Following> {
 
 suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
     val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
@@ -133,6 +143,8 @@ suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
                 append("Authorization", "Bearer $token")
             }
         }
+        Log.d("fetchFriendProfile", "Response: ${response.status}")
+        Log.d("fetchFriendProfile", "Response Body: ${response.bodyAsText()}")
         response.body()
     }
 }
@@ -209,6 +221,11 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
 // All trails
 suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String, filtersQuery: String): TrailsResponse {
     val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true

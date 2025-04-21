@@ -59,6 +59,11 @@ suspend fun createUserReport(token: String, reportRequest: UserReportRequest): U
                 encodeDefaults = true
             })
         }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
     }
 
     val response: HttpResponse = client.post(apiUrl+"userreports/create") {
@@ -135,6 +140,11 @@ suspend fun changeEmail(newEmail: String, password: String): String {
 
 suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
     val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000 // 120 seconds
+            connectTimeoutMillis = 120_000 // 120 seconds
+            socketTimeoutMillis = 120_000 // 120 seconds
+        }
         install(ContentNegotiation) {
             json()
         }
