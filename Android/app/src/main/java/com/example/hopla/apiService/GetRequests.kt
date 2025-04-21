@@ -516,6 +516,12 @@ suspend fun fetchStableDetails(token: String, stableId: String): StableDetails? 
                 ignoreUnknownKeys = true
             })
         }
+        install(HttpTimeout) {
+            Log.d("HttpTimeout", "Timeout settings: requestTimeout=60s, connectTimeout=60s, socketTimeout=60s")
+            requestTimeoutMillis = 180_000 // 60 seconds
+            connectTimeoutMillis = 180_000 // 60 seconds
+            socketTimeoutMillis = 180_000 // 60 seconds
+        }
     }
 
     Log.d("fetchStableDetails", "Request URL: https://hopla.onrender.com/stables/$stableId")

@@ -306,9 +306,9 @@ fun handleLogin(
                     })
                 }
                 install(HttpTimeout) {
-                    requestTimeoutMillis = 120_000 // 120 seconds
-                    connectTimeoutMillis = 120_000 // 120 seconds
-                    socketTimeoutMillis = 120_000 // 120 seconds
+                    requestTimeoutMillis = 180_000 // 120 seconds
+                    connectTimeoutMillis = 180_000 // 120 seconds
+                    socketTimeoutMillis = 180_000 // 120 seconds
                 }
             }
             try {
