@@ -9,8 +9,10 @@ import SwiftUI
 import GoogleMaps
 import CoreLocation
 
+
 @main
 struct HoplaApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isDarkMode") private var isDarkMode = false
     
