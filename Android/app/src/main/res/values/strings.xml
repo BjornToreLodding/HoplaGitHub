@@ -181,4 +181,6 @@
     <string name="ride_trail">Ri løype</string>
     <string name="today">I dag</string>
     <string name="yesterday">I går</string>
+    <string name="error_while_loading">En feil skjedde mens postene ble hentet. Prøv igjen senere!</string>
+    <string name="no_posts">Ingen poster er tilgjengelig for øyeblikket</string>
 </resources>

@@ -193,5 +193,7 @@
     <string name="ride_trail">Ride trail</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
+    <string name="error_while_loading">An error occurred while fetching posts. Please try again later.</string>
+    <string name="no_posts">No posts available at the moment.</string>
 
 </resources>

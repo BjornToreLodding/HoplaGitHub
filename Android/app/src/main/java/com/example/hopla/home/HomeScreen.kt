@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.hopla.apiService.fetchFeed
+import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.FeedItem
 import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.getCurrentLocation
@@ -77,7 +78,14 @@ fun HomeScreen(navController: NavController) {
 
 // Fetch the feed items based on the selected filter from top text
 @Composable
-fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = false, onlyLikedTrails: Boolean = false, latitude: Double? = null, longitude: Double? = null, sortByLikes: Boolean = false) {
+fun PostList(
+    navController: NavController,
+    onlyFriendsAndFollowing: Boolean = false,
+    onlyLikedTrails: Boolean = false,
+    latitude: Double? = null,
+    longitude: Double? = null,
+    sortByLikes: Boolean = false
+) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
@@ -95,35 +103,37 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
         sortByLikes
     ) {
         isLoading = true
-        val newFeedResponse = if (sortByLikes) {
-            fetchFeed(
-                token,
-                pageNumber,
-                onlyFriendsAndFollowing,
-                onlyLikedTrails,
-                latitude,
-                longitude,
-                sortByLikes = true
-            )
-        } else {
-            fetchFeed(
-                token,
-                pageNumber,
-                onlyFriendsAndFollowing,
-                onlyLikedTrails,
-                latitude,
-                longitude
-            )
-        }
-        if (newFeedResponse == null) {
-            errorMessage = "Not available right now"
-            hasMorePosts = false
-        } else {
-            if (newFeedResponse.items.isEmpty()) {
+        try {
+            val newFeedResponse = if (sortByLikes) {
+                fetchFeed(
+                    token,
+                    pageNumber,
+                    onlyFriendsAndFollowing,
+                    onlyLikedTrails,
+                    latitude,
+                    longitude,
+                    sortByLikes = true
+                )
+            } else {
+                fetchFeed(
+                    token,
+                    pageNumber,
+                    onlyFriendsAndFollowing,
+                    onlyLikedTrails,
+                    latitude,
+                    longitude
+                )
+            }
+            if (newFeedResponse == null || newFeedResponse.items.isEmpty()) {
                 hasMorePosts = false
+                if (feedItems.isEmpty()) {
+                    errorMessage = "Ingen innlegg tilgjengelig for øyeblikket"
+                }
             } else {
                 feedItems = feedItems + newFeedResponse.items
             }
+        } catch (e: Exception) {
+            errorMessage = "En feil har skjedd mens vi henter innlegg. Vennligst prøv igjen senere"
         }
         isLoading = false
     }
@@ -139,7 +149,7 @@ fun PostList(navController: NavController, onlyFriendsAndFollowing: Boolean = fa
 
     if (errorMessage != null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = errorMessage!!)
+            Text(text = errorMessage!!, style = underheaderTextStyle, color = MaterialTheme.colorScheme.tertiary)
         }
     } else {
         LazyColumn(
