@@ -155,8 +155,12 @@ public class HorseController : ControllerBase
             PictureUrl = pictureUrl,
             Dob = dob
         };
-
-        // Save the horse to the database
+        var user = await _context.Users.FindAsync(parsedUserId);
+        if (user != null)
+        {
+            user.HorseCount++;
+        }
+            // Save the horse to the database
         _context.Horses.Add(horse);
         await _context.SaveChangesAsync();
 
@@ -187,6 +191,14 @@ public class HorseController : ControllerBase
 
         // Perform soft delete
         horse.IsDeleted = true;
+        
+        //Decreasing HorseCounter in Users-table
+        var user = await _context.Users.FindAsync(parsedUserId);
+        if (user != null)
+        {
+            user.HorseCount--;
+        }
+
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Horse deleted" });

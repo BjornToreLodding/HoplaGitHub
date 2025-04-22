@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HoplaBackend.Controllers
 {
-    [Route("misc")]
+    [Route("sync")]
     [ApiController]
     public class MiscController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace HoplaBackend.Controllers
         }
 
         // Endpoint for å oppdatere FriendsCount og HorseCount for alle brukere
-        [HttpPost("updateuser")]
+        [HttpPost("updateusers")]
         public async Task<IActionResult> UpdateUserCounts()
         {
             var users = await _context.Users.ToListAsync();

@@ -496,6 +496,11 @@ public class UserRelationsController : ControllerBase
                 return BadRequest(new { message = "Kan kun godta venneforespørsel sendt til deg" });
 
             relation.Status = "FRIENDS";
+            var user1 = await _context.Users.FindAsync(userId);
+            var user2 = await _context.Users.FindAsync(request.TargetUserId);
+
+            if (user1 != null) user1.FriendsCount++;
+            if (user2 != null) user2.FriendsCount++;
 
             // Fjern eventuell FOLLOWING begge veier
             var toRemove = await _context.UserRelations
@@ -521,7 +526,11 @@ public class UserRelationsController : ControllerBase
                 Status = "BLOCK",
                 CreatedAt = DateTime.UtcNow
             };
+            var user1 = await _context.Users.FindAsync(userId);
+            var user2 = await _context.Users.FindAsync(request.TargetUserId);
 
+            if (user1 != null) user1.FriendsCount--;
+            if (user2 != null) user2.FriendsCount--;
             _context.UserRelations.Add(block);
         }
         // ✅ Andre tillatte oppdateringer (f.eks. BLOCK → FOLLOWING)
@@ -563,6 +572,12 @@ public class UserRelationsController : ControllerBase
 
         if (relation == null)
             return NotFound(new { message = "Relasjon ikke funnet" });
+
+        var user1 = await _context.Users.FindAsync(userId);
+        var user2 = await _context.Users.FindAsync(request.TargetUserId);
+
+        if (user1 != null) user1.FriendsCount--;
+        if (user2 != null) user2.FriendsCount--;
 
         _context.UserRelations.Remove(relation);
         await _context.SaveChangesAsync();
