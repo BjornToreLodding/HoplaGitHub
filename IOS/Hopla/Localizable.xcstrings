@@ -2,7 +2,14 @@
   "sourceLanguage" : "en",
   "strings" : {
     "(Save) - not working" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lagre) - virker ikke"
+          }
+        }
+      }
     },
     "@%@" : {
 
@@ -748,7 +755,14 @@
       }
     },
     "Hike saved to My Activity" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tur lagret i Min Aktivitet"
+          }
+        }
+      }
     },
     "Hikes" : {
       "localizations" : {
@@ -1136,19 +1150,15 @@
         }
       }
     },
-    "Password must be at least 9 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol." : {
-      "extractionState" : "stale",
+    "Password must be at least 9 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special symbol." : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passord må inneholde minst 9 tegn, inkludert minst 1 stor bokstav, 1 liten bokstav, 1 nummer og 1 spesialtegn (!*#)"
+            "value" : "Passord må inneholde minst 9 tegn, og må inkludere minst 1 stor bokstav, 1 liten bokstav, 1 tall og 1 spesialtegn."
           }
         }
       }
-    },
-    "Password must be at least 9 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special symbol." : {
-
     },
     "Pending" : {
       "localizations" : {
@@ -1181,7 +1191,14 @@
       }
     },
     "Please check your mail to validate your account." : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venligst åpne e-posten vi har sendt deg for å validere brukeren din."
+          }
+        }
+      }
     },
     "Private Group" : {
       "localizations" : {
@@ -1615,7 +1632,14 @@
       }
     },
     "User created successfully" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bruker opprettet"
+          }
+        }
+      }
     },
     "View Updates" : {
       "localizations" : {
@@ -1627,8 +1651,15 @@
         }
       }
     },
-    "We collect anonymous usage data to help improve Hopla—no personal info is ever shared." : {
-
+    "We collect usage data to help improve Hopla" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vi samler inn brukerdata for å forbedre Hopla"
+          }
+        }
+      }
     },
     "Write the new email and your current password to change your email." : {
       "localizations" : {

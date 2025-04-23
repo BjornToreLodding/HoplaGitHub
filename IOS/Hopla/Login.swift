@@ -241,7 +241,7 @@ struct Login: View {
                                                     .alert("Statistics Collection", isPresented: $isShowingStatsInfo) {
                                                         Button("OK", role: .cancel) { }
                                                     } message: {
-                                                        Text("We collect anonymous usage data to help improve Hopla—no personal info is ever shared.")
+                                                        Text("We collect usage data to help improve Hopla")
                                                     }
                                                 }
                                                 .padding(.horizontal)
