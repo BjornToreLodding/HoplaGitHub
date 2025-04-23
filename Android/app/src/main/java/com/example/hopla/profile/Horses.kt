@@ -88,7 +88,7 @@ fun UserHorsesScreen(navController: NavController, userId: String) {
             modifier = Modifier.fillMaxSize()
         ) {
             items(horses) { horse ->
-                HorseItem(horse, navController)
+                HorseItem(horse, navController, isMyPage = false)
             }
         }
     }
@@ -113,7 +113,7 @@ fun MyHorsesScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize()
         ) {
             items(horses) { horse ->
-                HorseItem(horse, navController)
+                HorseItem(horse, navController, isMyPage = true)
             }
             item {
                 Spacer(modifier = Modifier.height(64.dp))
@@ -217,9 +217,8 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
     }
 }
 
-
 @Composable
-fun HorseItem(horse: Horse, navController: NavController) {
+fun HorseItem(horse: Horse, navController: NavController, isMyPage: Boolean) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -252,12 +251,14 @@ fun HorseItem(horse: Horse, navController: NavController) {
             )
         }
 
-        IconButton(onClick = { showDeleteDialog = true }) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete horse",
-                tint = MaterialTheme.colorScheme.error
-            )
+        if (isMyPage) {
+            IconButton(onClick = { showDeleteDialog = true }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete horse",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 

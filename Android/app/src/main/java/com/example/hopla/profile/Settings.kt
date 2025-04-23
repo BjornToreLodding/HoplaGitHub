@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
@@ -90,7 +91,7 @@ fun SettingsScreen(
                 HorizontalDivider()
 
                 SettingsItem(
-                    icon = Icons.Default.CheckCircle,
+                    icon = Icons.Default.Brightness4,
                     title = stringResource(R.string.mode),
                     trailingContent = { ModeSelection(themeViewModel) }
                 )
@@ -98,7 +99,7 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsCategory(title = "Account")
+                SettingsCategory(title = stringResource(R.string.account))
                 SettingsClickableItem(
                     icon = Icons.Default.Create,
                     title = stringResource(R.string.send_a_report),

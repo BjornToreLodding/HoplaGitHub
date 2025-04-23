@@ -52,6 +52,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -447,17 +448,18 @@ fun ShareTripDialog(
                             }
                             onSave(name, description, imageBitmap, hike.id, filterData)
                         },
-                        enabled = isSaveEnabled
+                        enabled = isSaveEnabled,
+                        shape = RectangleShape
                     ) {
                         Text(
                             text = stringResource(R.string.save),
-                            style = buttonTextStyle
+                            style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Button(onClick = onDismiss) {
+                    Button(onClick = onDismiss, shape = RectangleShape) {
                         Text(
                             text = stringResource(R.string.cancel),
-                            style = buttonTextStyle
+                            style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -515,9 +517,9 @@ fun EditTripDialog(
                 ) {
                     TextField(
                         readOnly = true,
-                        value = if (selectedHorse.isEmpty()) "No Horse Selected" else selectedHorse,
+                        value = if (selectedHorse.isEmpty()) stringResource(R.string.no_horse_chosen) else selectedHorse,
                         onValueChange = {},
-                        label = { Text("Select Horse") },
+                        label = { Text(text = stringResource(R.string.choose_horse)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
@@ -534,7 +536,7 @@ fun EditTripDialog(
                                 expanded = false
                             }
                         ) {
-                            Text("No Horse Selected", color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = stringResource(R.string.choose_horse), color = MaterialTheme.colorScheme.onSurface)
                         }
                         horses.forEach { horse ->
                             DropdownMenuItem(
@@ -583,13 +585,13 @@ fun EditTripDialog(
                 onSave(tripName ?: "", tripDescription ?: "", selectedImage, updatedHorseId)
                 onHikesReload()
                 onDismiss()
-            }) {
-                Text("Save")
+            }, shape = RectangleShape) {
+                Text(text = stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
+            Button(onClick = onDismiss, shape = RectangleShape) {
+                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     )

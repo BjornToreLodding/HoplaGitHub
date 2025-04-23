@@ -404,9 +404,10 @@ fun AddCommunityScreen(navController: NavController, token: String) {
 
             Button(
                 onClick = { showMap = !showMap },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RectangleShape
             ) {
-                Text(text = stringResource(R.string.choose_position))
+                Text(text = stringResource(R.string.choose_position), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
 
             if (showMap) {
@@ -437,9 +438,10 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                         // Show a message to select an option, position, and image
                     }
                 },
-                enabled = name.isNotBlank() && description.isNotBlank() && selectedPosition != null && imageBitmap != null
+                enabled = name.isNotBlank() && description.isNotBlank() && selectedPosition != null && imageBitmap != null,
+                shape = RectangleShape
             ) {
-                Text(text = stringResource(R.string.add_new_community))
+                Text(text = stringResource(R.string.add_new_community), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

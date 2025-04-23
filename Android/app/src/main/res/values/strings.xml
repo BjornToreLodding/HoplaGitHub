@@ -190,4 +190,5 @@
     <string name="save_now_or_later">Fyll inn informasjon nå, eller trykk lagre for å fylle inn senere</string>
     <string name="created_at">Bruker lagd</string>
     <string name="unknown">Ukjent</string>
+    <string name="account">Konto</string>
 </resources>
