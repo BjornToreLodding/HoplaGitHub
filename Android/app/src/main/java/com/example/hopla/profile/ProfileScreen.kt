@@ -641,7 +641,11 @@ fun AddNewType(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text(text = stringResource(R.string.name), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                    ),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -653,7 +657,11 @@ fun AddNewType(
                             value = breedOrFriendType,
                             onValueChange = { breedOrFriendType = it },
                             label = { Text(text = stringResource(R.string.breed), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
+                                focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
+                                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                            ),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         DateOfBirthPicker(

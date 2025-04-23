@@ -488,7 +488,7 @@ fun TrailsScreen(navController: NavController) {
                                 .padding(top = 16.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Button(onClick = { showFiltersDialog = false }) {
+                            Button(onClick = { showFiltersDialog = false }, shape = RectangleShape) {
                                 Text(text = stringResource(R.string.cancel))
                             }
                             Button(onClick = {
@@ -512,7 +512,7 @@ fun TrailsScreen(navController: NavController) {
                                 }
 
                                 showFiltersDialog = false
-                            }) {
+                            }, shape = RectangleShape) {
                                 Text(text = stringResource(R.string.apply))
                             }
                         }

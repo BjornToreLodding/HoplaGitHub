@@ -132,48 +132,49 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                 ScreenHeader(navController = navController, headerText = profile.alias)
             }
 
-            // Row for IconButton and DropdownMenu
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { expanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
+                Box {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
 
-            // DropdownMenu
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(R.string.block_user),
-                            style = dropdownMenuTextStyle,
-                            color = MaterialTheme.colorScheme.secondary
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.block_user),
+                                    style = dropdownMenuTextStyle,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            },
+                            onClick = { showBlockConfirmationDialog = true }
                         )
-                    },
-                    onClick = { showBlockConfirmationDialog = true }
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(R.string.report_user),
-                            style = dropdownMenuTextStyle,
-                            color = MaterialTheme.colorScheme.secondary
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.report_user),
+                                    style = dropdownMenuTextStyle,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            },
+                            onClick = { showReportDialog = true }
                         )
-                    },
-                    onClick = { showReportDialog = true }
-                )
+                    }
+                }
             }
 
             if (showBlockConfirmationDialog) {
@@ -476,9 +477,9 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                val formattedDate = profile.created_at?.let { formatDate(it) } ?: "Unknown"
+                val formattedDate = profile.created_at?.let { formatDate(it) } ?: stringResource(R.string.unknown)
                 Text(
-                    text = "Created at: $formattedDate",
+                    text = stringResource(R.string.created_at) +": $formattedDate",
                     style = generalTextStyle,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)

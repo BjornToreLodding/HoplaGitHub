@@ -200,5 +200,7 @@
     <string name="choose_horse">Select horse</string>
     <string name="save_trip">Save trip</string>
     <string name="save_now_or_later">Insert information now, or just press save to input later</string>
+    <string name="created_at">Created at</string>
+    <string name="unknown">Unknown</string>
 
 </resources>

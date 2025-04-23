@@ -57,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -174,12 +175,12 @@ fun ReviewDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Button(onClick = onDismiss) {
+                    Button(onClick = onDismiss, shape = RectangleShape) {
                         Text(text = stringResource(R.string.cancel))
                     }
                     Button(onClick = {
                         onConfirm(imageBitmap, message) // Pass null if no image is selected
-                    }) {
+                    }, shape = RectangleShape) {
                         Text(text = stringResource(R.string.confirm))
                     }
                 }

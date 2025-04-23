@@ -183,18 +183,18 @@ suspend fun fetchUserHikeCoordinates(userHikeId: String, token: String): List<Hi
 
     return httpClient.use { client ->
         val url = "https://hopla.onrender.com/userhikes/coordinates/$userHikeId"
-        Log.d("fetchUserHikeCoordinates", "Request URL: $url")
+        Log.d("fetchUserHikeCoordinat", "Request URL: $url")
         val response: HttpResponse = client.get(url) {
             header("Authorization", "Bearer $token")
         }
 
         val responseBody: String = response.bodyAsText()
-        Log.d("fetchUserHikeCoordinates", "Response: $responseBody")
+        Log.d("fetchUserHikeCoordinat", "Response: $responseBody")
 
         if (response.status == HttpStatusCode.OK) {
             response.body()
         } else {
-            Log.e("fetchUserHikeCoordinates", "Error: ${response.status}")
+            Log.e("fetchUserHikeCoordinat", "Error: ${response.status}")
             null
         }
     }

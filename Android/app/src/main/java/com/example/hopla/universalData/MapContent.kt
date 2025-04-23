@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -54,6 +55,7 @@ import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.apiService.fetchTrailCoordinates
 import com.example.hopla.apiService.fetchTrailsOnMap
 import com.example.hopla.apiService.fetchUserHikeCoordinates
+import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -284,18 +286,18 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = { navController.popBackStack() }) {
-                Text("Cancel")
+            Button(onClick = { navController.popBackStack() }, shape = RectangleShape) {
+                Text(stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
-            Button(onClick = { showSaveDialog = true }) {
-                Text("Save")
+            Button(onClick = { showSaveDialog = true }, shape = RectangleShape) {
+                Text(stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
 
         if (showSaveDialog) {
             AlertDialog(
                 onDismissRequest = { showSaveDialog = false },
-                title = { Text("Save Trip") },
+                title = { Text(stringResource(R.string.save_trip)) },
                 text = {
                     AlertDialogContent(
                         tripName = tripName,
@@ -341,13 +343,13 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                             }
                         }
                         navController.popBackStack()
-                    }) {
-                        Text("Save")
+                    }, shape = RectangleShape) {
+                        Text(stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 dismissButton = {
-                    Button(onClick = { showSaveDialog = false }) {
-                        Text("Cancel")
+                    Button(onClick = { showSaveDialog = false }, shape = RectangleShape) {
+                        Text(stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             )
