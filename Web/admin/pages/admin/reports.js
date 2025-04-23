@@ -9,7 +9,7 @@ export async function render(container) {
 
     try {
         console.log("Fetching reports from API...");
-        const response = await fetch(`${apiUrl}/userreports/all`, {
+        const response = await fetch(`${apiUrl}/admin/userreports/reports`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

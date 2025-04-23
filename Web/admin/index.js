@@ -132,6 +132,8 @@ function loadSideMenu(section) {
 
         case "reports":
             menuItems = [
+                { name: "Alle", action: "loadContent('admin', 'reports')" },
+                { name: "Alle2", action: "loadContent('reports', 'all')" },
                 { name: "Ubehandlet", action: "loadContent('admin', 'new')" },
                 { name: "Under Behandlig", action: "loadContent('admin', 'inprogress')" },
                 { name: "Ferdig Behandlig", action: "loadContent('admin', 'resolved')" },
