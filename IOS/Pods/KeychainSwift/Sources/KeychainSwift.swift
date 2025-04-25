@@ -17,7 +17,9 @@ open class KeychainSwift {
   
   /**
 
-  Specify an access group that will be used to access keychain items. Access groups can be used to share keychain items between applications. When access group value is nil all application access groups are being accessed. Access group name is used by all functions: set, get, delete and clear.
+  Specify an access group that will be used to access keychain items. Access groups can be used to
+   share keychain items between applications. When access group value is nil all application access
+   groups are being accessed. Access group name is used by all functions: set, get, delete and clear.
 
   */
   open var accessGroup: String?
@@ -26,7 +28,9 @@ open class KeychainSwift {
   /**
    
   Specifies whether the items can be synchronized with other devices through iCloud. Setting this property to true will
-   add the item to other devices with the `set` method and obtain synchronizable items with the `get` command. Deleting synchronizable items will remove them from all devices. In order for keychain synchronization to work the user must enable "Keychain" in iCloud settings.
+   add the item to other devices with the `set` method and obtain synchronizable items with the `get` command.
+   Deleting synchronizable items will remove them from all devices. In order for keychain synchronization to work
+   the user must enable "Keychain" in iCloud settings.
    
   Does not work on macOS.
    
@@ -41,7 +45,8 @@ open class KeychainSwift {
   
   /**
   
-  - parameter keyPrefix: a prefix that is added before the key in get/set methods. Note that `clear` method still clears everything from the Keychain.
+  - parameter keyPrefix: a prefix that is added before the key in get/set methods. Note that `clear` method
+   still clears everything from the Keychain.
 
   */
   public init(keyPrefix: String) {
@@ -54,7 +59,9 @@ open class KeychainSwift {
   
   - parameter key: Key under which the text value is stored in the keychain.
   - parameter value: Text string to be written to the keychain.
-  - parameter withAccess: Value that indicates when your app needs access to the text in the keychain item. By default the .AccessibleWhenUnlocked option is used that permits the data to be accessed only while the device is unlocked by the user.
+  - parameter withAccess: Value that indicates when your app needs access to the text in the keychain item.
+   By default the .AccessibleWhenUnlocked option is used that permits the data to be accessed only while
+   the device is unlocked by the user.
    
    - returns: True if the text was successfully written to the keychain.
 
@@ -76,7 +83,9 @@ open class KeychainSwift {
   
   - parameter key: Key under which the data is stored in the keychain.
   - parameter value: Data to be written to the keychain.
-  - parameter withAccess: Value that indicates when your app needs access to the text in the keychain item. By default the .AccessibleWhenUnlocked option is used that permits the data to be accessed only while the device is unlocked by the user.
+  - parameter withAccess: Value that indicates when your app needs access to the text in the keychain item.
+   By default the .AccessibleWhenUnlocked option is used that permits the data to be accessed only
+   while the device is unlocked by the user.
   
   - returns: True if the text was successfully written to the keychain.
   
@@ -118,7 +127,9 @@ open class KeychainSwift {
 
   - parameter key: Key under which the value is stored in the keychain.
   - parameter value: Boolean to be written to the keychain.
-  - parameter withAccess: Value that indicates when your app needs access to the value in the keychain item. By default the .AccessibleWhenUnlocked option is used that permits the data to be accessed only while the device is unlocked by the user.
+  - parameter withAccess: Value that indicates when your app needs access to the value in the keychain item.
+   By default the .AccessibleWhenUnlocked option is used that permits the data to be accessed only while the
+   device is unlocked by the user.
 
   - returns: True if the value was successfully written to the keychain.
 

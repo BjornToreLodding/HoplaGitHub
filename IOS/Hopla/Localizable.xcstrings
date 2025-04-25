@@ -240,6 +240,9 @@
         }
       }
     },
+    "Comment" : {
+
+    },
     "Comment: %@" : {
       "localizations" : {
         "nb" : {
@@ -420,6 +423,9 @@
           }
         }
       }
+    },
+    "Details" : {
+
     },
     "Display" : {
       "localizations" : {
@@ -805,6 +811,9 @@
         }
       }
     },
+    "Horse" : {
+
+    },
     "Horse Details" : {
       "localizations" : {
         "nb" : {
@@ -854,9 +863,6 @@
           }
         }
       }
-    },
-    "KART FUNKER IKKE" : {
-
     },
     "Latitude" : {
 
@@ -1120,6 +1126,9 @@
         }
       }
     },
+    "None" : {
+
+    },
     "Not a member? Sign up" : {
       "localizations" : {
         "nb" : {
@@ -1362,6 +1371,7 @@
       }
     },
     "Select Filters" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1372,6 +1382,7 @@
       }
     },
     "Select Horse" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1392,6 +1403,7 @@
       }
     },
     "Selected Horse: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1572,6 +1584,7 @@
       }
     },
     "Trail name: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1601,6 +1614,9 @@
         }
       }
     },
+    "Trail: %@" : {
+
+    },
     "Type a message…" : {
       "localizations" : {
         "nb" : {
@@ -1622,6 +1638,7 @@
       }
     },
     "Upgrade to Trail" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {

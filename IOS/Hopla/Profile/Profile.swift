@@ -59,20 +59,20 @@ struct UpdateUserDto: Encodable {
   }
 
   func encode(to encoder: Encoder) throws {
-    var c = encoder.container(keyedBy: CodingKeys.self)
-    try c.encode(alias, forKey: .alias)
-    try c.encode(name,  forKey: .name)
-    try c.encode(email, forKey: .email)
+    var ccc = encoder.container(keyedBy: CodingKeys.self)
+    try ccc.encode(alias, forKey: .alias)
+    try ccc.encode(name,  forKey: .name)
+    try ccc.encode(email, forKey: .email)
     if let tel = telephone, !tel.isEmpty {
-      try c.encode(tel, forKey: .telephone)
+      try ccc.encode(tel, forKey: .telephone)
     }
     if let desc = description, !desc.isEmpty {
-      try c.encode(desc, forKey: .description)
+      try ccc.encode(desc, forKey: .description)
     }
-    if let y = year, let m = month, let d = day {
-      try c.encode(y, forKey: .year)
-      try c.encode(m, forKey: .month)
-      try c.encode(d, forKey: .day)
+    if let yyy = year, let mmm = month, let ddd = day {
+      try ccc.encode(yyy, forKey: .year)
+      try ccc.encode(mmm, forKey: .month)
+      try ccc.encode(ddd, forKey: .day)
     }
   }
 }

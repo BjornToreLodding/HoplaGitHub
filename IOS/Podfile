@@ -2,6 +2,9 @@
 platform :ios, '16.0'  # Adjust this if needed
 use_frameworks!
 
+# ignore all warnings from all dependencies
+inhibit_all_warnings!
+
 target 'Hopla' do
   # Pods for Hopla
   pod 'GoogleMaps', '~> 9.3.0'  # Replace with the latest stable version
