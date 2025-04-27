@@ -66,6 +66,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private const val INTERVAL = 1000 // 1 second
+private const val FASTEST_INTERVAL = 500 // 0.5 seconds
+
 // Main new trip screen composable function
 @SuppressLint("DefaultLocale")
 @Composable
@@ -108,8 +111,8 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
     }
 
     val locationRequest = LocationRequest.create().apply {
-        interval = 1000
-        fastestInterval = 500
+        interval = INTERVAL.toLong()
+        fastestInterval = FASTEST_INTERVAL.toLong()
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
     val locationCallback = remember {

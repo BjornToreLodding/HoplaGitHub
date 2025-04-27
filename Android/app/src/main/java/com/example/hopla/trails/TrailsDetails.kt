@@ -90,6 +90,8 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Locale
 
+private const val WIDTH_NUM = 0.5f
+
 // Function to display the review dialog
 @Composable
 fun ReviewDialog(
@@ -810,7 +812,7 @@ fun UpdateScreen(navController: NavController) {
                 navController.popBackStack() // Navigate back to the previous screen
             },
             modifier = Modifier
-                .fillMaxWidth(0.5f)
+                .fillMaxWidth(WIDTH_NUM)
                 .height(40.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
         ) {

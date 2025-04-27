@@ -85,6 +85,7 @@ import java.util.Calendar
 private val IMAGE_PICKER_PADDING_TOP = 8.dp
 private val SPACER_HEIGHT = 8.dp
 private val DROPDOWN_MENU_WIDTH = 90.dp
+private const val START_YEAR = 1925
 
 // A search bar with a icon and a text field
 @Composable
@@ -462,7 +463,7 @@ fun DateOfBirthPicker(
         stringResource(R.string.december)
     )
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    val years = (1925..currentYear).toList().reversed()
+    val years = (START_YEAR..currentYear).toList().reversed()
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
