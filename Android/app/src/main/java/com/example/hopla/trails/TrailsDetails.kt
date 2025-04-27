@@ -90,6 +90,7 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Locale
 
+// Function to display the review dialog
 @Composable
 fun ReviewDialog(
     onDismiss: () -> Unit,
@@ -525,6 +526,7 @@ fun RouteClicked(navController: NavController, contentBoxInfo: ContentBoxInfo, o
     }
 }
 
+// Function to display the updates about the route
 @Composable
 private fun TrailUpdates(
     showMessageBox: Boolean,
@@ -699,7 +701,7 @@ fun StarRating(trailId: String, rating: Int, onRatingChanged: (Int) -> Unit) {
                             try {
                                 val response = rateTrail(
                                     token,
-                                    TrailRatingRequest(TrailId = trailId, Rating = newRating)
+                                    TrailRatingRequest(trailId = trailId, rating = newRating)
                                 )
                                 Log.d("rateTrail", "Response: ${response.message}")
                             } catch (e: Exception) {
@@ -810,7 +812,7 @@ fun UpdateScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .height(40.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9CFC4))
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
         ) {
             Text(text = stringResource(R.string.publish), color = Color.Gray)
         }

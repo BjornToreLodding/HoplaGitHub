@@ -51,6 +51,7 @@ import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import kotlinx.coroutines.delay
 
+// This is a login screen for the app where users can enter their credentials to log in.
 @Composable
 fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser: () -> Unit, themeViewModel: ThemeViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
@@ -247,6 +248,7 @@ fun LoginScreen(navController: NavController, onLogin: () -> Unit, onCreateUser:
     }
 }
 
+// Save the login state in SharedPreferences
 fun saveLoginState(context: Context, username: String, password: String) {
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("LoginPrefs",
         Context.MODE_PRIVATE
@@ -258,6 +260,7 @@ fun saveLoginState(context: Context, username: String, password: String) {
     editor.apply()
 }
 
+// Check the login state when the app starts
 @Composable
 fun CheckLoginState(navController: NavController, onLogin: () -> Unit) {
     val context = LocalContext.current

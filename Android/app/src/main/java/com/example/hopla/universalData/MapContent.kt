@@ -71,12 +71,17 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+private const val POLYLINE_WIDTH = 5f
+private const val DEFAULT_ZOOM_LEVEL = 15f
+private const val MAP_PADDING = 100
+private const val START_ZOOM = 10
+
 // Map screen for displaying trails on a map
 @Composable
 fun MapScreen() {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
-    val zoomLevel = remember { mutableIntStateOf(10) }
+    val zoomLevel = remember { mutableIntStateOf(START_ZOOM) }
     val latitude = remember { mutableDoubleStateOf(0.0) }
     val longitude = remember { mutableDoubleStateOf(0.0) }
     val trails = remember { mutableStateOf(emptyList<MapTrail>()) }
@@ -91,12 +96,21 @@ fun MapScreen() {
             // Get the phone's location and move the camera to that location
             val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val locationProvider = LocationManager.GPS_PROVIDER
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            val hasFineLocationPermission = ActivityCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            val hasCoarseLocationPermission = ActivityCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (hasFineLocationPermission || hasCoarseLocationPermission) {
                 val lastKnownLocation = locationManager.getLastKnownLocation(locationProvider)
-                lastKnownLocation?.let {
-                    val userLocation = LatLng(it.latitude, it.longitude)
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoomLevel.intValue.toFloat()))
+                lastKnownLocation?.let { location ->
+                    val userLocation = LatLng(location.latitude, location.longitude)
+                    val zoom = zoomLevel.intValue.toFloat()
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, zoom))
                 }
             }
 
@@ -105,16 +119,28 @@ fun MapScreen() {
                 zoomLevel.intValue = googleMap.cameraPosition.zoom.toInt()
                 latitude.doubleValue = googleMap.cameraPosition.target.latitude
                 longitude.doubleValue = googleMap.cameraPosition.target.longitude
-                Log.d("MapScreen", "Zoom level: ${zoomLevel.intValue}, Latitude: ${latitude.doubleValue}, Longitude: ${longitude.doubleValue}")
 
                 // Fetch trails and update markers
                 coroutineScope.launch {
                     try {
-                        val response = fetchTrailsOnMap(token, latitude.doubleValue, longitude.doubleValue, zoomLevel.intValue)
+                        val latitudeValue = latitude.doubleValue
+                        val longitudeValue = longitude.doubleValue
+                        val zoomLevelValue = zoomLevel.intValue
+
+                        val response = fetchTrailsOnMap(
+                            token = token,
+                            latitude = latitudeValue,
+                            longitude = longitudeValue,
+                            zoomLevel = zoomLevelValue
+                        )
                         trails.value = response
                         googleMap.clear()
                         trails.value.forEach { trail ->
-                            googleMap.addMarker(MarkerOptions().position(LatLng(trail.latMean, trail.longMean)).title(trail.name))
+                            val position = LatLng(trail.latMean, trail.longMean)
+                            val markerOptions = MarkerOptions()
+                                .position(position)
+                                .title(trail.name)
+                            googleMap.addMarker(markerOptions)
                         }
                     } catch (e: Exception) {
                         Log.e("MapScreen", "Error fetching trails", e)
@@ -125,16 +151,24 @@ fun MapScreen() {
     }
 }
 
+// Function to enable My Location on the map
 private fun enableMyLocation(googleMap: GoogleMap, context: Context) {
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-        ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    val fineLocationPermission = ActivityCompat.checkSelfPermission(
+        context, Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
+    val coarseLocationPermission = ActivityCompat.checkSelfPermission(
+        context, Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
+    if (fineLocationPermission || coarseLocationPermission) {
         googleMap.isMyLocationEnabled = true
     } else {
         // Request location permissions from the user
-        // This part should be handled in your activity or a higher-level composable
     }
 }
 
+// Function to create a MapView and manage its lifecycle
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
     val context = LocalContext.current
@@ -163,6 +197,7 @@ fun rememberMapViewWithLifecycle(): MapView {
     return mapView
 }
 
+// Function to display a simple map with a marker
 @Composable
 fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
     val mapView = rememberMapViewWithLifecycle()
@@ -193,6 +228,7 @@ fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
     }
 }
 
+// Function to display a map screen for starting a trip
 @Composable
 fun StartTripMapScreen(trailId: String, navController: NavController) {
     val mapView = rememberMapViewWithLifecycle()
@@ -246,7 +282,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                     if (trailCoordinates.value.isNotEmpty()) {
                         val polylineOptions = PolylineOptions().apply {
                             color(polylineColor)
-                            width(5f)
+                            width(POLYLINE_WIDTH)
                         }
 
                         trailCoordinates.value.forEachIndexed { index, coordinate ->
@@ -268,7 +304,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                         googleMap.moveCamera(
                             CameraUpdateFactory.newLatLngZoom(
                                 LatLng(firstCoordinate.lat, firstCoordinate.lng),
-                                15f
+                                DEFAULT_ZOOM_LEVEL
                             )
                         )
                     } else {
@@ -285,10 +321,18 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = { navController.popBackStack() }, shape = RectangleShape) {
-                Text(stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    stringResource(R.string.cancel),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
             Button(onClick = { showSaveDialog = true }, shape = RectangleShape) {
-                Text(stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    stringResource(R.string.save),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
 
@@ -312,7 +356,8 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                 confirmButton = {
                     Button(onClick = {
                         showSaveDialog = false
-                        val currentTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(java.util.Date())
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                        val currentTime = dateFormat.format(java.util.Date())
                         val durationMillis = System.currentTimeMillis() - startTime
                         val durationMinutes = (durationMillis / 60000).toInt()
                         val durationSeconds = ((durationMillis % 60000) / 1000).toInt()
@@ -324,14 +369,14 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                         }
 
                         newHike = NewHike(
-                            StartetAt = currentTime,
-                            Distance = distanceStr,
-                            Duration = durationStr,
-                            Coordinates = coordinates,
-                            Title = tripName.ifEmpty { null },
-                            Description = tripNotes.ifEmpty { null },
-                            HorseId = horseMap[selectedHorse]?.id,
-                            TrailId = trailId
+                            startetAt = currentTime,
+                            distance = distanceStr,
+                            duration = durationStr,
+                            coordinates = coordinates,
+                            title = tripName.ifEmpty { null },
+                            description = tripNotes.ifEmpty { null },
+                            horseId = horseMap[selectedHorse]?.id,
+                            trailId = trailId
                         )
 
                         newHike?.let {
@@ -342,12 +387,20 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                         }
                         navController.popBackStack()
                     }, shape = RectangleShape) {
-                        Text(stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            stringResource(R.string.save),
+                            style = buttonTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 },
                 dismissButton = {
                     Button(onClick = { showSaveDialog = false }, shape = RectangleShape) {
-                        Text(stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            stringResource(R.string.cancel),
+                            style = buttonTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
             )
@@ -355,7 +408,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
     }
 }
 
-//-------------Functions to open up a map that displays coordinates for userhikes ------------
+// Function to display a map with coordinates for a specific hike
 @Composable
 fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
     val mapView = rememberMapViewWithLifecycle()
@@ -385,7 +438,7 @@ fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
                     val boundsBuilder = LatLngBounds.Builder()
                     val polylineOptions = PolylineOptions().apply {
                         color(Color.Black.toArgb())
-                        width(5f)
+                        width(POLYLINE_WIDTH)
                     }
 
                     coordinates.value.forEach { coord ->
@@ -397,7 +450,7 @@ fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
 
                     googleMap.addPolyline(polylineOptions)
                     val bounds = boundsBuilder.build()
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_PADDING))
                     Log.d("CoordinatesOnMap", "Polyline added with coordinates: ${polylineOptions.points}")
                 }
             } else {
@@ -415,6 +468,7 @@ fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
 
 }
 
+// Function to display a button that opens the map with coordinates for a specific hike
 @Composable
 fun MapButton(userHikeId: String, token: String) {
     var showMap by remember { mutableStateOf(false) }
@@ -433,7 +487,7 @@ fun MapButton(userHikeId: String, token: String) {
     }
 }
 
-//-------------Functions to open up a map that displays coordinates for trails ------------
+// Function to display a map with coordinates for a specific trail
 @Composable
 fun CoordinatesOnMapTrail(trailId: String, token: String, onClose: () -> Unit) {
     val mapView = rememberMapViewWithLifecycle()
@@ -460,7 +514,7 @@ fun CoordinatesOnMapTrail(trailId: String, token: String, onClose: () -> Unit) {
                     val boundsBuilder = LatLngBounds.Builder()
                     val polylineOptions = PolylineOptions().apply {
                         color(Color.Black.toArgb())
-                        width(5f)
+                        width(POLYLINE_WIDTH)
                     }
 
                     coordinates.value.forEach { coord ->
@@ -471,7 +525,7 @@ fun CoordinatesOnMapTrail(trailId: String, token: String, onClose: () -> Unit) {
 
                     googleMap.addPolyline(polylineOptions)
                     val bounds = boundsBuilder.build()
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_PADDING))
                 }
             }
         }
@@ -485,6 +539,7 @@ fun CoordinatesOnMapTrail(trailId: String, token: String, onClose: () -> Unit) {
     }
 }
 
+// Function to display a button that opens the map with coordinates for a specific trail
 @Composable
 fun MapButtonTrail(trailId: String, token: String) {
     var showMap by remember { mutableStateOf(false) }

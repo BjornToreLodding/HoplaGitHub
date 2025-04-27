@@ -12,6 +12,12 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.model.LatLng
 
+// Constants
+private const val LOCATION_UPDATE_MIN_TIME_MS = 2000L
+private const val LOCATION_UPDATE_MIN_DISTANCE_M = 0f
+private const val LOCATION_UPDATE_TIMEOUT_MS = 10_000L
+
+// Get the current location of the user
 fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     val hasFineLocationPermission = ActivityCompat.checkSelfPermission(
@@ -70,15 +76,15 @@ fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
         // Request updates from GPS and Network Providers
         locationManager.requestLocationUpdates(
             gpsProvider,
-            2000L, // Min time in milliseconds between updates
-            0f,    // Min distance in meters
+            LOCATION_UPDATE_TIMEOUT_MS, // Min time in milliseconds between updates
+            LOCATION_UPDATE_MIN_DISTANCE_M,    // Min distance in meters
             locationListener
         )
 
         locationManager.requestLocationUpdates(
             networkProvider,
-            2000L,
-            0f,
+            LOCATION_UPDATE_MIN_TIME_MS,
+            LOCATION_UPDATE_MIN_DISTANCE_M,
             locationListener
         )
 
@@ -87,6 +93,6 @@ fun getCurrentLocation(context: Context, onLocationReceived: (LatLng) -> Unit) {
         handler.postDelayed({
             Log.d("CommunityScreen", "Location update timeout")
             locationManager.removeUpdates(locationListener)
-        }, 10_000) // 10 seconds timeout
+        }, LOCATION_UPDATE_TIMEOUT_MS) // 10 seconds timeout
     }
 }

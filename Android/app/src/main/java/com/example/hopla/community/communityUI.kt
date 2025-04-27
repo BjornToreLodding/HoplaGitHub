@@ -213,8 +213,8 @@ fun MessageBox(stableId: String, token: String) {
     // Function to send a new message
     suspend fun sendMessage(content: String) {
         val stableMessageRequest = StableMessageRequest(
-            StableId = stableId,
-            Content = content
+            stableId = stableId,
+            content = content
         )
         sendStableMessage(token, stableMessageRequest)
         // Reload messages after sending

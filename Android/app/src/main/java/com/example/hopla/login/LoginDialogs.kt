@@ -67,7 +67,11 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
                     style = generalTextStyle,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp), shape = RectangleShape) {
+                Button(onClick = onDismiss,
+                    modifier = Modifier
+                        .padding(top = 16.dp),
+                    shape = RectangleShape
+                ) {
                     Text(
                         text = stringResource(R.string.ok),
                         style = buttonTextStyle
@@ -184,6 +188,7 @@ fun ForgottenPasswordDialog(onDismiss: () -> Unit) {
     }
 }
 
+// Dialog for showing response message for forgotten password
 @Composable
 fun ResponseDialog(message: String, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
@@ -448,6 +453,7 @@ fun CreateUserDialog(onDismiss: () -> Unit, onCreateUser: (String, String) -> Un
     }
 }
 
+// Dialog for showing information about statistics
 @Composable
 fun InfoDialogCU(onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {

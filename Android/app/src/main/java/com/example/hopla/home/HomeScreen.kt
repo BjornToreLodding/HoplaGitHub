@@ -149,7 +149,11 @@ fun PostList(
 
     if (errorMessage != null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = errorMessage!!, style = underheaderTextStyle, color = MaterialTheme.colorScheme.tertiary)
+            Text(
+                text = errorMessage!!,
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.tertiary
+            )
         }
     } else {
         LazyColumn(
@@ -161,7 +165,11 @@ fun PostList(
             }
             item {
                 if (isLoading) {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         CircularProgressIndicator()
                     }
                 }

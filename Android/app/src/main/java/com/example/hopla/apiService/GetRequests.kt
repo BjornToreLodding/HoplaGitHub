@@ -3,6 +3,7 @@ package com.example.hopla.apiService
 import android.util.Log
 import com.example.hopla.universalData.ErrorResponse2
 import com.example.hopla.universalData.FeedResponse
+import com.example.hopla.universalData.FetchStableRequest
 import com.example.hopla.universalData.Following
 import com.example.hopla.universalData.Friend
 import com.example.hopla.universalData.FriendProfile
@@ -41,15 +42,18 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+private const val DELAY_TIME = 120_000
+
+// ----------------Get requests for horses-------------------
 // Fetch a list of horses from the database and return as a list
 suspend fun fetchHorses(
     userId: String,
     token: String,
     httpClient: HttpClient = HttpClient {
         install(HttpTimeout) {
-            requestTimeoutMillis = 120_000 // 120 seconds
-            connectTimeoutMillis = 120_000 // 120 seconds
-            socketTimeoutMillis = 120_000 // 120 seconds
+            requestTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            connectTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            socketTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
         }
         install(ContentNegotiation) {
             json()
@@ -75,7 +79,7 @@ suspend fun fetchHorses(
     }
 }
 
-
+// Fetch horse details by horse the horses ID
 suspend fun fetchHorseDetails(horseId: String, token: String): HorseDetail {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -92,64 +96,8 @@ suspend fun fetchHorseDetails(horseId: String, token: String): HorseDetail {
     }
 }
 
-suspend fun fetchFriends(token: String): List<Friend> {
-    val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json()
-        }
-    }
-    return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl +"userrelations/friends") {
-            headers {
-                append("Authorization", "Bearer $token")
-            }
-        }
-        response.body()
-    }
-}
-
-suspend fun fetchFollowing(token: String): List<Following> {
-    val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json()
-        }
-    }
-    return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl + "userrelations/following") {
-            headers {
-                append("Authorization", "Bearer $token")
-            }
-        }
-        response.body()
-    }
-}
-
-suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
-    val httpClient = HttpClient {
-        install(HttpTimeout) {
-            requestTimeoutMillis = 120_000 // 120 seconds
-            connectTimeoutMillis = 120_000 // 120 seconds
-            socketTimeoutMillis = 120_000 // 120 seconds
-        }
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
-        }
-    }
-    return httpClient.use { client ->
-        val response: HttpResponse = client.get(apiUrl + "users/profile?userId=$userId") {
-            headers {
-                append("Authorization", "Bearer $token")
-            }
-        }
-        Log.d("fetchFriendProfile", "Response: ${response.status}")
-        Log.d("fetchFriendProfile", "Response Body: ${response.bodyAsText()}")
-        response.body()
-    }
-}
-
 //----------------Get requests for user hikes-------------------
+// Fetch hikes the logged in user has done in a list
 suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -172,6 +120,7 @@ suspend fun fetchUserHikes(token: String, pageNumber: Int): List<Hike> {
     }
 }
 
+// Fetch details of a specific hike (its coordinates)
 suspend fun fetchUserHikeCoordinates(userHikeId: String, token: String): List<HikeCoordinate>? {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -183,24 +132,24 @@ suspend fun fetchUserHikeCoordinates(userHikeId: String, token: String): List<Hi
 
     return httpClient.use { client ->
         val url = "https://hopla.onrender.com/userhikes/coordinates/$userHikeId"
-        Log.d("fetchUserHikeCoordinat", "Request URL: $url")
+        Log.d("fetchUserHikeCoordinate", "Request URL: $url")
         val response: HttpResponse = client.get(url) {
             header("Authorization", "Bearer $token")
         }
 
         val responseBody: String = response.bodyAsText()
-        Log.d("fetchUserHikeCoordinat", "Response: $responseBody")
+        Log.d("fetchUserHikeCoordinate", "Response: $responseBody")
 
         if (response.status == HttpStatusCode.OK) {
             response.body()
         } else {
-            Log.e("fetchUserHikeCoordinat", "Error: ${response.status}")
+            Log.e("fetchUserHikeCoordinate", "Error: ${response.status}")
             null
         }
     }
 }
 
-//----------------Get requests for user relations-------------------
+// Fetch the friends for another user
 suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -208,7 +157,7 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
         }
     }
     return httpClient.use { client ->
-        val response: HttpResponse = client.get("https://hopla.onrender.com/userrelations/friends?userid=$userId") {
+        val response: HttpResponse = client.get(apiUrl +"userrelations/friends?userid=$userId") {
             headers {
                 append("Authorization", "Bearer $token")
             }
@@ -218,13 +167,13 @@ suspend fun fetchUserFriends(userId: String, token: String): List<Friend> {
 }
 
 //---------------------------------Trails---------------------------------
-// All trails
+// Fetch all trails
 suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String, filtersQuery: String): TrailsResponse {
     val httpClient = HttpClient {
         install(HttpTimeout) {
-            requestTimeoutMillis = 120_000 // 120 seconds
-            connectTimeoutMillis = 120_000 // 120 seconds
-            socketTimeoutMillis = 120_000 // 120 seconds
+            requestTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            connectTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            socketTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
         }
         install(ContentNegotiation) {
             json(Json {
@@ -253,7 +202,7 @@ suspend fun fetchTrails(token: String, pageNumber: Int, searchQuery: String, fil
     }
 }
 
-// Trails by position
+// Fetch trails by position
 suspend fun fetchTrailsByLocation(token: String, latitude: Double, longitude: Double, pageNumber: Int): TrailsResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -274,7 +223,7 @@ suspend fun fetchTrailsByLocation(token: String, latitude: Double, longitude: Do
     }
 }
 
-// Favorite trails
+// Fetch favorite trails
 suspend fun fetchFavoriteTrails(token: String): TrailsResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -295,7 +244,7 @@ suspend fun fetchFavoriteTrails(token: String): TrailsResponse {
     }
 }
 
-// Friends and followers trails
+// Fetch friends and followers trails
 suspend fun fetchTrailsRelations(token: String, pageNumber: Int): TrailsResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -321,13 +270,13 @@ suspend fun fetchTrailsRelations(token: String, pageNumber: Int): TrailsResponse
     }
 }
 
-// Trail on the map
+// Fetch trail to be displayed on the map
 suspend fun fetchTrailsOnMap(token: String, latitude: Double, longitude: Double, zoomLevel: Int): List<MapTrail> {
     val httpClient = HttpClient {
         install(HttpTimeout) {
-            requestTimeoutMillis = 120_000 // 120 seconds
-            connectTimeoutMillis = 120_000 // 120 seconds
-            socketTimeoutMillis = 120_000 // 120 seconds
+            requestTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            connectTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            socketTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
         }
         install(ContentNegotiation) {
             json(Json {
@@ -431,7 +380,7 @@ suspend fun fetchTrailCoordinates(trailId: String, token: String): TrailResponse
     }
 }
 
-//-------------------------------Other users--------------------------------------------------
+//---------------------------GET requests for friends and following-------------------------
 // All users
 suspend fun fetchAllUsers(token: String): List<OtherUsers> {
     val httpClient = HttpClient {
@@ -469,8 +418,68 @@ suspend fun fetchUserRelationRequests(token: String): List<UserRelationRequest> 
     }
 }
 
+// Fetch a list of friends
+suspend fun fetchFriends(token: String): List<Friend> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl +"userrelations/friends") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}
+
+// Fetch a list of people the user is following
+suspend fun fetchFollowing(token: String): List<Following> {
+    val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "userrelations/following") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        response.body()
+    }
+}
+
+// Fetch details of a specific friend
+suspend fun fetchFriendProfile(userId: String, token: String): FriendProfile {
+    val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            connectTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            socketTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+        }
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    return httpClient.use { client ->
+        val response: HttpResponse = client.get(apiUrl + "users/profile?userId=$userId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        Log.d("fetchFriendProfile", "Response: ${response.status}")
+        Log.d("fetchFriendProfile", "Response Body: ${response.bodyAsText()}")
+        response.body()
+    }
+}
+
 //-------------------GET requests for stables--------------
-suspend fun fetchStables(token: String, search: String, userid: String, latitude: Double, longitude: Double, pageNumber: Int): List<Stable> {
+suspend fun fetchStables(request: FetchStableRequest): List<Stable> {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -479,18 +488,17 @@ suspend fun fetchStables(token: String, search: String, userid: String, latitude
         }
         install(HttpTimeout) {
             Log.d("HttpTimeout", "Timeout settings: requestTimeout=60s, connectTimeout=60s, socketTimeout=60s")
-            requestTimeoutMillis = 120_000 // 60 seconds
-            connectTimeoutMillis = 120_000 // 60 seconds
-            socketTimeoutMillis = 120_000 // 60 seconds
+            requestTimeoutMillis = DELAY_TIME.toLong() // 60 seconds
+            connectTimeoutMillis = DELAY_TIME.toLong() // 60 seconds
+            socketTimeoutMillis = DELAY_TIME.toLong() // 60 seconds
         }
     }
     return httpClient.use { client ->
         try {
-
-            Log.d("fetchStables", "Requesting stables with parameters: search=$search, latitude=$latitude, longitude=$longitude, pageNumber=$pageNumber")
-            val response: HttpResponse = client.get(apiUrl+"stables/all?search=$search&userid=$userid&latitude=$latitude&longitude=$longitude&pagenumber=$pageNumber") {
+            Log.d("fetchStables", "Requesting stables with parameters: search=${request.search}, latitude=${request.latitude}, longitude=${request.longitude}, pageNumber=${request.pageNumber}")
+            val response: HttpResponse = client.get(apiUrl + "stables/all?search=${request.search}&userid=${request.userId}&latitude=${request.latitude}&longitude=${request.longitude}&pagenumber=${request.pageNumber}") {
                 headers {
-                    append("Authorization", "Bearer $token")
+                    append("Authorization", "Bearer ${request.token}")
                 }
             }
             val responseBody: String = response.bodyAsText()
@@ -592,9 +600,9 @@ suspend fun fetchFeed(
 ): FeedResponse? {
     val httpClient = HttpClient {
         install(HttpTimeout) {
-            requestTimeoutMillis = 120_000 // 120 seconds
-            connectTimeoutMillis = 120_000 // 120 seconds
-            socketTimeoutMillis = 120_000 // 120 seconds
+            requestTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            connectTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
+            socketTimeoutMillis = DELAY_TIME.toLong() // 120 seconds
         }
         install(ContentNegotiation) {
             json(Json {

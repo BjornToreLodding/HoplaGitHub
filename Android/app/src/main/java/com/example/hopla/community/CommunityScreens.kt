@@ -64,6 +64,7 @@ import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleVerySmall
 import com.example.hopla.universalData.AddButton
+import com.example.hopla.universalData.FetchStableRequest
 import com.example.hopla.universalData.ImagePicker
 import com.example.hopla.universalData.ReportDialog
 import com.example.hopla.universalData.ScreenHeader
@@ -106,8 +107,16 @@ fun CommunityScreen(navController: NavController, token: String) {
             longitude = location.longitude
             coroutineScope.launch {
                 Log.d("CommunityScreen", "Coroutine launched")
-                val fetchedStables =
-                    fetchStables(token, searchQuery, "", latitude, longitude, pageNumber)
+                val request = FetchStableRequest(
+                    token = token,
+                    search = searchQuery,
+                    userId = "",
+                    latitude = latitude,
+                    longitude = longitude,
+                    pageNumber = pageNumber
+                )
+
+                val fetchedStables = fetchStables(request)
                 Log.d("CommunityScreen", "Stables fetched: ${fetchedStables.size}")
                 stables = fetchedStables
             }
@@ -119,14 +128,15 @@ fun CommunityScreen(navController: NavController, token: String) {
             loading = true
             coroutineScope.launch {
                 val newPageNumber = pageNumber + 1
-                val fetchedStables = fetchStables(
-                    token,
-                    searchQuery,
-                    if (currentPage == "liked") UserSession.userId else "",
-                    latitude,
-                    longitude,
-                    newPageNumber
+                val request = FetchStableRequest(
+                    token = token,
+                    search = searchQuery,
+                    userId = if (currentPage == "liked") UserSession.userId else "",
+                    latitude = latitude,
+                    longitude = longitude,
+                    pageNumber = newPageNumber
                 )
+                val fetchedStables = fetchStables(request)
                 if (fetchedStables.isNotEmpty()) {
                     stables = stables + fetchedStables
                     pageNumber = newPageNumber
@@ -140,14 +150,16 @@ fun CommunityScreen(navController: NavController, token: String) {
         coroutineScope.launch {
             loading = true
             pageNumber = 1
-            val fetchedStables = fetchStables(
-                token,
-                searchQuery,
-                if (currentPage == "liked") UserSession.userId else "",
-                latitude,
-                longitude,
-                pageNumber
+            val request = FetchStableRequest(
+                token = token,
+                search = searchQuery,
+                userId = if (currentPage == "liked") UserSession.userId else "",
+                latitude = latitude,
+                longitude = longitude,
+                pageNumber = pageNumber
             )
+
+            val fetchedStables = fetchStables(request)
             stables = fetchedStables
             loading = false
         }
@@ -407,7 +419,11 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RectangleShape
             ) {
-                Text(text = stringResource(R.string.choose_position), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.choose_position),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
 
             if (showMap) {
@@ -422,12 +438,12 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                 onClick = {
                     if (selectedPosition != null && imageBitmap != null) {
                         val stableRequest = StableRequest(
-                            Name = name,
-                            Description = description,
-                            Image = imageBitmap!!,
-                            Latitude = selectedPosition!!.latitude,
-                            Longitude = selectedPosition!!.longitude,
-                            PrivateGroup = false
+                            name = name,
+                            description = description,
+                            image = imageBitmap!!,
+                            latitude = selectedPosition!!.latitude,
+                            longitude = selectedPosition!!.longitude,
+                            privateGroup = false
                         )
                         coroutineScope.launch {
                             val response = createStable(token, stableRequest)
@@ -441,7 +457,11 @@ fun AddCommunityScreen(navController: NavController, token: String) {
                 enabled = name.isNotBlank() && description.isNotBlank() && selectedPosition != null && imageBitmap != null,
                 shape = RectangleShape
             ) {
-                Text(text = stringResource(R.string.add_new_community), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.add_new_community),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }

@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -98,7 +99,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.Locale
 
-
+// MainActivity class that serves as the entry point for the app
 class MainActivity : ComponentActivity() {
     private val bottomBarViewModel: BottomBarViewModel by viewModels()
 
@@ -229,6 +230,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// TopBar function to create a top app bar with a logo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
@@ -254,6 +256,13 @@ fun TopBar() {
     )
 }
 
+// Extracted functionality to create equal icons for bottom navigation bar
+@Composable
+fun ScreenIcon(icon: ImageVector) {
+    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+}
+
+// BottomNavigationBar function to create a bottom navigation bar
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
@@ -276,15 +285,21 @@ fun BottomNavigationBar(navController: NavHostController) {
         items.forEach { screen ->
             BottomNavigationItem(
                 icon = {
-                    when(screen) {
-                        Screen.Home -> Icon(Icons.Outlined.Home, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        Screen.Profile -> Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        Screen.NewTrip -> Icon(Icons.Outlined.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        Screen.Trails -> Icon(Icons.Outlined.AddRoad, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        Screen.Community -> Icon(Icons.Outlined.Face, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                    when (screen) {
+                        Screen.Home -> ScreenIcon(Icons.Outlined.Home)
+                        Screen.Profile -> ScreenIcon(Icons.Outlined.Person)
+                        Screen.NewTrip -> ScreenIcon(Icons.Outlined.Add)
+                        Screen.Trails -> ScreenIcon(Icons.Outlined.AddRoad)
+                        Screen.Community -> ScreenIcon(Icons.Outlined.Face)
                     }
                 },
-                label = { Text(screen.titleProvider(context), fontSize = 10.sp, maxLines = 1, style = generalTextStyle, color = MaterialTheme.colorScheme.onPrimary) },
+                label = { Text(
+                    screen.titleProvider(context),
+                    fontSize = 10.sp,
+                    maxLines = 1,
+                    style = generalTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                ) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     val currentTime = System.currentTimeMillis()
@@ -313,6 +328,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
+// ViewModel to manage user login state and actions
 class UserViewModel : ViewModel() {
     private val _isLoggedIn = mutableStateOf(false)
     val isLoggedIn: State<Boolean> = _isLoggedIn
@@ -349,7 +365,7 @@ class UserViewModel : ViewModel() {
                 val response = client.patch("https://hopla.onrender.com/users/delete") {
                     header("Authorization", "Bearer $token")
                     contentType(ContentType.Application.Json)
-                    setBody(DeleteUserRequest(Password = password))
+                    setBody(DeleteUserRequest(password = password))
                 }
 
                 val responseBody: String = response.bodyAsText()
@@ -368,6 +384,7 @@ class UserViewModel : ViewModel() {
     }
 }
 
+// Screen class to define different screens in the app
 sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
     data object Home : Screen("home", { context -> context.getString(R.string.home) })
     data object Trails : Screen("trails", { context -> context.getString(R.string.trails) })
@@ -376,6 +393,7 @@ sealed class Screen(val route: String, val titleProvider: (Context) -> String) {
     data object Profile : Screen("profile", { context -> context.getString(R.string.profile) })
 }
 
+// ViewModel to manage the visibility of the bottom navigation bar
 class BottomBarViewModel : ViewModel() {
     private val _isBottomBarVisible = mutableStateOf(true)
     val isBottomBarVisible: State<Boolean> = _isBottomBarVisible

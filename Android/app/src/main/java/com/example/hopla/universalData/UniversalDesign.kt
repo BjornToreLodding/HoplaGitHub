@@ -82,6 +82,10 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
+private val IMAGE_PICKER_PADDING_TOP = 8.dp
+private val SPACER_HEIGHT = 8.dp
+private val DROPDOWN_MENU_WIDTH = 90.dp
+
 // A search bar with a icon and a text field
 @Composable
 fun SearchBar(
@@ -103,7 +107,7 @@ fun SearchBar(
         singleLine = true,      // Only one line possible
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(IMAGE_PICKER_PADDING_TOP)
     )
 }
 
@@ -230,7 +234,7 @@ fun ImagePicker(
     Text(
         text = text,
         modifier = Modifier
-            .padding(top = 8.dp)
+            .padding(top = IMAGE_PICKER_PADDING_TOP)
             .clickable { showDialog.value = true },
         style = underlinedTextStyleSmall,
         color = MaterialTheme.colorScheme.secondary
@@ -240,8 +244,18 @@ fun ImagePicker(
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(text = stringResource(R.string.change_profile_picture), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
-            text = { Text(text = stringResource(R.string.profile_pic_description), style = generalTextStyleDialog, color = MaterialTheme.colorScheme.secondary) },
+            title = {
+                Text(
+                    text = stringResource(R.string.change_profile_picture),
+                    style = underheaderTextStyle,
+                    color = MaterialTheme.colorScheme.secondary
+                ) },
+            text = {
+                Text(
+                    text = stringResource(R.string.profile_pic_description),
+                    style = generalTextStyleDialog,
+                    color = MaterialTheme.colorScheme.secondary
+                ) },
             confirmButton = {
                 Column {
                     Button(onClick = {
@@ -250,20 +264,30 @@ fun ImagePicker(
                         }
                         showDialog.value = false
                     }, shape = RectangleShape ) {
-                        Text(text = stringResource(R.string.take_a_picture), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            text = stringResource(R.string.take_a_picture),
+                            style = buttonTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(SPACER_HEIGHT))
                     Button(onClick = {
                         contentPickerLauncher.launch("image/*")
                         showDialog.value = false
                     }, shape = RectangleShape) {
-                        Text(text = stringResource(R.string.choose_from_library), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            text = stringResource(R.string.choose_from_library),
+                            style = buttonTextStyle,
+                            color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             },
             dismissButton = {
                 Button(onClick = { showDialog.value = false }, shape = RectangleShape) {
-                    Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = stringResource(R.string.cancel),
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         )
@@ -285,7 +309,12 @@ fun ReportDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.send_a_report), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
+        title = {
+            Text(
+                stringResource(R.string.send_a_report),
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            ) },
         text = {
             Box(
                 modifier = Modifier
@@ -300,18 +329,28 @@ fun ReportDialog(
                             androidx.compose.material.TextField(
                                 value = reportTitle,
                                 onValueChange = { reportTitle = it },
-                                label = { Text(text = stringResource(R.string.title), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.title),
+                                        style = textFieldLabelTextStyle,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    ) },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
                                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
                                     unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
                                 )
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
                             androidx.compose.material.TextField(
                                 value = reportText,
                                 onValueChange = { reportText = it },
-                                label = { Text(text = stringResource(R.string.report), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.report),
+                                        style = textFieldLabelTextStyle,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    ) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp),
@@ -332,10 +371,10 @@ fun ReportDialog(
                         loading = true
                         try {
                             val reportRequest = UserReportRequest(
-                                EntityId = entityId,
-                                EntityName = entityName,
-                                Category = reportTitle,
-                                Message = reportText
+                                entityId = entityId,
+                                entityName = entityName,
+                                category = reportTitle,
+                                message = reportText
                             )
                             createUserReport(token, reportRequest)
                             onDismiss()
@@ -355,13 +394,21 @@ fun ReportDialog(
                         modifier = Modifier.size(16.dp)
                     )
                 } else {
-                    Text(text = stringResource(R.string.send), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = stringResource(R.string.send),
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         },
         dismissButton = {
             Button(onClick = onDismiss, shape = RectangleShape) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     )
@@ -387,7 +434,7 @@ fun CustomButton(text: String, onClick: () -> Unit) {
     }
 }
 
-//--------------------- For dropdown menu for date --------------------------------------
+// A composable for picking a date of birth
 @Composable
 fun DateOfBirthPicker(
     selectedDay: Int,
@@ -422,17 +469,17 @@ fun DateOfBirthPicker(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(IMAGE_PICKER_PADDING_TOP)
     ) {
         // Day Dropdown
         DropdownMenuBox(
             items = days,
             selectedItem = selectedDay,
             onItemSelected = { day -> onDateSelected(day, selectedMonth, selectedYear) },
-            textColor = textColor // Pass textColor parameter
+            textColor = textColor
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(SPACER_HEIGHT))
 
         // Month Dropdown
         DropdownMenuBox(
@@ -443,20 +490,20 @@ fun DateOfBirthPicker(
                 val index = months.indexOf(month) + 1
                 onDateSelected(selectedDay, index, selectedYear)
             },
-            textColor = textColor // Pass textColor parameter
+            textColor = textColor
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(IMAGE_PICKER_PADDING_TOP))
 
         // Year Dropdown
         DropdownMenuBox(
             items = years,
             selectedItem = selectedYear,
             onItemSelected = { year -> onDateSelected(selectedDay, selectedMonth, year) },
-            textColor = textColor // Pass textColor parameter
+            textColor = textColor
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(SPACER_HEIGHT))
 
         // Save Icon
         Icon(
@@ -472,21 +519,22 @@ fun DateOfBirthPicker(
     }
 }
 
+// A dropdown menu box for selecting an item from a list
 @Composable
 fun <T> DropdownMenuBox(
     items: List<T>,
     selectedItem: T,
     onItemSelected: (T) -> Unit,
     displayText: String = selectedItem.toString(),
-    textColor: Color = MaterialTheme.colorScheme.onBackground // Add textColor parameter
+    textColor: Color = MaterialTheme.colorScheme.onBackground
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         OutlinedButton(
             onClick = { expanded = true },
-            modifier = Modifier.width(90.dp)
+            modifier = Modifier.width(DROPDOWN_MENU_WIDTH),
         ) {
-            Text(text = displayText, color = textColor) // Apply textColor
+            Text(text = displayText, color = textColor)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             items.forEach { item ->
@@ -494,14 +542,14 @@ fun <T> DropdownMenuBox(
                     onItemSelected(item)
                     expanded = false
                 }) {
-                    Text(text = item.toString(), color = textColor) // Apply textColor
+                    Text(text = item.toString(), color = textColor)
                 }
             }
         }
     }
 }
 
-//--------------- Standard text field with trailing icon ------------------------
+// Editable text field for user input
 @Composable
 fun EditableTextField(
     label: String,
@@ -511,7 +559,7 @@ fun EditableTextField(
     isPhone: Boolean = false,
     singleLine: Boolean = true,
     maxLines: Int = 1,
-    textColor: Color = MaterialTheme.colorScheme.secondary // Add textColor parameter
+    textColor: Color = MaterialTheme.colorScheme.secondary
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showPasswordDialog by remember { mutableStateOf(false) }
@@ -529,11 +577,11 @@ fun EditableTextField(
             },
             singleLine = singleLine,
             maxLines = maxLines,
-            textStyle = MaterialTheme.typography.bodySmall.copy(color = textColor), // Apply textColor
+            textStyle = MaterialTheme.typography.bodySmall.copy(color = textColor),
             modifier = Modifier.fillMaxWidth(),
             colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
             ),
             trailingIcon = {
                 Icon(
@@ -548,9 +596,9 @@ fun EditableTextField(
                 )
             }
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.tertiary)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
     }
 
     if (showPasswordDialog) {
@@ -592,6 +640,7 @@ fun formatDateTime(dateTimeString: String): Pair<String, String> {
     return Pair(formattedDate, formattedTime)
 }
 
+// Dialog to display the server error message
 @Composable
 fun ServerErrorDialog(onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {

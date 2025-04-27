@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.hopla.R
 import com.example.hopla.apiService.fetchUserRelationRequests
-import com.example.hopla.apiService.sendUserRelationRequestDelete
+import com.example.hopla.apiService.relationRequestDelete
 import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.AcceptColor
 import com.example.hopla.ui.theme.HeartColor
@@ -54,6 +54,7 @@ import com.example.hopla.universalData.UserRelationRequest
 import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.launch
 
+// This screen displays the notifications for friend requests
 @Composable
 fun NotificationsScreen(navController: NavController) {
     var userRelationRequests by remember { mutableStateOf<List<UserRelationRequest>>(emptyList()) }
@@ -94,7 +95,7 @@ fun NotificationsScreen(navController: NavController) {
                             try {
                                 userRelationRequests = fetchUserRelationRequests(token)
                             } catch (e: Exception) {
-                                Log.e("NotificationsScreen", "Error fetching user relation requests", e)
+                                Log.e("NotificationsScreen", "Error fetching user requests", e)
                             }
                         }
                     }
@@ -105,6 +106,7 @@ fun NotificationsScreen(navController: NavController) {
     }
 }
 
+// Each of the notification items is displayed here
 @Composable
 fun NotificationItem(
     request: UserRelationRequest,
@@ -154,8 +156,8 @@ fun NotificationItem(
                 IconButton(
                     onClick = {
                         val changeRequest = UserRelationChangeRequest(
-                            TargetUserId = request.fromUserId,
-                            Status = "FRIENDS"
+                            targetUserId = request.fromUserId,
+                            status = "FRIENDS"
                         )
                         coroutineScope.launch {
                             try {
@@ -177,15 +179,15 @@ fun NotificationItem(
                 IconButton(
                     onClick = {
                         val deleteRequest = UserRelationChangeRequest(
-                            TargetUserId = request.fromUserId
+                            targetUserId = request.fromUserId
                         )
                         coroutineScope.launch {
                             try {
-                                val response = sendUserRelationRequestDelete(UserSession.token, deleteRequest)
+                                val response = relationRequestDelete(UserSession.token, deleteRequest)
                                 Log.d("changeRelations", "Response: $response")
                                 onReload()
                             } catch (e: Exception) {
-                                Log.e("changeRelations", "Error declining friend request", e)
+                                Log.e("changeRelations", "Error declining request", e)
                             }
                         }
                     }

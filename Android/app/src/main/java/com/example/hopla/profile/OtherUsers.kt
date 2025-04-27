@@ -58,7 +58,7 @@ import com.example.hopla.apiService.fetchFriendProfile
 import com.example.hopla.apiService.fetchFriends
 import com.example.hopla.apiService.fetchUserFriends
 import com.example.hopla.apiService.sendUserRelationRequest
-import com.example.hopla.apiService.sendUserRelationRequestDelete
+import com.example.hopla.apiService.relationRequestDelete
 import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.dropdownMenuTextStyle
@@ -81,7 +81,7 @@ import com.example.hopla.universalData.UserSession
 import com.example.hopla.universalData.formatDate
 import kotlinx.coroutines.launch
 
-// Details about a person
+// Details about a person specified by their user id
 @Composable
 fun UsersProfileScreen(navController: NavController, userId: String) {
     var friendProfile by remember { mutableStateOf<FriendProfile?>(null) }
@@ -185,8 +185,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         TextButton(onClick = {
                             showBlockConfirmationDialog = false
                             val request = UserRelationChangeRequest(
-                                TargetUserId = userId,
-                                Status = "BLOCK"
+                                targetUserId = userId,
+                                status = "BLOCK"
                             )
                             coroutineScope.launch {
                                 try {
@@ -268,11 +268,11 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         ) {
                             CustomButton(text = stringResource(R.string.pending)) {
                                 val deleteRequest = UserRelationChangeRequest(
-                                    TargetUserId = userId
+                                    targetUserId = userId
                                 )
                                 coroutineScope.launch {
                                     try {
-                                        val response = sendUserRelationRequestDelete(
+                                        val response = relationRequestDelete(
                                             UserSession.token,
                                             deleteRequest
                                         )
@@ -293,11 +293,11 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         ) {
                             CustomButton(text = stringResource(R.string.following)) {
                                 val deleteRequest = UserRelationChangeRequest(
-                                    TargetUserId = userId
+                                    targetUserId = userId
                                 )
                                 coroutineScope.launch {
                                     try {
-                                        val response = sendUserRelationRequestDelete(
+                                        val response = relationRequestDelete(
                                             UserSession.token,
                                             deleteRequest
                                         )
@@ -312,8 +312,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                             if (profile.relationStatus == PersonStatus.FOLLOWING.name && profile.relationStatus != PersonStatus.PENDING.name) {
                                 CustomButton(text = stringResource(R.string.add_friend)) {
                                     val request = UserRelationChangeRequest(
-                                        TargetUserId = userId,
-                                        Status = "PENDING"
+                                        targetUserId = userId,
+                                        status = "PENDING"
                                     )
                                     coroutineScope.launch {
                                         try {
@@ -337,11 +337,11 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                             if (profile.relationStatus == PersonStatus.FOLLOWING.name && profile.relationStatus == PersonStatus.PENDING.name) {
                                 CustomButton(text = stringResource(R.string.pending)) {
                                     val deleteRequest = UserRelationChangeRequest(
-                                        TargetUserId = userId
+                                        targetUserId = userId
                                     )
                                     coroutineScope.launch {
                                         try {
-                                            val response = sendUserRelationRequestDelete(
+                                            val response = relationRequestDelete(
                                                 UserSession.token,
                                                 deleteRequest
                                             )
@@ -363,11 +363,11 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                         ) {
                             CustomButton(text = stringResource(R.string.friends)) {
                                 val deleteRequest = UserRelationChangeRequest(
-                                    TargetUserId = userId
+                                    targetUserId = userId
                                 )
                                 coroutineScope.launch {
                                     try {
-                                        val response = sendUserRelationRequestDelete(
+                                        val response = relationRequestDelete(
                                             UserSession.token,
                                             deleteRequest
                                         )
@@ -389,8 +389,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                             // Button to send a friend request
                             CustomButton(text = stringResource(R.string.add)) {
                                 val request = UserRelationChangeRequest(
-                                    TargetUserId = userId,
-                                    Status = "PENDING"
+                                    targetUserId = userId,
+                                    status = "PENDING"
                                 )
                                 coroutineScope.launch {
                                     try {
@@ -406,8 +406,8 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
                             // Button to follow the user
                             CustomButton(text = stringResource(R.string.follow)) {
                                 val request = UserRelationChangeRequest(
-                                    TargetUserId = userId,
-                                    Status = "FOLLOWING"
+                                    targetUserId = userId,
+                                    status = "FOLLOWING"
                                 )
                                 coroutineScope.launch {
                                     try {
@@ -476,7 +476,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                val formattedDate = profile.created_at?.let { formatDate(it) } ?: stringResource(R.string.unknown)
+                val formattedDate = profile.createdAt?.let { formatDate(it) } ?: stringResource(R.string.unknown)
                 Text(
                     text = stringResource(R.string.created_at) +": $formattedDate",
                     style = generalTextStyle,
@@ -501,6 +501,7 @@ fun UsersProfileScreen(navController: NavController, userId: String) {
     }
 }
 
+// Screen to display a list of friends for a specific user
 @Composable
 fun FriendsListScreen(navController: NavController, userId: String) {
     var friends by remember { mutableStateOf<List<Friend>>(emptyList()) }
@@ -541,6 +542,7 @@ fun FriendsListScreen(navController: NavController, userId: String) {
     }
 }
 
+// Screen to display a list of users (friends or following)
 @Composable
 fun UserListScreen(
     navController: NavController,
@@ -599,6 +601,7 @@ fun UserListScreen(
     }
 }
 
+// Screen to display a list of friends
 @Composable
 fun FriendsScreen(navController: NavController) {
     UserListScreen(
@@ -608,6 +611,7 @@ fun FriendsScreen(navController: NavController) {
     )
 }
 
+// Screen to display a list of users that the current user is following
 @Composable
 fun FollowingScreen(navController: NavController) {
     UserListScreen(
@@ -617,6 +621,7 @@ fun FollowingScreen(navController: NavController) {
     )
 }
 
+// Composable function to display a user item in a list
 @Composable
 fun UserItemComposable(userItem: UserItem, navController: NavController) {
     Row(
@@ -639,11 +644,16 @@ fun UserItemComposable(userItem: UserItem, navController: NavController) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = userItem.alias, style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+            Text(
+                text = userItem.alias,
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
     }
 }
 
+// Composable function to display a user item in a list
 @Composable
 fun UserItemComposable(user: OtherUsers, navController: NavController) {
     Row(
@@ -663,7 +673,10 @@ fun UserItemComposable(user: OtherUsers, navController: NavController) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = user.alias ?: "Unknown", style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary)
+            Text(
+                text = user.alias ?: "Unknown", style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
     }
 }

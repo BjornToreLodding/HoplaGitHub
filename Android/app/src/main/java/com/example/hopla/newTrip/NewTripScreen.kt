@@ -66,6 +66,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// Main new trip screen composable function
 @SuppressLint("DefaultLocale")
 @Composable
 fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
@@ -252,7 +253,7 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                                     Date()
                                 )
                                 val distanceStr =
-                                    String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
+                                    String.format(Locale.GERMANY, "%.2f", distance)
                                 val durationStr = String.format(
                                     Locale.GERMANY,
                                     "%02d,%02d",
@@ -261,10 +262,10 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                                 ) // e.g., "5,45"
 
                                 newHike = NewHike(
-                                    StartetAt = currentTime,
-                                    Distance = distanceStr,
-                                    Duration = durationStr,
-                                    Coordinates = coordinates
+                                    startetAt = currentTime,
+                                    distance = distanceStr,
+                                    duration = durationStr,
+                                    coordinates = coordinates
                                 )
                             }
                         },
@@ -272,8 +273,8 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                         modifier = Modifier.size(90.dp),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary, // Background color
-                            contentColor = MaterialTheme.colorScheme.onPrimary // Text color
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text(
@@ -329,16 +330,16 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                     val minutes = (time / 60).toInt()
                     val seconds = (time % 60).toInt()
                     val distanceStr =
-                        String.format(Locale.GERMANY, "%.2f", distance) // e.g., "30,30"
+                        String.format(Locale.GERMANY, "%.2f", distance)
                     val durationStr =
-                        String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds) // e.g., "5,45"
+                        String.format(Locale.GERMANY, "%02d,%02d", minutes, seconds)
                     newHike = newHike?.copy(
-                        Distance = distanceStr,
-                        Duration = durationStr,
-                        Coordinates = coordinates,
-                        Title = tripName.ifEmpty { null },
-                        Description = tripNotes.ifEmpty { null },
-                        HorseId = selectedHorseId
+                        distance = distanceStr,
+                        duration = durationStr,
+                        coordinates = coordinates,
+                        title = tripName.ifEmpty { null },
+                        description = tripNotes.ifEmpty { null },
+                        horseId = selectedHorseId
                     )
                     time = 0.0
                     distance = 0.0
@@ -353,12 +354,20 @@ fun NewTripScreen(bottomBarViewModel: BottomBarViewModel) {
                         }
                     }
                 }, shape = RectangleShape ) {
-                    Text(text = stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = stringResource(R.string.save),
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             },
             dismissButton = {
                 Button(onClick = { showDialog = false }, shape = RectangleShape) {
-                    Text(stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        stringResource(R.string.cancel),
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         )

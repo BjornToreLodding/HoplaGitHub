@@ -2,7 +2,17 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     kotlin("plugin.serialization") version "1.8.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.1"
 }
+
+detekt {
+    toolVersion = "1.23.1"
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
+    ignoreFailures = true
+}
+
 
 android {
     namespace = "com.example.hopla"

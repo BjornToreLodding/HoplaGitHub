@@ -1,5 +1,6 @@
 package com.example.hopla.universalData
 
+// The user session data to be saved in the app
 object UserSession {
     var token: String = ""
     var userId: String = ""

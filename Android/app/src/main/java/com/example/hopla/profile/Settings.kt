@@ -59,6 +59,7 @@ import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.UserSession
 import java.util.Locale
 
+// Settings screen of the app
 @Composable
 fun SettingsScreen(
     languageViewModel: LanguageViewModel,
@@ -184,7 +185,10 @@ fun SettingsItem(icon: ImageVector, title: String, trailingContent: @Composable 
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary)
-        Text(text = title, style = generalTextStyle, modifier = Modifier.weight(1f).padding(start = 16.dp))
+        Text(
+            text = title,
+            style = generalTextStyle,
+            modifier = Modifier.weight(1f).padding(start = 16.dp))
         trailingContent()
     }
 }
@@ -200,7 +204,11 @@ fun SettingsClickableItem(icon: ImageVector, title: String, onClick: () -> Unit)
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = title, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary)
-        Text(text = title, style = generalTextStyle, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.weight(1f).padding(start = 16.dp))
+        Text(
+            text = title,
+            style = generalTextStyle,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.weight(1f).padding(start = 16.dp))
     }
 }
 
@@ -213,12 +221,20 @@ fun ConfirmDialog(title: String, message: String, onConfirm: () -> Unit, onDismi
         text = { Text(message) },
         confirmButton = {
             Button(onClick = onConfirm, shape = RectangleShape) {
-                Text(text = stringResource(R.string.confirm), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.confirm),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
         dismissButton = {
             Button(onClick = onDismiss, shape = RectangleShape) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     )
@@ -240,28 +256,40 @@ fun PasswordConfirmDialog(
                 TextField(
                     value = password,
                     onValueChange = onPasswordChange,
-                    label = { Text(stringResource(R.string.confirm_password), style = textFieldLabelTextStyle) },
+                    label = { Text(
+                        stringResource(R.string.confirm_password),
+                        style = textFieldLabelTextStyle
+                    ) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
                     ),
                 )
             }
         },
         confirmButton = {
             Button(onClick = { onConfirm(password) }, shape = RectangleShape) {
-                Text(stringResource(R.string.confirm), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    stringResource(R.string.confirm),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
         dismissButton = {
             Button(onClick = onDismiss, shape = RectangleShape) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     )
 }
 
+// Language ViewModel to manage language selection (Norwegian or English)
 class LanguageViewModel(
     application: Application,
     private val savedStateHandle: SavedStateHandle
@@ -286,6 +314,7 @@ class LanguageViewModel(
     }
 }
 
+// Language Selection UI
 @Composable
 fun LanguageSelection(languageViewModel: LanguageViewModel) {
     Box(
@@ -313,6 +342,7 @@ fun LanguageSelection(languageViewModel: LanguageViewModel) {
     }
 }
 
+// Theme ViewModel to manage dark/light mode
 @Composable
 fun ModeSelection(themeViewModel: ThemeViewModel = viewModel()) {
     Box(

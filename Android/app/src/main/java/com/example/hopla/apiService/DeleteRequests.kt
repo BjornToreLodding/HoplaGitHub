@@ -10,11 +10,12 @@ import kotlinx.serialization.json.Json
 import android.util.Log
 import com.example.hopla.universalData.ReactionRequest
 import com.example.hopla.universalData.StableActionRequest
-import com.example.hopla.universalData.StableActionResponse
+import com.example.hopla.universalData.StableResponse
 import com.example.hopla.universalData.UserRelationChangeRequest
 import com.example.hopla.universalData.apiUrl
 
-suspend fun sendUserRelationRequestDelete(token: String, request: UserRelationChangeRequest): String {
+// Delete a relation between two users, e.g., block a user, unfriend etc.
+suspend fun relationRequestDelete(token: String, request: UserRelationChangeRequest): String {
     val client = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -37,6 +38,7 @@ suspend fun sendUserRelationRequestDelete(token: String, request: UserRelationCh
     return responseBody
 }
 
+// Delete a horse from the user's list of horses
 suspend fun deleteHorse(token: String, horseId: String): String {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -96,7 +98,7 @@ suspend fun removeFavoriteTrail(token: String, trailId: String): String {
 }
 
 //Leave a stable the user is a member of
-suspend fun leaveStable(token: String, stableActionRequest: StableActionRequest): StableActionResponse {
+suspend fun leaveStable(token: String, stableActionRequest: StableActionRequest): StableResponse {
     val client = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -116,9 +118,10 @@ suspend fun leaveStable(token: String, stableActionRequest: StableActionRequest)
     val responseBody: String = response.bodyAsText()
     client.close()
     Log.d("stableJoinLeave", "Response Body: $responseBody")
-    return Json.decodeFromString(StableActionResponse.serializer(), responseBody)
+    return Json.decodeFromString(StableResponse.serializer(), responseBody)
 }
 
+// Delete a reaction from a post (e.g unlike a post)
 suspend fun deleteReaction(token: String, entityId: String): String {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -130,7 +133,7 @@ suspend fun deleteReaction(token: String, entityId: String): String {
         }
     }
 
-    val requestBody = ReactionRequest(EntityId = entityId)
+    val requestBody = ReactionRequest(entityId = entityId)
     val response: HttpResponse = client.delete("https://hopla.onrender.com/reactions") {
         header("Authorization", "Bearer $token")
         contentType(ContentType.Application.Json)

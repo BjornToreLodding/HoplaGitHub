@@ -62,6 +62,7 @@ import com.example.hopla.universalData.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+// This file contains the Composable functions for displaying horse-related screens in the app.
 @Composable
 fun UserHorsesScreen(navController: NavController, userId: String) {
     var horses by remember { mutableStateOf<List<Horse>>(emptyList()) }
@@ -92,6 +93,7 @@ fun UserHorsesScreen(navController: NavController, userId: String) {
     }
 }
 
+// This function is used to display the horses of the logged-in user.
 @Composable
 fun MyHorsesScreen(navController: NavController) {
     var horses by remember { mutableStateOf<List<Horse>>(emptyList()) }
@@ -121,6 +123,7 @@ fun MyHorsesScreen(navController: NavController) {
     AddButton(onClick = { navController.navigate("addHorseScreen") })
 }
 
+// Display the details of a specific horse.
 @Composable
 fun HorseDetailScreen(navController: NavController, horseId: String) {
     var horseDetail by remember { mutableStateOf<HorseDetail?>(null) }
@@ -198,9 +201,18 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            DetailRow(label = stringResource(R.string.breed) + ":", value = horse.breed)
-                            DetailRow(label = stringResource(R.string.age) + ":", value = horse.age.toString())
-                            DetailRow(label = stringResource(R.string.date_of_birth) + ":", value = formattedDob)
+                            DetailRow(
+                                label = stringResource(R.string.breed) + ":",
+                                value = horse.breed
+                            )
+                            DetailRow(
+                                label = stringResource(R.string.age) + ":",
+                                value = horse.age.toString()
+                            )
+                            DetailRow(
+                                label = stringResource(R.string.date_of_birth) + ":",
+                                value = formattedDob
+                            )
                         }
                     }
 
@@ -215,6 +227,7 @@ fun HorseDetailScreen(navController: NavController, horseId: String) {
     }
 }
 
+// This function is used to display each horse item in the list.
 @Composable
 fun HorseItem(horse: Horse, navController: NavController, isMyPage: Boolean) {
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -289,6 +302,7 @@ fun HorseItem(horse: Horse, navController: NavController, isMyPage: Boolean) {
     }
 }
 
+// This function is used to display the details of a horse in a row format.
 @Composable
 fun DetailRow(label: String, value: String) {
     Row(
@@ -304,6 +318,7 @@ fun DetailRow(label: String, value: String) {
     }
 }
 
+// This function is used to delete a horse and navigate back to the previous screen.
 fun deleteHorseAndNavigateBack(
     token: String,
     horseId: String,
@@ -320,6 +335,7 @@ fun deleteHorseAndNavigateBack(
     }
 }
 
+// This function is used to display the delete horse section with a confirmation dialog.
 @Composable
 fun DeleteHorseSection(
     horseId: String,

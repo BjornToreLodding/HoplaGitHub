@@ -91,6 +91,9 @@ import com.example.hopla.universalData.UserSession
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 
+private const val NUM_STARS = 5
+private const val TR_VALUE = 0.5f
+
 // Function to display the main screen of trails page
 @Composable
 fun TrailsScreen(navController: NavController) {
@@ -117,6 +120,13 @@ fun TrailsScreen(navController: NavController) {
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
     var searchResponse by remember { mutableStateOf<List<Trail>>(emptyList()) }
+    val isHighlighted = isMapClicked || (
+            !isCloseByClicked &&
+                    !isFavoriteClicked &&
+                    !isFollowingClicked &&
+                    !isFiltersClicked &&
+                    !showOnlyFavorites
+            )
 
     LaunchedEffect(searchQuery) {
         pageNumber = 1
@@ -184,18 +194,21 @@ fun TrailsScreen(navController: NavController) {
                                 }
                             }
                         },
-                        modifier = Modifier
+
+                        Modifier
                             .background(
-                                if (isMapClicked || (!isCloseByClicked && !isFavoriteClicked && !isFollowingClicked && !isFiltersClicked && !showOnlyFavorites)) Color.White.copy(
-                                    alpha = 0.5f
-                                ) else Color.Transparent,
+                                if (isHighlighted) Color.White.copy(alpha = TR_VALUE) else Color.Transparent,
                                 shape = RectangleShape
                             )
                             .padding(horizontal = 16.dp)
                             .size(32.dp)
                     ) {
                         Icon(
-                            imageVector = if (isMapClicked) Icons.AutoMirrored.Outlined.List else Icons.Outlined.Language,
+                            imageVector = if (isMapClicked) {
+                                Icons.AutoMirrored.Outlined.List
+                            } else {
+                                Icons.Outlined.Language
+                            },
                             tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
@@ -265,7 +278,7 @@ fun TrailsScreen(navController: NavController) {
                         },
                         modifier = Modifier
                             .background(
-                                if (isCloseByClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                if (isCloseByClicked) Color.White.copy(alpha = TR_VALUE) else Color.Transparent,
                                 shape = RectangleShape
                             )
                             .padding(horizontal = 16.dp)
@@ -307,7 +320,7 @@ fun TrailsScreen(navController: NavController) {
                         },
                         modifier = Modifier
                             .background(
-                                if (isFavoriteClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                if (isFavoriteClicked) Color.White.copy(alpha = TR_VALUE) else Color.Transparent,
                                 shape = RectangleShape
                             )
                             .padding(horizontal = 16.dp)
@@ -348,7 +361,7 @@ fun TrailsScreen(navController: NavController) {
                         },
                         modifier = Modifier
                             .background(
-                                if (isFollowingClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                if (isFollowingClicked) Color.White.copy(alpha = TR_VALUE) else Color.Transparent,
                                 shape = RectangleShape
                             )
                             .padding(horizontal = 16.dp)
@@ -380,7 +393,7 @@ fun TrailsScreen(navController: NavController) {
                                 },
                                 modifier = Modifier
                                     .background(
-                                        if (isFiltersClicked) Color.White.copy(alpha = 0.5f) else Color.Transparent,
+                                        if (isFiltersClicked) Color.White.copy(alpha = TR_VALUE) else Color.Transparent,
                                         shape = RectangleShape
                                     )
                                     .padding(horizontal = 16.dp)
@@ -504,7 +517,7 @@ fun TrailsScreen(navController: NavController) {
                                         val trailsResponse =
                                             fetchTrails(token, 1, searchQuery, filtersQuery)
                                         trails =
-                                            trailsResponse.trails // Update the trails state with the new response
+                                            trailsResponse.trails
                                         noResults = trails.isEmpty()
                                     } catch (e: Exception) {
                                         Log.e("fetchTrails", "Error fetching trails", e)
@@ -705,7 +718,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
+                    .background(Color.Black.copy(alpha = TR_VALUE))
             )
 
             // Top-right icons
@@ -775,7 +788,7 @@ fun ContentBox(info: ContentBoxInfo, onHeartClick: () -> Unit, onBoxClick: () ->
                     .align(Alignment.BottomEnd)
                     .padding(end = 5.dp, bottom = 35.dp)
             ) {
-                repeat(5) { index ->
+                repeat(NUM_STARS) { index ->
                     Icon(
                         imageVector = if (index < info.starRating) Icons.Filled.Star else Icons.TwoTone.Star,
                         contentDescription = null,

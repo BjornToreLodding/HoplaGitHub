@@ -37,6 +37,7 @@ import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.universalData.ImagePicker
 
+// This function creates the content of the AlertDialog for saving a trip.
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialogContent(
@@ -128,7 +129,10 @@ fun AlertDialogContent(
                         expanded = false
                     }
                 ) {
-                    Text(stringResource(R.string.no_horse_chosen), color = MaterialTheme.colorScheme.onSurface)
+                    Text(
+                        stringResource(R.string.no_horse_chosen),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
                 horses.forEach { horse ->
                     DropdownMenuItem(

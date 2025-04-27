@@ -84,7 +84,9 @@ import org.json.JSONObject
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 
-// Main profile function
+private const val STATUS_200 = 200
+
+// Main profile screen function
 @Composable
 fun ProfileScreen(navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
@@ -102,19 +104,31 @@ fun ProfileScreen(navController: NavController) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { /* Prevent dismissing */ },
-            title = { Text(text = stringResource(R.string.missing_information), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
+            title = { Text(
+                text = stringResource(R.string.missing_information),
+                style = underheaderTextStyle,
+                color = MaterialTheme.colorScheme.secondary
+            ) },
             text = {
                 Column {
                     TextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text(text = stringResource(R.string.name), style = generalTextStyleBold, color = MaterialTheme.colorScheme.secondary) },
+                        label = { Text(
+                            text = stringResource(R.string.name),
+                            style = generalTextStyleBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        ) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextField(
                         value = username,
                         onValueChange = { username = it },
-                        label = { Text(text = stringResource(R.string.username), style = generalTextStyleBold, color = MaterialTheme.colorScheme.secondary) },
+                        label = { Text(
+                            text = stringResource(R.string.username),
+                            style = generalTextStyleBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        ) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -123,7 +137,7 @@ fun ProfileScreen(navController: NavController) {
                 Button(onClick = {
                     coroutineScope.launch {
                         val (statusCode, _) = updateUserInfo(UserSession.token, username, name)
-                        if (statusCode == 200) {
+                        if (statusCode == STATUS_200) {
                             UserSession.name = name
                             UserSession.alias = username
                             showDialog = false
@@ -228,7 +242,7 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
                     val filePath = JSONObject(response).getString("filePath").replace("/uploads", "")
                     val fullUrl = "https://files.hopla.no$filePath"
                     UserSession.profilePictureURL = fullUrl
-                    Log.d("ProfilePicture", "New profile picture URL: ${UserSession.profilePictureURL}")
+                    Log.d("ProfilePicture", "Picture URL: ${UserSession.profilePictureURL}")
                 } catch (e: Exception) {
                     Log.e("ProfilePicture", "Error uploading profile picture", e)
                 }
@@ -238,6 +252,7 @@ fun ProfilePicture(imageUrl: String = UserSession.profilePictureURL) {
     )
 }
 
+// Function to create buttons for navigating to different sections of the profile
 @Composable
 fun ProfileButtons(navController: NavController) {
     Column(
@@ -261,7 +276,10 @@ fun ProfileButtons(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.my_trips), color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.my_trips),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
             Button(
                 onClick = { navController.navigate("my_horses") },
@@ -274,7 +292,10 @@ fun ProfileButtons(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.my_horses), color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.my_horses),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
         Row(
@@ -311,6 +332,7 @@ fun ProfileButtons(navController: NavController) {
     }
 }
 
+// Function to show a dialog for confirming the password
 @Composable
 fun PasswordConfirmationDialog(
     onDismiss: () -> Unit,
@@ -335,17 +357,26 @@ fun PasswordConfirmationDialog(
         },
         confirmButton = {
             Button(onClick = { onConfirm(password) }, shape = RectangleShape) {
-                Text(text = stringResource(R.string.confirm), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.confirm),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
         dismissButton = {
             Button(onClick = onDismiss, shape = RectangleShape) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     )
 }
 
+// The changes the user can make in their profile
 @Composable
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
@@ -386,7 +417,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token,
                         username, UserSession.name ?: "")
-                    if (statusCode == 200) {
+                    if (statusCode == STATUS_200) {
                         UserSession.alias = username
                         responseMessage = successMessage
                         showResponseDialog = true
@@ -412,7 +443,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onValueChange = { phone = it },
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", phone)
-                    if (statusCode == 200) {
+                    if (statusCode == STATUS_200) {
                         UserSession.telephone = phone.toIntOrNull()?.toString()
                         responseMessage = successMessage
                         showResponseDialog = true
@@ -431,7 +462,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onValueChange = { name = it },
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", name)
-                    if (statusCode == 200) {
+                    if (statusCode == STATUS_200) {
                         UserSession.name = name
                         responseMessage = successMessage
                         showResponseDialog = true
@@ -449,7 +480,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onValueChange = { description = it },
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", description = description)
-                    if (statusCode == 200) {
+                    if (statusCode == STATUS_200) {
                         UserSession.description = description
                         responseMessage = successMessage
                         showResponseDialog = true
@@ -487,7 +518,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 },
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", year = dob?.year, month = dob?.month, day = dob?.day)
-                    if (statusCode == 200) {
+                    if (statusCode == STATUS_200) {
                         UserSession.dob = dob
                         responseMessage = successMessage
                         showResponseDialog = true
@@ -559,7 +590,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                                 val (statusCode, message) = changePassword(UserSession.token, trimmedCurrentPassword, trimmedNewPassword, trimmedConfirmPassword)
                                 responseMessage = message
                                 showResponseDialog = true
-                                if (statusCode == 200) {
+                                if (statusCode == STATUS_200) {
                                     showDialog = false
                                 }
                             }
@@ -582,16 +613,25 @@ fun UserChanges(modifier: Modifier = Modifier) {
     if (showResponseDialog) {
         AlertDialog(
             onDismissRequest = { showResponseDialog = false },
-            text = { Text(text = responseMessage, style = generalTextStyleBold, color = MaterialTheme.colorScheme.secondary) },
+            text = { Text(
+                text = responseMessage,
+                style = generalTextStyleBold,
+                color = MaterialTheme.colorScheme.secondary
+            ) },
             confirmButton = {
                 Button(onClick = { showResponseDialog = false }, shape = RectangleShape) {
-                    Text(text = stringResource(R.string.close), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = stringResource(R.string.close),
+                        style = buttonTextStyle,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         )
     }
 }
 
+// Function to add a new type of item (e.g., horse, friend)
 @Composable
 fun AddNewType(
     navController: NavController,
@@ -641,11 +681,15 @@ fun AddNewType(
                 TextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(text = stringResource(R.string.name), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                    label = { Text(
+                        text = stringResource(R.string.name),
+                        style = textFieldLabelTextStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    ) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
                     ),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -657,11 +701,15 @@ fun AddNewType(
                         TextField(
                             value = breedOrFriendType,
                             onValueChange = { breedOrFriendType = it },
-                            label = { Text(text = stringResource(R.string.breed), style = textFieldLabelTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                            label = { Text(
+                                text = stringResource(R.string.breed),
+                                style = textFieldLabelTextStyle,
+                                color = MaterialTheme.colorScheme.secondary
+                            ) },
                             modifier = Modifier.fillMaxWidth(),
                             colors = androidx.compose.material.TextFieldDefaults.textFieldColors(
-                                focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Change highlight color
-                                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground // Optional: Change unfocused color
+                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground
                             ),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -709,12 +757,12 @@ fun AddNewType(
                         isLoading = true
                         try {
                             val horseRequest = HorseRequest(
-                                Name = name,
-                                Breed = breedOrFriendType,
-                                Year = selectedYear.toString(),
-                                Month = selectedMonth.toString(),
-                                Day = selectedDay.toString(),
-                                Image = imageBitmap!!
+                                name = name,
+                                breed = breedOrFriendType,
+                                year = selectedYear.toString(),
+                                month = selectedMonth.toString(),
+                                day = selectedDay.toString(),
+                                image = imageBitmap!!
                             )
                             Log.d("createHorse", "Sending request: $horseRequest")
                             val response = createHorse(token, horseRequest)

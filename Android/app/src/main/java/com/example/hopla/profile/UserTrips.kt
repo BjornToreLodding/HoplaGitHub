@@ -86,6 +86,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// This screen displays the user's trips
 @Composable
 fun MyTripsScreen(navController: NavController) {
     var userHikes by remember { mutableStateOf<List<Hike>>(emptyList()) }
@@ -143,7 +144,11 @@ fun MyTripsScreen(navController: NavController) {
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Text(text = stringResource(R.string.load_more), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                            Text(
+                                text = stringResource(R.string.load_more),
+                                style = buttonTextStyle,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 }
@@ -152,6 +157,7 @@ fun MyTripsScreen(navController: NavController) {
     }
 }
 
+// This function displays each hike item in the list
 @Composable
 fun HikeItem(
     hike: Hike,
@@ -183,10 +189,10 @@ fun HikeItem(
             onSave = { name, description, imageBitmap, userHikeId, filterData ->
                 coroutineScope.launch {
                     val createTrailRequest = CreateTrailRequest(
-                        Name = name,
+                        name = name,
                         description = description,
-                        UserHikeId = userHikeId,
-                        Filters = filterData
+                        userHikeId = userHikeId,
+                        filters = filterData
                     )
                     try {
                         val response = createTrail(token, imageBitmap!!, createTrailRequest)
@@ -224,7 +230,7 @@ fun HikeItem(
                 style = underheaderTextStyle,
                 color = MaterialTheme.colorScheme.secondary
             )
-            ExpandableDescription(hike = hike) // Add the expandable description here
+            ExpandableDescription(hike = hike)
             Spacer(modifier = Modifier.height(8.dp))
             if (isMyTripsScreen && hike.trailButton) {
                 Row {
@@ -273,6 +279,7 @@ fun HikeItem(
     }
 }
 
+// This function displays the description of the hike with expandable details
 @Composable
 fun ExpandableDescription(hike: Hike) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -326,6 +333,7 @@ fun ExpandableDescription(hike: Hike) {
     }
 }
 
+// Dialog for sharing a trip
 @Composable
 fun ShareTripDialog(
     hike: Hike,
@@ -360,13 +368,21 @@ fun ShareTripDialog(
                     value = name,
                     onValueChange = { name = it },
                     singleLine = true,
-                    label = { Text(text = stringResource(R.string.name), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                    label = { Text(
+                        text = stringResource(R.string.name),
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    ) },
                     modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
                 )
                 TextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(text = stringResource(R.string.description), style = generalTextStyle, color = MaterialTheme.colorScheme.secondary) },
+                    label = { Text(
+                        text = stringResource(R.string.description),
+                        style = generalTextStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    ) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
@@ -442,8 +458,8 @@ fun ShareTripDialog(
                             val filterData = selectedOptions.flatMap { (filterName, options) ->
                                 options.map { option ->
                                     FilterData(
-                                        FilterDefinitionId = filters.find { it.name == filterName }?.id ?: "",
-                                        Value = option
+                                        filterDefinitionId = filters.find { it.name == filterName }?.id ?: "",
+                                        value = option
                                     )
                                 }
                             }
@@ -469,6 +485,7 @@ fun ShareTripDialog(
     }
 }
 
+// Dialog for editing a trip
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditTripDialog(
@@ -493,7 +510,11 @@ fun EditTripDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.edit_trip), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
+        title = { Text(
+            text = stringResource(R.string.edit_trip),
+            style = underheaderTextStyle,
+            color = MaterialTheme.colorScheme.secondary
+        ) },
         text = {
             Column {
                 tripName?.let { it ->
@@ -537,7 +558,10 @@ fun EditTripDialog(
                                 expanded = false
                             }
                         ) {
-                            Text(text = stringResource(R.string.choose_horse), color = MaterialTheme.colorScheme.onSurface)
+                            Text(
+                                text = stringResource(R.string.choose_horse),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
                         horses.forEach { horse ->
                             DropdownMenuItem(
@@ -587,12 +611,20 @@ fun EditTripDialog(
                 onHikesReload()
                 onDismiss()
             }, shape = RectangleShape) {
-                Text(text = stringResource(R.string.save), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.save),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
         dismissButton = {
             Button(onClick = onDismiss, shape = RectangleShape) {
-                Text(text = stringResource(R.string.cancel), style = buttonTextStyle, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = buttonTextStyle,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     )

@@ -13,7 +13,7 @@ import com.example.hopla.universalData.NewHike
 import com.example.hopla.universalData.ReactionRequest
 import com.example.hopla.universalData.ResetPasswordRequest
 import com.example.hopla.universalData.StableActionRequest
-import com.example.hopla.universalData.StableActionResponse
+import com.example.hopla.universalData.StableResponse
 import com.example.hopla.universalData.StableMessageRequest
 import com.example.hopla.universalData.StableMessageResponse
 import com.example.hopla.universalData.StableRequest
@@ -50,6 +50,7 @@ import java.io.ByteArrayOutputStream
 import kotlinx.serialization.encodeToString
 
 //---------- Post requests for several pages  ---------------
+// Create a user report
 suspend fun createUserReport(token: String, reportRequest: UserReportRequest): UserReportResponse {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -78,6 +79,7 @@ suspend fun createUserReport(token: String, reportRequest: UserReportRequest): U
     return Json.decodeFromString(UserReportResponse.serializer(), responseBody)
 }
 
+// Create a user relation request (e.g., friend request, follow user)
 suspend fun sendUserRelationRequest(token: String, request: UserRelationChangeRequest): UserRelationResponse {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -102,6 +104,7 @@ suspend fun sendUserRelationRequest(token: String, request: UserRelationChangeRe
 }
 
 //----------- Post request for profile -----------------------------
+// Change the email of the logged in user
 suspend fun changeEmail(newEmail: String, password: String): String {
     val url = apiUrl+"users/change-email"
     val requestBody = JSONObject().apply {
@@ -138,6 +141,7 @@ suspend fun changeEmail(newEmail: String, password: String): String {
     }
 }
 
+// Create a new horse
 suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
     val httpClient = HttpClient {
         install(HttpTimeout) {
@@ -151,7 +155,7 @@ suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
     }
 
     val byteArrayOutputStream = ByteArrayOutputStream()
-    horseRequest.Image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    horseRequest.image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
     val imageBytes = byteArrayOutputStream.toByteArray()
 
     val response: HttpResponse = httpClient.use { client ->
@@ -163,11 +167,11 @@ suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
                         append(HttpHeaders.ContentType, "image/jpeg")
                         append(HttpHeaders.ContentDisposition, "filename=\"horse.jpg\"")
                     })
-                    append("Name", horseRequest.Name)
-                    append("Breed", horseRequest.Breed)
-                    append("Year", horseRequest.Year)
-                    append("Month", horseRequest.Month)
-                    append("Day", horseRequest.Day)
+                    append("Name", horseRequest.name)
+                    append("Breed", horseRequest.breed)
+                    append("Year", horseRequest.year)
+                    append("Month", horseRequest.month)
+                    append("Day", horseRequest.day)
                 }
             ))
         }
@@ -180,6 +184,7 @@ suspend fun createHorse(token: String, horseRequest: HorseRequest): String {
     return responseBody
 }
 
+// Create a new trail
 suspend fun createTrail(token: String, image: Bitmap, createTrailRequest: CreateTrailRequest): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -226,6 +231,7 @@ suspend fun createTrail(token: String, image: Bitmap, createTrailRequest: Create
 }
 
 //-------------- Post request for login page---------------------
+// Register a new user
 suspend fun registerUser(email: String, password: String): Pair<String, Int> {
     val url = apiUrl + "users/register"
     val requestBody = JSONObject().apply {
@@ -254,6 +260,7 @@ suspend fun registerUser(email: String, password: String): Pair<String, Int> {
     }
 }
 
+// Reset password request (if user forgets password)
 suspend fun resetPassword(email: String): String {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -277,6 +284,7 @@ suspend fun resetPassword(email: String): String {
     return responseBody
 }
 
+// For the user to be logged in
 fun handleLogin(
     username: String,
     password: String,
@@ -362,6 +370,7 @@ fun handleLogin(
 }
 
 //----------------------Community Post Request-------------------------
+// Create a new stable (community)
 suspend fun createStable(token: String, stableRequest: StableRequest): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -370,7 +379,7 @@ suspend fun createStable(token: String, stableRequest: StableRequest): String {
     }
 
     val byteArrayOutputStream = ByteArrayOutputStream()
-    stableRequest.Image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    stableRequest.image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
     val imageBytes = byteArrayOutputStream.toByteArray()
 
     val response: HttpResponse = httpClient.use { client ->
@@ -382,11 +391,11 @@ suspend fun createStable(token: String, stableRequest: StableRequest): String {
                         append(HttpHeaders.ContentType, "image/jpeg")
                         append(HttpHeaders.ContentDisposition, "filename=\"stable.jpg\"")
                     })
-                    append("Name", stableRequest.Name)
-                    append("Description", stableRequest.Description)
-                    append("Latitude", stableRequest.Latitude.toString())
-                    append("Longitude", stableRequest.Longitude.toString())
-                    append("PrivateGroup", stableRequest.PrivateGroup.toString())
+                    append("Name", stableRequest.name)
+                    append("Description", stableRequest.description)
+                    append("Latitude", stableRequest.latitude.toString())
+                    append("Longitude", stableRequest.longitude.toString())
+                    append("PrivateGroup", stableRequest.privateGroup.toString())
                 }
             ))
         }
@@ -399,6 +408,7 @@ suspend fun createStable(token: String, stableRequest: StableRequest): String {
     return responseBody
 }
 
+// Post a message to the message board in a stable/community
 suspend fun sendStableMessage(token: String, stableMessageRequest: StableMessageRequest): StableMessageResponse {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -422,7 +432,8 @@ suspend fun sendStableMessage(token: String, stableMessageRequest: StableMessage
     return Json.decodeFromString(StableMessageResponse.serializer(), responseBody)
 }
 
-suspend fun joinStable(token: String, stableActionRequest: StableActionRequest): StableActionResponse {
+// Join a stable (community)
+suspend fun joinStable(token: String, stableActionRequest: StableActionRequest): StableResponse {
     val client = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -442,10 +453,11 @@ suspend fun joinStable(token: String, stableActionRequest: StableActionRequest):
     val responseBody: String = response.bodyAsText()
     client.close()
     Log.d("stableJoinLeave", "Response Body: $responseBody")
-    return Json.decodeFromString(StableActionResponse.serializer(), responseBody)
+    return Json.decodeFromString(StableResponse.serializer(), responseBody)
 }
 
 //----------------------Post requests for trails ---------------------
+// Rate a trail by giving it 1-5 stars
 suspend fun rateTrail(token: String, trailRatingRequest: TrailRatingRequest): TrailRatingResponse {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -541,6 +553,7 @@ suspend fun postTrailReview(token: String, image: Bitmap?, trailId: String, mess
 }
 
 //--------------------------------Post requests for new trip----------------------
+// Create a new hike
 suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap?): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -552,23 +565,23 @@ suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap
         }
     }
 
-    val coordinatesJson = Json.encodeToString(newHike.Coordinates)
+    val coordinatesJson = Json.encodeToString(newHike.coordinates)
 
     val formData = formData {
-        append("StartetAt", newHike.StartetAt)
-        append("Distance", newHike.Distance)
-        append("Duration", newHike.Duration)
+        append("StartetAt", newHike.startetAt)
+        append("Distance", newHike.distance)
+        append("Duration", newHike.duration)
         append("Coordinates", coordinatesJson)
-        newHike.Title?.let {
+        newHike.title?.let {
             append("Title", it)
         }
-        newHike.Description?.let {
+        newHike.description?.let {
             append("Description", it)
         }
-        newHike.HorseId?.let {
+        newHike.horseId?.let {
             append("HorseId", it)
         }
-        newHike.TrailId?.let {
+        newHike.trailId?.let {
             append("TrailId", it)
         }
         selectedImage?.let { bitmap ->
@@ -600,6 +613,7 @@ suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap
 }
 
 //-------------------Post requests for home screen------------------------
+// Post a reaction (for now just like) to posts in the home screen
 suspend fun postReaction(token: String, entityId: String): String {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -611,7 +625,7 @@ suspend fun postReaction(token: String, entityId: String): String {
         }
     }
 
-    val requestBody = ReactionRequest(EntityId = entityId)
+    val requestBody = ReactionRequest(entityId = entityId)
     val response: HttpResponse = client.post("https://hopla.onrender.com/reactions") {
         header("Authorization", "Bearer $token")
         contentType(ContentType.Application.Json)

@@ -19,6 +19,7 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 
+// Change the profile picture of the logged in user
 suspend fun uploadProfilePicture(token: String, userId: String, imageBitmap: Bitmap): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -55,6 +56,7 @@ suspend fun uploadProfilePicture(token: String, userId: String, imageBitmap: Bit
     return responseBody
 }
 
+// Change the password of the logged in user
 suspend fun changePassword(
     token: String,
     oldPassword: String,
@@ -91,6 +93,7 @@ suspend fun changePassword(
     return response.status.value to message
 }
 
+// Update information about the logged in user
 suspend fun updateUserInfo(
     token: String,
     alias: String,
@@ -151,7 +154,7 @@ suspend fun updateUserInfo(
     }
 }
 
-//-------------------------PUT requests for relations between users-------------------------
+// Change user relations where a relation already exists
 suspend fun sendUserRelationRequestPut(token: String, request: UserRelationChangeRequest): UserRelationResponse {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -175,7 +178,7 @@ suspend fun sendUserRelationRequestPut(token: String, request: UserRelationChang
     return Json.decodeFromString(UserRelationResponse.serializer(), responseBody)
 }
 
-//-----------------------PUT requests for user hikes-------------------------
+// Update user hike details
 suspend fun updateUserHike(
     token: String,
     userHikeId: String,

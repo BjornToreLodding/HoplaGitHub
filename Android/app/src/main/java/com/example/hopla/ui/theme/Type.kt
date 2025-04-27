@@ -31,12 +31,14 @@ val headerTextStyle = TextStyle(
     fontWeight = FontWeight.Bold
 )
 
+// Custom text style for headers in smaller text size
 val headerTextStyleSmall = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 30.sp,
     fontWeight = FontWeight.Bold
 )
 
+// Custom text style for headers in very small text size
 val headerTextStyleVerySmall = TextStyle(
     fontFamily = customFontFamilyHeader,
     fontSize = 20.sp,
