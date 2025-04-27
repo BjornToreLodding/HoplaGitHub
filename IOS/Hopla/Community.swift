@@ -384,12 +384,16 @@ struct Community: View {
                 Spacer()
                 Button(action: {
                     isShowingAddStableSheet.toggle()
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                        .foregroundStyle(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                        .padding()
+                }) { Image(systemName: "plus.circle.fill")
+                      .resizable()
+                      .frame(width: 60, height: 60)
+                      .symbolRenderingMode(.palette)
+                      .foregroundStyle(
+                        .white,
+                        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                          .color(for: colorScheme)
+                      )
+                      .padding()
                 }
                 .sheet(isPresented: $isShowingAddStableSheet) {
                     AddStableView(viewModel: viewModel)

@@ -61,7 +61,7 @@ struct UpdateUserDto: Encodable {
   func encode(to encoder: Encoder) throws {
     var ccc = encoder.container(keyedBy: CodingKeys.self)
     try ccc.encode(alias, forKey: .alias)
-    try ccc.encode(name,  forKey: .name)
+    try ccc.encode(name, forKey: .name)
     try ccc.encode(email, forKey: .email)
     if let tel = telephone, !tel.isEmpty {
       try ccc.encode(tel, forKey: .telephone)

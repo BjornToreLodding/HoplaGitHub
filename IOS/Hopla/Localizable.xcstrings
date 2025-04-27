@@ -608,6 +608,7 @@
       }
     },
     "Enter your email" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {

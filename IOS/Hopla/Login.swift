@@ -52,42 +52,32 @@ struct Login: View {
                 //   GeometryReader { geometry in
                 
                 VStack {
-                    VStack {
+                    VStack(alignment: .center) {
                         // Logo
                         Image("LogoUtenBakgrunn")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 170, height: 170)
+                            .frame(width: 200, height: 200)
                         
                         Text("Hopla")
-                            .font(.system(size: 50, weight: .bold, design: .rounded))
+                            .font(.custom("GeorgiaPro-Black", size: 60))
                         
-                        Spacer()
                     }
-                    .padding(.top, 150)
-                    
+                    .padding(.top, 130)
                     
                     
                     // MARK: - Text fields
                     
-                    // Username Label & TextField
-                    Text("Email")
-                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                        .padding(.top, 10)
-                    
-                    TextField("Enter your email", text: $email)
+                    // Username TextField
+                    TextField("Email", text: $email)
                         .padding()
                         .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                         .cornerRadius(8)
                         .frame(width: 300)
                         .multilineTextAlignment(.center)
                     
-                    // Password Label & SecureField
-                    Text("Password")
-                        .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                        .padding(.top, 20)
-                    
-                    SecureField("Enter your password", text: $password)
+                    // Password SecureField
+                    SecureField("Password", text: $password)
                         .padding()
                         .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                         .cornerRadius(8)
