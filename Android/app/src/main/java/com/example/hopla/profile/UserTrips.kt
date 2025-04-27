@@ -23,10 +23,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.AlertDialog
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.ExposedDropdownMenuBox
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -166,7 +168,7 @@ fun HikeItem(
         EditTripDialog(
             hike = hike,
             onDismiss = { showEditDialog = false },
-            onSave = { tripName, tripDescription, selectedImage, selectedHorseId ->
+            onSave = { _, _, _, _ ->
                 showEditDialog = false
             },
             onHikesReload = onHikesReload
@@ -333,7 +335,6 @@ fun ShareTripDialog(
 ) {
     var name by remember { mutableStateOf(hike.trailName) }
     var description by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableStateOf(filters.firstOrNull()?.name ?: "") }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val selectedOptions = remember { mutableStateMapOf<String, MutableSet<String>>() }
 
@@ -495,7 +496,7 @@ fun EditTripDialog(
         title = { Text(text = stringResource(R.string.edit_trip), style = underheaderTextStyle, color = MaterialTheme.colorScheme.secondary) },
         text = {
             Column {
-                tripName?.let {
+                tripName?.let { it ->
                     TextField(
                         value = it,
                         onValueChange = { tripName = it },
@@ -517,7 +518,7 @@ fun EditTripDialog(
                 ) {
                     TextField(
                         readOnly = true,
-                        value = if (selectedHorse.isEmpty()) stringResource(R.string.no_horse_chosen) else selectedHorse,
+                        value = selectedHorse.ifEmpty { stringResource(R.string.no_horse_chosen) },
                         onValueChange = {},
                         label = { Text(text = stringResource(R.string.choose_horse)) },
                         trailingIcon = {
@@ -582,7 +583,7 @@ fun EditTripDialog(
                         description = updatedDescription
                     )
                 }
-                onSave(tripName ?: "", tripDescription ?: "", selectedImage, updatedHorseId)
+                onSave(tripName ?: "", tripDescription, selectedImage, updatedHorseId)
                 onHikesReload()
                 onDismiss()
             }, shape = RectangleShape) {

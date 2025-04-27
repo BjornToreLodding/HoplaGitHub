@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -349,7 +350,7 @@ fun PasswordConfirmationDialog(
 fun UserChanges(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf(UserSession.email) }
     var username by remember { mutableStateOf(UserSession.alias ?: "") }
-    var phone by remember { mutableStateOf(UserSession.telephone?.toString() ?: "") }
+    var phone by remember { mutableStateOf(UserSession.telephone ?: "") }
     var name by remember { mutableStateOf(UserSession.name ?: "")}
     var description by remember { mutableStateOf(UserSession.description ?: "")}
     var dob by remember { mutableStateOf(UserSession.dob) }
@@ -360,7 +361,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var successMessage = stringResource(R.string.info_updated)
+    val successMessage = stringResource(R.string.info_updated)
 
     Box(
         modifier = modifier
@@ -412,7 +413,7 @@ fun UserChanges(modifier: Modifier = Modifier) {
                 onSave = {
                     val (statusCode, message) = updateUserInfo(UserSession.token, UserSession.alias?: "", UserSession.name?: "", phone)
                     if (statusCode == 200) {
-                        UserSession.telephone = phone?.toIntOrNull()?.toString()
+                        UserSession.telephone = phone.toIntOrNull()?.toString()
                         responseMessage = successMessage
                         showResponseDialog = true
                     } else {

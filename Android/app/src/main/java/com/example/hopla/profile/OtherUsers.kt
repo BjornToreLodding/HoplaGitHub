@@ -63,7 +63,6 @@ import com.example.hopla.apiService.sendUserRelationRequestPut
 import com.example.hopla.ui.theme.buttonTextStyle
 import com.example.hopla.ui.theme.dropdownMenuTextStyle
 import com.example.hopla.ui.theme.generalTextStyle
-import com.example.hopla.ui.theme.headerTextStyleSmall
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.ui.theme.underlinedTextStyleSmall
 import com.example.hopla.universalData.AddButton

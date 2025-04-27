@@ -127,18 +127,6 @@ data class ErrorResponse(
     val message: String
 )
 
-enum class Difficulty {
-    EASY,
-    MEDIUM,
-    HARD
-}
-
-// Define the Filters class
-data class Filters(
-    val filterStrings: Set<String> = emptySet(),
-    val difficulty: Difficulty? = null
-)
-
 // Data class to hold the information for each ContentBox
 data class ContentBoxInfo(
     val id: String,

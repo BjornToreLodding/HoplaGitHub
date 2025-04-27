@@ -541,7 +541,7 @@ suspend fun postTrailReview(token: String, image: Bitmap?, trailId: String, mess
 }
 
 //--------------------------------Post requests for new trip----------------------
-suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap?, trailId: String? = null): String {
+suspend fun createNewHike(token: String, newHike: NewHike, selectedImage: Bitmap?): String {
     val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {

@@ -1,5 +1,6 @@
 package com.example.hopla.profile
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
@@ -17,7 +18,6 @@ import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Brightness4
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
@@ -46,8 +46,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hopla.R
-import com.example.hopla.universalData.ReportDialog
-import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.UserViewModel
 import com.example.hopla.login.saveLoginState
 import com.example.hopla.ui.theme.ThemeViewModel
@@ -56,6 +54,8 @@ import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.textFieldLabelTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
+import com.example.hopla.universalData.ReportDialog
+import com.example.hopla.universalData.ScreenHeader
 import com.example.hopla.universalData.UserSession
 import java.util.Locale
 
@@ -149,10 +149,9 @@ fun SettingsScreen(
         val context = LocalContext.current
 
         PasswordConfirmDialog(
-            token = UserSession.token,
             password = password,
             onPasswordChange = { password = it },
-            onConfirm = { password ->
+            onConfirm = { _ ->
                 userViewModel.deleteUser(UserSession.token, password)
                 saveLoginState(context = context, "", "") // Reset login state
                 showDeleteDialog = false
@@ -228,7 +227,6 @@ fun ConfirmDialog(title: String, message: String, onConfirm: () -> Unit, onDismi
 // Password Confirmation Dialog
 @Composable
 fun PasswordConfirmDialog(
-    token: String,
     password: String,
     onPasswordChange: (String) -> Unit,
     onConfirm: (String) -> Unit,

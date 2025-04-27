@@ -105,6 +105,7 @@ class MainActivity : ComponentActivity() {
     private val languageViewModel: LanguageViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
                 return LanguageViewModel(application as Application, SavedStateHandle()) as T
             }
         }

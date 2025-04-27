@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -196,9 +197,6 @@ fun SimpleMapScreen(onPositionSelected: (LatLng) -> Unit) {
 fun StartTripMapScreen(trailId: String, navController: NavController) {
     val mapView = rememberMapViewWithLifecycle()
     val context = LocalContext.current
-    val zoomLevel = remember { mutableIntStateOf(15) }
-    val latitude = remember { mutableDoubleStateOf(0.0) }
-    val longitude = remember { mutableDoubleStateOf(0.0) }
     val coroutineScope = rememberCoroutineScope()
     val token = UserSession.token
     val trailCoordinates = remember { mutableStateOf<List<TrailCoordinate>>(emptyList()) }
@@ -211,7 +209,7 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
     var horseMap by remember { mutableStateOf(mapOf<String, Horse>()) }
     var newHike by remember { mutableStateOf<NewHike?>(null) }
     val startTime = remember { System.currentTimeMillis() }
-    var trailDistance by remember { mutableStateOf(0.0) }
+    var trailDistance by remember { mutableDoubleStateOf(0.0) }
     var isLoading by remember { mutableStateOf(true) } // Loading state
 
     val polylineColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -330,8 +328,8 @@ fun StartTripMapScreen(trailId: String, navController: NavController) {
                             Distance = distanceStr,
                             Duration = durationStr,
                             Coordinates = coordinates,
-                            Title = if (tripName.isNotEmpty()) tripName else null,
-                            Description = if (tripNotes.isNotEmpty()) tripNotes else null,
+                            Title = tripName.ifEmpty { null },
+                            Description = tripNotes.ifEmpty { null },
                             HorseId = horseMap[selectedHorse]?.id,
                             TrailId = trailId
                         )
@@ -364,7 +362,6 @@ fun CoordinatesOnMap(userHikeId: String, token: String, onClose: () -> Unit) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val coordinates = remember { mutableStateOf<List<HikeCoordinate>>(emptyList()) }
-    val zoomLevel = remember { mutableIntStateOf(15) } // Adjusted zoom level for closer view
 
     LaunchedEffect(userHikeId) {
         coroutineScope.launch {
@@ -443,7 +440,6 @@ fun CoordinatesOnMapTrail(trailId: String, token: String, onClose: () -> Unit) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val coordinates = remember { mutableStateOf<List<TrailCoordinate>>(emptyList()) }
-    val zoomLevel = remember { mutableIntStateOf(15) }
 
     LaunchedEffect(trailId) {
         coroutineScope.launch {

@@ -56,7 +56,7 @@ suspend fun fetchHorses(
         }
     }
 ): List<Horse> {
-    return httpClient.use { client ->
+    httpClient.use { client ->
         val response: HttpResponse = client.get(apiUrl + "horses/userhorses?userid=$userId") {
             headers {
                 append("Authorization", "Bearer $token")

@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -54,7 +53,6 @@ import com.example.hopla.apiService.fetchHorses
 import com.example.hopla.ui.theme.generalTextStyle
 import com.example.hopla.ui.theme.generalTextStyleBold
 import com.example.hopla.ui.theme.generalTextStyleRed
-import com.example.hopla.ui.theme.headerTextStyle
 import com.example.hopla.ui.theme.underheaderTextStyle
 import com.example.hopla.universalData.AddButton
 import com.example.hopla.universalData.Horse
