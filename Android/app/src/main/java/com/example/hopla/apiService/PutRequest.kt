@@ -225,3 +225,4 @@ suspend fun updateUserHike(
     Log.d("updateUserHike", "Response: $responseBody")
     return responseBody
 }
+
