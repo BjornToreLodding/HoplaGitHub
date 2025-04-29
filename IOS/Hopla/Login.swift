@@ -6,7 +6,21 @@
 //
 
 import SwiftUI
+import UIKit
 import KeychainAccess // For token
+
+extension View {
+    /// Call this in your onSubmit to swallow the keyboard
+    func hideKeyboardOnSubmit() -> some View {
+        self
+            .submitLabel(.done)
+            .onSubmit {
+                UIApplication.shared
+                    .sendAction(#selector(UIResponder.resignFirstResponder),
+                                to: nil, from: nil, for: nil)
+            }
+    }
+}
 
 struct Login: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
@@ -30,16 +44,15 @@ struct Login: View {
     @ObservedObject var viewModel: LoginViewModel
     @ObservedObject var loginViewModel: LoginViewModel
     
-    // Convenience computed property
-        private var isSignUpFormValid: Bool {
-            return
-                !newEmail.isEmpty &&
-                isValidEmail(newEmail) &&
-                isValidPassword(newPassword) &&
-                newPassword == confirmNewPassword &&
-                allowStatistics
-        }
-
+    // True once all fields are filled and the stats box is checked
+    private var isSignUpFormComplete: Bool {
+        return
+        !newEmail.isEmpty &&
+        !newPassword.isEmpty &&
+        !confirmNewPassword.isEmpty &&
+        allowStatistics
+    }
+    
     
     var body: some View {
         NavigationStack {
@@ -51,258 +64,292 @@ struct Login: View {
                 
                 //   GeometryReader { geometry in
                 
-                VStack {
-                    VStack(alignment: .center) {
-                        // Logo
-                        Image("LogoUtenBakgrunn")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 200, height: 200)
-                        
-                        Text("Hopla")
-                            .font(.custom("GeorgiaPro-Black", size: 60))
-                        
-                    }
-                    .padding(.top, 130)
-                    
-                    
-                    // MARK: - Text fields
-                    
-                    // Username TextField
-                    TextField("Email", text: $email)
-                        .padding()
-                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                        .cornerRadius(8)
-                        .frame(width: 300)
-                        .multilineTextAlignment(.center)
-                    
-                    // Password SecureField
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
-                        .cornerRadius(8)
-                        .frame(width: 300)
-                        .multilineTextAlignment(.center)
-                    
-                    
-                    // MARK: - Forgotten password
+                ScrollView(.vertical, showsIndicators: false) {
                     VStack {
-                        Text("Forgotten password?")
-                            .frame(width: 360, height: 30)
-                            .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                            .underline(true)
-                            .padding(.top, 10)
-                            .onTapGesture { // When clicking on change password
-                                resetEmail() // Reset email when opening
-                                isShowingForgottenPassword = true // Show sheet
-                            }
-                    }
-                    
-                    
-                    .sheet(isPresented: $isShowingForgottenPassword, onDismiss: {
-                        resetEmail() // Reset fields when closing
-                    }) {
-                        VStack(spacing: 20) {
-                            Text("Enter your email address to reset your password:")
-                                .font(.headline)
+                        VStack(alignment: .center) {
+                            // Logo
+                            Image("LogoUtenBakgrunn")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 200, height: 200)
                             
-                            TextField("Enter email:", text: $email)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding()
+                            Text("Hopla")
+                                .font(.custom("GeorgiaPro-Black", size: 60))
                             
-                            let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // To clear whitespaces
-                            
-                            Button("Send") {
-                                Task {
-                                    await viewModel.resetPasswordRequest(email: normalizedEmail)
-                                }
-                                // Optionally, clear the email field and dismiss the sheet.
-                                resetEmail()
-                                isShowingForgottenPassword = false
-                            }
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            
-                            Button("Cancel") {
-                                isShowingForgottenPassword = false
-                            }
-                            .padding()
                         }
-                        .padding()
-                    }
-                    
-                    
-                    // MARK: - Login
-                    
-                    Button(action: {
-                        if email.isEmpty || password.isEmpty {
-                            viewModel.errorMessage = "Email and password cannot be empty!"
-                        } else if !isValidEmail(email){
-                            viewModel.errorMessage = "Enter a valid email!"
-                        } else {
-                            viewModel.login(email: email, password: password)
-                        }
-                    }) {
-                        Text("Log In")
-                            .foregroundColor(.white)
+                        .padding(.top, 130)
+                        
+                        
+                        // MARK: - Text fields
+                        
+                        // Username TextField
+                        TextField("Email", text: $email)
                             .padding()
-                            .frame(width: 200, height: 50)
-                            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                            .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                             .cornerRadius(8)
-                    }
-                    
-                    .alert(isPresented: Binding<Bool>(
-                        get: { viewModel.errorMessage != nil },
-                        set: { _ in viewModel.errorMessage = nil }
-                    )) {
-                        Alert(title: Text("Login Failed"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
-                    }
-                    .padding(.top, 30)
-                    .navigationBarBackButtonHidden(true) // Hide the back arrow
-                    
-                    
-                    // MARK: - Sign up
-                    
-                    VStack {
-                        Text("Not a member? Sign up")
-                            .frame(width: 360, height: 30)
-                            .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                            .underline(true)
-                            .padding(.top, 10)
-                            .onTapGesture {
-                                resetEmail()
-                                isShowingSignUp = true
+                            .frame(width: 300)
+                            .multilineTextAlignment(.center)
+                            .accessibilityIdentifier("EmailField")
+                        
+                        // Password SecureField
+                        SecureField("Password", text: $password)
+                            .padding()
+                            .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
+                            .cornerRadius(8)
+                            .frame(width: 300)
+                            .multilineTextAlignment(.center)
+                            .accessibilityIdentifier("PasswordField")
+                        
+                        
+                        // MARK: - Forgotten password
+                        VStack {
+                            Text("Forgotten password?")
+                                .frame(width: 360, height: 30)
+                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                                .underline(true)
+                                .padding(.top, 10)
+                                .onTapGesture { // When clicking on change password
+                                    resetEmail() // Reset email when opening
+                                    isShowingForgottenPassword = true // Show sheet
+                                }
+                        }
+                        
+                        
+                        .sheet(isPresented: $isShowingForgottenPassword, onDismiss: {
+                            resetEmail() // Reset fields when closing
+                        }) {
+                            VStack(spacing: 20) {
+                                Text("Enter your email address to reset your password:")
+                                    .font(.headline)
+                                
+                                TextField("Enter email:", text: $email)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+                                    .accessibilityIdentifier("newUserEmailField")
+                                
+                                let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // To clear whitespaces
+                                
+                                Button("Send") {
+                                    Task {
+                                        await viewModel.resetPasswordRequest(email: normalizedEmail)
+                                    }
+                                    // Optionally, clear the email field and dismiss the sheet.
+                                    resetEmail()
+                                    isShowingForgottenPassword = false
+                                }
+                                .accessibilityIdentifier("SendResetPasswordButton")
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                
+                                Button("Cancel") {
+                                    isShowingForgottenPassword = false
+                                }
+                                .accessibilityIdentifier("CancelResetPasswordButton")
+                                .padding()
                             }
-                    }
-                    
-                    Spacer()
-                    
+                            .padding()
+                        }
+                        
+                        
+                        // MARK: - Login
+                        
+                        Button(action: {
+                            // UITest shortcut:
+                            if ProcessInfo.processInfo.environment["UITEST_MODE"] == "true" {
+                                isLoggedIn = true
+                                return
+                            }
+                            
+                            if email.isEmpty || password.isEmpty {
+                                viewModel.errorMessage = "Email and password cannot be empty!"
+                            } else if !isValidEmail(email){
+                                viewModel.errorMessage = "Enter a valid email!"
+                            } else {
+                                viewModel.login(email: email, password: password)
+                            }
+                        }) {
+                            Text("Log In")
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: 200, height: 50)
+                                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                .cornerRadius(8)
+                        }
+                        .accessibilityIdentifier("loginButton")
+                        
+                        .alert(isPresented: Binding<Bool>(
+                            get: { viewModel.errorMessage != nil },
+                            set: { _ in viewModel.errorMessage = nil }
+                        )) {
+                            Alert(title: Text("Login Failed"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
+                        }
+                        .padding(.top, 30)
+                        .navigationBarBackButtonHidden(true) // Hide the back arrow
+                        
+                        
+                        // MARK: - Sign up
+                        
+                        VStack {
+                            Text("Not a member? Sign up")
+                                .frame(width: 360, height: 30)
+                                .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
+                                .underline(true)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    resetEmail()
+                                    isShowingSignUp = true
+                                }
+                        }
                         .sheet(isPresented: $isShowingSignUp, onDismiss: {
-                                            // reset everything
-                                            newEmail = ""
-                                            newPassword = ""
-                                            confirmNewPassword = ""
-                                            allowStatistics = false
-                                            passwordMismatchWarning = nil
-                                        }) {
-                                            VStack(spacing: 16) {
-                                                Text("Register New Account")
-                                                    .font(.headline)
-
-                                                TextField("Enter email address", text: $newEmail)
-                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                                SecureField("Enter password", text: $newPassword)
-                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                                SecureField("Confirm password", text: $confirmNewPassword)
-                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                                Text("Password must be at least 9 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special symbol.")
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                                    .multilineTextAlignment(.center)
-
-                                                if let warning = passwordMismatchWarning {
-                                                    Text(warning)
-                                                        .foregroundColor(.red)
-                                                        .font(.caption)
-                                                        .multilineTextAlignment(.center)
-                                                }
-
-                                                // ——— checkbox + info ———
-                                                HStack {
-                                                    Button { allowStatistics.toggle() }
-                                                    label: {
-                                                        Image(systemName: allowStatistics ? "checkmark.square" : "square")
-                                                    }
-
-                                                    Text("Allow collection of statistics")
-                                                        .font(.caption)
-
-                                                    Spacer()
-
-                                                    Button { isShowingStatsInfo = true }
-                                                    label: {
-                                                        Image(systemName: "questionmark.circle")
-                                                    }
-                                                    .alert("Statistics Collection", isPresented: $isShowingStatsInfo) {
-                                                        Button("OK", role: .cancel) { }
-                                                    } message: {
-                                                        Text("We collect usage data to help improve Hopla")
-                                                    }
-                                                }
-                                                .padding(.horizontal)
-
-                                                // ——— Join now ———
-                                                Button {
-                                                    // final sanity check
-                                                    guard isValidPassword(newPassword) else {
-                                                        passwordMismatchWarning = "Password doesn’t meet requirements."
-                                                        return
-                                                    }
-                                                    guard newPassword == confirmNewPassword else {
-                                                        passwordMismatchWarning = "Passwords do not match!"
-                                                        return
-                                                    }
-
-                                                    viewModel.register(email: newEmail, password: newPassword) { success, message in
-                                                        if success {
-                                                            // dismiss + show confirmation
-                                                            isShowingSignUp = false
-                                                            showSignUpSuccessAlert = true
-                                                        } else {
-                                                            passwordMismatchWarning = message
-                                                        }
-                                                    }
-                                                } label: {
-                                                    Text("Join now")
-                                                        .foregroundColor(.white)
-                                                        .frame(width: 200, height: 50)
-                                                        .background(
-                                                            // conditional color
-                                                            isSignUpFormValid
-                                                                ? AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme)
-                                                                : Color.gray
-                                                        )
-                                                        .cornerRadius(8)
-                                                }
-                                                .disabled(!isSignUpFormValid)
-
-                                                Button("Cancel") {
-                                                    isShowingSignUp = false
-                                                }
-                                                .padding(.top, 8)
+                            // reset everything
+                            newEmail = ""
+                            newPassword = ""
+                            confirmNewPassword = ""
+                            allowStatistics = false
+                            passwordMismatchWarning = nil
+                        }) {
+                            ScrollViewReader { proxy in
+                                ScrollView(.vertical, showsIndicators: false) {
+                                    VStack(spacing: 16) {
+                                        Text("Register New Account")
+                                            .font(.headline)
+                                        
+                                        TextField("Enter email address", text: $newEmail)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .accessibilityIdentifier("signUpEmailField")
+                                        
+                                        SecureField("Enter password", text: $newPassword)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .accessibilityIdentifier("signUpPasswordField")
+                                            .hideKeyboardOnSubmit()
+                                        SecureField("Confirm password", text: $confirmNewPassword)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .accessibilityIdentifier("signUpConfirmPasswordField")
+                                            .hideKeyboardOnSubmit()
+                                        Text("Password must be at least 9 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special symbol.")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                            .multilineTextAlignment(.center)
+                                        
+                                        if let warning = passwordMismatchWarning {
+                                            Text(warning)
+                                                .accessibilityIdentifier("PasswordMismatchWarning")
+                                                .accessibilityLabel(warning)
+                                                .foregroundColor(.red)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.center)
+                                        }
+                                        
+                                        // ——— checkbox + info ———
+                                        HStack {
+                                            Button { allowStatistics.toggle() }
+                                            label: {
+                                                Image(systemName: allowStatistics ? "checkmark.square" : "square")
                                             }
-                                            .padding()
+                                            .accessibilityIdentifier("statisticsCheckbox")
+                                            
+                                            Text("Allow collection of statistics")
+                                                .font(.caption)
+                                            
+                                            Spacer()
+                                            
+                                            Button { isShowingStatsInfo = true }
+                                            label: {
+                                                Image(systemName: "questionmark.circle")
+                                            }
+                                            .alert("Statistics Collection", isPresented: $isShowingStatsInfo) {
+                                                Button("OK", role: .cancel) { }
+                                            } message: {
+                                                Text("We collect usage data to help improve Hopla")
+                                            }
                                         }
-                                        // ← show alert on main screen
-                                        .alert("User created successfully", isPresented: $showSignUpSuccessAlert) {
-                                            Button("OK", role: .cancel) { }
-                                        } message: {
-                                            Text("Please check your mail to validate your account.")
+                                        .padding(.horizontal)
+                                        
+                                        // ——— Join now ———
+                                        Button {
+                                            // final sanity check
+                                            guard isValidPassword(newPassword) else {
+                                                passwordMismatchWarning = "Password doesn’t meet requirements."
+                                                return
+                                            }
+                                            guard newPassword == confirmNewPassword else {
+                                                passwordMismatchWarning = "Passwords do not match!"
+                                                return
+                                            }
+                                            
+                                            viewModel.register(email: newEmail, password: newPassword) { success, message in
+                                                if success {
+                                                    // dismiss + show confirmation
+                                                    isShowingSignUp = false
+                                                    showSignUpSuccessAlert = true
+                                                } else {
+                                                    passwordMismatchWarning = message
+                                                }
+                                            }
+                                        } label: {
+                                            Text("Join now")
+                                                .foregroundColor(.white)
+                                                .frame(width: 200, height: 50)
+                                                .background(
+                                                    // conditional color
+                                                    isSignUpFormComplete
+                                                    ? AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme)
+                                                    : Color.gray
+                                                )
+                                                .cornerRadius(8)
                                         }
-
-                }
-                .onAppear {
-                    DispatchQueue.main.async {
-                        if let token = TokenManager.shared.getToken(), !token.isEmpty {
-                            viewModel.isLoggedIn = true
+                                        .id("JoinNowButton")                // ← give it an ID
+                                        .accessibilityIdentifier("JoinNowButton")
+                                        .disabled(!isSignUpFormComplete)
+                                        
+                                        Button("Cancel") {
+                                            isShowingSignUp = false
+                                        }
+                                        .accessibilityIdentifier("cancelSignUp")
+                                        .padding(.top, 8)
+                                        
+                                    } // VStack
+                                    .padding()
+                                } // ScrollView
+                                // Whenever the form *becomes* valid, scroll down to the button:
+                                .onChange(of: isSignUpFormComplete) { valid in
+                                    if valid {
+                                        withAnimation {
+                                            proxy.scrollTo("JoinNowButton", anchor: .bottom)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // ← show alert on main screen
+                        .alert("User created successfully", isPresented: $showSignUpSuccessAlert) {
+                            Button("OK", role: .cancel) { }
+                        } message: {
+                            Text("Please check your mail to validate your account.")
                         }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                    // extra scrollable space so fields can come up under the keyboard
+                    .padding(.bottom, 300)
                 }
-
-                .frame(maxWidth: .infinity, alignment: .center) // Ensure content is centered
-                .frame(maxHeight: .infinity) // Limit height to prevent overflow
-                //  }
-                //.padding(.bottom, 100)
+                // make the scroll view cover the whole ZStack
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // and lift its content above the keyboard
+                .ignoresSafeArea(.keyboard, edges: .bottom)
             }
-            .navigationBarHidden(true) // Hide navigation bar on the login screen
+            .onAppear {
+                DispatchQueue.main.async {
+                    if let token = TokenManager.shared.getToken(), !token.isEmpty {
+                        viewModel.isLoggedIn = true
+                    }
+                }
+            }
         }
+        .navigationBarHidden(true) // Hide navigation bar on the login screen
     }
-    
     
     // MARK: - Functions Sheets
     
@@ -330,5 +377,5 @@ struct Login: View {
         let predicate = NSPredicate(format: "SELF MATCHES %@", passwordFormat)
         return predicate.evaluate(with: password)
     }
-
+    
 }

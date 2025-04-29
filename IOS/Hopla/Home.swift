@@ -231,6 +231,7 @@ struct Home: View {
                 }
             }
         }
+        .accessibilityIdentifier("homeScreenRoot")
     }
 
     private var filterBar: some View {

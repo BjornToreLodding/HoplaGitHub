@@ -23,6 +23,12 @@ struct HoplaApp: App {
     @State private var navigationPath = NavigationPath()
     
     init() {
+        // If we were launched by UI tests asking to reset,
+                // clear the stored login flag so we always start at Login:
+                if CommandLine.arguments.contains("-UITest_ResetAuthentication") {
+                    UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+                }
+        
             // initial appearance (light)
             setupTabBarAppearance(forDarkMode: isDarkMode)
             setupNavigationBar(forDarkMode: isDarkMode)
@@ -48,6 +54,7 @@ struct HoplaApp: App {
                         .environmentObject(loginViewModel)
                         .environmentObject(locationManager)
                         .environmentObject(myHikeVM)
+                        .accessibilityIdentifier("homeScreenRoot")
                     } else {
                         Login(viewModel: LoginViewModel(),
                               loginViewModel: loginViewModel)

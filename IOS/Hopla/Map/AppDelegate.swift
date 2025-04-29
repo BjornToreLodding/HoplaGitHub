@@ -8,24 +8,36 @@
 import UIKit
 import GoogleMaps
 import CoreLocation
+import KeychainAccess
 
 class AppDelegate: NSObject, UIApplicationDelegate, CLLocationManagerDelegate {
     var locationManager = CLLocationManager()
-
+    
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        // 0) If running under UI tests, clear defaults & keychain:
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-UITest_ResetAuthentication") {
+            UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+            do {
+                try Keychain(service: "com.yourcompany.Hopla").removeAll()
+            } catch {
+                print("⚠️ Could not clear keychain: \(error)")
+            }
+        }
+        // 1) Google Maps setup
         GMSServices.provideAPIKey("AIzaSyC-2qlkvP8M1pgfnRMG0rr76SlxaI6jzwQ")
-
-        // Request location permissions
+        
+        // 2) Request location permissions
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
         return true
     }
-
+    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined:
