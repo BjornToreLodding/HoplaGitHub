@@ -139,7 +139,7 @@ class FetchHorsesTest {
             )
         }
 
-        val client = HttpClient(mockEngine) {
+        HttpClient(mockEngine) {
             install(ContentNegotiation) {
                 json(Json { ignoreUnknownKeys = true })
             }
