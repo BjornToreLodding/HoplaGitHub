@@ -4,46 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hopla Endpointtestside</title>
-
-    <!-- Egen stil -->
     <link rel="stylesheet" href="/styles.css">
-
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-    <!-- Leaflet JavaScript -->
     <script src="/utils/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
-    <!-- LOGIN-SKJERM (vises først) -->
+
+    <!-- FELLES TOPPMENY -->
+    <nav id="top-menu">
+        <ul id="top-menu-list"></ul>
+    </nav>
+
+    <!-- LOGIN-SKJERM -->
     <div id="login-screen">
-        <h1>Logg inn</h1>
-        <input type="email" id="login-email" placeholder="E-post">
-        <input type="password" id="login-password" placeholder="Passord">
-        <button id="login-submit">Logg inn</button>
+        <div class="login-container">
+            <img src="/images/Hopla_logo_2025.png" alt="Logo" class="login-logo">
+            <div class="login-card">
+                <h2>Logg inn</h2>
+                <label for="login-email">E-post</label>
+                <input type="email" id="login-email" placeholder="E-post">
+                <label for="login-password">Passord</label>
+                <input type="password" id="login-password" placeholder="Passord">
+                <button id="login-submit">Logg inn</button>
+            </div>
+        </div>
     </div>
 
-    <!-- APP-INNHOLD (skjult før login) -->
+    <!-- APP-INNHOLD -->
     <div id="app-content" class="hidden">
-        <nav id="top-menu">
-            <ul>
-                <li><a href="#" data-section="tools">Tools</a></li>
-                <li><a href="#" data-section="experimental">Experimental</a></li>
-                <li><a href="#" data-section="stats">Stats</a></li>
-                <li><a href="#" data-section="reports">Reports</a></li>
-                <li><a href="#" data-section="users">Users</a></li>
-                <li><a href="#" data-section="stables">Stables</a></li>
-                <li><a href="#" data-section="trails">Trails</a></li>
-                
-                <li id="user-info" class="hidden">
-                    <img id="user-avatar" src="" alt="Profilbilde" class="profile-pic hidden">
-                    <span id="user-text"></span>
-                    <button id="logout-button" class="hidden">Logg ut</button>
-                </li>
-            </ul>
-        </nav>
-
         <div class="container">
             <aside id="side-menu">
                 <ul id="side-menu-list"></ul>

@@ -1,6 +1,4 @@
-
 const apiUrl = window.appConfig.API_URL || "https://localhost:7128";
-console.log("API URL:", apiUrl);
 
 function showToast(message) {
     let toast = document.createElement('div');
@@ -75,23 +73,10 @@ export async function render(container) {
         });
 
         let csvHeaderInserted = false;
+        let csvWrapper;
 
         settings.forEach(setting => {
             const { key, value, type } = setting;
-            const settingDiv = document.createElement('div');
-            settingDiv.className = 'setting';
-
-            const label = document.createElement('label');
-            label.textContent = key;
-            label.htmlFor = key;
-
-            const inputContainer = document.createElement('div');
-            inputContainer.style.display = 'flex';
-            inputContainer.style.alignItems = 'center';
-            inputContainer.style.gap = '8px';
-            inputContainer.style.flexWrap = 'wrap';
-
-            let originalValue = value;
 
             if (type === "csv") {
                 if (!csvHeaderInserted) {
@@ -100,45 +85,86 @@ export async function render(container) {
                     title.className = 'csv-title';
                     settingsContainer.appendChild(title);
 
-                    const csvHeader = document.createElement('div');
-                    csvHeader.className = 'csv-header';
+                    csvWrapper = document.createElement('div');
+                    csvWrapper.style.display = 'flex';
+                    csvWrapper.style.flexDirection = 'column';
+                    csvWrapper.style.gap = '12px';
+                    csvWrapper.style.marginBottom = '20px';
+
+                    const headerRow = document.createElement('div');
+                    headerRow.style.display = 'flex';
+                    headerRow.style.alignItems = 'center';
+                    headerRow.style.gap = '15px';
+                    headerRow.style.fontWeight = 'bold';
+                    headerRow.style.marginBottom = '8px';
+
+                    const labelSpacer = document.createElement('div');
+                    labelSpacer.style.width = '200px';
+                    headerRow.appendChild(labelSpacer);
+
                     ['Width', 'Height', 'Fit'].forEach(titleText => {
                         const col = document.createElement('div');
                         col.textContent = titleText;
-                        csvHeader.appendChild(col);
+                        col.style.width = '90px';
+                        headerRow.appendChild(col);
                     });
-                    settingsContainer.appendChild(csvHeader);
 
-                    const csvInputs = document.createElement('div');
-                    csvInputs.className = 'csv-inputs';
-                    settingsContainer.appendChild(csvInputs);
+                    const btnSpacer = document.createElement('div');
+                    btnSpacer.style.width = '80px';
+                    headerRow.appendChild(btnSpacer);
 
+                    csvWrapper.appendChild(headerRow);
+                    settingsContainer.appendChild(csvWrapper);
                     csvHeaderInserted = true;
                 }
 
-                // Finner riktig input-container
-                const csvInputs = settingsContainer.querySelector('.csv-inputs');
-
+                let originalValue = value;
                 const [widthVal, heightVal, fitVal] = value.split(",");
+
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                row.style.gap = '15px';
+
+                const label = document.createElement('label');
+                label.textContent = key;
+                label.style.width = '200px';
+                label.style.flexShrink = '0';
+                label.style.fontWeight = 'bold';
 
                 const widthInput = document.createElement('input');
                 widthInput.type = 'number';
                 widthInput.value = widthVal || "";
+                widthInput.style.width = '75px';
 
                 const heightInput = document.createElement('input');
                 heightInput.type = 'number';
                 heightInput.value = heightVal || "";
+                heightInput.style.width = '75px';
 
-                const fitInput = document.createElement('input');
-                fitInput.type = 'text';
-                fitInput.value = fitVal || "";
+                const fitSelect = document.createElement('select');
+                const fitOptions = ['clip', 'crop', 'fill', 'fillmax', 'max', 'scale', 'min', 'stretch', 'facearea'];
+                fitOptions.forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue;
+                    fitSelect.appendChild(option);
+                });
+                fitSelect.value = fitVal || "";
+                fitSelect.style.width = '100px';
 
                 const saveButton = document.createElement('button');
                 saveButton.textContent = 'Lagre';
                 saveButton.className = 'save-button hidden';
+                saveButton.style.width = '80px';
+
+                [widthInput, heightInput, fitSelect].forEach(input => {
+                    input.style.padding = '5px';
+                    input.addEventListener('input', updateSaveButton);
+                });
 
                 function updateSaveButton() {
-                    const newValue = `${widthInput.value},${heightInput.value},${fitInput.value}`;
+                    const newValue = `${widthInput.value},${heightInput.value},${fitSelect.value}`;
                     if (newValue !== originalValue) {
                         saveButton.classList.remove('hidden');
                         saveButton.classList.add('show');
@@ -148,12 +174,8 @@ export async function render(container) {
                     }
                 }
 
-                [widthInput, heightInput, fitInput].forEach(input => {
-                    input.addEventListener('input', updateSaveButton);
-                });
-
                 saveButton.addEventListener('click', async () => {
-                    const newValue = `${widthInput.value},${heightInput.value},${fitInput.value}`;
+                    const newValue = `${widthInput.value},${heightInput.value},${fitSelect.value}`;
                     try {
                         const putResponse = await fetch(`${apiUrl}/admin/settings/${key}`, {
                             method: 'PUT',
@@ -174,12 +196,28 @@ export async function render(container) {
                     }
                 });
 
-                csvInputs.appendChild(widthInput);
-                csvInputs.appendChild(heightInput);
-                csvInputs.appendChild(fitInput);
-                csvInputs.appendChild(saveButton);
+                row.appendChild(label);
+                row.appendChild(widthInput);
+                row.appendChild(heightInput);
+                row.appendChild(fitSelect);
+                row.appendChild(saveButton);
 
+                csvWrapper.appendChild(row);
             } else {
+                const settingDiv = document.createElement('div');
+                settingDiv.className = 'setting';
+
+                const label = document.createElement('label');
+                label.textContent = key;
+                label.htmlFor = key;
+                label.style.fontWeight = 'bold';
+
+                const inputContainer = document.createElement('div');
+                inputContainer.style.display = 'flex';
+                inputContainer.style.alignItems = 'center';
+                inputContainer.style.gap = '8px';
+                inputContainer.style.flexWrap = 'wrap';
+
                 const input = document.createElement('input');
                 input.type = type === "bool" ? 'checkbox' : (type === "int" || type === "float" ? 'number' : 'text');
                 input.value = value;
@@ -189,6 +227,7 @@ export async function render(container) {
                 saveButton.textContent = 'Lagre';
                 saveButton.className = 'save-button hidden';
 
+                let originalValue = value;
                 input.addEventListener('input', () => {
                     const currentValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
                     if (currentValue !== originalValue) {
@@ -234,137 +273,3 @@ export async function render(container) {
         console.error('Feil ved henting av settings:', error);
     }
 }
-
-
-
-
-/*
-const apiUrl = window.appConfig.API_URL || "https://localhost:7128"; // Fallback hvis miljøvariabelen ikke er satt
-console.log("API URL:", apiUrl);
-
-
-export async function render(container) {
-    container.innerHTML = "<h2>System Settings</h2><div id='settings-container'></div>";
-
-    const settingsContainer = document.getElementById("settings-container");
-
-    try {
-        console.log("Fetching settings from API...");
-        const response = await fetch(`${apiUrl}/admin/settings/all`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        let settings = await response.json();
-        console.log("Received settings:", settings);
-
-        settings.forEach(setting => {
-            const { key, value, type } = setting;
-            const settingDiv = document.createElement('div');
-            settingDiv.className = 'setting';
-
-            const label = document.createElement('label');
-            label.textContent = key;
-            label.htmlFor = key;
-
-            let input;
-            if (type === "bool") {
-                input = document.createElement('input');
-                input.type = 'checkbox';
-                input.checked = value === "true";
-            } else if (type === "int") {
-                input = document.createElement('input');
-                input.type = 'number';
-                input.value = value;
-            } else {
-                input = document.createElement('input');
-                input.type = 'text';
-                input.value = value;
-            }
-
-            input.id = key;
-            // Endret fra const til let for at verdien kan oppdateres senere
-            let originalValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
-
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Lagre';
-            saveButton.className = 'save-button hidden';
-
-            console.log("Oppretter lagre-knapp for:", key);
-            console.log(saveButton);
-
-
-            // Opprett en container for input og knapp for å unngå layout-skift
-            const inputContainer = document.createElement('div');
-            inputContainer.style.display = 'flex';
-            inputContainer.style.alignItems = 'center';
-            inputContainer.style.gap = '8px';
-
-            input.addEventListener('input', () => {
-                const currentValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
-                console.log(`Endrer ${key}: ${originalValue} → ${currentValue}`);
-            
-                if (currentValue !== originalValue) {
-                    console.log("Viser lagre-knappen!");
-                    saveButton.classList.remove('hidden'); // Fjern hidden hvis den finnes
-                    saveButton.classList.add('show');
-                } else {
-                    console.log("Skjuler lagre-knappen!");
-                    saveButton.classList.remove('show');
-                    saveButton.classList.add('hidden');
-                }
-            });
-            
-            
-            
-
-            saveButton.addEventListener('click', async () => {
-                const newValue = input.type === 'checkbox' ? input.checked.toString() : input.value;
-            
-                try {
-                    console.log(`Sender PUT-request til serveren med key: ${key} og value: ${newValue}`);
-            
-                    const putResponse = await fetch(`https://localhost:7128/admin/settings/${key}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ value: newValue }) // Send ny verdi til serveren
-                    });
-            
-                    const responseData = await putResponse.json();
-                    console.log('PUT response:', responseData);
-            
-                    if (!putResponse.ok) {
-                        throw new Error(`HTTP error! Status: ${putResponse.status}, message: ${responseData.message || "Unknown error"}`);
-                    }
-            
-                    // Oppdater originalverdien slik at knappens synlighet oppdateres korrekt
-                    originalValue = newValue;
-                    saveButton.classList.remove('show'); // Skjul knappen
-                    console.log(`✅ Setting oppdatert: ${key} = ${newValue}`);
-                } catch (error) {
-                    console.error(`❌ Feil ved oppdatering av setting ${key}:`, error);
-                }
-            });
-            
-
-            inputContainer.appendChild(input);
-            inputContainer.appendChild(saveButton);
-
-            settingDiv.appendChild(label);
-            settingDiv.appendChild(inputContainer);
-            settingsContainer.appendChild(settingDiv);
-        });
-    } catch (error) {
-        console.error('Feil ved henting av settings:', error);
-    }
-}
-*/

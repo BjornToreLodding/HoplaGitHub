@@ -4,6 +4,7 @@
 //console.log(apiURL)
 //export default apiURL;
 window.appConfig = {
-    API_URL: "__API_URL__"
+    //API_URL: "__API_URL__"
+    API_URL: "https://hopla.onrender.com"
 };
 

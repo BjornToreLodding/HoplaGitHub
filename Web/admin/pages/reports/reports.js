@@ -10,7 +10,8 @@ export async function render(container) {
     try {
         console.log("Fetching reports from API...");
         const response = await fetch(`${apiUrl}/admin/userreports/reports`, {
-            method: 'GET',
+        //const response = await fetch(`https://localhost:7128/admin/userreports/reports`, {
+        method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'

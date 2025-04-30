@@ -25,6 +25,21 @@ public class MockController : ControllerBase
         _context = context;
         _mediator = mediator;
     }
+    [HttpPost("randomize-userdates")]
+    public async Task<IActionResult> RandomizeUserCreatedAt()
+    {
+        var rng = new Random();
+        var users = await _context.Users.ToListAsync();
+
+        foreach (var user in users)
+        {
+            int daysAgo = rng.Next(0, 121); // 0 til 120 dager
+            user.CreatedAt = DateTime.UtcNow.AddDays(-daysAgo);
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = $"{users.Count} brukere oppdatert med tilfeldig CreatedAt." });
+    }
 
     [HttpPost("clearsystemsettings")]
     public async Task<IActionResult> ClearSystemsettings()

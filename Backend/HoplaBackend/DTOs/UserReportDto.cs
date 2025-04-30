@@ -10,3 +10,9 @@ public class CreateUserReportRequest
     public string? Status { get; set; }
     public required string Message { get; set; }    // Rapportens innhold
 }
+
+public class ReportUpdateDto
+{
+    public string Status { get; set; }
+    public string Feedback { get; set; }
+}

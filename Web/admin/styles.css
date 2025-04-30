@@ -27,7 +27,11 @@ body {
 nav {
     background-color: #456559;
     color: white;
-    padding: 10px 20px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 nav ul {
@@ -36,6 +40,7 @@ nav ul {
     margin: 0;
     display: flex;
     align-items: center;
+    height: 100%;
 }
 
 nav ul li {
@@ -109,7 +114,7 @@ aside {
 /* --- HOVEDINNHOLD --- */
 main {
     flex-grow: 1;
-    min-height: calc(100vh - 70px); /* Tilpasset for høyden på toppmenyen */
+    min-height: calc(100vh - 64px);
     background: #eae6e1;
     padding: 30px;
     margin: 20px;
@@ -123,10 +128,23 @@ main {
 /* --- GENERELLE ELEMENTER --- */
 h1, h2, h3 {
     font-family: 'GeorgiaProBlack', serif;
+    margin-top: 50px; /* eller bare på h2 som vist over */
 }
-
 button {
     font-family: 'ArialNovaLight', sans-serif;
+}
+.button-brown {
+    background-color: #745e4d;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'ArialNovaLight', sans-serif;
+}
+
+.button-brown:hover {
+    background-color: #8c7260;
 }
 
 /* Skjulte elementer */
@@ -160,7 +178,7 @@ button {
 .save-button {
     visibility: hidden;
     padding: 5px 10px;
-    background-color: #28a745;
+    background-color: #456559 ;
     color: white;
     border: none;
     border-radius: 5px;
@@ -181,8 +199,9 @@ button {
 }
 
 .save-button:hover {
-    background-color: #218838;
+    background-color: #5c7d6d;
 }
+
 
 /* Settings container padding */
 #settings-container {
@@ -229,7 +248,7 @@ button {
 /* --- KNAPPER --- */
 .button {
     padding: 5px 10px;
-    background-color: #007bff;
+    background-color: #456559 ;
     color: white;
     border: none;
     cursor: pointer;
@@ -237,7 +256,7 @@ button {
 }
 
 .button:hover {
-    background-color: #0056b3;
+    background-color: #5c7d6d;
 }
 
 /* --- Profilknapp --- */
@@ -245,4 +264,68 @@ button {
     display: inline-block !important;
     visibility: visible !important;
     opacity: 1 !important;
+}
+
+/* --- LOGIN-SPESIFIKT --- */
+.login-container {
+    height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 30px;
+    background: #eae6e1;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.login-logo {
+    width: 150px;
+    margin-bottom: 30px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+}
+
+.login-card h2 {
+    margin-top: 0;
+    text-align: center;
+    font-family: 'GeorgiaProBlack', serif;
+}
+
+.login-card label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-family: 'ArialNova', sans-serif;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    font-family: 'ArialNovaLight', sans-serif;
+    font-size: 14px;
+}
+
+.login-card button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #745e4d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'ArialNovaLight', sans-serif;
+    font-size: 16px;
+}
+
+.login-card button:hover {
+    background-color: #8c7260;
 }
