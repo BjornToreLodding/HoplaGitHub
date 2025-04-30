@@ -26,6 +26,12 @@ struct HomePost: Identifiable, Decodable {
 
 class HomeViewModel: ObservableObject {
     @Published var homePosts: [HomePost] = []
+    private let session: URLSession
+    
+    // DESIGNATED INIT
+        init(session: URLSession = .shared) {
+            self.session = session
+        }
 
     func fetchPosts(for filter: String, latitude: Double? = nil, longitude: Double? = nil) {
         guard let token = TokenManager.shared.getToken() else {
@@ -66,7 +72,7 @@ class HomeViewModel: ObservableObject {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Error: \(error)")
                 return
@@ -104,7 +110,7 @@ class HomeViewModel: ObservableObject {
             let body: [String: String] = ["EntityId": entityId]
             request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
-            URLSession.shared.dataTask(with: request) { _, response, error in
+        session.dataTask(with: request) { _, response, error in
                 if let error = error {
                     print("❌ Like error: \(error)")
                     return
@@ -138,7 +144,7 @@ class HomeViewModel: ObservableObject {
             let body: [String: String] = ["EntityId": entityId]
             request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
-            URLSession.shared.dataTask(with: request) { _, response, error in
+            session.dataTask(with: request) { _, response, error in
                 if let error = error {
                     print("❌ Unlike error: \(error)")
                     return
