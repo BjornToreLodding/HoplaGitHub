@@ -63,7 +63,11 @@ import kotlinx.coroutines.launch
 
 // Top navigation bar with icons of the home screen
 @Composable
-fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Unit) {
+fun TopTextColumn(
+    selectedItem: ImageVector,
+    onItemSelected: (ImageVector) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val items = listOf(
         Icons.Outlined.Language,
         Icons.Outlined.PeopleOutline,
@@ -97,7 +101,7 @@ fun TopTextColumn(selectedItem: ImageVector, onItemSelected: (ImageVector) -> Un
                 ) {
                     Icon(
                         imageVector = item,
-                        contentDescription = null,
+                        contentDescription = "1st icon",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
@@ -137,7 +141,7 @@ fun PostItem(feedItem: FeedItem, navController: NavController) {
         ) {
             Image(
                 painter = rememberAsyncImagePainter(feedItem.userProfilePicture),
-                contentDescription = null,
+                contentDescription = "post1",
                 modifier = Modifier
                     .size(40.dp)
                     .background(MaterialTheme.colorScheme.primary, shape = CircleShape)

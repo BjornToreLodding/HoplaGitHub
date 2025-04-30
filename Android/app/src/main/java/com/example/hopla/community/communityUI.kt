@@ -71,7 +71,13 @@ import kotlinx.coroutines.launch
 
 // Function to display a card for each stable
 @Composable
-fun StableCard(stable: Stable, navController: NavController, likedStables: MutableList<Stable>, token: String) {
+fun StableCard(
+    stable: Stable,
+    navController: NavController,
+    likedStables: MutableList<Stable>,
+    token: String,
+    contentDescriptionProvider: ((Boolean) -> String)? = null // Optional contentDescriptionProvider
+) {
     var isLiked by remember { mutableStateOf(stable.member || likedStables.contains(stable)) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -126,9 +132,8 @@ fun StableCard(stable: Stable, navController: NavController, likedStables: Mutab
                 ) {
                     Icon(
                         imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = if (isLiked) stringResource(R.string.liked) else stringResource(
-                            R.string.not_liked
-                        ),
+                        contentDescription = contentDescriptionProvider?.invoke(isLiked)
+                            ?: if (isLiked) stringResource(R.string.liked) else stringResource(R.string.not_liked),
                         tint = if (isLiked) colorResource(id = R.color.likedHeart) else Color.White,
                     )
                 }

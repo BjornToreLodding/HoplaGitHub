@@ -29,6 +29,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavController
 import com.example.hopla.apiService.fetchFeed
 import com.example.hopla.ui.theme.underheaderTextStyle
@@ -56,22 +57,38 @@ fun HomeScreen(navController: NavController) {
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
     ) {
-        TopTextColumn(selectedItem) { selectedItem = it }
+        TopTextColumn(
+            selectedItem = selectedItem,
+            onItemSelected = { selectedItem = it },
+            modifier = Modifier.testTag("TopTextColumn") // Test tag
+        )
         when (selectedItem) {
-            Icons.Outlined.Language -> PostList(navController = navController)
+            Icons.Outlined.Language -> PostList(
+                navController = navController,
+                modifier = Modifier.testTag("PostList")
+            )
             Icons.Outlined.PeopleOutline -> PostList(
                 navController = navController,
-                onlyFriendsAndFollowing = true
+                onlyFriendsAndFollowing = true,
+                modifier = Modifier.testTag("PostList")
             )
 
-            Icons.Outlined.Cable -> PostList(navController = navController, onlyLikedTrails = true)
+            Icons.Outlined.Cable -> PostList(
+                navController = navController,
+                onlyLikedTrails = true,
+                modifier = Modifier.testTag("PostList")
+            )
             Icons.Outlined.LocationOn -> PostList(
                 navController = navController,
                 latitude = latitude,
-                longitude = longitude
+                longitude = longitude,
+                modifier = Modifier.testTag("PostList")
             )
-
-            Icons.Outlined.ThumbUp -> PostList(navController = navController, sortByLikes = true)
+            Icons.Outlined.ThumbUp -> PostList(
+                navController = navController,
+                sortByLikes = true,
+                modifier = Modifier.testTag("PostList")
+            )
         }
     }
 }
@@ -84,7 +101,8 @@ fun PostList(
     onlyLikedTrails: Boolean = false,
     latitude: Double? = null,
     longitude: Double? = null,
-    sortByLikes: Boolean = false
+    sortByLikes: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     val token = UserSession.token
     var pageNumber by remember { mutableIntStateOf(1) }

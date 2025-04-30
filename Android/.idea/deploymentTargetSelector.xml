@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="BottomBarTest">
+      <SelectionState runConfigName="bottomBar_navigatesToTrailsScreen()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="bottomBar_clickFaceIcon_navigatesToProfileScreen()">
+      <SelectionState runConfigName="bottomBar_navigatesToNewTripScreen()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="bottomBar_navigatesToProfileScreen()">
+      <SelectionState runConfigName="bottomBar_navigatesToHomeScreen()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="bottomBar_navigatesToProfileScreen_withEspresso()">
+      <SelectionState runConfigName="CommunityTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="bottomBar_navigatesToCommunityScreen()">
+      <SelectionState runConfigName="LoginUiTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
