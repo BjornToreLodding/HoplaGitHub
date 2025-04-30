@@ -63,33 +63,51 @@ nav ul li a:hover {
 
 #top-menu-list {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
-    padding: 0;
-    margin: 0;
     list-style: none;
+    padding: 0 20px;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-.topmenu-left a {
+/* Venstreknapper */
+.menu-left {
     margin-right: 15px;
 }
 
-.topmenu-center {
-    font-family: 'GeorgiaProBlack', serif;
-    font-size: 28px;
-    text-align: center;
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
+.menu-left a {
+    display: inline-block;
+    padding: 8px 12px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: 'ArialNova', sans-serif;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
-.topmenu-right {
+.menu-left a:hover {
+    background-color: #5c7d6d;
+}
+
+/* Midttittel */
+.menu-center {
+    flex-grow: 1;
+    text-align: center;
+    font-family: 'GeorgiaProBlack', serif;
+    font-size: 28px;
+}
+
+/* Brukerinfo */
+.menu-right {
     display: flex;
     align-items: center;
     gap: 10px;
     white-space: nowrap;
 }
+
 /* --- AKTIV KNAPP I TOPPMENY --- */
 nav ul li a.active {
     background-color: #344d42; /* Liten mørkere variant */

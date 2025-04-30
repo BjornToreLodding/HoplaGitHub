@@ -19,7 +19,7 @@ export async function render(container) {
             reports.sort((a, b) => new Date(b.created) - new Date(a.created));
     
             container.innerHTML = reports.map(r => `
-                <div class="report" data-id="${r.id}" style="width: 60%; margin: 2em auto; padding: 1em; border: 1px solid #bbb; border-radius: 8px;">
+                <div class="report" data-id="${r.id}" style="width: 60%; margin: 2em auto; padding: 1em; border: 1px solid #ccc; border-radius: 8px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <strong>${r.name || 'Ukjent'}</strong>
                         <span><strong>Reported:</strong> ${new Date(r.created).toLocaleString()}</span>
