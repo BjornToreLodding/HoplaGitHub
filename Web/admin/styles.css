@@ -72,7 +72,13 @@ nav ul li a:hover {
     box-sizing: border-box;
 }
 
+
 /* Venstreknapper */
+.menu-left,
+.menu-right {
+    flex: 0 0 auto;
+}
+
 .menu-left {
     margin-right: 15px;
 }
@@ -185,15 +191,15 @@ button {
     color: white;
     padding: 5px 10px;
     border: none;
-    cursor: pointer;
     border-radius: 5px;
+    cursor: pointer;
     font-family: 'ArialNovaLight', sans-serif;
+    font-size: 16px;
 }
 
 .button-brown:hover {
     background-color: #8c7260;
 }
-
 /* Skjulte elementer */
 .hidden {
     display: none;
@@ -225,7 +231,7 @@ button {
 .save-button {
     visibility: hidden;
     padding: 5px 10px;
-    background-color: #456559 ;
+    background-color: #745e4d;
     color: white;
     border: none;
     border-radius: 5px;
@@ -246,7 +252,7 @@ button {
 }
 
 .save-button:hover {
-    background-color: #5c7d6d;
+    background-color: #8c7260;
 }
 
 
@@ -295,7 +301,7 @@ button {
 /* --- KNAPPER --- */
 .button {
     padding: 5px 10px;
-    background-color: #456559 ;
+    background-color: #745e4d ;
     color: white;
     border: none;
     cursor: pointer;
@@ -303,7 +309,7 @@ button {
 }
 
 .button:hover {
-    background-color: #5c7d6d;
+    background-color: #8c7260;
 }
 
 /* --- Profilknapp --- */
@@ -375,4 +381,147 @@ button {
 
 .login-card button:hover {
     background-color: #8c7260;
+}
+
+/* --- Tilpassede checkboxer og radioknapper --- */
+/* --- Tilpasset checkbox og radio med brun stil --- */
+
+/* Felles stil for begge */
+input[type="checkbox"],
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: white;
+    border: 2px solid #745e4d;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    margin-right: 8px;
+    transition: all 0.2s ease;
+}
+
+/* Ruteform for checkbox */
+input[type="checkbox"] {
+    border-radius: 4px;
+}
+
+/* Rund form for radio */
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+/* Checkmark for checkbox */
+input[type="checkbox"]:checked::after {
+    content: "✔";
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    top: -2px;
+    left: 2px;
+}
+
+/* Fyll brun bakgrunn når valgt */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background-color: #745e4d;
+    border-color: #745e4d;
+}
+
+/* Prikk i midten av radio-knapp */
+input[type="radio"]:checked::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+
+/* Fokus-effekt */
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+    outline: 2px solid #8c7260;
+}
+
+
+/* --- TRAILFILTERS-SPESIFIKK --- */
+#new-filter-form label,
+#new-filter-form input,
+#new-filter-form select,
+#new-filter-form div {
+    margin-bottom: 5px;
+}
+
+#new-filter-form .inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#new-filter-form .radio-group,
+#new-filter-form .default-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: 20px;
+    margin-top: 4px;
+}
+
+#new-filter-form .form-section {
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+}
+
+#new-filter-form input[type="number"] {
+    width: 50px;
+}
+
+#new-filter-form .block-label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+#new-filter-form .indented-input {
+    margin-left: 20px;
+    margin-top: 4px;
+}
+
+
+.existing-filter,
+#new-filter-form {
+    width: 1000px;
+}
+
+.existing-filter {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+}
+
+.existing-filter .options-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+    margin-left: 20px;
+}
+
+.default-indicator {
+    font-weight: bold;
+    margin-left: 10px;
+    color: green;
+}
+
+#trail-filters {
+    padding-bottom: 100px;
 }

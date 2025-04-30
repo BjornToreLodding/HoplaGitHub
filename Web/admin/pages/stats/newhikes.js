@@ -14,8 +14,8 @@ export async function render(container) {
         </div>`;
 
     try {
-        const response = await fetch(`${apiUrl}/admin/stats/newusersbymonth`);
-        //const response = await fetch(`https://localhost:7128/admin/stats/newusersbymonth`);
+        const response = await fetch(`${apiUrl}/admin/stats/newuserhikesbymonth`);
+        //const response = await fetch(`https://localhost:7128/admin/stats/newuserhikesbymonth`);
         if (!response.ok) throw new Error(`Status: ${response.status}`);
 
         const data = await response.json();
@@ -33,7 +33,7 @@ export async function render(container) {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Nye brukere per måned',
+                    label: 'Nye turer per måned',
                     data: counts,
                     backgroundColor: '#745e4d',
                     borderRadius: 5

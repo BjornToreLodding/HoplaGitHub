@@ -36,5 +36,25 @@ public class AdminStatsController : ControllerBase
         return Ok(result);
     
     }
+
+    [HttpGet("newuserhikesbymonth")]
+    public async Task<IActionResult> GetNewUserHikesByMonth()
+    {
+        var result = await _context.UserHikes
+            .GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                Count = g.Count()
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToListAsync();
+
+        return Ok(result);
+    
+    }
+
     
 }

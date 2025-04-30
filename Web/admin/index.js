@@ -31,38 +31,45 @@ function updateLoginState() {
     const token = localStorage.getItem("authToken");
     const loginScreen = document.getElementById("login-screen");
     const appContent = document.getElementById("app-content");
-    const topMenuList = document.getElementById("top-menu-list");
+    const topMenu = document.getElementById("top-menu");
+
+    const tools = document.getElementById("menu-tools");
+    const stats = document.getElementById("menu-stats");
+    const reports = document.getElementById("menu-reports");
+    const userInfo = document.getElementById("user-info");
+    const logoutButton = document.getElementById("logout-button");
 
     if (token) {
         loginScreen.classList.add("hidden");
         appContent.classList.remove("hidden");
-//<li><a href="#" data-section="trails">Trails</a></li>
-        topMenuList.innerHTML = `
-            <li><a href="#" data-section="tools">Tools</a></li>
-            <li><a href="#" data-section="stats">Stats</a></li>
-            <li><a href="#" data-section="reports">Reports</a></li>
-            
-            <li style="color: white; font-family: 'GeorgiaProBlack', serif; font-size: 28px; padding: 0 150px;">Hopla Adminportal</li>
+        topMenu.classList.remove("hidden");
 
-            <li id="user-info" style="display: flex; align-items: center; gap: 10px;">
-                <img id="user-avatar" src="" alt="Profilbilde" class="profile-pic hidden">
-                <div id="user-text"></div>
-                <button id="logout-button" class="button-brown hidden">Logg ut</button>
-            </li>
-        `;
+        // Vis menyvalg og bruker
+        tools.classList.remove("hidden");
+        stats.classList.remove("hidden");
+        reports.classList.remove("hidden");
+        userInfo.classList.remove("hidden");
+
+        // Koble logg ut-knappen
+        logoutButton.classList.remove("hidden");
+        logoutButton.removeEventListener("click", logout); // unngå dobbel
+        logoutButton.addEventListener("click", logout);
     } else {
         loginScreen.classList.remove("hidden");
         appContent.classList.add("hidden");
-        topMenuList.innerHTML = `
-        <center><li style="color: white; font-family: 'GeorgiaProBlack', serif; font-size: 28px; padding: 0 150px;">Hopla Adminportal</li></center>
-        `
-    }
+        topMenu.classList.remove("hidden");
 
-    const logoutButton = document.getElementById("logout-button");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", logout);
+        // Skjul alle menyvalg og bruker
+        tools.classList.add("hidden");
+        stats.classList.add("hidden");
+        reports.classList.add("hidden");
+        userInfo.classList.add("hidden");
+        logoutButton.classList.add("hidden");
     }
 }
+
+
+
 
 function updateUserUI() {
     const token = localStorage.getItem("authToken");
@@ -78,18 +85,24 @@ function updateUserUI() {
     }
 
     const user = JSON.parse(userInfo);
+
     if (userInfoElement) userInfoElement.classList.remove("hidden");
     if (logoutButton) logoutButton.classList.remove("hidden");
-    if (userText) userText.innerHTML = `<div style="display: flex; flex-direction: column; line-height: 1.2;">
-    <span>Logget inn som:</span>
-    <center>${user.alias}</center>
-    <small>(${user.name})</small>
-</div>`;
+    if (userText) {
+        userText.innerHTML = `
+            <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                <span>Logget inn som:</span>
+                <center>${user.alias || "Ukjent"}</center>
+                <center><small>(${user.name || "bruker"})</small></center>
+            </div>
+        `;
+    }
     if (userAvatar) {
         userAvatar.src = user.pictureUrl || "https://hopla.imgix.net/main.jpg?w=64&h=64&fit=crop";
         userAvatar.classList.remove("hidden");
     }
 }
+
 
 function checkAuthStatus() {
     const token = localStorage.getItem("authToken");
@@ -144,8 +157,8 @@ function loadSideMenu(section) {
         case "stats":
             menuItems = [
                 { name: "Fakta", action: "loadContent('stats', 'fakta')" },
-                { name: "Nye brukere", action: "loadContent('stats', 'newusers')" },
-                { name: "Turer", action: "loadContent('stats', 'newusers-fixed')" },
+                { name: "Nye brukere", action: "loadContent('stats', 'newusers-fixed')" },
+                { name: "Turer", action: "loadContent('stats', 'newhikes')" },
                 { name: "YNI", action: "loadContent('stats', 'yni')" }
             ]; break;
         case "trails":

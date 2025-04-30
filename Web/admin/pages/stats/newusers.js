@@ -14,7 +14,7 @@ export async function render(container) {
         </div>`;
 
     try {
-          const response = await fetch(`${apiUrl}/admin/stats/newusersbymonth`);
+        const response = await fetch(`${apiUrl}/admin/stats/newusersbymonth`);
         //const response = await fetch(`https://localhost:7128/admin/stats/newusersbymonth`);
         if (!response.ok) throw new Error(`Status: ${response.status}`);
 

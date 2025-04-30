@@ -3,72 +3,12 @@ console.log("API URL:", apiUrl);
 
 export async function render(container) {
     container.innerHTML = `
-        <style>
-            #new-filter-form label,
-            #new-filter-form input,
-            #new-filter-form select,
-            #new-filter-form div {
-                margin-bottom: 5px;
-            }
-            #new-filter-form .inline {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
-            #new-filter-form .radio-group,
-            #new-filter-form .default-group {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                margin-left: 20px;
-                margin-top: 4px;
-            }
-            #new-filter-form .form-section {
-                border: 1px solid #ddd;
-                padding: 12px;
-                border-radius: 6px;
-                margin-bottom: 20px;
-                background: #f9f9f9;
-            }
-            #new-filter-form input[type="number"] {
-                width: 50px;
-            }
-            #new-filter-form .block-label {
-                display: block;
-                margin-top: 12px;
-                font-weight: bold;
-            }
-            #new-filter-form .indented-input {
-                margin-left: 20px;
-                margin-top: 4px;
-            }
-            .existing-filter {
-                border: 1px solid #ccc;
-                padding: 10px;
-                margin-bottom: 15px;
-                border-radius: 5px;
-                background-color: #fdfdfd;
-            }
-            .existing-filter .options-inline {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-top: 5px;
-                margin-left: 20px;
-            }
-            .default-indicator {
-                font-weight: bold;
-                margin-left: 10px;
-                color: green;
-            }
-            #trail-filters {
-                padding-bottom: 100px;
-            }
-        </style>
+        
         <h2>Trail Filters</h2>
+        <h3>Standard Verdier</h3>
         <div id='trail-filters'></div>
         <hr>
-        <h2>Legg til nytt filter</h2>
+        <h3>Legg til nytt filter</h3>
         <div id="new-filter-form"></div>
         <pre id="new-filter-output"></pre>
     `;
@@ -231,7 +171,9 @@ export async function render(container) {
 
     const addButton = document.createElement("button");
     addButton.textContent = "Legg til filter";
+    addButton.className = "button-brown";
     formSection.appendChild(addButton);
+    
 
     newForm.appendChild(formSection);
 
