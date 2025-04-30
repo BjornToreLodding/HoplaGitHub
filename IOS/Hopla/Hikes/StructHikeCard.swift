@@ -44,7 +44,10 @@ struct HikeCard: View {
                         }
                         .padding(10)
                     }
-
+                    // UITests
+                    .accessibilityIdentifier("FavoriteButton_\(hike.id)")
+                    .accessibilityLabel("Favorite")
+                    .accessibilityValue(hike.isFavorite ? "true" : "false")
                 }
                 
                 // Hike name and rating

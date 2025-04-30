@@ -7,7 +7,9 @@
 
 import XCTest
 
-final class HoplaUITests: XCTestCase {
+// MARK: - Login page tests
+
+final class LoginUITests: XCTestCase {
     var app: XCUIApplication!
     
     override func setUpWithError() throws {

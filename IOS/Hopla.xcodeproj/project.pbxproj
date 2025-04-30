@@ -52,20 +52,42 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B71DB4102DC2392200D52172 /* Exceptions for "Hopla" folder in "HoplaTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockURLProtocol.swift,
+				stubHikes.json,
+			);
+			target = B706E9752D3FE03D008496F9 /* HoplaTests */;
+		};
 		B740BE7D2D8D7A6D00E28F86 /* Exceptions for "Hopla" folder in "Hopla" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Mocks/MockURLProtocol.swift,
+				stubHikes.json,
 			);
 			target = B706E9652D3FE03A008496F9 /* Hopla */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		B76940682DC11FA600DEB1B9 /* Exceptions for "Hopla" folder in "Compile Sources" phase from "Hopla" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = B706E9622D3FE03A008496F9 /* Sources */;
+			membershipExceptions = (
+				stubHikes.json,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B706E9682D3FE03A008496F9 /* Hopla */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				B740BE7D2D8D7A6D00E28F86 /* Exceptions for "Hopla" folder in "Hopla" target */,
+				B76940682DC11FA600DEB1B9 /* Exceptions for "Hopla" folder in "Compile Sources" phase from "Hopla" target */,
+				B71DB4102DC2392200D52172 /* Exceptions for "Hopla" folder in "HoplaTests" target */,
 			);
 			path = Hopla;
 			sourceTree = "<group>";

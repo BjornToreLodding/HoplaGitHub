@@ -36,6 +36,12 @@ class LoginViewModel: ObservableObject {
             let redirect: String?
         }
     
+    // For XCTest
+    private let session: URLSession
+        init(session: URLSession = .shared) {
+            self.session = session
+        }
+    
     // MARK: - Register a New User
     
     func register(email: String, password: String, completion: @escaping (Bool, String?) -> Void) {
@@ -62,7 +68,7 @@ class LoginViewModel: ObservableObject {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = jsonData
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async {
                     self.errorMessage = "Registration error: \(error.localizedDescription)"
@@ -114,7 +120,7 @@ class LoginViewModel: ObservableObject {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = jsonData
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async { self.errorMessage = "Request error: \(error.localizedDescription)" }
                 return
@@ -178,7 +184,7 @@ class LoginViewModel: ObservableObject {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Profile request error:", error.localizedDescription)
                 return
@@ -423,7 +429,4 @@ class LoginViewModel: ObservableObject {
             }
         }
     }
-
-
 }
-

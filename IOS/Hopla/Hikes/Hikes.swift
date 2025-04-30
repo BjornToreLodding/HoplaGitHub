@@ -199,6 +199,7 @@ struct Hikes: View {
                 isShowingFilterOptions: $isShowingFilterOptions,
                 colorScheme: colorScheme
             )
+            .accessibilityIdentifier("HikesFilterBar")
             searchBar
             
             if isShowingFilterOptions {
@@ -344,6 +345,7 @@ struct Hikes: View {
                         },
                         viewModel: viewModel
                     )
+                    .accessibilityIdentifier("HikeCard_\(hike.id)")
                     .onAppear {
                         // Trigger load more when nearing the end of the list
                         if hike == hikes.last {

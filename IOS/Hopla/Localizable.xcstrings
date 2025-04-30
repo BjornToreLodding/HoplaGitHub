@@ -638,6 +638,12 @@
         }
       }
     },
+    "false" : {
+
+    },
+    "Favorite" : {
+
+    },
     "Fill in Details" : {
       "localizations" : {
         "nb" : {
@@ -1616,6 +1622,9 @@
       }
     },
     "Trail: %@" : {
+
+    },
+    "true" : {
 
     },
     "Type a message…" : {

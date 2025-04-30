@@ -29,6 +29,27 @@ class StableViewModel: ObservableObject {
     private var currentPage = 1
     private var isLastPage = false
     @Published var isLoading = false // Track loading state
+    private let session: URLSession
+    
+    // Inject both the location manager and session:
+       init(locationManager: LocationManager,
+            session: URLSession = .shared) {
+           self.locationManager = locationManager
+           self.session = session
+           NotificationCenter.default.addObserver(
+             self,
+             selector: #selector(handleLocationUpdate(_:)),
+             name: .didUpdateLocation,
+             object: nil
+           )
+       }
+       deinit {
+           NotificationCenter.default.removeObserver(
+             self,
+             name: .didUpdateLocation,
+             object: nil
+           )
+       }
     
     
     func loadMoreStablesIfNeeded(search: String? = nil, latitude: Double, longitude: Double) {
@@ -44,16 +65,6 @@ class StableViewModel: ObservableObject {
                 self.currentPage += 1
             }
         }
-    }
-    
-    
-    init(locationManager: LocationManager) {
-        self.locationManager = locationManager
-        NotificationCenter.default.addObserver(self, selector: #selector(handleLocationUpdate(_:)), name: .didUpdateLocation, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: .didUpdateLocation, object: nil)
     }
     
     @objc private func handleLocationUpdate(_ notification: Notification) {
@@ -116,7 +127,7 @@ class StableViewModel: ObservableObject {
             return
         }
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error joining stable:", error.localizedDescription)
                 completion(false)
@@ -150,7 +161,7 @@ class StableViewModel: ObservableObject {
             return
         }
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error leaving stable:", error.localizedDescription)
                 completion(false)
@@ -193,7 +204,7 @@ class StableViewModel: ObservableObject {
         request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
         
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        session.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 self?.isLoading = false // Set loading to false when the fetch is done
                 
@@ -258,7 +269,7 @@ class StableViewModel: ObservableObject {
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         request.httpBody = body
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let httpResponse = response as? HTTPURLResponse {
                 print("HTTP Status Code: \(httpResponse.statusCode)")
             }
