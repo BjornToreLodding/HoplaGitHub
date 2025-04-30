@@ -1,8 +1,6 @@
-// ✅ Riktig import for jsDelivr +esm ESM-pakke
-// ✅ ESM-import fra jsDelivr
 import * as ChartModule from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/+esm';
 const { Chart, registerables } = ChartModule;
-Chart.register(...registerables); // 🧠 Viktig!
+Chart.register(...registerables); 
 
 
 //const apiUrl = "https://localhost:7128";

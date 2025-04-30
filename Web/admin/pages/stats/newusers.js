@@ -1,11 +1,12 @@
-const apiUrl = window.appConfig.API_URL || "https://localhost:7128";
-// ✅ Bruk ESM-bygget som støtter import Chart from ...
-import Chart from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.esm.js';
+import * as ChartModule from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/+esm';
+const { Chart, registerables } = ChartModule;
+Chart.register(...registerables); 
+
 
 //const apiUrl = "https://localhost:7128";
+const apiUrl = window.appConfig.API_URL || "https://localhost:7128";
 
 export async function render(container) {
-    // Overskrift og graf-område
     container.innerHTML = `
         <h2 style="text-align: center;">Statistikk: Nye brukere per måned</h2>
         <div id="chart-area" style="width: 100%; max-width: 1200px; margin: auto; padding: 2em;">
@@ -13,7 +14,7 @@ export async function render(container) {
         </div>`;
 
     try {
-        const response = await fetch(`${apiUrl}/admin/stats/newusersbymonth`);
+          const response = await fetch(`${apiUrl}/admin/stats/newusersbymonth`);
         //const response = await fetch(`https://localhost:7128/admin/stats/newusersbymonth`);
         if (!response.ok) throw new Error(`Status: ${response.status}`);
 
@@ -24,11 +25,9 @@ export async function render(container) {
 
         const canvas = document.getElementById("userChart");
 
-        // 📏 Sett intern tegneflate-størrelse
         canvas.setAttribute("width", "1200");
         canvas.setAttribute("height", "600");
 
-        // Bygg graf
         new Chart(canvas, {
             type: 'bar',
             data: {
@@ -60,8 +59,6 @@ export async function render(container) {
 
     } catch (err) {
         container.innerHTML += `<p style="color: red;">Feil: ${err.message}</p>`;
+        console.error("Feil i graf:", err);
     }
 }
-
-
-
