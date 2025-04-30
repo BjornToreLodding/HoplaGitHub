@@ -10,13 +10,13 @@ import CoreLocation
 import GoogleMaps
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
-    
     var locationManager = CLLocationManager()
     var timer: Timer?
     var elapsedTime: TimeInterval = 0
     var distance: Double = 0.0
     var coordinates: [Coordinate] = []
     var isTracking = false // ✅ Toggle between Start/Stop
+    var session: URLSession = .shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -139,7 +139,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             return
         }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Error saving hike:", error.localizedDescription)
                 return
