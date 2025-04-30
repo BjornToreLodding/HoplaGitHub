@@ -45,7 +45,8 @@ export async function render(container) {
                     const feedback = reportDiv.querySelector("textarea").value;
     
                     try {
-                        const response = await fetch(`https://localhost:7128/admin/userreports/${reportId}`, {
+                        //const response = await fetch(`https://localhost:7128/admin/userreports/${reportId}`, {
+                        const response = await fetch(`${apiUrl}/admin/userreports/${reportId}`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
