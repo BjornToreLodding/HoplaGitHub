@@ -60,7 +60,38 @@ nav ul li a {
 nav ul li a:hover {
     background-color: #5c7d6d; /* 30% lysere variant */
 }
+#top-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    padding: 0 20px;
+    background-color: #456559;
+    color: white;
+}
 
+.topmenu-left,
+.topmenu-center,
+.topmenu-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Midten skal være midtstilt på skjermen */
+.topmenu-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'GeorgiaProBlack', serif;
+    font-size: 28px;
+}
+
+/* Eventuell justering av høyremeny */
+.topmenu-right {
+    gap: 10px;
+    white-space: nowrap;
+}
 /* --- AKTIV KNAPP I TOPPMENY --- */
 nav ul li a.active {
     background-color: #344d42; /* Liten mørkere variant */
