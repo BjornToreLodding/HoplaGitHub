@@ -115,6 +115,9 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.10")
     testImplementation("com.google.code.gson:gson:2.10")
     testImplementation("net.bytebuddy:byte-buddy:1.14.6")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.0")
 }
 
 configurations.all {

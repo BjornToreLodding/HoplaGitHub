@@ -151,7 +151,6 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Home.route) { HomeScreen(navController) }
                             composable(Screen.Trails.route) { TrailsScreen(navController) }
                             composable(Screen.NewTrip.route) { NewTripScreen(bottomBarViewModel = bottomBarViewModel) }
-                            composable(Screen.Community.route) { CommunityScreen(navController, UserSession.token) }
                             composable(Screen.Profile.route) { ProfileScreen( navController) }
                             composable("friends_list/{userId}") { backStackEntry ->
                                 val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
@@ -258,8 +257,8 @@ fun TopBar() {
 
 // Extracted functionality to create equal icons for bottom navigation bar
 @Composable
-fun ScreenIcon(icon: ImageVector) {
-    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+fun ScreenIcon(icon: ImageVector, description: String) {
+    Icon(icon, contentDescription = description, tint = MaterialTheme.colorScheme.onPrimary)
 }
 
 // BottomNavigationBar function to create a bottom navigation bar
@@ -286,11 +285,11 @@ fun BottomNavigationBar(navController: NavHostController) {
             BottomNavigationItem(
                 icon = {
                     when (screen) {
-                        Screen.Home -> ScreenIcon(Icons.Outlined.Home)
-                        Screen.Profile -> ScreenIcon(Icons.Outlined.Person)
-                        Screen.NewTrip -> ScreenIcon(Icons.Outlined.Add)
-                        Screen.Trails -> ScreenIcon(Icons.Outlined.AddRoad)
-                        Screen.Community -> ScreenIcon(Icons.Outlined.Face)
+                        Screen.Home -> ScreenIcon(Icons.Outlined.Home, "HomeScreen")
+                        Screen.Profile -> ScreenIcon(Icons.Outlined.Person, "PersonIcon")
+                        Screen.NewTrip -> ScreenIcon(Icons.Outlined.Add, "AddIcon")
+                        Screen.Trails -> ScreenIcon(Icons.Outlined.AddRoad, "AddRoadIcon")
+                        Screen.Community -> ScreenIcon(Icons.Outlined.Face, "FaceIcon")
                     }
                 },
                 label = { Text(

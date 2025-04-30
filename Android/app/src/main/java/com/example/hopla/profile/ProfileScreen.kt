@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -89,6 +90,9 @@ private const val STATUS_200 = 200
 // Main profile screen function
 @Composable
 fun ProfileScreen(navController: NavController) {
+    Column(modifier = Modifier.testTag("Profile")) {
+        Text("Profile") // example content
+    }
     var showDialog by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf(UserSession.name ?: "") }
     var username by remember { mutableStateOf(UserSession.alias ?: "") }
@@ -154,6 +158,9 @@ fun ProfileScreen(navController: NavController) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.testTag("ProfileScreen")) {
+            Text("Profile")
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
