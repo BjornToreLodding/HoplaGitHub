@@ -525,3 +525,14 @@ input[type="radio"]:focus {
 #trail-filters {
     padding-bottom: 100px;
 }
+
+.fakta-box {
+    width: 100%;
+    max-width: 600px; /* gir lik bredde */
+    margin: 1em auto; /* auto på sidene = sentrert */
+    border: 1px solid #ccc;
+    padding: 1em;
+    border-radius: 6px;
+    background: #f9f9f9;
+    box-sizing: border-box;
+}

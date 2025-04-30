@@ -21,7 +21,7 @@ public class ApiController : ControllerBase
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    // 📌 GET: /div/helloworld
+    // GET: /div/helloworld
     [HttpGet("helloworld")]
     public IActionResult HelloWorld()
     {
@@ -39,7 +39,7 @@ public class ApiController : ControllerBase
         }
     }
 
-    // 📌 GET: /div/status
+    // GET: /div/status
     [HttpGet("status")]
     public IActionResult Status()
     {

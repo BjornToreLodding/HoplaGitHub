@@ -156,7 +156,7 @@ function loadSideMenu(section) {
             ]; break;
         case "stats":
             menuItems = [
-                { name: "Fakta", action: "loadContent('stats', 'fakta')" },
+                { name: "Info", action: "loadContent('stats', 'fakta')" },
                 { name: "Nye brukere", action: "loadContent('stats', 'newusers-fixed')" },
                 { name: "Turer", action: "loadContent('stats', 'newhikes')" },
                 { name: "YNI", action: "loadContent('stats', 'yni')" }

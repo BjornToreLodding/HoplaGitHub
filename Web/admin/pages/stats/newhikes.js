@@ -8,7 +8,7 @@ const apiUrl = window.appConfig.API_URL || "https://localhost:7128";
 
 export async function render(container) {
     container.innerHTML = `
-        <h2 style="text-align: center;">Statistikk: Nye brukere per måned</h2>
+        <h2 style="text-align: center;">Statistikk: Antall turer per måned</h2>
         <div id="chart-area" style="width: 100%; max-width: 1200px; margin: auto; padding: 2em;">
             <canvas id="userChart"></canvas>
         </div>`;
@@ -33,7 +33,7 @@ export async function render(container) {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Nye turer per måned',
+                    label: 'Antall turer per måned',
                     data: counts,
                     backgroundColor: '#745e4d',
                     borderRadius: 5
