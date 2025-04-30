@@ -58,6 +58,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    tasks.withType<Test> {
+        jvmArgs("-Xmx2g") // Increase the maximum heap size to 2GB
+    }
 }
 
 dependencies {
@@ -104,12 +107,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation("androidx.compose.material:material-icons-extended:<version>")
-    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("io.ktor:ktor-client-mock:2.0.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
     testImplementation(libs.kotlin.test)
     testImplementation(libs.jetbrains.kotlinx.coroutines.test)
     testImplementation("org.robolectric:robolectric:4.10")
+    testImplementation("com.google.code.gson:gson:2.10")
+    testImplementation("net.bytebuddy:byte-buddy:1.14.6")
 }
 
 configurations.all {
