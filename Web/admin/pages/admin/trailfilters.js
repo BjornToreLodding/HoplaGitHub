@@ -119,7 +119,7 @@ export async function render(container) {
 
     const typeWrapper = document.createElement("div");
     typeWrapper.className = "radio-group";
-    const types = ["enum", "multiEnum", "int", "bool"];
+    const types = ["enum (kun ett valg)", "multiEnum (flere valg)", "int", "bool"];
     types.forEach((t, i) => {
         const row = document.createElement("div");
         row.className = "inline";
