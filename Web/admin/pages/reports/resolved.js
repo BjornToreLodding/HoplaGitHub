@@ -1,5 +1,6 @@
 const apiUrl = window.appConfig.API_URL || "https://localhost:7128";
 //const apiUrl = "https://localhost:7128";
+
 export async function render(container) {
     try {
         const response = await fetch(`${apiUrl}/admin/userreports/reports?status=Resolved`, {
@@ -18,14 +19,14 @@ export async function render(container) {
         reports.sort((a, b) => new Date(b.created) - new Date(a.created));
 
         container.innerHTML = reports.map(r => `
-            <div class="report" data-id="${r.id}" style="width: 60%; margin: 2em auto; padding: 1em; border: 1px solid #ccc; border-radius: 8px;">
+            <div class="report" data-id="${r.id}" style="width: 60%; margin: 2em auto; padding: 1em; border: 1px solid #555; border-radius: 8px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <strong>${r.name || 'Ukjent'}</strong>
                     <span>Reported: ${new Date(r.created).toLocaleString()}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5em;">
                     <div><strong>Message:</strong> ${r.message || 'Ingen melding'}</div>
-                    <div style="color: #555;"><strong>Gjelder:</strong> ${r.tabell || 'Ukjent'}</div>
+                    <div><strong>Gjelder:</strong> ${r.tabell || 'Ukjent'}</div>
                 </div>            
                 <textarea placeholder="Feedback..." rows="4" style="width: 100%; resize: vertical; margin-bottom: 0.5em;">${r.feedback || ''}</textarea>
 
