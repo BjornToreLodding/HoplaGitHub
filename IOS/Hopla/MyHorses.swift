@@ -15,6 +15,12 @@ import Foundation
 class HorseViewModel: ObservableObject {
     @Published var horses: [Horse] = []
     private var cancellables = Set<AnyCancellable>()
+    private let session: URLSession
+    
+    // DESIGNATED INIT
+        init(session: URLSession = .shared) {
+            self.session = session
+        }
     
     func fetchHorses() {
         guard let token = TokenManager.shared.getToken() else {
@@ -27,7 +33,7 @@ class HorseViewModel: ObservableObject {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
@@ -89,7 +95,7 @@ class HorseViewModel: ObservableObject {
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         request.httpBody = body
 
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        session.dataTask(with: request) { [weak self] data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
@@ -124,7 +130,7 @@ class HorseViewModel: ObservableObject {
         request.httpMethod = "DELETE"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return

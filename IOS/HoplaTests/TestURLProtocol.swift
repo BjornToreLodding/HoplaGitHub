@@ -9,9 +9,12 @@ import XCTest
 
 class TestURLProtocol: URLProtocol {
     static var lastRequest: URLRequest?
-    static var lastRequestBody: Data?       
+    static var lastRequestBody: Data?
     static var stubResponseData: Data?
     static var stubStatusCode = 200
+    
+    // New: keep all requests in order
+        static var requests: [URLRequest] = []
 
     /// XCTestExpectation your test sets before calling saveHike()
     static weak var requestExpectation: XCTestExpectation?
@@ -26,6 +29,7 @@ class TestURLProtocol: URLProtocol {
 
     override func startLoading() {
         // 1) Capture the raw request
+        TestURLProtocol.requests.append(request)
         TestURLProtocol.lastRequest = request
 
         // 2) Pull the body out of the stream (or fallback to httpBody)
