@@ -24,7 +24,6 @@ extension View {
 
 struct Login: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
-    
     @State private var isShowingForgottenPassword = false // True when clicking on text
     @State private var isShowingSignUp = false // Sheet for creating a new user
     @State private var password: String = "" // Already a user: Password
@@ -52,8 +51,7 @@ struct Login: View {
         !confirmNewPassword.isEmpty &&
         allowStatistics
     }
-    
-    
+  
     var body: some View {
         NavigationStack {
             ZStack {
@@ -67,11 +65,14 @@ struct Login: View {
                     VStack {
                         VStack(alignment: .center) {
                             // Logo
-                            Image("LogoUtenBakgrunn")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 200, height: 200)
-                            
+                            Image(
+                                    colorScheme == .light
+                                      ? "LogoUtenBakgrunn"
+                                      : "logo_white_without_background"
+                                  )
+                                  .resizable()
+                                  .scaledToFit()
+                                  .frame(width: 200, height: 200)
                             Text("Hopla")
                                 .font(.custom("GeorgiaPro-Black", size: 60))
                         }
