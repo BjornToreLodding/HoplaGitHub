@@ -34,6 +34,25 @@ class HomeViewModel: ObservableObject {
         }
 
     func fetchPosts(for filter: String, latitude: Double? = nil, longitude: Double? = nil) {
+        let args = ProcessInfo.processInfo.arguments
+            if args.contains("-UITestMode") {
+                let stub = HomePost(
+                  entityId: "stub-1",
+                  title: ProcessInfo.processInfo.environment["MOCK_POST_TITLE"] ?? "Stub Title",
+                  description: ProcessInfo.processInfo.environment["MOCK_POST_DESC"]  ?? "Stub Description",
+                  pictureUrl: nil,
+                  userAlias: ProcessInfo.processInfo.environment["MOCK_POST_ALIAS"] ?? "stub_user",
+                  userProfilePicture: nil,
+                  likes: Int(ProcessInfo.processInfo.environment["MOCK_POST_LIKES"] ?? "3") ?? 3,
+                  isLikedByUser: false,
+                  createdAt: "2025-05-01T12:00:00Z"
+                )
+                DispatchQueue.main.async {
+                  self.homePosts = [stub]
+                }
+                return
+            }
+        
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found")
             return
@@ -95,6 +114,12 @@ class HomeViewModel: ObservableObject {
     }
 
     func likePost(entityId: String) {
+        if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
+            DispatchQueue.main.async {
+              self.updatePost(entityId: entityId, liked: true)
+            }
+            return
+          }
             guard let token = TokenManager.shared.getToken() else {
                 print("❌ No token found")
                 return
@@ -129,6 +154,12 @@ class HomeViewModel: ObservableObject {
         }
 
         func unlikePost(entityId: String) {
+            if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
+                DispatchQueue.main.async {
+                  self.updatePost(entityId: entityId, liked: false)
+                }
+                return
+              }
             guard let token = TokenManager.shared.getToken() else {
                 print("❌ No token found")
                 return
@@ -301,10 +332,12 @@ struct PostContainer: View {
             }
 
             Text(post.title)
+                .accessibilityIdentifier("homepost_\(post.id)_title_label")
                 .bold()
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 
             Text(post.description)
+                .accessibilityIdentifier("homepost_\(post.id)_description_label")
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
 
             if let url = URL(string: post.pictureUrl ?? "") {
@@ -330,8 +363,11 @@ struct PostContainer: View {
                     Image(systemName: post.isLikedByUser ? "heart.fill" : "heart")
                         .foregroundColor(post.isLikedByUser ? .red : .gray)
                 }
+                .accessibilityIdentifier("homepost_\(post.id)_like_button")
+                .accessibilityValue(post.isLikedByUser ? "liked" : "not_liked")
 
                 Text("\(post.likes)")
+                    .accessibilityIdentifier("homepost_\(post.id)_likes_label")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 

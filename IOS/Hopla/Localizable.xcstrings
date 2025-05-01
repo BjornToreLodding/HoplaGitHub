@@ -900,6 +900,9 @@
         }
       }
     },
+    "liked" : {
+
+    },
     "Loading filters..." : {
       "localizations" : {
         "nb" : {
@@ -1145,6 +1148,9 @@
           }
         }
       }
+    },
+    "not_liked" : {
+
     },
     "OK" : {
       "localizations" : {

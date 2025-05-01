@@ -141,6 +141,25 @@ class ProfileViewModel: ObservableObject {
     }
     
     func fetchUserProfile() async {
+        if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
+              let env = ProcessInfo.processInfo.environment
+              let alias = env["MOCK_USER_ALIAS"] ?? ""
+              let name  = env["MOCK_USER_NAME"]
+              let email = env["MOCK_USER_EMAIL"] ?? ""
+              let fake = UserProfile(alias: alias.isEmpty ? nil : alias,
+                                     name: name,
+                                     email: email,
+                                     pictureUrl: nil,
+                                     telephone: nil,
+                                     description: nil,
+                                     dob: nil)
+              DispatchQueue.main.async {
+                self.userProfile = fake
+                self.draftProfile = fake
+              }
+              return
+            }
+        
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
@@ -661,6 +680,7 @@ struct EditableProfileField: View {
                 if editingField == fieldId {
                     // Editing Mode: show a TextField and a Save button
                     TextField("Enter \(title)", text: $tempValue)
+                        .accessibilityIdentifier("profile_\(fieldId)_textField")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(maxWidth: 200)
                     Button(action: {
@@ -670,11 +690,13 @@ struct EditableProfileField: View {
                         editingField = nil
                     }) {
                         Image(systemName: "checkmark.circle")
+                            .accessibilityIdentifier("profile_\(fieldId)_save_button")
                             .foregroundColor(.green)
                     }
                 } else {
                     // Display Mode: show the saved value and an edit pencil
                     Text(value.isEmpty ? "Not provided" : value)
+                        .accessibilityIdentifier("profile_\(fieldId)_label")
                         .font(.custom("ArialNova-Light", size: 16))
                         .frame(maxWidth: .infinity, alignment: .center)
                     Button(action: {
@@ -687,6 +709,7 @@ struct EditableProfileField: View {
                         Image(systemName: "pencil")
                             .foregroundColor(editingField == nil ? .blue : .gray)
                     }
+                    .accessibilityIdentifier("profile_\(fieldId)_edit_button")
                     .disabled(editingField != nil)
                 }
             }
@@ -867,5 +890,3 @@ struct ChangeEmail: View {
         localErrorMessage = ""
     }
 }
-
-
