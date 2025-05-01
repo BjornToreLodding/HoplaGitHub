@@ -1,8 +1,6 @@
-
 import SwiftUI
 import Foundation
 import CoreLocation
-
 
 
 // MARK: - Hike Model

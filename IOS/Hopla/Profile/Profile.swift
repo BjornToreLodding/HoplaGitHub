@@ -84,6 +84,12 @@ class ProfileViewModel: ObservableObject {
     @Published var draftProfile: UserProfile?             // Editable draft profile
     @Published var selectedImage: UIImage?
     
+    // For network test
+    private let session: URLSession
+        init(session: URLSession = .shared) {
+            self.session = session
+        }
+    
     func uploadProfileImage(image: UIImage, entityId: String, table: String, token: String) async {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             print("Could not convert image to Data")
@@ -119,7 +125,7 @@ class ProfileViewModel: ObservableObject {
         request.httpBody = body
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await session.data(for: request)
             if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
                 let uploadResponse = try JSONDecoder().decode(UploadResponse.self, from: data)
                 print("Uploaded file saved at: \(uploadResponse.filePath)")
@@ -146,7 +152,7 @@ class ProfileViewModel: ObservableObject {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await session.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("Invalid response")
                 return
@@ -211,7 +217,7 @@ class ProfileViewModel: ObservableObject {
             print("➡️ PUT payload:", String(data: jsonData, encoding: .utf8)!)
             request.httpBody = jsonData
             
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await session.data(for: request)
             guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
                 let body = String(data: data, encoding: .utf8) ?? "<no body>"
                 print("❌ Update failed — status: \((response as? HTTPURLResponse)?.statusCode ?? -1), body: \(body)")
