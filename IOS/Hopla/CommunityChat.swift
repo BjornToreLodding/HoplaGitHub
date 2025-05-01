@@ -85,7 +85,7 @@ struct CommunityChat: View {
                             VStack(spacing: 0) {
                                 // MARK: — Group Name Header
                                 Text(stable.stableName)
-                                    .font(.title)
+                                    .font(.custom("ArialNova", size: 20))
                                     .fontWeight(.bold)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 40)

@@ -465,11 +465,10 @@ struct Community: View {
 }
 
 struct AddStableView: View {
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: StableViewModel
     @StateObject private var locationManager = LocationManager()
-    
-    
     @State private var name: String = ""
     @State private var description: String = ""
     @State private var latitude: String = ""
@@ -493,6 +492,7 @@ struct AddStableView: View {
                     }
                 }
                 
+                
                 Section(header: Text("Image Selection")) {
                     Button(action: { showImagePicker = true }) {
                         Text("Select Image")
@@ -514,6 +514,10 @@ struct AddStableView: View {
                     .disabled(name.isEmpty || description.isEmpty || latitude.isEmpty || longitude.isEmpty || selectedImage == nil)
                 }
             }
+            .foregroundColor(
+                AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground)
+                    .color(for: colorScheme)
+            )
             .navigationTitle("Add Stable")
             .navigationBarItems(trailing: Button("Cancel") {
                 dismiss()

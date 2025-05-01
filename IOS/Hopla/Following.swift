@@ -31,7 +31,7 @@ struct FollowingHeaderView: View {
     
     var body: some View {
         Text("Following")
-            .font(.title)
+            .font(.custom("ArialNova", size: 20))
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .frame(height: 40)
@@ -246,6 +246,7 @@ struct FollowingListView: View {
                 }
             }
         }
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
     }
 }
 
@@ -275,9 +276,9 @@ struct FollowingRowView: View {
             }
             
             Text(user.name)
-                .font(.headline)
+                .font(.custom("ArialNova", size: 16))
                 .padding(.leading, 10)
-            
+                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             Spacer()
         }
         .padding()
@@ -313,7 +314,7 @@ struct AddFollowingPage: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                FriendsHeaderView(colorScheme: colorScheme)
+                AddFollowingHeaderView(colorScheme: colorScheme)
                 searchBar
                   .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
                                 .color(for: colorScheme))
@@ -354,6 +355,21 @@ struct AddFollowingPage: View {
     }
 }
 
+// MARK: - Header
+struct AddFollowingHeaderView: View {
+    var colorScheme: ColorScheme
+    
+    var body: some View {
+        Text("Add new following")
+            .font(.custom("ArialNova", size: 20))
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+            .foregroundColor(.white)
+    }
+}
+
 struct FollowingUserRowView: View {
     let user: User
     @ObservedObject var vm: FollowingViewModel
@@ -383,9 +399,9 @@ struct FollowingUserRowView: View {
 
             // name
             Text(user.name ?? "—")
-                .font(.headline)
+                .font(.custom("ArialNova", size: 16))
+                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 .padding(.leading, 10)
-
             Spacer()
 
             // follow/following button
@@ -399,8 +415,8 @@ struct FollowingUserRowView: View {
                     vm.addFollowing(userId: user.id)
                 }
                 .padding(8)
-                .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen)
-                             .color(for: colorScheme))
+                .background(Color.green)
+                .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                 .cornerRadius(8)
             }
         }

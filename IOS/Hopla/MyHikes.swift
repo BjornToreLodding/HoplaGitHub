@@ -267,7 +267,7 @@ struct HeaderViewMyHikes: View {
     
     var body: some View {
         Text("My hikes")
-            .font(.title)
+            .font(.custom("ArialNova", size: 20))
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .frame(height: 40)

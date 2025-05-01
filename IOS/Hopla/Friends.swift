@@ -42,9 +42,6 @@ struct User: Identifiable, Decodable {
 }
 
 
-
-
-
 // MARK: - Post Model / Hikes (userHikes)
 struct Post: Identifiable, Decodable {
     var id: String
@@ -70,7 +67,7 @@ struct FriendsHeaderView: View {
     
     var body: some View {
         Text("My friends")
-            .font(.title)
+            .font(.custom("ArialNova", size: 20))
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .frame(height: 40)
@@ -79,6 +76,20 @@ struct FriendsHeaderView: View {
     }
 }
 
+// MARK: - Header
+struct AddFriendsHeaderView: View {
+    var colorScheme: ColorScheme
+    
+    var body: some View {
+        Text("Add new friends")
+            .font(.custom("ArialNova", size: 20))
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+            .foregroundColor(.white)
+    }
+}
 
 class FriendViewModel: ObservableObject {
     @Published var friends: [Friend] = []
@@ -307,6 +318,7 @@ struct FriendListView: View {
                 }
             }
         }
+        .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
     }
 }
 
@@ -336,9 +348,9 @@ struct FriendRowView: View {
             }
             
             Text(friend.name)
-                .font(.headline)
+                .font(.custom("ArialNova", size: 16))
                 .padding(.leading, 10)
-            
+                .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             Spacer()
         }
         .padding()
@@ -374,7 +386,7 @@ struct AddFriendPage: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                FriendsHeaderView(colorScheme: colorScheme)
+                AddFriendsHeaderView(colorScheme: colorScheme)
                 searchBar
                     .frame(maxWidth: .infinity)
                     .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
@@ -388,6 +400,7 @@ struct AddFriendPage: View {
                     }
                     .padding(.horizontal)
                 }
+                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
             }
             .onAppear {
                 vm.fetchAllUsers()
@@ -422,7 +435,8 @@ struct AddFriendPage: View {
                     ProfileImageView(urlString: user.profilePictureUrl)
 
                     Text(user.name ?? "No name")
-                        .font(.headline)
+                        .font(.custom("ArialNova", size: 16))
+                        .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         .padding(.leading, 10)
 
                     Spacer()
@@ -440,13 +454,13 @@ struct AddFriendPage: View {
                             Text(user.relationStatus == .pending ? "Pending" : "Add Friend")
                                 .padding(8)
                                 .background(user.relationStatus == .pending ? Color.orange : Color.green)
-                                .foregroundColor(.white)
+                                .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                                 .cornerRadius(8)
                         }
                     }
                 }
                 .padding()
-                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+                .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme)) //Correct
                 .shadow(radius: 2)
             }
         }

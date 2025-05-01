@@ -110,7 +110,7 @@ struct FriendRequests: View {
                         .color(for: colorScheme)
                         .frame(maxWidth: .infinity)
                     Text("Friend Requests")
-                        .font(.title2)
+                        .font(.custom("ArialNova", size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     HStack {

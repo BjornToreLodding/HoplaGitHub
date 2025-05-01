@@ -178,8 +178,8 @@ struct UserDetailsHeader: View {
     var body: some View {
         VStack {
             if let user = user {
-                Text(user.name)
-                    .font(.title)
+                Text(user.alias)
+                    .font(.custom("ArialNova", size: 20))
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
@@ -253,7 +253,15 @@ struct UserDetails: View {
                         .scaledToFill()
                         .frame(width: 200, height: 200)
                         .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white, lineWidth: 10))
+                        .overlay(
+                          Circle()
+                            .stroke(
+                              AdaptiveColor(light: .lightPostBackground,
+                                            dark:  .darkPostBackground)
+                                .color(for: colorScheme),
+                              lineWidth: 10
+                            )
+                        )
                         .padding(20)
                 } placeholder: {
                     Circle()

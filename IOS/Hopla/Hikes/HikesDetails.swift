@@ -19,10 +19,9 @@ struct HikesDetails: View {
                     
                     // Centered title
                     Text(hike.name)
-                        .font(.title2)
+                        .font(.custom("ArialNova", size: 20))
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
+                        .foregroundColor(.white)                    
                     // Leading back arrow
                     HStack {
                         Button {
@@ -253,7 +252,7 @@ struct HikeFiltersView: View {
                 let values = getValues(from: trailFilter, using: hikeFilter)
                 ForEach(values, id: \.self) { value in
                     Text(value)
-                        .font(.subheadline)
+                        .font(.custom("ArialNova", size: 20))
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
                         .background(Color.gray.opacity(0.2))
@@ -262,11 +261,6 @@ struct HikeFiltersView: View {
             }
         }
     }
-    
-    
-    
-    
-    
     
     // MARK: - Helpers
     

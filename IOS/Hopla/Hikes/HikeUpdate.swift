@@ -36,7 +36,7 @@ struct HikeUpdate: View {
                     
                     // Centered title
                     Text("Trail Updates")
-                        .font(.title2)
+                        .font(.custom("ArialNova", size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     

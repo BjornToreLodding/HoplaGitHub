@@ -63,7 +63,6 @@ struct Login: View {
                     .ignoresSafeArea() // Fill the entire screen
                 
                 //   GeometryReader { geometry in
-                
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack {
                         VStack(alignment: .center) {
@@ -75,11 +74,8 @@ struct Login: View {
                             
                             Text("Hopla")
                                 .font(.custom("GeorgiaPro-Black", size: 60))
-                            
                         }
                         .padding(.top, 130)
-                        
-                        
                         // MARK: - Text fields
                         
                         // Username TextField
@@ -113,8 +109,6 @@ struct Login: View {
                                     isShowingForgottenPassword = true // Show sheet
                                 }
                         }
-                        
-                        
                         .sheet(isPresented: $isShowingForgottenPassword, onDismiss: {
                             resetEmail() // Reset fields when closing
                         }) {
@@ -150,9 +144,7 @@ struct Login: View {
                                 .padding()
                             }
                             .padding()
-                        }
-                        
-                        
+                        }                      
                         // MARK: - Login
                         
                         Button(action: {

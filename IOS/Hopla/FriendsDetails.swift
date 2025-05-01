@@ -20,7 +20,6 @@ struct FriendInfo: Identifiable, Decodable {
     var createdAt: String?
     var dob: String? = nil
 
-
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -35,8 +34,6 @@ struct FriendInfo: Identifiable, Decodable {
         case dob
     }
 }
-
-
 
 class FriendDetailsViewModel: ObservableObject {
     @Published var friendDetails: FriendInfo?
@@ -124,8 +121,8 @@ struct FriendsDetailsHeader: View {
     var body: some View {
         VStack {
             if let friend = friend {
-                Text(friend.name)
-                    .font(.title)
+                Text(friend.alias)
+                    .font(.custom("ArialNova", size: 20))
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 40)
@@ -196,7 +193,15 @@ struct FriendsDetails: View {
                         .scaledToFill()
                         .frame(width: 200, height: 200)
                         .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white, lineWidth: 10))
+                        .overlay(
+                          Circle()
+                            .stroke(
+                              AdaptiveColor(light: .lightPostBackground,
+                                            dark:  .darkPostBackground)
+                                .color(for: colorScheme),
+                              lineWidth: 10
+                            )
+                        )
                         .padding(20)
                 } placeholder: {
                     Circle()

@@ -171,7 +171,7 @@ struct HorseDetails: View {
                 
                 // Centered Title
                 Text(name)
-                    .font(.title2)
+                    .font(.custom("ArialNova", size: 20))
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 

@@ -31,7 +31,7 @@ struct Settings: View {
                 .ignoresSafeArea(edges: .all)
             VStack(spacing: 0) {
                 Text("Settings")
-                    .font(.title)
+                    .font(.custom("ArialNova", size: 20))
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .center) // Aligns text to the right
                     .frame(height: 40)
@@ -208,9 +208,7 @@ struct Settings: View {
                 }
             }
         }
-    }
-
-    
+    } 
     
     // Custom Report Issue Form
     struct ReportIssueView: View {
@@ -301,4 +299,3 @@ struct Settings: View {
         }
     }
 }
-
