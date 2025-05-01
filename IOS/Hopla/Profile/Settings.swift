@@ -22,10 +22,8 @@ struct Settings: View {
     @State private var password = "" // Store the entered password
     @FocusState private var isPasswordFieldFocused: Bool // To auto-focus password field
     @State private var showReportSheet = false // Report
-    
     var viewModel: ProfileViewModel
-   
-    
+       
     var body: some View {
         ZStack {
             // Ensure the whole background is green

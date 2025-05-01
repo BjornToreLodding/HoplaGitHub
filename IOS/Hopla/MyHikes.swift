@@ -49,11 +49,40 @@ class MyHikeViewModel: ObservableObject {
         self.currentPage   = 1
         self.hasMorePages  = true
         self.myHikes       = []
-        self.fetchedIds.removeAll() 
+        self.fetchedIds.removeAll()
         fetchMyHikes()
-      }
+    }
     
     func fetchMyHikes() {
+        // For UITests
+        if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
+            // Build a stub from env vars, or fall back to defaults
+            let env = ProcessInfo.processInfo.environment
+            let id      = env["MOCK_HIKE_ID"]      ?? "hike1"
+            let title   = env["MOCK_HIKE_TITLE"]   ?? "Morning Hike"
+            let trail   = env["MOCK_HIKE_TRAIL"]   ?? "Sunny Trail"
+            let comment = env["MOCK_HIKE_COMMENT"] ?? "Great view"
+            let length  = Double(env["MOCK_HIKE_LENGTH"]  ?? "10.5") ?? 10.5
+            let dur     = Double(env["MOCK_HIKE_DURATION"] ?? "120")  ?? 120
+            
+            let stub = MyHike(
+                id: id,
+                trailName: trail,
+                trailId: nil,
+                length: length,
+                duration: dur,
+                pictureUrl: nil,
+                title: title,
+                comment: comment,
+                horseName: nil,
+                trailButton: false
+            )
+            DispatchQueue.main.async {
+                self.myHikes = [stub]
+                self.isLoading = false
+            }
+            return
+        }
         guard !isLoading else { return }
         guard hasMorePages else { return }
         
@@ -70,9 +99,9 @@ class MyHikeViewModel: ObservableObject {
           pageNumber=\(currentPage)
           &pageSize=\(pageSize)
           """
-          .replacingOccurrences(of: "\n", with: "")
-
-
+            .replacingOccurrences(of: "\n", with: "")
+        
+        
         print("📤 Final request URL:", urlString)
         
         guard let url = URL(string: urlString) else {
@@ -115,36 +144,33 @@ class MyHikeViewModel: ObservableObject {
             }
             
             do {
-                    let resp = try JSONDecoder().decode(MyHikeResponse.self, from: data)
-                    DispatchQueue.main.async {
-                      let page = resp.userHikes
-                      
-                      // Reverse the batch so within it newest→oldest
-                      let reversed = page.reversed()
-                      
-                      // Filter out anything whose id we've already inserted
-                      let newOnes = reversed.filter { self.fetchedIds.insert($0.id).inserted }
-
-                      if newOnes.isEmpty {
+                let resp = try JSONDecoder().decode(MyHikeResponse.self, from: data)
+                DispatchQueue.main.async {
+                    let page = resp.userHikes
+                    
+                    // Reverse the batch so within it newest→oldest
+                    let reversed = page.reversed()
+                    
+                    // Filter out anything whose id we've already inserted
+                    let newOnes = reversed.filter { self.fetchedIds.insert($0.id).inserted }
+                    
+                    if newOnes.isEmpty {
                         self.hasMorePages = false
-                      } else {
+                    } else {
                         if self.currentPage == 1 {
-                          self.myHikes = newOnes
+                            self.myHikes = newOnes
                         } else {
-                          self.myHikes.append(contentsOf: newOnes)
+                            self.myHikes.append(contentsOf: newOnes)
                         }
                         self.currentPage += 1
-                      }
                     }
-                  } catch {
-                    print("Decoding error:", error)
-                  }        }
+                }
+            } catch {
+                print("Decoding error:", error)
+            }        }
         .resume()
     }
 }
-
-
-
 
 // MARK: - MyHikes View
 struct MyHikes: View {
@@ -154,56 +180,85 @@ struct MyHikes: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // Custom header matches MyHorses
                 HeaderViewMyHikes(colorScheme: colorScheme)
-                
-                NavigationStack {
-                    ZStack {
-                        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
-                            .color(for: colorScheme)
-                            .edgesIgnoringSafeArea(.all)
-                        ScrollView {
-                            LazyVStack(spacing: 10) {
-                                ForEach(viewModel.myHikes.indices, id: \.self) { index in
-                                    let hike = viewModel.myHikes[index]
-                                    NavigationLink(destination: MyHikesDetails(hike: hike, myHikes: $viewModel.myHikes)) {
-                                        MyHikePostContainer(
-                                            trailName: hike.trailName,
-                                            title: hike.title,
-                                            imageName: hike.pictureUrl ?? "",
-                                            comment: hike.comment,
-                                            length: hike.length,
-                                            duration: hike.duration,
-                                            colorScheme: colorScheme
-                                        )
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                    .onAppear {
-                                        if index == viewModel.myHikes.count - 1 {
-                                            viewModel.fetchMyHikes()
-                                        }
-                                    }
-                                }
-                            }
-                            .padding()
-                            if viewModel.isLoading {
-                                ProgressView("Loading more hikes...")
-                                    .padding()
-                            }
-                        }
-                    }
-                }
-                .navigationBarBackButtonHidden(true)
+                hikesNavigation
             }
             .onAppear {
-                // only load if we haven’t already
                 if viewModel.myHikes.isEmpty {
                     viewModel.fetchMyHikes()
                 }
             }
-            // Custom back button overlay
             CustomBackButton(colorScheme: colorScheme)
         }
+        .accessibilityIdentifier("myhikes_screen_root")
+    }
+    
+    // 1) Pull the Navigation + list into its own small var
+    @ViewBuilder
+    private var hikesNavigation: some View {
+        NavigationStack {
+            ZStack {
+                // 2) Background
+                AdaptiveColor(light: .mainLightBackground,
+                              dark:  .mainDarkBackground)
+                    .color(for: colorScheme)
+                    .ignoresSafeArea()         // fill behind the header too
+
+                // 3) The ScrollView + LazyVStack
+                hikesScrollView
+            }
+            .frame(maxWidth: .infinity,
+                   maxHeight: .infinity)         // force the ZStack to fill
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+    
+    // 2) Background
+    private var contentBackground: some View {
+        AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+            .color(for: colorScheme)
+            .edgesIgnoringSafeArea(.all)
+    }
+    
+    // 3) The ScrollView + LazyVStack
+    @ViewBuilder
+    private var hikesScrollView: some View {
+        ScrollView {
+            LazyVStack(spacing: 10) {
+                ForEach(viewModel.myHikes) { hike in
+                    hikeLink(for: hike)
+                        .onAppear {
+                            if hike.id == viewModel.myHikes.last?.id {
+                                viewModel.fetchMyHikes()
+                            }
+                        }
+                }
+            }
+            .padding()
+            if viewModel.isLoading {
+                ProgressView("Loading more hikes…").padding()
+            }
+        }
+    }
+    
+    // 4) Extract each row into its own tiny function
+    private func hikeLink(for hike: MyHike) -> some View {
+        NavigationLink(
+            destination: MyHikesDetails(hike: hike, myHikes: $viewModel.myHikes)
+        ) {
+            MyHikePostContainer(
+                id:           hike.id,
+                trailName:    hike.trailName,
+                title:        hike.title,
+                imageName:    hike.pictureUrl ?? "",
+                comment:      hike.comment,
+                length:       hike.length,
+                duration:     hike.duration,
+                colorScheme:  colorScheme
+            )
+        }
+        .accessibilityIdentifier("myhike_\(hike.id)_navlink")
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -211,7 +266,7 @@ struct HeaderViewMyHikes: View {
     var colorScheme: ColorScheme
     
     var body: some View {
-        Text("My activity")
+        Text("My hikes")
             .font(.title)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
@@ -221,11 +276,9 @@ struct HeaderViewMyHikes: View {
     }
 }
 
-
-
-
 // MARK: - PostContainer View
 struct MyHikePostContainer: View {
+    let id: String
     var trailName: String
     var title: String
     var imageName: String
@@ -267,23 +320,28 @@ struct MyHikePostContainer: View {
             
             // Hike Details
             Text(title)
+                .accessibilityIdentifier("myhike_\(id)_title_label")
                 .font(.title)
                 .bold()
                 .padding(.bottom, 2)
             
             Text("Trail Name: \(trailName)")
+                .accessibilityIdentifier("myhike_\(id)_trail_label")
                 .font(.headline)
                 .padding(.bottom, 2)
             
             Text(comment)
+                .accessibilityIdentifier("myhike_\(id)_comment_label")
                 .font(.headline)
                 .padding(.top, 5)
             
             Text("Length: \(String(format: "%.2f", length)) km")
+                .accessibilityIdentifier("myhike_\(id)_length_label")
                 .font(.subheadline)
                 .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
             
             Text("Duration: \(String(format: "%02d.%02d", Int(duration) / 60, Int(duration) % 60)) min")
+                .accessibilityIdentifier("myhike_\(id)_duration_label")
         }
         .frame(maxWidth: .infinity)
         .padding()

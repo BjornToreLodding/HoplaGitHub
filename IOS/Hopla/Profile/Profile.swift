@@ -380,14 +380,16 @@ struct Profile: View {
 
                         // Navigation Buttons (unchanged)
                         HStack(spacing: 10) {
-                            NavigationLink(destination: MyHikes()) {
-                                Text("My activity")
+                            NavigationLink(destination: MyHikes()
+                                .environmentObject(MyHikeViewModel()) ) {
+                                Text("My hikes")
+                                    .accessibilityIdentifier("profile_myHikes_button")
                                     .font(.custom("ArialNova", size: 20))
                                     .frame(width: 180, height: 50)
                                     .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
                                     .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                             }
-                            
+                            .environmentObject(MyHikeViewModel())
                             NavigationLink(destination: MyHorses()) {
                                 Text("My horses")
                                     .font(.custom("ArialNova", size: 20))

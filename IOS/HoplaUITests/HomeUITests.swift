@@ -7,8 +7,7 @@
 import XCTest
 
 final class HomeUITests: XCTestCase {
-    var app: XCUIApplication!
-    
+    var app: XCUIApplication!    
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
@@ -18,7 +17,7 @@ final class HomeUITests: XCTestCase {
         app.launchEnvironment = [
             "MOCK_POST_ALIAS": "jane_doe",
             "MOCK_POST_TITLE": "Hello World",
-            "MOCK_POST_DESC":  "This is a stub post.",
+            "MOCK_POST_DESC": "This is a stub post.",
             "MOCK_POST_LIKES": "5"
         ]
         app.launch()

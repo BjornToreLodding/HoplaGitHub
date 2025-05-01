@@ -4,7 +4,6 @@
 //
 //  Created by Ane Marie Johnsen on 28/01/2025.
 //
-
 import SwiftUI
 import GoogleMaps
 import GooglePlaces
@@ -13,18 +12,12 @@ struct CreateHikeResponse: Decodable {
     let id: String
 }
 
-
 struct NewHike: View {
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject private var locationManager = LocationManager()
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var myHikeVM: MyHikeViewModel
     @State private var showSaveConfirmation = false
-
-    
-    
-    
-    
     @State private var isTracking = false
     @State private var elapsedTime: TimeInterval = 0
     @State private var distance: Double = 0.0
@@ -35,7 +28,6 @@ struct NewHike: View {
     @State private var filters: String = ""
     @State private var isPrivate: Bool = false
     @State private var selectedImage: UIImage? = nil
-    
     
     // For saving a new hike
     @State private var showPopup = false
@@ -72,7 +64,7 @@ struct NewHike: View {
                     
                     // ✅ Move .alert outside
                     .alert("Save or Fill in Details", isPresented: $showPopup) {
-                        Button("(Save) - not working") {
+                        Button("Save") {
                             saveHike {
                                 DispatchQueue.main.async {
                                     locationManager.elapsedTime = 0 // ✅ Reset elapsed time

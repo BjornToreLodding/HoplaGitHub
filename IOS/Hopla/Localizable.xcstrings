@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "(Save) - not working" : {
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Lagre) - virker ikke"
-          }
-        }
-      }
-    },
     "@%@" : {
 
     },
@@ -241,7 +231,14 @@
       }
     },
     "Comment" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommentar"
+          }
+        }
+      }
     },
     "Comment: %@" : {
       "localizations" : {
@@ -425,7 +422,14 @@
       }
     },
     "Details" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detaljer"
+          }
+        }
+      }
     },
     "Display" : {
       "localizations" : {
@@ -607,17 +611,6 @@
         }
       }
     },
-    "Enter your email" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv e-posten din"
-          }
-        }
-      }
-    },
     "Enter your email address to reset your password:" : {
       "localizations" : {
         "nb" : {
@@ -639,10 +632,24 @@
       }
     },
     "false" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nei"
+          }
+        }
+      }
     },
     "Favorite" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritt"
+          }
+        }
+      }
     },
     "Fill in Details" : {
       "localizations" : {
@@ -819,7 +826,14 @@
       }
     },
     "Horse" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hest"
+          }
+        }
+      }
     },
     "Horse Details" : {
       "localizations" : {
@@ -901,7 +915,14 @@
       }
     },
     "liked" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "likt"
+          }
+        }
+      }
     },
     "Loading filters..." : {
       "localizations" : {
@@ -923,12 +944,12 @@
         }
       }
     },
-    "Loading more hikes..." : {
+    "Loading more hikes…" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Laster flere løyper…"
+            "value" : "Laster flere turer…"
           }
         }
       }
@@ -1017,6 +1038,7 @@
       }
     },
     "My activity" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -1032,6 +1054,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mine venner"
+          }
+        }
+      }
+    },
+    "My hikes" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine turer"
           }
         }
       }
@@ -1137,7 +1169,14 @@
       }
     },
     "None" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen"
+          }
+        }
+      }
     },
     "Not a member? Sign up" : {
       "localizations" : {
@@ -1150,7 +1189,14 @@
       }
     },
     "not_liked" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ikke_likt"
+          }
+        }
+      }
     },
     "OK" : {
       "localizations" : {
@@ -1383,45 +1429,12 @@
         }
       }
     },
-    "Select Filters" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Velg filtere"
-          }
-        }
-      }
-    },
-    "Select Horse" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Velg hest"
-          }
-        }
-      }
-    },
     "Select Image" : {
       "localizations" : {
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Velg bilde"
-          }
-        }
-      }
-    },
-    "Selected Horse: %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Valgt hest: %@"
           }
         }
       }
@@ -1596,17 +1609,6 @@
         }
       }
     },
-    "Trail name: %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Løypenavn: %@"
-          }
-        }
-      }
-    },
     "Trail Name: %@" : {
       "localizations" : {
         "nb" : {
@@ -1628,10 +1630,24 @@
       }
     },
     "Trail: %@" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Løype: %@"
+          }
+        }
+      }
     },
     "true" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ja"
+          }
+        }
+      }
     },
     "Type a message…" : {
       "localizations" : {
@@ -1649,17 +1665,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppdatert: %@"
-          }
-        }
-      }
-    },
-    "Upgrade to Trail" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oppgrader til løype"
           }
         }
       }

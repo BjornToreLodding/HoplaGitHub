@@ -23,16 +23,26 @@ struct HoplaApp: App {
     @State private var navigationPath = NavigationPath()
     
     init() {
-        // If we were launched by UI tests asking to reset,
-                // clear the stored login flag so we always start at Login:
-                if CommandLine.arguments.contains("-UITest_ResetAuthentication") {
-                    UserDefaults.standard.removeObject(forKey: "isLoggedIn")
-                }
+        let args = CommandLine.arguments
         
-            // initial appearance (light)
-            setupTabBarAppearance(forDarkMode: isDarkMode)
-            setupNavigationBar(forDarkMode: isDarkMode)
+        // legacy reset-data tests used this one:
+        if args.contains("-UITest_ResetData") {
+          UserDefaults.standard.set(true, forKey: "isLoggedIn")
         }
+        // your new mode for profile/tests:
+        if args.contains("-UITestMode") {
+          UserDefaults.standard.set(true, forKey: "isLoggedIn")
+        }
+        
+        // your existing reset-auth cleanup
+        if args.contains("-UITest_ResetAuthentication") {
+          UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+          // keychain wipe…
+        }
+
+        setupTabBarAppearance(forDarkMode: isDarkMode)
+        setupNavigationBar(forDarkMode: isDarkMode)
+      }
     
     var body: some Scene {
         WindowGroup {
@@ -65,7 +75,7 @@ struct HoplaApp: App {
                 DispatchQueue.main.async {
                     setupTabBarAppearance(forDarkMode: isDarkMode)
                     setupNavigationBar(forDarkMode: isDarkMode)
-                  }
+                }
             }
             .onChange(of: isDarkMode) { newVal in
                 setupNavigationBar(forDarkMode: newVal)
@@ -96,19 +106,26 @@ struct MainTabView: View {
     @Binding var navigationPath: NavigationPath
     let isDarkMode: Bool
     
+    // Select the Hikes tab (index 1) when launched with -UITest_ResetData
+    @State private var selectedTab = ProcessInfo.processInfo.arguments.contains("-UITest_ResetData") ? 1 : 0
+    
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             NavigationStack { Home() }
                 .tabItem { Image(systemName: "house"); Text("Home") }
+                .tag(0)
             
-            NavigationStack { Hikes(viewModel: HikeService()) }
+            NavigationStack { Hikes(viewModel: HikeService.shared) }
                 .tabItem { Image(systemName: "map"); Text("Hikes") }
+                .tag(1)
             
             NavigationStack { NewHike() }
                 .tabItem { Image(systemName: "plus.circle"); Text("New Hike") }
+                .tag(2)
             
             NavigationStack { Community() }
                 .tabItem { Image(systemName: "person.2.circle"); Text("Community") }
+                .tag(3)
             
             NavigationStack {
                 Profile(profileViewModel: ProfileViewModel(),
@@ -116,6 +133,7 @@ struct MainTabView: View {
                         navigationPath: $navigationPath)
             }
             .tabItem { Image(systemName: "person"); Text("Profile") }
+            .tag(4)
         }
     }
 }

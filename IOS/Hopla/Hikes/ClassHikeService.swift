@@ -15,11 +15,15 @@ class HikeService: ObservableObject {
     private let session: URLSession
     
     init(session: URLSession = .shared) {
-        self.session = session
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "true" {
-          loadStubHikes()
-        }
+      self.session = session
+      let args      = ProcessInfo.processInfo.arguments
+      let envTest   = ProcessInfo.processInfo.environment["UITEST_MODE"] == "true"
+      let resetData = args.contains("-UITest_ResetData")
+      let resetAuth = args.contains("-UITest_ResetAuthentication")
+      if envTest || resetData || resetAuth {
+        loadStubHikes()
       }
+    }
     
     // MARK: – UITest stub flag & data
     private let isUITest: Bool = ProcessInfo.processInfo.environment["UITEST_MODE"] == "true"
@@ -27,22 +31,25 @@ class HikeService: ObservableObject {
     
     // Synchronously load “stubHikes.json” from the main bundle.
     private func loadStubHikes() {
-        guard
-            let url = Bundle.main.url(forResource: "stubHikes", withExtension: "json"),
-            let data = try? Data(contentsOf: url),
-            let response = try? JSONDecoder().decode(HikeResponse.self, from: data)
-        else {
-            print("⚠️ Couldn’t load stubHikes.json")
-            return
+        // 100 dummy hikes, index 0 named “Everest”
+        let generated = (0..<100).map { iii in
+            Hike(
+              id: "\(iii)",
+              name: iii == 0 ? "Everest"       : "Hike \(iii)",
+              pictureUrl: "",
+              averageRating: 0,
+              isFavorite: false,
+              distance: nil,
+              filters: nil
+            )
         }
-        stubbedHikes = response.trails
-        // Also publish them immediately so your view shows data on appear:
+        stubbedHikes = generated
+
         DispatchQueue.main.async {
-            self.hikes = response.trails
+            self.hikes = generated
         }
     }
-    
-    
+
     private let baseURL = "https://hopla.onrender.com/trails/all"
     private let locationBaseURL = "https://hopla.onrender.com/trails/list"
     private let favoriteBaseURL = "https://hopla.onrender.com/trails/favorites"
@@ -94,14 +101,17 @@ class HikeService: ObservableObject {
     // Function to fetch hikes based on page number
     func fetchHikes(page: Int, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
         // If in UITest, immediately return our stubbed data:
-        if isUITest {
+        let args = ProcessInfo.processInfo.arguments
+        let resetData = args.contains("-UITest_ResetData")
+        if isUITest || resetData {
             let perPage = 20
             let start = (page - 1) * perPage
             let slice = Array(stubbedHikes.dropFirst(start).prefix(perPage))
             let resp = HikeResponse(trails: slice,
                                     pageNumber: page,
                                     pageSize: slice.count)
-            DispatchQueue.main.async {
+            // simulate a slight network lag so your View’s `isLoading` spinner actually shows up
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 completion(.success(resp))
             }
             return
@@ -120,53 +130,53 @@ class HikeService: ObservableObject {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         session.dataTask(with: request) { data, response, error in
-                // 1) Network error first
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-
-                // 2) Cast to HTTPURLResponse so we can read statusCode
-                guard let httpResp = response as? HTTPURLResponse else {
-                    let err = NSError(
-                      domain: "HikeService",
-                      code: -1,
-                      userInfo: [NSLocalizedDescriptionKey: "Invalid response"]
-                    )
-                    completion(.failure(err))
-                    return
-                }
-
-                // 3) If not 2xx, immediately fail with that code
-                guard (200...299).contains(httpResp.statusCode) else {
-                    let err = NSError(
-                      domain: "HikeService",
-                      code: httpResp.statusCode,
-                      userInfo: [NSLocalizedDescriptionKey: HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)]
-                    )
-                    completion(.failure(err))
-                    return
-                }
-
-                // 4) Now it’s safe to decode JSON
-                guard let data = data else {
-                    let err = NSError(
-                      domain: "HikeService",
-                      code: -1,
-                      userInfo: [NSLocalizedDescriptionKey: "No data received"]
-                    )
-                    completion(.failure(err))
-                    return
-                }
-
-                do {
-                    let decoded = try JSONDecoder().decode(HikeResponse.self, from: data)
-                    completion(.success(decoded))
-                } catch {
-                    completion(.failure(error))
-                }
+            // 1) Network error first
+            if let error = error {
+                completion(.failure(error))
+                return
             }
-            .resume()    }
+            
+            // 2) Cast to HTTPURLResponse so we can read statusCode
+            guard let httpResp = response as? HTTPURLResponse else {
+                let err = NSError(
+                    domain: "HikeService",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Invalid response"]
+                )
+                completion(.failure(err))
+                return
+            }
+            
+            // 3) If not 2xx, immediately fail with that code
+            guard (200...299).contains(httpResp.statusCode) else {
+                let err = NSError(
+                    domain: "HikeService",
+                    code: httpResp.statusCode,
+                    userInfo: [NSLocalizedDescriptionKey: HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)]
+                )
+                completion(.failure(err))
+                return
+            }
+            
+            // 4) Now it’s safe to decode JSON
+            guard let data = data else {
+                let err = NSError(
+                    domain: "HikeService",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "No data received"]
+                )
+                completion(.failure(err))
+                return
+            }
+            
+            do {
+                let decoded = try JSONDecoder().decode(HikeResponse.self, from: data)
+                completion(.success(decoded))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        .resume()    }
     // New function to fetch hikes based on user's location (lat and long)
     func fetchHikesByLocation(latitude: Double, longitude: Double, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
         guard let token = TokenManager.shared.getToken() else {

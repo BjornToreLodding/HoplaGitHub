@@ -59,6 +59,7 @@ struct FilterContentView: View {
     private func mapOrListView() -> some View {
         if isMapViewActive {
             HikeMapView(hikes: $viewModel.hikes)
+                .accessibilityIdentifier("HikesMapView")
         } else {
             List(hikes) { hike in
                 HikeCard(
@@ -192,6 +193,7 @@ struct FilterBarView: View {
                         .bold()
                         .padding()
                 }
+                .accessibilityIdentifier("HikesToggleMapButton")
             }
         }
         .frame(width: 420, height: 30)

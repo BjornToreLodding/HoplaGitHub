@@ -16,16 +16,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, CLLocationManagerDelegate {
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        // 0) If running under UI tests, clear defaults & keychain:
+      ) -> Bool {
         let args = ProcessInfo.processInfo.arguments
+
+        // 0a) If running under UI tests, force “logged in” _before_ SwiftUI boots:
+        if args.contains("-UITestMode") {
+          UserDefaults.standard.set(true, forKey: "isLoggedIn")
+        }
+
+        // 0b) If tests requested a full reset, clear it:
         if args.contains("-UITest_ResetAuthentication") {
-            UserDefaults.standard.removeObject(forKey: "isLoggedIn")
-            do {
-                try Keychain(service: "com.yourcompany.Hopla").removeAll()
-            } catch {
-                print("⚠️ Could not clear keychain: \(error)")
-            }
+          UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+          do {
+            try Keychain(service: "com.yourcompany.Hopla").removeAll()
+          } catch {
+            print("⚠️ Could not clear keychain: \(error)")
+          }
         }
         // 1) Google Maps setup
         GMSServices.provideAPIKey("AIzaSyC-2qlkvP8M1pgfnRMG0rr76SlxaI6jzwQ")

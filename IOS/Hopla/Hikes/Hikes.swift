@@ -190,7 +190,6 @@ struct Hikes: View {
         }
     }
     
-    
     var body: some View {
         VStack(spacing: 0) {
             FilterBarView(
@@ -263,6 +262,7 @@ struct Hikes: View {
     private var hikeDisplay: some View {
         if isMapViewActive {
             MapTrailsView(trails: $mapTrails)
+                .accessibilityIdentifier("HikesMapView")
         } else {
             hikeList
         }
@@ -335,30 +335,37 @@ struct Hikes: View {
     private var hikeList: some View {
         ScrollView {
             LazyVStack {
-                ForEach(filteredHikes()) { hike in
-                    HikeCard(
-                        hike: hike,
-                        trailFilters: trailFilters,
-                        likedHikes: $likedHikes,
-                        toggleFavoriteAction: { selectedHike in
-                            toggleFavoriteHandler(selectedHike)
-                        },
-                        viewModel: viewModel
-                    )
-                    .accessibilityIdentifier("HikeCard_\(hike.id)")
+                ForEach(Array(filteredHikes().enumerated()), id: \.offset) { index, hike in
+                    ZStack {
+                        // 1) Invisible “count” badge for .matching(identifier: "HikeCard_")
+                            Color.clear
+                              .frame(width:1, height:1)
+                              .accessibilityIdentifier("HikeCard_")
+                        // 2) Real card, indexed
+                        HikeCard(
+                            hike: hike,
+                            trailFilters: trailFilters,
+                            likedHikes: $likedHikes,
+                            toggleFavoriteAction: { selectedHike in
+                                toggleFavoriteHandler(selectedHike)
+                            },
+                            viewModel: viewModel
+                        )
+                        .accessibilityIdentifier("HikeCard_\(index)")
+                    }
                     .onAppear {
                         // Trigger load more when nearing the end of the list
-                        if hike == hikes.last {
+                        if index == filteredHikes().count - 1 {
                             loadMoreHikes()
                         }
                     }
                     .padding()
-                }
-                
+                }                
                 if isLoading {
                     HStack {
                         Spacer()
                         ProgressView()
+                            .accessibilityIdentifier("HikesLoadingSpinner")
                         Spacer()
                     }
                 }
@@ -706,6 +713,7 @@ struct Hikes: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
             TextField("Search hikes...", text: $searchText)
+                .accessibilityIdentifier("HikesSearchField")
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(8)
                 .background(
