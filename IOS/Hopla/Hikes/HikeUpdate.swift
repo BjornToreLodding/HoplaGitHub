@@ -4,7 +4,6 @@
 //
 //  Created by Ane Marie Johnsen on 26/02/2025.
 //
-
 import SwiftUI
 
 // MARK: - Model for Trail Update
@@ -24,7 +23,6 @@ struct HikeUpdate: View {
     @State private var trailUpdates: [TrailUpdate] = []
     @State private var isLoading = false
     var trailId: String // Pass the trailId
-
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -33,13 +31,11 @@ struct HikeUpdate: View {
                     AdaptiveColor(light: .lightGreen, dark: .darkGreen)
                         .color(for: colorScheme)
                         .frame(maxWidth: .infinity)
-                    
                     // Centered title
                     Text("Trail Updates")
                         .font(.custom("ArialNova", size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                    
                     // Leading back arrow
                     HStack {
                         Button(action: { dismiss() }) {
@@ -50,7 +46,7 @@ struct HikeUpdate: View {
                                 .foregroundStyle(
                                     AdaptiveColor(light: .lightModeTextOnGreen,
                                                   dark: .darkModeTextOnGreen)
-                                        .color(for: colorScheme)
+                                    .color(for: colorScheme)
                                 )
                         }
                         Spacer()
@@ -58,7 +54,6 @@ struct HikeUpdate: View {
                     .padding(.horizontal, 16)
                 }
                 .frame(height: 40)
-                
                 // ─── Scrollable Content ───────────────────────────────
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
@@ -116,6 +111,7 @@ struct HikeUpdate: View {
         .onAppear(perform: fetchTrailUpdates)
     }
     
+    // Fetch trail updates
     private func fetchTrailUpdates() {
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found")
@@ -159,4 +155,3 @@ private func formatDate(from isoString: String) -> String {
     }
     return "Unknown Date"
 }
-

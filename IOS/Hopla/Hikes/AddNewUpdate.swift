@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 11/04/2025.
 //
-
 import SwiftUI
 
+// Struct to add a new update to a trail
 struct AddNewUpdateView: View {
     let trailId: String  // Pass the trailId from HikesDetails
     @Environment(\.presentationMode) var presentationMode
@@ -15,8 +15,7 @@ struct AddNewUpdateView: View {
     @State private var image: UIImage?
     @State private var isUploading = false
     @State private var showImagePicker = false
-    
-    let conditions = ["Ukjent", "Bra", "Vått", "Møkkette", "Farlig", "Blokkert"]
+    let conditions = ["Ukjent", "Bra", "Vått", "Møkkette", "Farlig", "Blokkert"] // The different conditions
     
     var body: some View {
         VStack(spacing: 16) {
@@ -67,6 +66,7 @@ struct AddNewUpdateView: View {
         }
     }
     
+    // Function to submit an update - POST request
     func submitUpdate() {
         guard !message.isEmpty else { return }
         guard let token = TokenManager.shared.getToken() else {
@@ -74,7 +74,7 @@ struct AddNewUpdateView: View {
             return
         }
         isUploading = true
-
+        
         guard let url = URL(string: "https://hopla.onrender.com/trails/review") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -82,10 +82,10 @@ struct AddNewUpdateView: View {
         let boundary = UUID().uuidString
         request.setValue("multipart/form-data; boundary=\(boundary)",
                          forHTTPHeaderField: "Content-Type")
-
+        
         var body = Data()
         let lineBreak = "\r\n"
-
+        
         // 1) Image part (if any)
         if let imageData = image?.jpegData(compressionQuality: 0.8) {
             body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
@@ -94,27 +94,27 @@ struct AddNewUpdateView: View {
             body.append(imageData)
             body.append("\(lineBreak)".data(using: .utf8)!)
         }
-
+        
         // 2) TrailId
         body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"TrailId\"\(lineBreak)\(lineBreak)".data(using: .utf8)!)
         body.append("\(trailId)\(lineBreak)".data(using: .utf8)!)
-
+        
         // 3) Message
         body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"Message\"\(lineBreak)\(lineBreak)".data(using: .utf8)!)
         body.append("\(message)\(lineBreak)".data(using: .utf8)!)
-
+        
         // 4) Condition
         let conditionIndex = conditions.firstIndex(of: selectedCondition) ?? 0
         body.append("--\(boundary)\(lineBreak)".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"Condition\"\(lineBreak)\(lineBreak)".data(using: .utf8)!)
         body.append("\(conditionIndex)\(lineBreak)".data(using: .utf8)!)
-
+        
         // Close
         body.append("--\(boundary)--\(lineBreak)".data(using: .utf8)!)
         request.httpBody = body
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 isUploading = false

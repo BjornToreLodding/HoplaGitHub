@@ -10,6 +10,7 @@ import Foundation
 import CoreLocation
 import GoogleMaps
 
+// To decode the data
 struct AnyDecodable: Decodable {
     let value: Any
     
@@ -73,7 +74,6 @@ enum FilterOption: String, CaseIterable, Identifiable {
 }
 
 // MARK: - The filters of the hikes
-
 struct TrailFilter: Identifiable, Codable {
     let id: String
     let name: String
@@ -90,6 +90,7 @@ enum FilterType: String, Codable {
     case int = "Int"
 }
 
+// To decode the filters
 enum FilterValue: Codable {
     case string(String)
     case stringArray([String])
@@ -97,7 +98,6 @@ enum FilterValue: Codable {
     case bool(Bool)  // Added the bool case
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        
         if let array = try? container.decode([String].self) {
             self = .stringArray(array)
         } else if let string = try? container.decode(String.self) {
@@ -126,17 +126,15 @@ enum FilterValue: Codable {
     }
 }
 
+// The trails displayed on the map
 struct MapTrail: Codable, Identifiable {
     let id: String
     let name: String
     let latMean: Double?
     let longMean: Double?
-    
-    // If you want properties with more intuitive names:
     var latitude: Double? { latMean }
     var longitude: Double? { longMean }
 }
-
 
 //MARK: - To view hikes on a map
 struct HikeMapView: View {
@@ -172,7 +170,7 @@ struct Hikes: View {
     @State private var isMapViewActive: Bool = false
     @State private var mapTrails: [MapTrail] = []
     
-    
+    // To "heart"/like a trail
     private var toggleFavoriteHandler: (Hike) -> Void {
         { hike in
             viewModel.toggleFavorite(for: hike) { success in
@@ -200,7 +198,6 @@ struct Hikes: View {
             )
             .accessibilityIdentifier("HikesFilterBar")
             searchBar
-            
             if isShowingFilterOptions {
                 FilterContentView(
                     filter:                 selectedFilter,
@@ -216,7 +213,6 @@ struct Hikes: View {
                     viewModel:              viewModel
                 )
             }
-            
             if isLoading && hikes.isEmpty {
                 ProgressView("Loading Hikes...")
                     .padding()
@@ -258,6 +254,7 @@ struct Hikes: View {
         .navigationBarHidden(true)
     }
     
+    // To display the trails either in list or map form
     @ViewBuilder
     private var hikeDisplay: some View {
         if isMapViewActive {
@@ -268,6 +265,7 @@ struct Hikes: View {
         }
     }
     
+    // Fetch trail filters
     func fetchTrailFilters() {
         trailFilters = TrailFilter.allDefaults
     }
@@ -275,14 +273,14 @@ struct Hikes: View {
     // This function returns only the hikes that match every filter in selectedOptions.
     func filterHikesLocally(selectedOptions: [String: Any], hikes: [Hike]) -> [Hike] {
         return hikes.filter { hike in
-            // Ensure that for every filter in selectedOptions, the hike's filters array contains a matching value.
+            // Ensure that for every filter in selectedOptions, the hike's filters array contains a matching value
             guard let hikeFilters = hike.filters else {
                 return false
             }
             
             // For each selected option key/value in the dictionary:
             for (key, selectedValue) in selectedOptions {
-                // Find the hike filter with the matching name (case-insensitive).
+                // Find the hike filter with the matching name (case-insensitive)
                 guard let filter = hikeFilters.first(where: { $0.name.lowercased() == key.lowercased() }) else {
                     // If the hike does not even have that filter, consider it a non-match.
                     return false
@@ -290,7 +288,7 @@ struct Hikes: View {
                 
                 // Depending on the type of selectedValue, check for a match:
                 if let selectedStr = selectedValue as? String {
-                    // For enum filters: split the filter's value (which might be comma separated)
+                    // For enum filters: split the filter's value
                     let values = filter.value
                         .split(separator: ",")
                         .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
@@ -298,7 +296,7 @@ struct Hikes: View {
                         return false
                     }
                 } else if let selectedSet = selectedValue as? Set<String> {
-                    // For multiEnum filters: check that at least one of the selected options is included.
+                    // For multiEnum filters: check that at least one of the selected options is included
                     let values = filter.value
                         .split(separator: ",")
                         .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
@@ -309,7 +307,7 @@ struct Hikes: View {
                         return false
                     }
                 } else if let selectedBool = selectedValue as? Bool {
-                    // Convert filter's value (as string) to a Bool by comparing with "true".
+                    // Convert filter's value (as string) to a Bool by comparing with "true"
                     let filterBool = (filter.value.lowercased() == "true")
                     if filterBool != selectedBool {
                         return false
@@ -320,27 +318,26 @@ struct Hikes: View {
                     }
                 }
             }
-            // If every selected option is satisfied, then include this hike.
+            // If every selected option is satisfied, then include this hike
             return true
         }
     }
     
-    
+    // Apply the filters
     private func applySelectedFilters() {
-        // Apply logic here
         print("Filters applied: \(selectedOptions)")
-        // You might want to refilter hikes based on selectedOptions
     }
     
+    // The list of trails
     private var hikeList: some View {
         ScrollView {
             LazyVStack {
                 ForEach(Array(filteredHikes().enumerated()), id: \.offset) { index, hike in
                     ZStack {
                         // 1) Invisible “count” badge for .matching(identifier: "HikeCard_")
-                            Color.clear
-                              .frame(width:1, height:1)
-                              .accessibilityIdentifier("HikeCard_")
+                        Color.clear
+                            .frame(width:1, height:1)
+                            .accessibilityIdentifier("HikeCard_")
                         // 2) Real card, indexed
                         HikeCard(
                             hike: hike,
@@ -360,7 +357,7 @@ struct Hikes: View {
                         }
                     }
                     .padding()
-                }                
+                }
                 if isLoading {
                     HStack {
                         Spacer()
@@ -390,7 +387,7 @@ struct Hikes: View {
         }
     }
     
-    
+    // To like/unlike a trail
     private func toggleFavorite(for hike: Hike) {
         if let index = likedHikes.firstIndex(of: hike.id) {
             likedHikes.remove(at: index)
@@ -421,8 +418,7 @@ struct Hikes: View {
                 ForEach(trailFilters) { filter in
                     VStack(alignment: .leading) {
                         Text(filter.displayName).bold()
-                        
-                        switch filter.type {
+                        switch filter.type { // Switch for the different filters
                         case .bool:
                             Toggle(isOn: Binding(
                                 get: {
@@ -434,7 +430,6 @@ struct Hikes: View {
                             )) {
                                 Text("Yes")
                             }
-                            
                         case .enumType:
                             SwiftUI.Picker("Choose", selection: Binding(
                                 get: {
@@ -449,7 +444,6 @@ struct Hikes: View {
                                 }
                             }
                             .pickerStyle(SegmentedPickerStyle())
-                            
                         case .multiEnum:
                             VStack(alignment: .leading) {
                                 ForEach(filter.options, id: \.self) { option in
@@ -470,7 +464,6 @@ struct Hikes: View {
                                     ))
                                 }
                             }
-                            
                         case .int:
                             Stepper(
                                 value: Binding(
@@ -499,9 +492,9 @@ struct Hikes: View {
                 // Apply Filters button.
                 Button("Apply Filters") {
                     print("Selected Options: \(selectedOptions.wrappedValue)")
-                    // Call the apply action (this may use your network call or local filter)
+                    // Call the apply action
                     applyAction()
-                    // Dismiss the dropdown view.
+                    // Dismiss the dropdown view
                     isShowing.wrappedValue = false
                 }
                 .padding()
@@ -571,18 +564,13 @@ struct Hikes: View {
                               let hike1Long = hike1.longitude,
                               let hike2Lat = hike2.latitude,
                               let hike2Long = hike2.longitude else { return false }
-                        
                         let hike1Location = CLLocation(latitude: hike1Lat, longitude: hike1Long)
                         let hike2Location = CLLocation(latitude: hike2Lat, longitude: hike2Long)
-                        
                         let distance1 = location.distance(from: hike1Location)
                         let distance2 = location.distance(from: hike2Location)
-                        
                         print("📏 Hike 1 Distance:", distance1, "📏 Hike 2 Distance:", distance2) // ✅ Debug distance calculations
-                        
                         return distance1 < distance2 // ✅ Sort by proximity
                     }
-                    
                     self.canLoadMore = false // No pagination for location-based fetch
                 case .failure(let error):
                     print("❌ Error fetching hikes by location:", error.localizedDescription)
@@ -590,15 +578,11 @@ struct Hikes: View {
                 self.isLoading = false
             })
         }
-        
     }
-    
-    
     
     private func fetchFavoriteHikes(page: Int, pageSize: Int = 20) {
         guard !isLoading else { return }
         isLoading = true
-        
         HikeService.shared.fetchFavoriteHikes(page: page, pageSize: pageSize) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -623,6 +607,7 @@ struct Hikes: View {
         fetchFavoriteHikes(page: currentPage)
     }
     
+    // To fetch more trails
     private func fetchAllHikesIfNeeded() {
         guard !isLoading else { return }
         isLoading = true
@@ -650,13 +635,12 @@ struct Hikes: View {
                 }
             }
         }
-        
         loadNextPage()
     }
     
+    // Fetch more trails
     private func loadMoreHikes() {
         guard !isLoading && canLoadMore else { return }
-        
         switch selectedFilter {
         case .map:
             fetchHikes()
@@ -680,9 +664,8 @@ struct Hikes: View {
     }
     
     // MARK: - Filtering
-    
     private func filteredHikes() -> [Hike] {
-        // Start with all hikes.
+        // Start with all hikes
         var filtered = hikes
         
         // First, filter by search text (if any).
@@ -692,7 +675,7 @@ struct Hikes: View {
             }
         }
         
-        // Optionally, if using the heart filter you might filter for favorites.
+        // If using the heart filter, filter for favorites
         if selectedFilter == .heart {
             filtered = filtered.filter { $0.isFavorite }
         }
@@ -701,13 +684,10 @@ struct Hikes: View {
         if !selectedOptions.isEmpty {
             filtered = filterHikesLocally(selectedOptions: selectedOptions, hikes: filtered)
         }
-        
         return filtered
     }
     
-    
     // MARK: - UI
-    
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -727,6 +707,7 @@ struct Hikes: View {
 }
 // swiftlint:enable type_body_length
 
+// The filters from the database
 private extension TrailFilter {
     static let allDefaults: [TrailFilter] = [
         TrailFilter(
@@ -849,11 +830,9 @@ private extension TrailFilter {
     ]
 }
 
-
 // MARK: - Star Rating With Tap Gesture
 struct StarRating: View {
     @Binding var rating: Int  // Use a Binding to allow changes
-    
     var body: some View {
         HStack {
             ForEach(1...5, id: \.self) { index in

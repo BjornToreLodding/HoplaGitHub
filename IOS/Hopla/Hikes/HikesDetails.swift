@@ -1,13 +1,12 @@
 import SwiftUI
 
+// Struct to display a trail's details
 struct HikesDetails: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colorScheme
     let hike: Hike
     let trailFilters: [TrailFilter]
-    
     @State private var userRating: Int = 0
-    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -21,7 +20,7 @@ struct HikesDetails: View {
                     Text(hike.name)
                         .font(.custom("ArialNova", size: 20))
                         .fontWeight(.bold)
-                        .foregroundColor(.white)                    
+                        .foregroundColor(.white)
                     // Leading back arrow
                     HStack {
                         Button {
@@ -34,7 +33,7 @@ struct HikesDetails: View {
                                 .foregroundStyle(
                                     AdaptiveColor(light: .lightModeTextOnGreen,
                                                   dark: .darkModeTextOnGreen)
-                                        .color(for: colorScheme)
+                                    .color(for: colorScheme)
                                 )
                         }
                         Spacer()
@@ -42,34 +41,29 @@ struct HikesDetails: View {
                     .padding(.horizontal, 16)
                 }
                 .frame(height: 40)
-                
                 // ─── Scrollable Content ────────────────────────────────────
                 ScrollView {
                     VStack(spacing: 16) {
-                        // 2. Image
+                        // Image
                         HikeImageView(hike: hike)
-                        
-                        // 3. Filters
+                        // Filters
                         HikeFiltersView(hike: hike, trailFilters: trailFilters)
-                        
-                        // 4. Buttons
+                        // Buttons
                         HikeButtonsView(hike: hike)
-                        
-                        // 5. Description
+                        // Description
                         Text("Description of trail")
                             .frame(width: 370, height: 70)
                             .background(
                                 AdaptiveColor(light: .lightPostBackground,
                                               dark:  .darkPostBackground)
-                                    .color(for: colorScheme)
+                                .color(for: colorScheme)
                             )
                             .foregroundStyle(
                                 AdaptiveColor(light: .textLightBackground,
                                               dark:  .textDarkBackground)
-                                    .color(for: colorScheme)
+                                .color(for: colorScheme)
                             )
-                        
-                        // 6. Rating
+                        // Rating
                         VStack {
                             HStack {
                                 Text("Rating:")
@@ -91,15 +85,14 @@ struct HikesDetails: View {
                         .background(
                             AdaptiveColor(light: .lightPostBackground,
                                           dark:  .darkPostBackground)
-                                .color(for: colorScheme)
+                            .color(for: colorScheme)
                         )
                         .foregroundStyle(
                             AdaptiveColor(light: .textLightBackground,
                                           dark:  .textDarkBackground)
-                                .color(for: colorScheme)
+                            .color(for: colorScheme)
                         )
-                        
-                        // 8. Update box
+                        // Update box
                         NavigationLink(destination: HikeUpdate(trailId: hike.id)) {
                             Text("View Updates")
                                 .frame(maxWidth: .infinity)
@@ -107,16 +100,15 @@ struct HikesDetails: View {
                                 .background(
                                     AdaptiveColor(light: .lightGreen,
                                                   dark:  .darkGreen)
-                                        .color(for: colorScheme)
+                                    .color(for: colorScheme)
                                 )
                                 .foregroundStyle(
                                     AdaptiveColor(light: .lightModeTextOnGreen,
                                                   dark:  .darkModeTextOnGreen)
-                                        .color(for: colorScheme)
+                                    .color(for: colorScheme)
                                 )
                                 .cornerRadius(8)
                         }
-                        
                         Spacer()
                     }
                     .padding(.top)
@@ -128,23 +120,19 @@ struct HikesDetails: View {
                 .background(
                     AdaptiveColor(light: .mainLightBackground,
                                   dark:  .mainDarkBackground)
-                        .color(for: colorScheme)
+                    .color(for: colorScheme)
                 )
             }
             .navigationBarBackButtonHidden(true)
         }
     }
 }
-    
 
-
-
+// The custom back-button at the top left
 struct CustomBackButtonHikesDetails: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
-    
     var colorScheme: ColorScheme
-    
     var body: some View {
         VStack {
             HStack {
@@ -165,12 +153,9 @@ struct CustomBackButtonHikesDetails: View {
     }
 }
 
-
-
 // Image section
 struct HikeImageView: View {
     let hike: Hike
-    
     var body: some View {
         ZStack {
             AsyncImage(url: URL(string: hike.pictureUrl)) { phase in
@@ -195,12 +180,11 @@ struct HikeImageView: View {
     }
 }
 
-
+// To display the filters of the trail
 struct HikeFiltersView: View {
     @Environment(\.colorScheme) var colorScheme
     let hike: Hike
     let trailFilters: [TrailFilter]
-    
     var body: some View {
         ZStack {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -231,12 +215,11 @@ struct HikeFiltersView: View {
         )
     }
     
-    
+    // To display every single filter in a box
     private var filterChips: some View {
         let matchingFilters: [(TrailFilter, HikeFilter)] = {
             guard let hikeFilters = hike.filters else { return [] }
             
-            // ✅ You can print here
             print("Hike filters:", hikeFilters.map { $0.id })
             print("Trail filters:", trailFilters.map { $0.id })
             
@@ -246,7 +229,6 @@ struct HikeFiltersView: View {
                 }
             }
         }()
-        
         return Group {
             ForEach(matchingFilters.filter { shouldDisplay($0.0) }, id: \.0.id) { (trailFilter, hikeFilter) in
                 let values = getValues(from: trailFilter, using: hikeFilter)
@@ -263,7 +245,6 @@ struct HikeFiltersView: View {
     }
     
     // MARK: - Helpers
-    
     /// Only show "Difficulty" and "SurfaceType" filters
     private func shouldDisplay(_ filter: TrailFilter) -> Bool {
         let ignored = ["Custom13", "Custom14"]
@@ -277,30 +258,23 @@ struct HikeFiltersView: View {
             return hikeFilter.value
                 .split(separator: ",")
                 .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
-            
         case .enumType:
             return [hikeFilter.value]
-            
         case .bool:
             if hikeFilter.value.lowercased() == "true" {
                 return [trailFilter.displayName]
             }
-            
         case .int:
             return ["\(trailFilter.displayName): \(hikeFilter.value)"]
         }
-        
         return []
     }
 }
 
-
-// Hikes button
+// Hikes buttons
 struct HikeButtonsView: View {
     @Environment(\.colorScheme) var colorScheme
-    
     let hike: Hike
-    
     var body: some View {
         HStack(alignment: .center) {
             NavigationLink(destination: StartHike()) {
@@ -309,7 +283,6 @@ struct HikeButtonsView: View {
             }
             .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
             .foregroundStyle(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-            
             NavigationLink(destination: AddNewUpdateView(trailId: hike.id)) {
                 Text("New update")
                     .frame(width: 120, height: 50)
@@ -321,9 +294,9 @@ struct HikeButtonsView: View {
     }
 }
 
+// The rating
 struct StarsView: View {
     let rating: Int
-    
     var body: some View {
         HStack(spacing: 4) {
             ForEach(1...5, id: \.self) { index in
@@ -334,9 +307,9 @@ struct StarsView: View {
     }
 }
 
+// To rate a trail
 struct StarsPicker: View {
     @Binding var rating: Int
-    
     var body: some View {
         HStack(spacing: 4) {
             ForEach(1...5, id: \.self) { index in

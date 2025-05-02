@@ -4,43 +4,43 @@
 //
 //  Created by Ane Marie Johnsen on 04/03/2025.
 //
-
 import Foundation
 import SwiftUI
 import KeychainAccess
 
+// Class with the http requests for logging in
 class LoginViewModel: ObservableObject {
     @Published var errorMessage: String?
-        @Published var successMessage: String?
-        @Published var isLoggedIn: Bool = false
-        @Published var userProfile: UserProfile?
-        
-        private let loginUrl = "https://hopla.onrender.com/users/login/"
-        private let registerUrl = "https://hopla.onrender.com/users/register"
-        private let changePasswordUrl = "https://hopla.onrender.com/users/change-password"
-        
-        struct LoginRequest: Codable {
-            let email: String
-            let password: String
-        }
-        
-        struct LoginResponse: Codable {
-            let token: String
-            let userId: String
-            let name: String?
-            let alias: String?
-            let pictureUrl: String?
-            let telephone: String?
-            let description: String?
-            let dob: DOB?
-            let redirect: String?
-        }
+    @Published var successMessage: String?
+    @Published var isLoggedIn: Bool = false
+    @Published var userProfile: UserProfile?
+    
+    private let loginUrl = "https://hopla.onrender.com/users/login/"
+    private let registerUrl = "https://hopla.onrender.com/users/register"
+    private let changePasswordUrl = "https://hopla.onrender.com/users/change-password"
+    
+    struct LoginRequest: Codable {
+        let email: String
+        let password: String
+    }
+    
+    struct LoginResponse: Codable {
+        let token: String
+        let userId: String
+        let name: String?
+        let alias: String?
+        let pictureUrl: String?
+        let telephone: String?
+        let description: String?
+        let dob: DOB?
+        let redirect: String?
+    }
     
     // For XCTest
     private let session: URLSession
-        init(session: URLSession = .shared) {
-            self.session = session
-        }
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
     
     // MARK: - Register a New User
     
@@ -51,7 +51,7 @@ class LoginViewModel: ObservableObject {
             return
         }
         
-        // Note: The registration endpoint expects keys "Email" and "Password" per your example.
+        // Register email and password
         let registerData: [String: Any] = [
             "Email": email,
             "Password": password
@@ -102,7 +102,6 @@ class LoginViewModel: ObservableObject {
     }
     
     // MARK: - Login Existing User
-    
     func login(email: String, password: String) {
         guard let url = URL(string: loginUrl) else {
             DispatchQueue.main.async { self.errorMessage = "Invalid login URL" }
@@ -135,10 +134,10 @@ class LoginViewModel: ObservableObject {
                 do {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .iso8601
-
+                    
                     let loginResponse = try decoder.decode(LoginResponse.self, from: data)
                     print("Login Response Description:", loginResponse.description ?? "No description in response")
-
+                    
                     DispatchQueue.main.async {
                         TokenManager.shared.saveToken(loginResponse.token)
                         TokenManager.shared.saveUserDescription(loginResponse.description)
@@ -162,7 +161,6 @@ class LoginViewModel: ObservableObject {
     }
     
     // MARK: - Logout
-    
     func logout() {
         TokenManager.shared.deleteToken()
         DispatchQueue.main.async {
@@ -171,8 +169,7 @@ class LoginViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Fetch User Profile
-    
+    // MARK: - Fetch User Profile    
     func fetchUserProfile() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -227,56 +224,56 @@ class LoginViewModel: ObservableObject {
     
     //MARK: - Change password
     func changePassword(oldPassword: String, newPassword: String, confirmPassword: String) async {
-            guard let token = TokenManager.shared.getToken() else {
-                DispatchQueue.main.async {
-                    self.errorMessage = "User token not available."
-                }
-                return
+        guard let token = TokenManager.shared.getToken() else {
+            DispatchQueue.main.async {
+                self.errorMessage = "User token not available."
             }
-            
-            guard let url = URL(string: changePasswordUrl) else {
-                DispatchQueue.main.async {
-                    self.errorMessage = "Invalid change password URL."
-                }
-                return
+            return
+        }
+        
+        guard let url = URL(string: changePasswordUrl) else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Invalid change password URL."
             }
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = [
+            "OldPassword": oldPassword,
+            "NewPassword": newPassword,
+            "ConfirmPassword": confirmPassword
+        ]
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            request.httpBody = jsonData
             
-            var request = URLRequest(url: url)
-            request.httpMethod = "PUT"
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            let body: [String: Any] = [
-                "OldPassword": oldPassword,
-                "NewPassword": newPassword,
-                "ConfirmPassword": confirmPassword
-            ]
-            
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
-                request.httpBody = jsonData
-                
-                let (data, response) = try await URLSession.shared.data(for: request)
-                
-                if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
-                    DispatchQueue.main.async {
-                        self.successMessage = "Password changed successfully!"
-                        self.errorMessage = nil
-                    }
-                } else {
-                    let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
-                    DispatchQueue.main.async {
-                        self.errorMessage = "Password change failed: \(errorMsg)"
-                        self.successMessage = nil
-                    }
-                }
-            } catch {
+            if let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) {
                 DispatchQueue.main.async {
-                    self.errorMessage = "Error: \(error.localizedDescription)"
+                    self.successMessage = "Password changed successfully!"
+                    self.errorMessage = nil
+                }
+            } else {
+                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                DispatchQueue.main.async {
+                    self.errorMessage = "Password change failed: \(errorMsg)"
                     self.successMessage = nil
                 }
             }
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = "Error: \(error.localizedDescription)"
+                self.successMessage = nil
+            }
         }
+    }
     
     //MARK: - Change email
     func changeEmail(newEmail: String, password: String) async {
@@ -378,7 +375,7 @@ class LoginViewModel: ObservableObject {
             }
         }
     }
-
+    
     // MARK: - Delete (Soft Delete) User
     func deleteUser(password: String) async {
         guard let token = TokenManager.shared.getToken() else {

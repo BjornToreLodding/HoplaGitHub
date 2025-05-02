@@ -15,14 +15,14 @@ class HikeService: ObservableObject {
     private let session: URLSession
     
     init(session: URLSession = .shared) {
-      self.session = session
-      let args      = ProcessInfo.processInfo.arguments
-      let envTest   = ProcessInfo.processInfo.environment["UITEST_MODE"] == "true"
-      let resetData = args.contains("-UITest_ResetData")
-      let resetAuth = args.contains("-UITest_ResetAuthentication")
-      if envTest || resetData || resetAuth {
-        loadStubHikes()
-      }
+        self.session = session
+        let args      = ProcessInfo.processInfo.arguments
+        let envTest   = ProcessInfo.processInfo.environment["UITEST_MODE"] == "true"
+        let resetData = args.contains("-UITest_ResetData")
+        let resetAuth = args.contains("-UITest_ResetAuthentication")
+        if envTest || resetData || resetAuth {
+            loadStubHikes()
+        }
     }
     
     // MARK: – UITest stub flag & data
@@ -34,26 +34,28 @@ class HikeService: ObservableObject {
         // 100 dummy hikes, index 0 named “Everest”
         let generated = (0..<100).map { iii in
             Hike(
-              id: "\(iii)",
-              name: iii == 0 ? "Everest"       : "Hike \(iii)",
-              pictureUrl: "",
-              averageRating: 0,
-              isFavorite: false,
-              distance: nil,
-              filters: nil
+                id: "\(iii)",
+                name: iii == 0 ? "Everest"       : "Hike \(iii)",
+                pictureUrl: "",
+                averageRating: 0,
+                isFavorite: false,
+                distance: nil,
+                filters: nil
             )
         }
         stubbedHikes = generated
-
+        
         DispatchQueue.main.async {
             self.hikes = generated
         }
     }
-
+    
     private let baseURL = "https://hopla.onrender.com/trails/all"
     private let locationBaseURL = "https://hopla.onrender.com/trails/list"
     private let favoriteBaseURL = "https://hopla.onrender.com/trails/favorites"
     private let relationBaseURL = "https://hopla.onrender.com/trails/relations"
+    
+    // Function to fetch all trail filters
     func fetchTrailFilters() {
         guard let url = URL(string: "https://hopla.onrender.com/trailfilters/all") else { return }
         session.dataTask(with: url) { data, response, error in
@@ -69,6 +71,8 @@ class HikeService: ObservableObject {
             }
         }.resume()
     }
+    
+    // Apply the filters
     func applySelectedFilters() {
         var urlComponents = URLComponents(string: "https://hopla.onrender.com/hikes")! // Example endpoint
         urlComponents.queryItems = selectedOptions.map { key, value in
@@ -98,9 +102,10 @@ class HikeService: ObservableObject {
             }
         }.resume()
     }
+    
     // Function to fetch hikes based on page number
     func fetchHikes(page: Int, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
-        // If in UITest, immediately return our stubbed data:
+        // If in UITest, immediately return the stubbed data:
         let args = ProcessInfo.processInfo.arguments
         let resetData = args.contains("-UITest_ResetData")
         if isUITest || resetData {
@@ -110,7 +115,7 @@ class HikeService: ObservableObject {
             let resp = HikeResponse(trails: slice,
                                     pageNumber: page,
                                     pageSize: slice.count)
-            // simulate a slight network lag so your View’s `isLoading` spinner actually shows up
+            // simulate a slight network lag so the View’s `isLoading` spinner actually shows up
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 completion(.success(resp))
             }
@@ -168,7 +173,6 @@ class HikeService: ObservableObject {
                 completion(.failure(err))
                 return
             }
-            
             do {
                 let decoded = try JSONDecoder().decode(HikeResponse.self, from: data)
                 completion(.success(decoded))
@@ -292,7 +296,7 @@ class HikeService: ObservableObject {
     }
     func toggleFavorite(for hike: Hike, completion: @escaping (Bool) -> Void) {
         if isUITest {
-            // immediately succeed and update our published array
+            // immediately succeed and update the published array
             DispatchQueue.main.async {
                 if let idx = self.stubbedHikes.firstIndex(where: { $0.id == hike.id }) {
                     self.stubbedHikes[idx].isFavorite.toggle()
@@ -306,7 +310,7 @@ class HikeService: ObservableObject {
             }
             return
         }
-        let isFavoriting = !hike.isFavorite // ✅ Correct toggle behavior
+        let isFavoriting = !hike.isFavorite
         guard let url = URL(string: "https://hopla.onrender.com/trails/favorite") else {
             completion(false)
             return
@@ -337,7 +341,6 @@ class HikeService: ObservableObject {
                     if let responseData = data {
                         print("Raw API response:", String(data: responseData, encoding: .utf8) ?? "No response body")
                     }
-                    
                     completion((200...299).contains(httpResponse.statusCode))
                 } else {
                     completion(false)
@@ -347,7 +350,6 @@ class HikeService: ObservableObject {
     }
     
     //MARK: - To fetch coordinates and show on map
-    
     func fetchTrailsForMap(latitude: Double, longitude: Double, zoomLevel: Int, completion: @escaping ([MapTrail]) -> Void) {
         guard let token = TokenManager.shared.getToken() else {
             print("❌ No token found")

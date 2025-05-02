@@ -17,7 +17,6 @@ extension Color {
     }
     
     // MARK: - Custom Colors
-    
     // Details in brown
     static let lightBrown = Color(hex: "745e4d") // Light
     static let darkBrown = Color(hex: "493d2f") // Dark
@@ -41,7 +40,6 @@ extension Color {
     // Text colors if green background
     static let lightModeTextOnGreen = Color(hex: "FFFFFF") // Text on Light background
     static let darkModeTextOnGreen = Color(hex: "FFFFFF") // Text on Dark background
-    
 }
 
 // MARK: - Adaptive Colors for Light/Dark Mode
@@ -95,7 +93,7 @@ func setupNavigationBar(forDarkMode darkMode: Bool) {
     appearance.titleTextAttributes   = [.foregroundColor: titleColor]
     appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
     
-    // 3) Remove shadow if you like
+    // 3) Remove shadow
     appearance.shadowColor = nil
     
     // 4) Apply it everywhere
@@ -110,20 +108,18 @@ func setupNavigationBar(forDarkMode darkMode: Bool) {
     UINavigationBar.appearance().tintColor = titleColor
 }
 
-
 // MARK: - Tab Bar Colors
 func setupTabBarAppearance(forDarkMode darkMode: Bool) {
     let appearance = UITabBarAppearance()
     appearance.configureWithOpaqueBackground()
     
-    // 1) Background
-    // dynamic background
-      let dynamicBG = UIColor { traits in
+    // 1) Background - dynamic background
+    let dynamicBG = UIColor { traits in
         traits.userInterfaceStyle == .dark
-          ? UIColor(Color.darkGreen)    // make sure you have a UIColor init for your SwiftUI Color
-          : UIColor(Color.lightGreen)
-      }
-      appearance.backgroundColor = dynamicBG
+        ? UIColor(Color.darkGreen)
+        : UIColor(Color.lightGreen)
+    }
+    appearance.backgroundColor = dynamicBG
     
     // 2) Selected vs. unselected colors
     let selectedColor   = darkMode ? UIColor.black : UIColor.black
@@ -131,9 +127,9 @@ func setupTabBarAppearance(forDarkMode darkMode: Bool) {
     
     // Apply to all the item layouts
     let layouts = [
-      appearance.stackedLayoutAppearance,
-      appearance.inlineLayoutAppearance,
-      appearance.compactInlineLayoutAppearance
+        appearance.stackedLayoutAppearance,
+        appearance.inlineLayoutAppearance,
+        appearance.compactInlineLayoutAppearance
     ]
     for layout in layouts {
         layout.selected.iconColor             = selectedColor
@@ -142,7 +138,7 @@ func setupTabBarAppearance(forDarkMode darkMode: Bool) {
         layout.normal.titleTextAttributes     = [.foregroundColor: unselectedColor]
     }
     
-    // 3) Tint fallback (just in case)
+    // 3) Tint fallback
     UITabBar.appearance().tintColor = selectedColor
     
     // 4) Install

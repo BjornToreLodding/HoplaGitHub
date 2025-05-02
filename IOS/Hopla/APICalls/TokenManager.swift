@@ -4,10 +4,10 @@
 //
 //  Created by Ane Marie Johnsen on 04/03/2025.
 //
-
 import Foundation
 import KeychainSwift
 
+// Class to retrieve, store and save user token
 class TokenManager {
     static let shared = TokenManager() // Singleton instance
     
@@ -25,7 +25,6 @@ class TokenManager {
         //print("Retrieved Token:", token ?? "nil")
         return token
     }
-    
     
     // Delete the stored token
     func deleteToken() {
@@ -75,8 +74,6 @@ class TokenManager {
         }
     }
     
-    
-    
     // Get the userId from the decoded token
     func getUserId() -> String? {
         guard let decodedToken = decodeToken() else {
@@ -101,18 +98,17 @@ class TokenManager {
     
     private let descriptionKey = "userDescription"
     
+    // Save user description
     func saveUserDescription(_ description: String?) {
         if let description = description {
             UserDefaults.standard.set(description, forKey: "userDescription") // Persist description
-            UserDefaults.standard.synchronize() // Force save (optional)
+            UserDefaults.standard.synchronize() // Force save
             print("Saved Description in UserDefaults:", description)
         } else {
             print("No description received to store")
         }
     }
-
-
-    
+    // Get user description
     func getUserDescription() -> String? {
         let storedDescription = UserDefaults.standard.string(forKey: "userDescription") // Retrieve stored value
         print("Retrieved Description from UserDefaults:", storedDescription ?? "No description stored")
