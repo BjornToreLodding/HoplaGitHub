@@ -1,4 +1,3 @@
-
 // MARK: - Hike Model
 struct Hike: Codable, Identifiable, Equatable {
     let id: String
@@ -37,22 +36,17 @@ struct Hike: Codable, Identifiable, Equatable {
         // If latMean/longMean are missing, attempt to decode from raw keys
         if latitude == nil || longitude == nil {
             let raw = try decoder.singleValueContainer().decode([String: AnyDecodable].self)
-
             if let lat = raw["latitude"]?.value as? Double {
                 latitude = lat
             }
-
             if let lon = raw["longitude"]?.value as? Double {
                 longitude = lon
             }
         }
     }
-
-
-    // Custom encoding below
+    // Custom encoding
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encodeIfPresent(description, forKey: .description)
@@ -61,7 +55,6 @@ struct Hike: Codable, Identifiable, Equatable {
         try container.encode(isFavorite, forKey: .isFavorite)
         try container.encodeIfPresent(distance, forKey: .distance)
         try container.encodeIfPresent(filters, forKey: .filters)
-
         try container.encodeIfPresent(latitude, forKey: .latMean)
         try container.encodeIfPresent(longitude, forKey: .longMean)
     }

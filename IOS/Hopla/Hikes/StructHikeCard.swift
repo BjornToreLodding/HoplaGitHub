@@ -7,12 +7,10 @@ import GoogleMaps
 struct HikeCard: View {
     let hike: Hike
     let trailFilters: [TrailFilter]
-    
     @Binding var likedHikes: [String]
     var toggleFavoriteAction: (Hike) -> Void
-    @ObservedObject var viewModel: HikeService  // This works now
+    @ObservedObject var viewModel: HikeService
     @Environment(\.colorScheme) var colorScheme
-    
     var body: some View {
         NavigationLink(destination: HikesDetails(hike: hike, trailFilters: trailFilters)) {
             VStack(alignment: .leading, spacing: 8) {
@@ -89,6 +87,7 @@ struct HikeCard: View {
         }
     }
     
+    // Toggle favorite trails
     private func toggleFavorite(for hike: Hike) {
         if let index = likedHikes.firstIndex(of: hike.id) {
             likedHikes.remove(at: index)
@@ -97,6 +96,7 @@ struct HikeCard: View {
         }
     }
     
+    // Display the true/false values from code to yes/no in app
     private func displayValue(for filter: HikeFilter) -> String {
         if filter.type == "Bool" {
             return filter.value.lowercased() == "true" ? "Yes" : "No"

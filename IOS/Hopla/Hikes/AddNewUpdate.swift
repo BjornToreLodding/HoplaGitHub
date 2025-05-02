@@ -70,7 +70,7 @@ struct AddNewUpdateView: View {
     func submitUpdate() {
         guard !message.isEmpty else { return }
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token")
+            print("No token")
             return
         }
         isUploading = true
@@ -119,14 +119,14 @@ struct AddNewUpdateView: View {
             DispatchQueue.main.async {
                 isUploading = false
                 if let error = error {
-                    print("❌ Failed to upload:", error)
+                    print("Failed to upload:", error)
                     return
                 }
                 guard let http = response as? HTTPURLResponse else {
-                    print("❌ No HTTP response")
+                    print("No HTTP response")
                     return
                 }
-                print("📡 Status code:", http.statusCode)
+                print("Status code:", http.statusCode)
                 if (200...299).contains(http.statusCode) {
                     presentationMode.wrappedValue.dismiss()
                 } else {

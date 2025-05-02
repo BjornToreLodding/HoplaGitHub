@@ -122,13 +122,13 @@ class HikeService: ObservableObject {
             return
         }
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
+            print("No token found")
             completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unauthorized - No Token"])))
             return
         }
         let urlString = "\(baseURL)?pageNumber=\(page)&pageSize=20"
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return
         }
         var request = URLRequest(url: url)
@@ -184,13 +184,13 @@ class HikeService: ObservableObject {
     // New function to fetch hikes based on user's location (lat and long)
     func fetchHikesByLocation(latitude: Double, longitude: Double, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
+            print("No token found")
             completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unauthorized - No Token"])))
             return
         }
         let urlString = "\(locationBaseURL)?latitude=\(latitude)&longitude=\(longitude)"
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return
         }
         var request = URLRequest(url: url)
@@ -198,7 +198,7 @@ class HikeService: ObservableObject {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         session.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("❌ Request error:", error.localizedDescription)
+                print("Request error:", error.localizedDescription)
                 completion(.failure(error))
                 return
             }
@@ -209,7 +209,7 @@ class HikeService: ObservableObject {
             do {
                 // Print the raw JSON data to inspect it
                 if let jsonString = String(data: data, encoding: .utf8) {
-                    print("📜 Raw JSON Data:\n", jsonString)
+                    print("Raw JSON Data:\n", jsonString)
                 }
                 // Decode the response into TrailsResponse
                 let decodedResponse = try JSONDecoder().decode(HikeResponse.self, from: data)
@@ -217,7 +217,7 @@ class HikeService: ObservableObject {
                     completion(.success(decodedResponse)) // Pass the decoded response to the completion handler
                 }
             } catch {
-                print("❌ Error decoding hikes: \(error.localizedDescription)")
+                print("Error decoding hikes: \(error.localizedDescription)")
                 completion(.failure(error)) // Pass error if decoding fails
             }
         }.resume() }
@@ -232,12 +232,12 @@ class HikeService: ObservableObject {
             DispatchQueue.main.async { completion(.success(resp)) }
             return }
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
+            print("No token found")
             completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unauthorized - No Token"])))
             return }
         let urlString = "\(favoriteBaseURL)?pagenumber=\(page)&pagesize=\(20)"
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -263,13 +263,13 @@ class HikeService: ObservableObject {
     }
     func fetchRelationHikes(page: Int, pageSize: Int, completion: @escaping (Result<HikeResponse, Error>) -> Void) {
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
+            print("No token found")
             completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unauthorized - No Token"])))
             return
         }
         let urlString = "\(relationBaseURL)?friends=true&following=true&pagenumber=\(page)&pagesize=\(pageSize)"
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return
         }
         var request = URLRequest(url: url)
@@ -352,12 +352,12 @@ class HikeService: ObservableObject {
     //MARK: - To fetch coordinates and show on map
     func fetchTrailsForMap(latitude: Double, longitude: Double, zoomLevel: Int, completion: @escaping ([MapTrail]) -> Void) {
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
+            print("No token found")
             return
         }
         let urlString = "https://hopla.onrender.com/trails/map?latitude=\(latitude)&longitude=\(longitude)&zoomlevel=\(zoomLevel)"
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return
         }
         var request = URLRequest(url: url)
@@ -365,23 +365,23 @@ class HikeService: ObservableObject {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         session.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("❌ Error fetching map trails: \(error.localizedDescription)")
+                print("Error fetching map trails: \(error.localizedDescription)")
                 return
             }
             guard let data = data else {
-                print("❌ No data received")
+                print("No data received")
                 return
             }
             do {
                 if let jsonString = String(data: data, encoding: .utf8) {
-                    print("📜 Raw Map JSON Data:\n", jsonString)
+                    print("Raw Map JSON Data:\n", jsonString)
                 }
                 let mapTrails = try JSONDecoder().decode([MapTrail].self, from: data)
                 DispatchQueue.main.async {
                     completion(mapTrails)
                 }
             } catch {
-                print("❌ Error decoding map trails: \(error.localizedDescription)")
+                print("Error decoding map trails: \(error.localizedDescription)")
                 completion([])
             }
         }.resume()

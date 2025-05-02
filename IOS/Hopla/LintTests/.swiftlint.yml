@@ -1,37 +1,52 @@
-
+# swiftlint configuration file
 disabled_rules:
-  - trailing_whitespace
-  - vertical_whitespace             # disallow warnings about blank lines
-  - vertical_whitespace_between_cases
-  - blank_lines                     # controls max blank lines in a row
-  - horizontal_whitespace           # warnings about spaces around operators, etc.
+  - trailing_whitespace               # don’t warn about spaces at ends of lines
+  - vertical_whitespace               # disable general blank‐line warnings
+  - vertical_whitespace_between_cases # allow blank lines between switch cases
+  - blank_lines                       # don’t enforce max blank lines in a row
+  - horizontal_whitespace             # ignore spacing around operators, etc.
+
 opt_in_rules:
-- empty_count
-- empty_string
+  - empty_count   # warn if calling .count on an empty collection (use isEmpty)
+  - empty_string  # warn if comparing strings to "" (use isEmpty)
+
 excluded:
-- Carthage
-- Pods
-- SwiftLint/Common/3rdPartyLib
+  - Carthage                     # skip linting Carthage checkouts
+  - Pods                          # skip CocoaPods dependencies
+  - SwiftLint/Common/3rdPartyLib  # skip third‐party SwiftLint helpers
+
+# Maximum allowed length of a line
 line_length:
-    warning: 150
-    error: 200
-    ignores_function_declarations: true
-    ignores_comments: true
-    ignores_urls: true
+  warning: 150                    # emit warning if line exceeds 150 characters
+  error: 200                      # emit error if line exceeds 200 characters
+  ignores_function_declarations: true # ignore long lines in function signatures
+  ignores_comments: true              # ignore long comment lines
+  ignores_urls: true                  # ignore long URLs
+
+# Maximum number of lines in a function body
 function_body_length:
-    warning: 400
-    error: 500
+  warning: 400                    # warning threshold
+  error: 500                      # error threshold
+
+# Maximum number of parameters per function
 function_parameter_count:
-    warning: 6
-    error: 8
+  warning: 6                      # warn if more than 6 parameters
+  error: 8                        # error if more than 8 parameters
+
+# Maximum number of lines in a type (class/struct/enum)
 type_body_length:
-    warning: 400
-    error: 500
+  warning: 400                    # warning threshold
+  error: 500                      # error threshold
+
+# Maximum number of lines in a file
 file_length:
-    warning: 1000
-    error: 1500
-    ignore_comment_only_lines: true
+  warning: 1000                   # warning threshold
+  error: 1500                     # error threshold
+  ignore_comment_only_lines: true # don’t count lines that only have comments
+
+# Maximum allowed cyclomatic complexity per function
 cyclomatic_complexity:
-    warning: 15
-    error: 25
-reporter: "xcode"
+  warning: 15                     # warn if complexity > 15
+  error: 25                       # error if complexity > 25
+
+reporter: "xcode"  # output results in Xcode‐friendly format

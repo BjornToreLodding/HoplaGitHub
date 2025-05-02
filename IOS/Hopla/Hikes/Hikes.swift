@@ -145,7 +145,7 @@ struct HikeMapView: View {
         MapContainerView(hikes: hikes, locationManager: locationManager)
             .edgesIgnoringSafeArea(.all)
             .onAppear {
-                print("🗺️ HikeMapView appeared with \(hikes.count) hikes")
+                print("HikeMapView appeared with \(hikes.count) hikes")
             }
     }
 }
@@ -373,7 +373,7 @@ struct Hikes: View {
     //MARK: - Loading trails on map
     func loadTrailsOnMap() {
         guard let location = locationManager.userLocation else {
-            print("❌ User location is nil in loadTrailsOnMap")
+            print("User location is nil in loadTrailsOnMap")
             return
         }
         
@@ -382,7 +382,7 @@ struct Hikes: View {
             longitude: location.coordinate.longitude,
             zoomLevel: 14
         ) { mapResults in
-            print("✅ Fetched \(mapResults.count) trails for map")
+            print("Fetched \(mapResults.count) trails for map")
             self.mapTrails = mapResults  // Assign to mapTrails (of type [MapTrail])
         }
     }
@@ -521,7 +521,7 @@ struct Hikes: View {
                     currentPage += 1
                     canLoadMore = !response.trails.isEmpty
                 case .failure(let error):
-                    print("❌ Error fetching friend hikes: \(error.localizedDescription)")
+                    print("Error fetching friend hikes: \(error.localizedDescription)")
                 }
                 isLoading = false
             }
@@ -544,7 +544,7 @@ struct Hikes: View {
                     currentPage += 1
                     canLoadMore = !response.trails.isEmpty
                 case .failure(let error):
-                    print("❌ Error fetching hikes:", error.localizedDescription)
+                    print("Error fetching hikes:", error.localizedDescription)
                 }
                 isLoading = false
             }
@@ -568,12 +568,12 @@ struct Hikes: View {
                         let hike2Location = CLLocation(latitude: hike2Lat, longitude: hike2Long)
                         let distance1 = location.distance(from: hike1Location)
                         let distance2 = location.distance(from: hike2Location)
-                        print("📏 Hike 1 Distance:", distance1, "📏 Hike 2 Distance:", distance2) // ✅ Debug distance calculations
-                        return distance1 < distance2 // ✅ Sort by proximity
+                        print("📏 Hike 1 Distance:", distance1, "📏 Hike 2 Distance:", distance2) // Debug distance calculations
+                        return distance1 < distance2 // Sort by proximity
                     }
                     self.canLoadMore = false // No pagination for location-based fetch
                 case .failure(let error):
-                    print("❌ Error fetching hikes by location:", error.localizedDescription)
+                    print("Error fetching hikes by location:", error.localizedDescription)
                 }
                 self.isLoading = false
             })
@@ -592,7 +592,7 @@ struct Hikes: View {
                     currentPage += 1
                     canLoadMore = !response.trails.isEmpty
                 case .failure(let error):
-                    print("❌ Error fetching favorite hikes:", error.localizedDescription)
+                    print("Error fetching favorite hikes:", error.localizedDescription)
                 }
                 isLoading = false
             }
@@ -629,7 +629,7 @@ struct Hikes: View {
                             loadNextPage()
                         }
                     case .failure(let error):
-                        print("❌ Error fetching all hikes: \(error.localizedDescription)")
+                        print("Error fetching all hikes: \(error.localizedDescription)")
                         isLoading = false
                     }
                 }
@@ -646,10 +646,10 @@ struct Hikes: View {
             fetchHikes()
         case .location:
             if let location = userLocation {
-                print("📍 Fetching hikes by user location")
+                print("Fetching hikes by user location")
                 fetchHikesByLocation(location)
             } else {
-                print("❌ User location is nil!")
+                print("User location is nil!")
             }
         case .heart:
             fetchAllHikesIfNeeded()

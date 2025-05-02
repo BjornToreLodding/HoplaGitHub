@@ -114,11 +114,11 @@ struct HikeUpdate: View {
     // Fetch trail updates
     private func fetchTrailUpdates() {
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
+            print("No token found")
             return
         }
         guard let url = URL(string: "https://hopla.onrender.com/trails/updates?trailId=\(trailId)") else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return
         }
         isLoading = true
@@ -129,7 +129,7 @@ struct HikeUpdate: View {
         URLSession.shared.dataTask(with: request) { data, response, error in
             defer { DispatchQueue.main.async { self.isLoading = false } }
             if let error = error {
-                print("❌ Error fetching trail updates:", error.localizedDescription)
+                print("Error fetching trail updates:", error.localizedDescription)
                 return
             }
             if let data = data {
@@ -137,7 +137,7 @@ struct HikeUpdate: View {
                     let updates = try JSONDecoder().decode([TrailUpdate].self, from: data)
                     DispatchQueue.main.async { self.trailUpdates = updates }
                 } catch {
-                    print("❌ Failed to decode trail updates:", error.localizedDescription)
+                    print("Failed to decode trail updates:", error.localizedDescription)
                 }
             }
         }.resume()
