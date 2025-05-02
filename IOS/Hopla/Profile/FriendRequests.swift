@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 11/04/2025.
 //
-
 import SwiftUI
 
+// Struct for friend requests
 struct FriendRequest: Identifiable, Decodable {
     var id: String
     var fromUserId: String
@@ -14,6 +14,7 @@ struct FriendRequest: Identifiable, Decodable {
     var fromUserName: String
 }
 
+// Class for fetching requests and handle action
 class FriendRequestViewModel: ObservableObject {
     @Published var friendRequests: [FriendRequest] = []
     
@@ -67,12 +68,10 @@ class FriendRequestViewModel: ObservableObject {
         case .block:
             url = "https://hopla.onrender.com/userrelations/block/\(request.id)"
         }
-        
         guard let requestUrl = URL(string: url) else {
             print("Invalid URL")
             return
         }
-        
         var urlRequest = URLRequest(url: requestUrl)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -82,7 +81,6 @@ class FriendRequestViewModel: ObservableObject {
                 print("Error with the action: \(error.localizedDescription)")
                 return
             }
-            
             DispatchQueue.main.async {
                 // Remove the friend request from the list after performing the action
                 self.friendRequests.removeAll { $0.id == request.id }
@@ -92,10 +90,12 @@ class FriendRequestViewModel: ObservableObject {
     }
 }
 
+// The different enum values for requests
 enum FriendAction {
     case add, decline, block
 }
 
+// The friend request page
 struct FriendRequests: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colorScheme
@@ -130,7 +130,6 @@ struct FriendRequests: View {
                     .padding(.horizontal, 16)
                 }
                 .frame(height: 40)
-                
                 // List of requests
                 ScrollView {
                     VStack(spacing: 12) {
@@ -196,4 +195,3 @@ struct FriendRequests: View {
         }
     }
 }
-

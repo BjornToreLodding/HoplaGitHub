@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 12/02/2025.
 //
-
 import UIKit
 
+// To select either photo from library or camera
 enum Picker {
     enum Source: String {
         case library

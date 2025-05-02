@@ -1,5 +1,6 @@
 import SwiftUI
 
+// Struct to change password
 struct ChangePassword: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var isShowingSheet = false // When clicking on text
@@ -8,9 +9,9 @@ struct ChangePassword: View {
     @State private var confirmPassword = ""
     @State private var localErrorMessage = ""
     
-    // We inject the view model so that we can call changePassword.
+    // Inject the view model so that we can call changePassword
     @ObservedObject var loginViewModel: LoginViewModel
-
+    
     var body: some View {
         VStack {
             Text("Change password")
@@ -56,7 +57,7 @@ struct ChangePassword: View {
                             await loginViewModel.changePassword(oldPassword: oldPassword,
                                                                 newPassword: newPassword,
                                                                 confirmPassword: confirmPassword)
-                            // Optionally, you could check if errorMessage is still nil
+                            // Check if errorMessage is still nil
                             if loginViewModel.errorMessage == nil {
                                 isShowingSheet = false
                             } else {

@@ -4,17 +4,17 @@
 //
 //  Created by Ane Marie Johnsen on 28/01/2025.
 //
-
 import SwiftUI
 import PhotosUI // To select photos
 import UIKit
 import Foundation
 
+// struct for Date Of Birth
 public struct DOB: Codable {
     var year: Int
     var month: Int
     var day: Int
-
+    
     enum CodingKeys: String, CodingKey {
         case year = "year"
         case month = "month"
@@ -22,7 +22,7 @@ public struct DOB: Codable {
     }
 }
 
-
+// User profile struct
 public struct UserProfile: Codable {
     var alias: String?
     var name: String?
@@ -31,7 +31,7 @@ public struct UserProfile: Codable {
     var telephone: String?
     var description: String?
     var dob: DOB?
-
+    
     enum CodingKeys: String, CodingKey {
         case alias = "alias"
         case name = "name"
@@ -43,42 +43,41 @@ public struct UserProfile: Codable {
     }
 }
 
-// 1) Define an update‐only struct
+// An update‐only struct
 struct UpdateUserDto: Encodable {
-  var alias: String
-  var name:  String
-  var email: String
-  var telephone:   String?
-  var description: String?
-  var year:  Int?
-  var month: Int?
-  var day:   Int?
-
-  enum CodingKeys: String, CodingKey {
-    case alias, name, email, telephone, description, year, month, day
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var ccc = encoder.container(keyedBy: CodingKeys.self)
-    try ccc.encode(alias, forKey: .alias)
-    try ccc.encode(name, forKey: .name)
-    try ccc.encode(email, forKey: .email)
-    if let tel = telephone, !tel.isEmpty {
-      try ccc.encode(tel, forKey: .telephone)
+    var alias: String
+    var name:  String
+    var email: String
+    var telephone:   String?
+    var description: String?
+    var year:  Int?
+    var month: Int?
+    var day:   Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case alias, name, email, telephone, description, year, month, day
     }
-    if let desc = description, !desc.isEmpty {
-      try ccc.encode(desc, forKey: .description)
+    
+    func encode(to encoder: Encoder) throws {
+        var ccc = encoder.container(keyedBy: CodingKeys.self)
+        try ccc.encode(alias, forKey: .alias)
+        try ccc.encode(name, forKey: .name)
+        try ccc.encode(email, forKey: .email)
+        if let tel = telephone, !tel.isEmpty {
+            try ccc.encode(tel, forKey: .telephone)
+        }
+        if let desc = description, !desc.isEmpty {
+            try ccc.encode(desc, forKey: .description)
+        }
+        if let yyy = year, let mmm = month, let ddd = day {
+            try ccc.encode(yyy, forKey: .year)
+            try ccc.encode(mmm, forKey: .month)
+            try ccc.encode(ddd, forKey: .day)
+        }
     }
-    if let yyy = year, let mmm = month, let ddd = day {
-      try ccc.encode(yyy, forKey: .year)
-      try ccc.encode(mmm, forKey: .month)
-      try ccc.encode(ddd, forKey: .day)
-    }
-  }
 }
 
-
-
+// The http requests for profile
 class ProfileViewModel: ObservableObject {
     @Published var userProfile: UserProfile?            // Original profile from the server
     @Published var draftProfile: UserProfile?             // Editable draft profile
@@ -86,9 +85,9 @@ class ProfileViewModel: ObservableObject {
     
     // For network test
     private let session: URLSession
-        init(session: URLSession = .shared) {
-            self.session = session
-        }
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
     
     func uploadProfileImage(image: UIImage, entityId: String, table: String, token: String) async {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
@@ -142,23 +141,23 @@ class ProfileViewModel: ObservableObject {
     
     func fetchUserProfile() async {
         if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
-              let env = ProcessInfo.processInfo.environment
-              let alias = env["MOCK_USER_ALIAS"] ?? ""
-              let name  = env["MOCK_USER_NAME"]
-              let email = env["MOCK_USER_EMAIL"] ?? ""
-              let fake = UserProfile(alias: alias.isEmpty ? nil : alias,
-                                     name: name,
-                                     email: email,
-                                     pictureUrl: nil,
-                                     telephone: nil,
-                                     description: nil,
-                                     dob: nil)
-              DispatchQueue.main.async {
+            let env = ProcessInfo.processInfo.environment
+            let alias = env["MOCK_USER_ALIAS"] ?? ""
+            let name  = env["MOCK_USER_NAME"]
+            let email = env["MOCK_USER_EMAIL"] ?? ""
+            let fake = UserProfile(alias: alias.isEmpty ? nil : alias,
+                                   name: name,
+                                   email: email,
+                                   pictureUrl: nil,
+                                   telephone: nil,
+                                   description: nil,
+                                   dob: nil)
+            DispatchQueue.main.async {
                 self.userProfile = fake
                 self.draftProfile = fake
-              }
-              return
             }
+            return
+        }
         
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -191,7 +190,6 @@ class ProfileViewModel: ObservableObject {
                         description: user.description,
                         dob: user.dob
                     )
-                    
                     // Update both original and draft copies
                     self.userProfile = fetchedProfile
                     self.draftProfile = fetchedProfile
@@ -204,7 +202,6 @@ class ProfileViewModel: ObservableObject {
             print("Error fetching user profile:", error.localizedDescription)
         }
     }
-
     
     // Updated: Use the current draftProfile for the update, and then update both local copies.
     func updateUserInfo(token: String, userId: String, loginVM: LoginViewModel) async {
@@ -216,56 +213,50 @@ class ProfileViewModel: ObservableObject {
         
         guard let draft = draftProfile else { return }
         
-        // 2) Build the DTO (use empty or default values as needed)
+        // Build the DTO
         let dto = UpdateUserDto(
-          alias:       draft.alias       ?? "",
-          name:        draft.name        ?? "",
-          email:       draft.email,
-          telephone:   draft.telephone,
-          description: draft.description,
-          year:        draft.dob?.year,
-          month:       draft.dob?.month,
-          day:         draft.dob?.day
+            alias:       draft.alias       ?? "",
+            name:        draft.name        ?? "",
+            email:       draft.email,
+            telephone:   draft.telephone,
+            description: draft.description,
+            year:        draft.dob?.year,
+            month:       draft.dob?.month,
+            day:         draft.dob?.day
         )
-
+        
         do {
-            // 3) Encode with JSONEncoder
+            // Encode with JSONEncoder
             let encoder = JSONEncoder()
             encoder.keyEncodingStrategy = .convertToSnakeCase // if your API wants snake_case
             let jsonData = try encoder.encode(dto)
-            print("➡️ PUT payload:", String(data: jsonData, encoding: .utf8)!)
+            print("PUT payload:", String(data: jsonData, encoding: .utf8)!)
             request.httpBody = jsonData
-            
             let (data, response) = try await session.data(for: request)
             guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
                 let body = String(data: data, encoding: .utf8) ?? "<no body>"
-                print("❌ Update failed — status: \((response as? HTTPURLResponse)?.statusCode ?? -1), body: \(body)")
+                print("Update failed — status: \((response as? HTTPURLResponse)?.statusCode ?? -1), body: \(body)")
                 return
             }
-            
             try await Task.sleep(nanoseconds: 500_000_000)   // 0.5s
             await fetchUserProfile()
-
         } catch {
             print("Encoding error:", error)
         }
     }
-
 }
 
+// Upload response
 struct UploadResponse: Decodable {
     let filePath: String
 }
 
-
 struct Profile: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject var vm: ViewModel
-
     @ObservedObject var loginViewModel: LoginViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
     @State private var editingField: String? = nil
-
     // Holds the information about the photo selected from the photo picker
     @State private var selectedItem: PhotosPickerItem? = nil
     // Stores the actual UIImage to display in the profile view
@@ -279,15 +270,12 @@ struct Profile: View {
     @State private var isShowingImageForm = false
     @State private var selectedSource: SourceType? = nil
     @State private var tempSelectedImage: UIImage? = nil
-
-
-
-
+    
     enum SourceType {
         case camera
         case library
     }
-
+    
     // The initializer ensures that all state properties are initialized
     init(profileViewModel: ProfileViewModel, loginViewModel: LoginViewModel, navigationPath: Binding<NavigationPath>) {
         self.profileViewModel = profileViewModel
@@ -295,7 +283,8 @@ struct Profile: View {
         self._vm = StateObject(wrappedValue: ViewModel(profileViewModel: profileViewModel))
         self._navigationPath = navigationPath
     }
-
+    
+    // Save update
     private func saveUpdate() {
         if let token = TokenManager.shared.getToken(),
            let userId = TokenManager.shared.getUserId() {
@@ -304,7 +293,7 @@ struct Profile: View {
             }
         }
     }
-
+    
     var body: some View {
         ZStack {
             AdaptiveColor.background.color(for: colorScheme)
@@ -319,9 +308,9 @@ struct Profile: View {
                             .padding(.leading, 10)
                             .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
-
+                    
                     Spacer()
-
+                    
                     NavigationLink(destination: Settings(loginViewModel: LoginViewModel(), navigationPath: $navigationPath, viewModel: profileViewModel)) {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 24))
@@ -331,7 +320,7 @@ struct Profile: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-
+                
                 VStack {
                     // Display the profile image section (unchanged)
                     if let user = profileViewModel.userProfile {
@@ -363,7 +352,7 @@ struct Profile: View {
                                     .clipShape(Circle())
                             }
                         }
-
+                        
                         // Main button to open the form
                         Button(action: {
                             isShowingImageForm = true
@@ -373,23 +362,21 @@ struct Profile: View {
                                 .underline()
                                 .font(.custom("ArialNova-Light", size: 16))
                                 .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                            
                         }
                         .padding(.bottom)
-
-
-                        // Navigation Buttons (unchanged)
+                                                
+                        // Navigation Buttons
                         HStack(spacing: 10) {
                             NavigationLink(destination: MyHikes()
                                 .environmentObject(MyHikeViewModel()) ) {
-                                Text("My hikes")
-                                    .accessibilityIdentifier("profile_myHikes_button")
-                                    .font(.custom("ArialNova", size: 20))
-                                    .frame(width: 180, height: 50)
-                                    .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
-                                    .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
-                            }
-                            .environmentObject(MyHikeViewModel())
+                                    Text("My hikes")
+                                        .accessibilityIdentifier("profile_myHikes_button")
+                                        .font(.custom("ArialNova", size: 20))
+                                        .frame(width: 180, height: 50)
+                                        .background(AdaptiveColor(light: .lightGreen, dark: .darkGreen).color(for: colorScheme))
+                                        .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
+                                }
+                                .environmentObject(MyHikeViewModel())
                             NavigationLink(destination: MyHorses()) {
                                 Text("My horses")
                                     .font(.custom("ArialNova", size: 20))
@@ -446,7 +433,6 @@ struct Profile: View {
                                         onSave: { _ in saveUpdate() }
                                     )
                                 }
-                                
                                 fieldContainer(colorScheme: colorScheme) {
                                     // Name Field
                                     EditableProfileField(
@@ -460,7 +446,6 @@ struct Profile: View {
                                         onSave: { _ in saveUpdate() }
                                     )
                                 }
-                                
                                 // Telephone Field
                                 fieldContainer(colorScheme: colorScheme) {
                                     EditableProfileField(
@@ -515,7 +500,7 @@ struct Profile: View {
                                 await profileViewModel.fetchUserProfile()
                                 loginViewModel.userProfile = profileViewModel.draftProfile
                             }
-                            print("📡 Fetching user profile...")
+                            print("Fetching user profile...")
                         }
                         
                         Spacer()
@@ -538,33 +523,33 @@ struct Profile: View {
                     .font(.title2)
                     .bold()
                     .padding(.top)
-
+                
                 HStack(spacing: 30) {
                     Button("Camera") {
                         selectedSource = .camera
                         vm.source = .camera
                         vm.showPhotoPicker()
                     }
-
+                    
                     Button("Photos") {
                         selectedSource = .library
                         vm.source = .library
                         vm.showPhotoPicker()
                     }
                 }
-
+                
                 // Image picker sheet triggers inside the form
                 .sheet(isPresented: $vm.showPicker) {
-                  ImagePicker(
-                    sourceType: selectedSource == .library ? .photoLibrary : .camera,
-                    selectedImage: $tempSelectedImage, // ← bind *temp* only
-                    showImagePicker: $isShowingCamera
-                  )
-                  .onChange(of: tempSelectedImage) { _ in
-                    // as soon as the user taps “Done” in the picker,
-                    // dismiss the picker sheet automatically:
-                    vm.showPicker = false
-                  }
+                    ImagePicker(
+                        sourceType: selectedSource == .library ? .photoLibrary : .camera,
+                        selectedImage: $tempSelectedImage, // ← bind *temp* only
+                        showImagePicker: $isShowingCamera
+                    )
+                    .onChange(of: tempSelectedImage) { _ in
+                        // as soon as the user taps “Done” in the picker,
+                        // dismiss the picker sheet automatically:
+                        vm.showPicker = false
+                    }
                 }
                 
                 if let tempImage = tempSelectedImage {
@@ -575,9 +560,9 @@ struct Profile: View {
                             .foregroundColor(
                                 AdaptiveColor(light: .lightPostBackground,
                                               dark: .darkPostBackground)
-                                  .color(for: colorScheme)
+                                .color(for: colorScheme)
                             )
-
+                        
                         // The picked image inset a bit
                         Image(uiImage: tempImage)
                             .resizable()
@@ -587,47 +572,47 @@ struct Profile: View {
                     }
                     .padding(.vertical)
                 }
-
+                
                 HStack {
                     Button("Cancel") {
-                      tempSelectedImage = nil
-                      selectedSource      = nil
-                      vm.showPicker       = false    // in case it’s still open
-                      isShowingImageForm  = false    // dismiss the “New Profile Picture” form
-                    }
-
-                    Spacer()
-
-                    Button("Save") {
-                      guard
-                        let image   = tempSelectedImage,
-                        let token   = TokenManager.shared.getToken(),
-                        let userId  = TokenManager.shared.getUserId()
-                      else {
-                        print("Nothing selected or missing credentials.")
-                        return
-                      }
-
-                      Task {
-                        await profileViewModel.uploadProfileImage(
-                          image: image,
-                          entityId: userId,
-                          table: "Users",
-                          token: token
-                        )
-                        // only now update your UI/model:
-                        profileViewModel.selectedImage = image
-
-                        // clear and dismiss:
-                        tempSelectedImage   = nil
+                        tempSelectedImage = nil
                         selectedSource      = nil
-                        isShowingImageForm  = false
-                      }
+                        vm.showPicker       = false    // in case it’s still open
+                        isShowingImageForm  = false    // dismiss the “New Profile Picture” form
+                    }
+                    
+                    Spacer()
+                    
+                    Button("Save") {
+                        guard
+                            let image   = tempSelectedImage,
+                            let token   = TokenManager.shared.getToken(),
+                            let userId  = TokenManager.shared.getUserId()
+                        else {
+                            print("Nothing selected or missing credentials.")
+                            return
+                        }
+                        
+                        Task {
+                            await profileViewModel.uploadProfileImage(
+                                image: image,
+                                entityId: userId,
+                                table: "Users",
+                                token: token
+                            )
+                            // only now update the UI/model:
+                            profileViewModel.selectedImage = image
+                            
+                            // clear and dismiss:
+                            tempSelectedImage   = nil
+                            selectedSource      = nil
+                            isShowingImageForm  = false
+                        }
                     }
                     .bold()
                 }
                 .padding(.horizontal)
-
+                
                 Spacer()
             }
             .padding()
@@ -635,6 +620,7 @@ struct Profile: View {
     }
 }
 
+// Field container
 @ViewBuilder
 func fieldContainer<Content: View>(
     colorScheme: ColorScheme,
@@ -655,9 +641,7 @@ func fieldContainer<Content: View>(
         .font(.custom("ArialNova", size: 16))
 }
 
-
-
-
+// Edit profile
 struct EditableProfileField: View {
     @Environment(\.colorScheme) var colorScheme
     let title: String
@@ -722,18 +706,19 @@ struct EditableProfileField: View {
     }
 }
 
+// Date of birth field
 struct EditableDOBField: View {
     @Environment(\.colorScheme) var colorScheme
     let title: String = "Date of Birth"
     @Binding var dob: DOB
     @Binding var editingField: String?
     var onSave: (DOB) -> Void
-
+    
     // Local state for the picker values
     @State private var tempYear: Int = 2000
     @State private var tempMonth: Int = 1
     @State private var tempDay: Int = 1
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
@@ -808,17 +793,16 @@ struct EditableDOBField: View {
     }
 }
 
-//MARK: - Change email
+// MARK: - Change email
 struct ChangeEmail: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var isShowingSheet = false  // Controls popup visibility
     @State private var newEmail = ""
     @State private var currentPassword = ""
     @State private var localErrorMessage = ""
-    
-    // Inject the view model so that we can call changeEmail.
+    // Inject the view model to call changeEmail
     @ObservedObject var loginViewModel: LoginViewModel
-
+    
     var body: some View {
         VStack {
             Text("Change email")
@@ -840,7 +824,7 @@ struct ChangeEmail: View {
                     .font(.headline)
                     .multilineTextAlignment(.center)
                     .padding()
-
+                
                 TextField("Enter new email", text: $newEmail)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
@@ -848,7 +832,7 @@ struct ChangeEmail: View {
                 SecureField("Enter current password", text: $currentPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-
+                
                 if !localErrorMessage.isEmpty {
                     Text(localErrorMessage)
                         .foregroundColor(.red)

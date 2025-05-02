@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Struct for settings
 struct Settings: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
@@ -23,7 +24,7 @@ struct Settings: View {
     @FocusState private var isPasswordFieldFocused: Bool // To auto-focus password field
     @State private var showReportSheet = false // Report
     var viewModel: ProfileViewModel
-       
+    
     var body: some View {
         ZStack {
             // Ensure the whole background is green
@@ -55,8 +56,7 @@ struct Settings: View {
                             }
                         }
                         
-                        // Send a Report Button
-                        // Inside your Settings view's Form or VStack:
+                        // Send a Report Button inside Settings view
                         Button(action: {
                             showReportSheet = true
                         }) {
@@ -65,8 +65,7 @@ struct Settings: View {
                         .sheet(isPresented: $showReportSheet) {
                             ReportIssueView(showReportSheet: $showReportSheet)
                         }
-
-                        
+                                                
                         // Log out button
                         Button(action: {
                             // Show the logout confirmation alert
@@ -90,7 +89,6 @@ struct Settings: View {
                                 secondaryButton: .cancel()
                             )
                         }
-
                         
                         // Delete User Button
                         Button(action: {
@@ -118,7 +116,7 @@ struct Settings: View {
                                                  showPasswordConfirmation: $showPasswordConfirmation,
                                                  loginViewModel: loginViewModel)
                     }
-
+                    
                 }
                 .navigationBarBackButtonHidden(true) // Hides the default back button
                 .preferredColorScheme(isDarkMode ? .dark : .light)
@@ -136,7 +134,6 @@ struct Settings: View {
                             .foregroundColor(AdaptiveColor(light: .lightModeTextOnGreen, dark: .darkModeTextOnGreen).color(for: colorScheme))
                     }
                     .position(x: 25, y: 20)
-                    
                     Spacer()
                 }
                 Spacer()
@@ -148,8 +145,6 @@ struct Settings: View {
         }
     }
     
-    
-    
     // To change language
     private func changeLanguage() {
         let languageCode = isEnglishSelected ? "English" : "nb_NO"
@@ -157,8 +152,7 @@ struct Settings: View {
         UserDefaults.standard.synchronize()
         exit(0) // Restart app to apply language change
     }
-    
-    
+        
     // Custom Password Confirmation Popup
     struct PasswordConfirmationView: View {
         @Binding var password: String
@@ -168,7 +162,7 @@ struct Settings: View {
         
         // Accept the loginViewModel to perform deletion.
         @ObservedObject var loginViewModel: LoginViewModel
-
+        
         var body: some View {
             VStack(spacing: 20) {
                 Text("Confirm Deletion")
@@ -197,7 +191,7 @@ struct Settings: View {
             }
         }
         
-        // Instead of static checking, we call deleteUser on the view model.
+        // Instead of static checking, call deleteUser on the view model.
         private func verifyPasswordAndDelete() {
             Task {
                 await loginViewModel.deleteUser(password: password)
@@ -208,7 +202,7 @@ struct Settings: View {
                 }
             }
         }
-    } 
+    }
     
     // Custom Report Issue Form
     struct ReportIssueView: View {
@@ -274,7 +268,7 @@ struct Settings: View {
                                     return
                                 }
                                 
-                                // For now, EntityName is "Profile". In future, you can adapt this.
+                                // EntityName is "Profile"
                                 await reportViewModel.submitReport(entityId: entityId,
                                                                    entityName: "Profile",
                                                                    category: reportTopic,
