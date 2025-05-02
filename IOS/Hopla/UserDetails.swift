@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 27/03/2025.
 //
-
 import SwiftUI
 
+// Struct with user information
 struct UserInfo: Identifiable, Decodable {
     var id: String
     var name: String
@@ -19,7 +19,7 @@ struct UserInfo: Identifiable, Decodable {
     var userHikes: [Post]?
     var createdAt: String?
     var dob: String? = nil
-
+    
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -35,10 +35,12 @@ struct UserInfo: Identifiable, Decodable {
     }
 }
 
+// Http requests
 class UserDetailsViewModel: ObservableObject {
     @Published var userDetails: UserInfo?
     @Published var isLoading = false
     
+    // Fetch user details
     func fetchUserDetails(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -91,33 +93,32 @@ class UserDetailsViewModel: ObservableObject {
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: Any] = ["userId": userId]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-            
-            // Handle after following
         }.resume()
     }
 }
 
+// Http request to change the relationship to a user
 class RelationViewModel: ObservableObject {
     private let baseURL = "https://hopla.onrender.com/userrelations"
-
+    
     func changeRelation(to status: PersonStatus, for userId: String, completion: @escaping (Bool)->Void = { _ in }) {
         guard let token = TokenManager.shared.getToken() else {
             completion(false); return
         }
-
+        
         var method: String
         var url = URL(string: baseURL)!
         var body: [String: Any]?
-
+        
         switch status {
         case .none:
             method = "DELETE"
@@ -135,7 +136,7 @@ class RelationViewModel: ObservableObject {
             method = "PUT"
             body = ["TargetUserId": userId, "Status": "BLOCK"]
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -144,7 +145,7 @@ class RelationViewModel: ObservableObject {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         }
-
+        
         URLSession.shared.dataTask(with: request) { _, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
@@ -153,14 +154,14 @@ class RelationViewModel: ObservableObject {
                 }
                 return
             }
-
+            
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 DispatchQueue.main.async {
                     completion(false)
                 }
                 return
             }
-
+            
             // After the relation change is successful, reload the user details
             DispatchQueue.main.async {
                 completion(true)
@@ -169,12 +170,10 @@ class RelationViewModel: ObservableObject {
     }
 }
 
-
 // MARK: - Header
 struct UserDetailsHeader: View {
     var user: UserInfo?
     var colorScheme: ColorScheme
-    
     var body: some View {
         VStack {
             if let user = user {
@@ -197,12 +196,11 @@ struct UserDetailsHeader: View {
     }
 }
 
-
+// Struct to display the user details
 struct UserDetails: View {
     var userId: String
     @StateObject private var vm = UserDetailsViewModel()
     @Environment(\.colorScheme) var colorScheme
-    
     var body: some View {
         VStack {
             if vm.isLoading {
@@ -215,18 +213,13 @@ struct UserDetails: View {
                             ScrollView {
                                 // Profile Picture
                                 profilePictureView(user: user)
-                                
                                 actionButtonsView(for: user)
-                                
                                 // User details in a white box
                                 userDetailsBox(user: user)
-                                
                                 // Description
                                 descriptionView(user: user)
-                                
                                 // Hikes
                                 hikesView(user: user)
-                                
                                 // Action buttons (Follow, Add Friend)
                                 actionButtonsView(for: user)
                             }
@@ -245,6 +238,7 @@ struct UserDetails: View {
         }
     }
     
+    // Users profile picture
     private func profilePictureView(user: UserInfo) -> some View {
         if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
             return AnyView(
@@ -254,13 +248,13 @@ struct UserDetails: View {
                         .frame(width: 200, height: 200)
                         .clipShape(Circle())
                         .overlay(
-                          Circle()
-                            .stroke(
-                              AdaptiveColor(light: .lightPostBackground,
-                                            dark:  .darkPostBackground)
-                                .color(for: colorScheme),
-                              lineWidth: 10
-                            )
+                            Circle()
+                                .stroke(
+                                    AdaptiveColor(light: .lightPostBackground,
+                                                  dark:  .darkPostBackground)
+                                    .color(for: colorScheme),
+                                    lineWidth: 10
+                                )
                         )
                         .padding(20)
                 } placeholder: {
@@ -275,6 +269,7 @@ struct UserDetails: View {
         }
     }
     
+    // Users name and alias, friends and horses
     private func userDetailsBox(user: UserInfo) -> some View {
         return VStack(spacing: 0) {
             Text(user.name)
@@ -292,14 +287,14 @@ struct UserDetails: View {
         }
         .padding()
     }
-
+    
+    // Description of user
     private func descriptionView(user: UserInfo) -> some View {
         if let description = user.description {
             return AnyView(
                 VStack(alignment: .leading) {
                     Text("Description:")
                         .font(.headline)
-                    
                     Text(description)
                         .padding()
                         .frame(width: 370)
@@ -335,19 +330,18 @@ struct UserDetails: View {
                         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
                 }
-                .padding()
+                    .padding()
             )
         } else {
             return AnyView(EmptyView()) // Return empty view if no hikes
         }
     }
     
-    
     //MARK: - Buttons relationships
     private func actionButtonsView(for user: UserInfo) -> some View {
         let relationVM = RelationViewModel()
         let vm = UserDetailsViewModel()
-
+        
         func buttonTitle(for status: PersonStatus) -> String {
             switch status {
             case .none:      return "Add Friend"
@@ -357,18 +351,18 @@ struct UserDetails: View {
             case .block:     return "Unblock"
             }
         }
-
+        
         // Adaptive background and text
         let bgColor = AdaptiveColor(
             light: .lightPostBackground,
             dark:  .darkPostBackground
         ).color(for: colorScheme)
-
+        
         let textColor = AdaptiveColor(
             light: .textLightBackground,
             dark:  .textDarkBackground
         ).color(for: colorScheme)
-
+        
         return VStack {
             Button(action: {
                 switch user.relationStatus {
@@ -394,4 +388,3 @@ struct UserDetails: View {
         }
     }
 }
-

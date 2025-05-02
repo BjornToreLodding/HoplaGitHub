@@ -4,11 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 21/01/2025.
 //
-
 import XCTest
 
-// MARK: - Login page tests
-
+// Login page tests
 final class LoginUITests: XCTestCase {
     var app: XCUIApplication!
     
@@ -22,8 +20,7 @@ final class LoginUITests: XCTestCase {
         app = nil
     }
     
-    // MARK: - Login Tests
-    
+    // Login to home screen test
     @MainActor
     func testSuccessfulLogin_flowsToHomeScreen() {
         app = XCUIApplication()
@@ -52,7 +49,7 @@ final class LoginUITests: XCTestCase {
         XCTAssertTrue(homeRoot.waitForExistence(timeout: 3), "Home screen never appeared")
     }
     
-    
+    // Show error alert when empty fields
     @MainActor
     func testEmptyCredentials_showsErrorAlert() {
         app = XCUIApplication()
@@ -86,8 +83,7 @@ final class LoginUITests: XCTestCase {
         alert.buttons["OK"].tap()
     }
     
-    
-    
+    // Test invalid email
     @MainActor
     func testInvalidEmail_showsErrorAlert() {
         app = XCUIApplication()
@@ -100,7 +96,7 @@ final class LoginUITests: XCTestCase {
         emailField.tap()
         emailField.typeText("invalid-email")
         
-        // ← scroll the form up so PasswordField comes into view
+        // scroll the form up so PasswordField comes into view
         app.swipeUp()
         
         let passwordField = app.secureTextFields["PasswordField"]
@@ -108,7 +104,7 @@ final class LoginUITests: XCTestCase {
         passwordField.tap()
         passwordField.typeText("Password123!")
         
-        // you can also swipe up again before tapping Log In if you’d like:
+        // swipe up again before tapping Log In:
         app.swipeUp()
         
         app.buttons["loginButton"].tap()
@@ -120,13 +116,11 @@ final class LoginUITests: XCTestCase {
         alert.buttons["OK"].tap()
     }
     
-    
-    // MARK: - Forgot Password Sheet
-    
+    // Forgot Password Sheet
     @MainActor
     func testForgotPassword_sendsResetRequest() {
         app = XCUIApplication()
-        // still reset, even though we’re not logged in yet
+        // still reset, even though not logged in yet
         app.launchArguments = ["-UITest_ResetAuthentication"]
         app.launch()
         
@@ -149,7 +143,7 @@ final class LoginUITests: XCTestCase {
         )
     }
     
-    
+    // Cancel the "forgot password" sheet
     @MainActor
     func testForgotPassword_cancelDismissesSheet() {
         app = XCUIApplication()
@@ -173,16 +167,13 @@ final class LoginUITests: XCTestCase {
         waitForExpectations(timeout: 2)
     }
     
-    
-    // MARK: - Sign Up Sheet
-    
+    // Sign Up Sheet
     @MainActor
     func testSignUpSheet_uiElementsExist() {
         app = XCUIApplication()
         // still reset, even though we’re not logged in yet
         app.launchArguments = ["-UITest_ResetAuthentication"]
         app.launch()
-        
         app.staticTexts["Not a member? Sign up"].tap()
         
         let emailField = app.textFields["signUpEmailField"]
@@ -201,73 +192,74 @@ final class LoginUITests: XCTestCase {
         XCTAssertFalse(emailField.exists)
     }
     
+    // Test different passwords
     @MainActor
     func testSignUpPasswordMismatchWarning() {
         // 1) Launch fresh
         app = XCUIApplication()
         app.launchArguments = ["-UITest_ResetAuthentication"]
         app.launch()
-
+        
         // 2) Open the sheet
         app.staticTexts["Not a member? Sign up"].tap()
-
+        
         // 3) Fill in the e-mail
         let emailField = app.textFields["signUpEmailField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: 2))
         emailField.tap()
         emailField.typeText("user@example.com")
-
+        
         // 4) Fill in the password
         let pwField = app.secureTextFields["signUpPasswordField"]
         XCTAssertTrue(pwField.waitForExistence(timeout: 2))
         pwField.tap()
         pwField.typeText("Password1!")
-
-        // 5) Fill in the *different* confirmation
+        
+        // 5) Fill in the different confirmation
         let confirmField = app.secureTextFields["signUpConfirmPasswordField"]
         XCTAssertTrue(confirmField.waitForExistence(timeout: 2))
         confirmField.tap()
         confirmField.typeText("Different1!")
-
-        // 6) ***Explicitly*** dismiss the keyboard
+        
+        // 6) Explicitly dismiss the keyboard
         if app.keyboards.buttons["Return"].exists {
-          app.keyboards.buttons["Return"].tap()
+            app.keyboards.buttons["Return"].tap()
         } else if app.keyboards.buttons["Done"].exists {
-          app.keyboards.buttons["Done"].tap()
+            app.keyboards.buttons["Done"].tap()
         } else {
-          // fallback tap outside
-          app.tap()
+            // fallback tap outside
+            app.tap()
         }
-
+        
         // 7) Scroll so the stats checkbox is visible
         app.swipeUp()
-
+        
         // 8) Now toggle the checkbox
         let statsToggle = app.buttons["statisticsCheckbox"]
         XCTAssertTrue(statsToggle.waitForExistence(timeout: 2))
         statsToggle.tap()
-
+        
         // 9) Scroll again to bring the “Join now” button into view
         app.swipeUp()
-
-        // 10) Wait for “Join now” to appear **and** actually become enabled
+        
+        // 10) Wait for “Join now” to appear and actually become enabled
         let join = app.buttons["JoinNowButton"]
         XCTAssertTrue(join.waitForExistence(timeout: 2), "Join button never appeared")
-
+        
         let enabled = NSPredicate(format: "isEnabled == true")
         expectation(for: enabled, evaluatedWith: join, handler: nil)
         waitForExpectations(timeout: 2)
-
+        
         XCTAssertTrue(join.isEnabled, "Join button should be enabled when form is valid")
         join.tap()
-
+        
         // 11) Finally, assert that the mismatch warning shows up
         let warning = app.staticTexts["PasswordMismatchWarning"]
         XCTAssertTrue(warning.waitForExistence(timeout: 2),
                       "Expected the “Passwords do not match!” warning to appear")
     }
-
     
+    // Test stats alert description
     @MainActor
     func testStatsInfo_alertDescription() {
         app = XCUIApplication()
@@ -287,6 +279,7 @@ final class LoginUITests: XCTestCase {
         alert.buttons["OK"].tap()
     }
     
+    // Test join button when form is invalid
     @MainActor
     func testJoinButtonDisabledWhenFormInvalid() {
         app = XCUIApplication()
@@ -300,8 +293,7 @@ final class LoginUITests: XCTestCase {
         XCTAssertFalse(joinButton.isEnabled)
     }
     
-    // MARK: - Performance
-    
+    // Performance
     @MainActor
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {

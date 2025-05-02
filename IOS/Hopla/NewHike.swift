@@ -12,6 +12,7 @@ struct CreateHikeResponse: Decodable {
     let id: String
 }
 
+// New hike struct
 struct NewHike: View {
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject private var locationManager = LocationManager()
@@ -36,7 +37,7 @@ struct NewHike: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                MapView(locationManager: locationManager) // ✅ Pass location manager to track hike
+                MapView(locationManager: locationManager) // Pass location manager to track hike
                     .frame(maxHeight: .infinity)
                     .edgesIgnoringSafeArea(.top)
                 
@@ -50,7 +51,7 @@ struct NewHike: View {
                             startHikeTracking()
                         } else {
                             stopHikeTracking()
-                            showPopup = true // ✅ Set state variable instead
+                            showPopup = true // Set state variable instead
                         }
                     }) {
                         Text(isTracking ? "Stop" : "Start")
@@ -61,38 +62,32 @@ struct NewHike: View {
                             .overlay(Circle().stroke(AdaptiveColor(light: .lightBrown, dark: .darkBrown).color(for: colorScheme), lineWidth: 4))
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
-                    
-                    // ✅ Move .alert outside
                     .alert("Save or Fill in Details", isPresented: $showPopup) {
                         Button("Save") {
                             saveHike {
                                 DispatchQueue.main.async {
-                                    locationManager.elapsedTime = 0 // ✅ Reset elapsed time
-                                    locationManager.distance = 0 // ✅ Reset distance
+                                    locationManager.elapsedTime = 0 // Reset elapsed time
+                                    locationManager.distance = 0 // Reset distance
                                 }
-                                presentationMode.wrappedValue.dismiss() // ✅ Only dismiss when saving
+                                presentationMode.wrappedValue.dismiss() // Only dismiss when saving
                             }
                         }
                         Button("Fill in Details") {
                             showDetailForm = true
                         }
                     }
-                    
-                    
-                    // ✅ Move .sheet outside
                     .sheet(isPresented: $showDetailForm) {
-                      FillHikeDetailsView(
-                        locationManager: locationManager,
-                        showSaveConfirmation: $showSaveConfirmation
-                      )
+                        FillHikeDetailsView(
+                            locationManager: locationManager,
+                            showSaveConfirmation: $showSaveConfirmation
+                        )
                     }
                     .alert("Hike saved to My Activity", isPresented: $showSaveConfirmation) {
-                            Button("OK", role: .cancel) {
-                              presentationMode.wrappedValue.dismiss()
-                            }
-                          }
-                    
-                    Text(String(format: "%.4f km", locationManager.distance))
+                        Button("OK", role: .cancel) {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                    Text(String(format: "%.3f km", locationManager.distance))
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .foregroundColor(.white)
@@ -102,50 +97,46 @@ struct NewHike: View {
         }
     }
     
+    // Format time in minutes:Seconds
     private func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
-        let formattedDuration = String(format: "%02d:%02d", minutes, seconds) // ✅ Correct MM:SS format
+        let formattedDuration = String(format: "%02d:%02d", minutes, seconds) // Correct MM:SS format
         
-        print("📡 Correctly Formatted Duration:", formattedDuration) // ✅ Debugging output
-        
+        print("Correctly Formatted Duration:", formattedDuration) // Debugging output
         return formattedDuration
     }
     
-    
-    
-    
+    // Start tracking hike, start timer and coordinates
     private func startHikeTracking() {
         elapsedTime = 0
-        distance = 0.0 // ✅ Reset distance when starting
-        locationManager.coordinates = [] // ✅ Reset coordinates
+        distance = 0.0 // Reset distance when starting
+        locationManager.coordinates = [] // Reset coordinates
         locationManager.startTracking()
         
-        print("🚀 Starting hike tracking!")
+        print("Starting hike tracking!")
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             DispatchQueue.main.async {
-                locationManager.elapsedTime += 1 // ✅ Updates every second
-                print("⏳ Timer Updated Elapsed Time:", locationManager.elapsedTime) // ✅ Debugging duration updates
+                locationManager.elapsedTime += 1 // Updates every second
+                print("Timer Updated Elapsed Time:", locationManager.elapsedTime) // Debugging duration updates
             }
         }
-        
         locationManager.startTracking()
     }
     
-    
-    
-    
+    // Stop timer and stop tracking
     private func stopHikeTracking() {
         timer?.invalidate()
         timer = nil
         locationManager.stopTracking()
-        showPopup = true // ✅ Show pop-up when stopping
+        showPopup = true // Show pop-up when stopping
     }
     
+    // Save hike
     private func saveHike(completion: @escaping () -> Void) {
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found.")
+            print("No token found.")
             return
         }
         
@@ -157,7 +148,7 @@ struct NewHike: View {
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        // (Build your multipart body exactly as you already do.)
+        // Build your multipart body
         var body = Data()
         let lineBreak = "\r\n"
         
@@ -173,10 +164,9 @@ struct NewHike: View {
         appendField(name: "Distance", value: locationManager.distance > 0 ? String(format: "%.2f", locationManager.distance) : "0.00")
         appendField(name: "Duration", value: "\(Int(locationManager.elapsedTime))")
         
-        // Append JSON field for coordinates (and other fields)
-        // … (same as your current code)
+        // Append JSON field (and other fields)
         
-        appendField(name: "HorseId", value: "") // you might send an empty string or a valid horse id
+        appendField(name: "HorseId", value: "") // (send an empty string or a valid horse id)
         appendField(name: "TrailId", value: "")
         appendField(name: "Stars", value: "\(stars)")
         appendField(name: "Filters", value: filters.isEmpty ? "None" : filters)
@@ -197,14 +187,14 @@ struct NewHike: View {
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("❌ Error saving hike:", error)
+                print("Error saving hike:", error)
                 return
             }
             guard let data = data else { return }
             
             do {
                 let resp = try JSONDecoder().decode(CreateHikeResponse.self, from: data)
-                print("✅ Created hike id:", resp.id)
+                print("Created hike id:", resp.id)
                 DispatchQueue.main.async {
                     // Instead of inserting a half‑baked MyHike, just reload the full list
                     self.myHikeVM.reloadHikes()
@@ -212,7 +202,7 @@ struct NewHike: View {
                     self.showSaveConfirmation = true
                 }
             } catch {
-                print("❌ Decoding create response:", error)
+                print("Decoding create response:", error)
             }
         }
         .resume()
@@ -225,12 +215,9 @@ struct FillHikeDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var locationManager: LocationManager
-    
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
     @Binding var showSaveConfirmation: Bool
-    
-    
     @State private var title = ""
     @State private var description = ""
     @State private var stars: Int = 0
@@ -253,12 +240,11 @@ struct FillHikeDetailsView: View {
                         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 }
                 .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                
                 Button("Save Hike") {
                     saveHike {
                         DispatchQueue.main.async {
-                            locationManager.elapsedTime = 0 // ✅ Reset elapsed time
-                            locationManager.distance = 0 // ✅ Reset distance
+                            locationManager.elapsedTime = 0 // Reset elapsed time
+                            locationManager.distance = 0 // Reset distance
                         }
                         showSaveConfirmation = true
                         presentationMode.wrappedValue.dismiss()
@@ -271,9 +257,10 @@ struct FillHikeDetailsView: View {
         }
     }
     
+    // Save hike
     private func saveHike(completion: @escaping () -> Void) {
         guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found.")
+            print("No token found.")
             return
         }
         
@@ -285,10 +272,10 @@ struct FillHikeDetailsView: View {
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        // ✅ Debugging Duration Before Sending
-        print("📡 Title being sent:", title)
-        print("📡 Duration before sending:", locationManager.elapsedTime)
-        print("📡 Formatted Duration:", String(format: "%.2f", locationManager.elapsedTime / 60))
+        // Debugging Duration Before Sending
+        print("Title being sent:", title)
+        print("Duration before sending:", locationManager.elapsedTime)
+        print("Formatted Duration:", String(format: "%.2f", locationManager.elapsedTime / 60))
         
         // Prepare coordinates JSON string
         let coordinatesArray = locationManager.coordinates.map {
@@ -299,10 +286,9 @@ struct FillHikeDetailsView: View {
             ]
         }
         
-        
         guard let coordinatesData = try? JSONSerialization.data(withJSONObject: coordinatesArray, options: []),
               let coordinatesString = String(data: coordinatesData, encoding: .utf8) else {
-            print("❌ Failed to serialize coordinates")
+            print("Failed to serialize coordinates")
             return
         }
         
@@ -319,16 +305,13 @@ struct FillHikeDetailsView: View {
         appendField(name: "Description", value: description.isEmpty ? "No description provided." : description)
         appendField(name: "StartedAt", value: ISO8601DateFormatter().string(from: Date()))
         appendField(name: "Distance", value: locationManager.distance > 0 ? String(format: "%.2f", locationManager.distance) : "0.00")
-        appendField(name: "Duration", value: "\(Int(locationManager.elapsedTime))") // ✅ Send raw seconds as an integer
-        
-        
+        appendField(name: "Duration", value: "\(Int(locationManager.elapsedTime))") // Send raw seconds as an integer
         
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"Coordinates\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!) // ✅ Explicit JSON format
-        body.append(coordinatesData) // ✅ Direct JSON data
+        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!) // Explicit JSON format
+        body.append(coordinatesData) // Direct JSON data
         body.append("\r\n".data(using: .utf8)!)
-        
         
         appendField(name: "HorseId", value: "") // send empty string instead of NSNull
         appendField(name: "TrailId", value: "")
@@ -339,36 +322,33 @@ struct FillHikeDetailsView: View {
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         
         if let rawBody = String(data: body, encoding: .utf8) {
-            print("📡 Final Request Body:\n", rawBody) // ✅ Debugging raw request payload
+            print("Final Request Body:\n", rawBody) // Debugging raw request payload
         }
         
         request.httpBody = body
-        
         // Send request
         URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
-                print("❌ Error saving hike:", error)
+                print("Error saving hike:", error)
                 return
             }
             guard let data = data else { return }
             
             // DEBUG
             if let jsonStr = String(data: data, encoding: .utf8) {
-                print("📡 Raw response JSON:\n", jsonStr)
+                print("Raw response JSON:\n", jsonStr)
             }
-            
             do {
                 let resp = try JSONDecoder().decode(CreateHikeResponse.self, from: data)
-                print("✅ Created hike id:", resp.id)
+                print("Created hike id:", resp.id)
                 DispatchQueue.main.async {
                     // reload the full hikes list
                     self.myHikeVM.reloadHikes()
                     completion()
                     self.presentationMode.wrappedValue.dismiss()
-                    
                 }
             } catch {
-                print("❌ Decoding create response:", error)
+                print("Decoding create response:", error)
             }
         }
         .resume()

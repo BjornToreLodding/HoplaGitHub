@@ -9,22 +9,22 @@ import Combine
 import UIKit
 @testable import Hopla
 
+// Testing MyHorses file
 final class MyHorsesTests: XCTestCase {
     var vm: HorseViewModel!
     var session: URLSession!
     var cancellables = Set<AnyCancellable>()
     
     override func setUp() {
-      super.setUp()
-      let cfg = URLSessionConfiguration.ephemeral
-      cfg.protocolClasses = [TestURLProtocol.self]
-      session = URLSession(configuration: cfg)
-      vm = HorseViewModel(session: session)
-      TokenManager.shared.saveToken("dummy")
-
-      TestURLProtocol.lastRequest = nil
-      TestURLProtocol.lastRequestBody = nil
-      TestURLProtocol.requestExpectation = nil
+        super.setUp()
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.protocolClasses = [TestURLProtocol.self]
+        session = URLSession(configuration: cfg)
+        vm = HorseViewModel(session: session)
+        TokenManager.shared.saveToken("dummy")
+        TestURLProtocol.lastRequest = nil
+        TestURLProtocol.lastRequestBody = nil
+        TestURLProtocol.requestExpectation = nil
     }
     
     override func tearDown() {
@@ -38,6 +38,7 @@ final class MyHorsesTests: XCTestCase {
         super.tearDown()
     }
     
+    // Testing to fetch horses
     func testFetchHorses_success() {
         // 1) Stub a JSON array of one horse
         let json = """
@@ -82,6 +83,7 @@ final class MyHorsesTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
     
+    // Testing to delete horses
     func testDeleteHorse_removesFromArray() {
         // 1) Seed two horses in the view model
         let h1 = Horse(id: "x1", name: "A", breed: nil, age: nil, horsePictureUrl: nil, dob: nil)

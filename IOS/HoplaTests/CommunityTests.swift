@@ -12,31 +12,31 @@ import CoreLocation
 // 1) Dummy LocationManager that never has a real location,
 //    so toggleMembership won't cascade into fetchStables.
 class DummyLocationManager: LocationManager {
-  // Base class probably has `var userLocation: CLLocation?`
-  override var userLocation: CLLocation? {
-    get { nil }       // always nil
-    set { /* ignore */ }
-  }
+    override var userLocation: CLLocation? {
+        get { nil }       // always nil
+        set { /* ignore */ }
+    }
 }
 
+// Testing Community file
 final class CommunityTests: XCTestCase {
     var viewModel: StableViewModel!
     var session: URLSession!
     var cancellables = Set<AnyCancellable>()
-
+    
     override func setUp() {
         super.setUp()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         session = URLSession(configuration: config)
-
+        
         // Inject dummy location manager + mock session
         viewModel = StableViewModel(
             locationManager: DummyLocationManager(),
             session: session
         )
     }
-
+    
     override func tearDown() {
         MockURLProtocol.stubResponses = [:]
         cancellables.removeAll()
@@ -44,7 +44,8 @@ final class CommunityTests: XCTestCase {
         session = nil
         super.tearDown()
     }
-
+    
+    // Testing to fetch communities
     func testFetchStables_success() {
         // 1) Build a JSON payload matching EVERY field in your Stable model:
         let json = """
@@ -58,16 +59,16 @@ final class CommunityTests: XCTestCase {
           }
         ]
         """.data(using: .utf8)!
-
+        
         // 2) Stub the exact URL your viewModel will hit:
         let urlString = "https://hopla.onrender.com/stables/all" +
-                        "?latitude=59.9139&longitude=10.7522" +
-                        "&pagesize=20&pagenumber=1"
+        "?latitude=59.9139&longitude=10.7522" +
+        "&pagesize=20&pagenumber=1"
         let url = URL(string: urlString)!
         MockURLProtocol.stubResponses = [
             url: (200, json, nil as Error?)
         ]
-
+        
         // 3) Observe the `stables` array for the update
         let exp = expectation(description: "stables updated")
         viewModel.$stables
@@ -79,16 +80,17 @@ final class CommunityTests: XCTestCase {
                 exp.fulfill()
             }
             .store(in: &cancellables)
-
+        
         // 4) Trigger the fetch
         viewModel.fetchStables(
             latitude: 59.9139,
             longitude: 10.7522
         )
-
+        
         wait(for: [exp], timeout: 1.0)
     }
-
+    
+    // Testing membership toggle
     func testToggleMembership_join() {
         // Seed with a non-member
         let stable = Stable(
@@ -99,14 +101,14 @@ final class CommunityTests: XCTestCase {
             pictureUrl: nil
         )
         viewModel.stables = [stable]
-
+        
         // Stub the join endpoint
         let joinURL = URL(string: "https://hopla.onrender.com/stables/join")!
         MockURLProtocol.stubResponses = [
             joinURL: (200, Data(), nil as Error?)
         ]
-
-        // Expect it to flip `member` from false → true
+        
+        // Expect it to flip `member` from false to true
         let exp = expectation(description: "joined")
         viewModel.$stables
             .dropFirst()
@@ -115,11 +117,12 @@ final class CommunityTests: XCTestCase {
                 exp.fulfill()
             }
             .store(in: &cancellables)
-
+        
         viewModel.toggleMembership(for: stable)
         wait(for: [exp], timeout: 1.0)
     }
-
+    
+    // Testing to leave a community
     func testToggleMembership_leave() {
         // Seed with a member
         let stable = Stable(
@@ -130,14 +133,14 @@ final class CommunityTests: XCTestCase {
             pictureUrl: nil
         )
         viewModel.stables = [stable]
-
+        
         // Stub the leave endpoint
         let leaveURL = URL(string: "https://hopla.onrender.com/stables/leave")!
         MockURLProtocol.stubResponses = [
             leaveURL: (200, Data(), nil as Error?)
         ]
-
-        // Expect it to flip `member` from true → false
+        
+        // Expect it to flip `member` from true to false
         let exp = expectation(description: "left")
         viewModel.$stables
             .dropFirst()
@@ -146,7 +149,7 @@ final class CommunityTests: XCTestCase {
                 exp.fulfill()
             }
             .store(in: &cancellables)
-
+        
         viewModel.toggleMembership(for: stable)
         wait(for: [exp], timeout: 1.0)
     }

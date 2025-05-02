@@ -311,23 +311,19 @@ struct MyHikePostContainer: View {
                 .accessibilityIdentifier("myhike_\(id)_title_label")
                 .font(.title)
                 .bold()
-                .padding(.bottom, 2)
-            
+                .padding(.bottom, 2)            
             Text("Trail Name: \(trailName)")
                 .accessibilityIdentifier("myhike_\(id)_trail_label")
                 .font(.headline)
                 .padding(.bottom, 2)
-            
             Text(comment)
                 .accessibilityIdentifier("myhike_\(id)_comment_label")
                 .font(.headline)
                 .padding(.top, 5)
-            
             Text("Length: \(String(format: "%.2f", length)) km")
                 .accessibilityIdentifier("myhike_\(id)_length_label")
                 .font(.subheadline)
                 .foregroundColor(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-            
             Text("Duration: \(String(format: "%02d.%02d", Int(duration) / 60, Int(duration) % 60)) min")
                 .accessibilityIdentifier("myhike_\(id)_duration_label")
         }

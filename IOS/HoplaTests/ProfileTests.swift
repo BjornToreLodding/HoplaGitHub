@@ -4,11 +4,10 @@
 //
 //  Created by Ane Marie Johnsen on 01/05/2025.
 //
-
-
 import XCTest
 @testable import Hopla
 
+// Testing Profile file
 final class ProfileTests: XCTestCase {
     var viewModel: ProfileViewModel!
     var session: URLSession!
@@ -18,7 +17,7 @@ final class ProfileTests: XCTestCase {
         // Reset any previous stubs
         MockURLProtocol.stubResponses = [:]
         
-        // Make a URLSession that uses your mock protocol
+        // Make a URLSession that uses my mock protocol
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         let session = URLSession(configuration: config)
@@ -33,6 +32,7 @@ final class ProfileTests: XCTestCase {
         super.tearDown()
     }
     
+    // Testing to fetch user profile
     func testFetchUserProfile_Success() async throws {
         // Prepare a fake profile JSON
         let stubUser = UserProfile(
@@ -67,7 +67,7 @@ final class ProfileTests: XCTestCase {
         XCTAssertEqual(viewModel.draftProfile?.alias, "jane_doe")
     }
     
-    
+    // Testing to updatee the user information
     func testUpdateUserInfo_Success() async {
         // Stub the update endpoint with a 204 No Content
         let updateURL = URL(string: "https://hopla.onrender.com/users/update")!
@@ -85,8 +85,5 @@ final class ProfileTests: XCTestCase {
             userId: "user-id",
             loginVM: LoginViewModel()
         )
-        
-        // If fetchUserProfile() is also called under the hood,
-        // stub that too, or assert no crash.
     }
 }

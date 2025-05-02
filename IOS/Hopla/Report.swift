@@ -4,10 +4,10 @@
 //
 //  Created by Ane Marie Johnsen on 15/04/2025.
 //
-
 import Foundation
 import SwiftUI
 
+// Http response for sending report
 class ReportViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?

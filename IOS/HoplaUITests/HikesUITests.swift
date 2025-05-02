@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 29/04/2025.
 //
-
 import XCTest
 
+// Testing Hikes file
 final class HikesUITests: XCTestCase {
     var app: XCUIApplication!
     
@@ -23,8 +23,7 @@ final class HikesUITests: XCTestCase {
         super.tearDown()
     }
     
-    // MARK: – Search Flow
-    
+    // Testing searching for hikes
     @MainActor
     func testSearchingFiltersList() {
         // 1) Focus the search field

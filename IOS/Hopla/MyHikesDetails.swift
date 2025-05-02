@@ -4,11 +4,11 @@
 //
 //  Created by Ane Marie Johnsen on 07/04/2025.
 //
-
 import SwiftUI
 import Combine
 import UIKit
 
+// Coordinates
 struct CoordinateMyHikes: Codable {
     let lat: Double
     let lng: Double
@@ -19,12 +19,14 @@ struct CoordinateMyHikes: Codable {
     }
 }
 
+// Trail response
 struct TrailResponse: Codable {
     let id: String
     let distance: Double
     let allCoords: [CoordinateMyHikes]
 }
 
+// Select filters
 struct FilterPicker: View {
     @Binding var selectedFilters: [String]
     
@@ -56,104 +58,102 @@ struct FilterPicker: View {
     }
 }
 
+// MyHikes Details
 struct MyHikesDetails: View {
-  @Binding var myHikes: [MyHike]
-  @Environment(\.dismiss) private var dismiss
-
-  // Create and own the view-model for this screen:
-  @StateObject private var vm: MyHikesDetailsViewModel
+    @Binding var myHikes: [MyHike]
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var vm: MyHikesDetailsViewModel
     
-
-  // Local UI state:
-  @State private var isEditing     = false
-  @State private var formVisible   = false
-  @State private var newTitle      = ""
-
-  init(hike: MyHike, myHikes: Binding<[MyHike]>) {
-    _myHikes = myHikes
-    // initialize the StateObject with the incoming hike
-    _vm       = StateObject(wrappedValue: MyHikesDetailsViewModel(hike: hike))
-  }
-
-  var body: some View {
-    NavigationStack {
-      // our own back button
-      MyHikesDetailsHeader { dismiss() }
-
-        /*
-      ScrollView {
-        // read-only vs edit form
-        if isEditing {
-          HikeEditSection(
-            trailName:       $vm.hike.trailName,
-            title:           $vm.hike.title,
-            description:     $vm.hike.comment,
-            selectedHorseId: $vm.hike.horseName,
-            onSave:          saveEdits,
-            onCancel:        { isEditing = false },
-            horses:          vm.horses
-          )
-        } else {
-          HikeReadOnlySection(hike: vm.hike)
-            .toolbar {
-              Button { isEditing.toggle() }
-                 label: { Image(systemName: "pencil") }
-            }
-        }
-
-        // upgrade section
-          HikeUpgradeSection(
-            formVisible:     $formVisible,
-            selectedImage:   $vm.selectedImage,
-            newTitle:        $vm.hike.title,
-            selectedFilters: $vm.selectedFilters,
-            onSubmit: {
-              vm.upgradeToTrail(
-                filters: vm.selectedFilters,
-                completion: { success in
-                  if success {
-                    formVisible = false
-                  }
+    // Local UI state:
+    @State private var isEditing     = false
+    @State private var formVisible   = false
+    @State private var newTitle      = ""
+    
+    init(hike: MyHike, myHikes: Binding<[MyHike]>) {
+        _myHikes = myHikes
+        // initialize the StateObject with the incoming hike
+        _vm       = StateObject(wrappedValue: MyHikesDetailsViewModel(hike: hike))
+    }
+    
+    var body: some View {
+        NavigationStack {
+            // Custom back button
+            MyHikesDetailsHeader { dismiss() }
+            /*
+             ScrollView {
+             // read-only vs edit form
+             if isEditing {
+             HikeEditSection(
+             trailName:       $vm.hike.trailName,
+             title:           $vm.hike.title,
+             description:     $vm.hike.comment,
+             selectedHorseId: $vm.hike.horseName,
+             onSave:          saveEdits,
+             onCancel:        { isEditing = false },
+             horses:          vm.horses
+             )
+             } else {
+             HikeReadOnlySection(hike: vm.hike)
+             .toolbar {
+             Button { isEditing.toggle() }
+             label: { Image(systemName: "pencil") }
+             }
+             }
+             
+             // upgrade section
+             HikeUpgradeSection(
+             formVisible:     $formVisible,
+             selectedImage:   $vm.selectedImage,
+             newTitle:        $vm.hike.title,
+             selectedFilters: $vm.selectedFilters,
+             onSubmit: {
+             vm.upgradeToTrail(
+             filters: vm.selectedFilters,
+             completion: { success in
+             if success {
+             formVisible = false
+             }
+             }
+             )
+             }
+             )
+             
+             // map & route
+             MapWithRouteView(
+             coordinates:   vm.coordinates,
+             trailButton:   vm.hike.trailButton,
+             trailResponse: vm.trailResponse
+             )
+             .frame(height: 300)
+             .cornerRadius(12)
+             }
+             */
+                .onAppear {
+                    vm.fetchDetails()
+                    vm.fetchCoordinates()
+                    vm.fetchHorses()
                 }
-              )
-            }
-          )
-
-        // map & route
-        MapWithRouteView(
-          coordinates:   vm.coordinates,
-          trailButton:   vm.hike.trailButton,
-          trailResponse: vm.trailResponse
+        }
+    }
+    
+    // Save edit
+    private func saveEdits() {
+        // call through to VM
+        vm.updateHike(
+            trailName:   vm.hike.trailName,
+            title:       vm.hike.title,
+            description: vm.hike.comment,
+            horseId:     vm.hike.horseName
         )
-        .frame(height: 300)
-        .cornerRadius(12)
-      }
-         */
-      .onAppear {
-        vm.fetchDetails()
-        vm.fetchCoordinates()
-        vm.fetchHorses()
-      }
+        // also update parent array:
+        if let idx = myHikes.firstIndex(where: { $0.id == vm.hike.id }) {
+            myHikes[idx] = vm.hike
+        }
+        isEditing = false
     }
-  }
-
-  private func saveEdits() {
-    // call through to VM
-    vm.updateHike(
-      trailName:   vm.hike.trailName,
-      title:       vm.hike.title,
-      description: vm.hike.comment,
-      horseId:     vm.hike.horseName
-    )
-    // also update your parent array:
-    if let idx = myHikes.firstIndex(where: { $0.id == vm.hike.id }) {
-      myHikes[idx] = vm.hike
-    }
-    isEditing = false
-  }
 }
 
-
+// Header view
 struct HeaderViewMyHikesDetails: View {
     let name: String
     let colorScheme: ColorScheme
@@ -191,6 +191,7 @@ struct HeaderViewMyHikesDetails: View {
     }
 }
 
+// Details header
 struct MyHikesDetailsHeader: View {
     let onBack: ()->Void
     var body: some View {
@@ -206,9 +207,10 @@ struct MyHikesDetailsHeader: View {
     }
 }
 
+// The read-only section
 struct HikeReadOnlySection: View {
     let hike: MyHike
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Image
@@ -230,7 +232,7 @@ struct HikeReadOnlySection: View {
                     EmptyView()
                 }
             }
-
+            
             // Details
             Text("Trail: \(hike.trailName)")
                 .font(.title2)
@@ -239,8 +241,8 @@ struct HikeReadOnlySection: View {
             if let horse = hike.horseName, !horse.isEmpty {
                 Text("Horse: \(horse)")
             }
-
-            // Metrics (customize formatting)
+            
+            // Metrics
             Text("Distance: \(String(format: "%.2f km", hike.length))")
             Text("Duration: \(String(format: "%02d:%02d", Int(hike.duration) / 60, Int(hike.duration) % 60))")
         }
@@ -248,6 +250,7 @@ struct HikeReadOnlySection: View {
     }
 }
 
+// Edit hike
 struct HikeEditSection: View {
     @Binding var trailName: String
     @Binding var title: String
@@ -277,6 +280,7 @@ struct HikeEditSection: View {
     }
 }
 
+// Upgrade hike to trail
 struct HikeUpgradeSection: View {
     @Binding var formVisible: Bool
     @Binding var selectedImage: UIImage?
@@ -302,6 +306,7 @@ struct HikeUpgradeSection: View {
     }
 }
 
+// To select from existing horses
 struct HorseSelectionView: View {
     @ObservedObject var horseVM = HorseViewModel()
     var onSelect: (String) -> Void
@@ -325,7 +330,7 @@ struct HorseSelectionView: View {
     }
 }
 
-
+// Http requests
 final class MyHikesDetailsViewModel: ObservableObject {
     @Published var hike: MyHike
     @Published var coordinates: [CoordinateMyHikes] = []
@@ -333,11 +338,9 @@ final class MyHikesDetailsViewModel: ObservableObject {
     @Published var selectedImage: UIImage?
     @Published var horses: [Horse] = []
     @Published var selectedFilters: [String] = []
-    
     private let tokenManager = TokenManager.shared
     private var cancellables = Set<AnyCancellable>()
     private let horseVM = HorseViewModel()
-
     
     init(hike: MyHike) {
         self.hike = hike
@@ -346,15 +349,15 @@ final class MyHikesDetailsViewModel: ObservableObject {
     func fetchHorses() {
         horseVM.fetchHorses()          // kick off the load…
         horseVM.$horses                // …then subscribe to its @Published
-          .receive(on: DispatchQueue.main)
-          .assign(to: \.horses, on: self)
-          .store(in: &cancellables)
-      }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.horses, on: self)
+            .store(in: &cancellables)
+    }
     
     /// Fetch the latest hike details from server
     func fetchDetails() {
         guard let url = URL(string: "https://hopla.onrender.com/userhikes/\(hike.id)") else {
-            print("❌ Invalid URL for fetchDetails")
+            print("Invalid URL for fetchDetails")
             return
         }
         URLSession.shared.dataTaskPublisher(for: url)
@@ -368,7 +371,7 @@ final class MyHikesDetailsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 if case let .failure(error) = completion {
-                    print("❌ fetchDetails error: \(error.localizedDescription)")
+                    print("fetchDetails error: \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] updated in
                 self?.hike = updated
@@ -382,11 +385,11 @@ final class MyHikesDetailsViewModel: ObservableObject {
                     description: String,
                     horseId: String?) {
         guard let token = tokenManager.getToken() else {
-            print("❌ No token found for updateHike")
+            print("No token found for updateHike")
             return
         }
         guard let url = URL(string: "https://hopla.onrender.com/userhikes/\(hike.id)") else {
-            print("❌ Invalid URL for updateHike")
+            print("Invalid URL for updateHike")
             return
         }
         
@@ -439,7 +442,7 @@ final class MyHikesDetailsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 if case let .failure(error) = completion {
-                    print("❌ updateHike error: \(error.localizedDescription)")
+                    print("updateHike error: \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] updated in
                 self?.hike = updated
@@ -453,7 +456,7 @@ final class MyHikesDetailsViewModel: ObservableObject {
         ? "userhikes/coordinates/\(hike.id)"
         : "trails/prepare?trailId=\(hike.id)"
         guard let url = URL(string: "https://hopla.onrender.com/\(endpoint)") else {
-            print("❌ Invalid URL for fetchCoordinates")
+            print("Invalid URL for fetchCoordinates")
             return
         }
         URLSession.shared.dataTaskPublisher(for: url)
@@ -466,7 +469,7 @@ final class MyHikesDetailsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { comp in
                 if case let .failure(err) = comp {
-                    print("❌ fetchCoordinates error: \(err)")
+                    print("fetchCoordinates error: \(err)")
                 }
             }, receiveValue: { [weak self] data in
                 guard let self = self else { return }
@@ -480,7 +483,7 @@ final class MyHikesDetailsViewModel: ObservableObject {
                         self.coordinates = resp.allCoords
                     }
                 } catch {
-                    print("❌ decode coordinates error: \(error)")
+                    print("decode coordinates error: \(error)")
                 }
             })
             .store(in: &cancellables)

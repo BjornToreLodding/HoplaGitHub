@@ -4,11 +4,11 @@
 //
 //  Created by Ane Marie Johnsen on 30/04/2025.
 //
-
 import XCTest
 import Combine
 @testable import Hopla
 
+// Testing LoginViewModel file
 final class LoginViewModelTests: XCTestCase {
     var viewModel: LoginViewModel!
     var cancellables = Set<AnyCancellable>()
@@ -32,6 +32,7 @@ final class LoginViewModelTests: XCTestCase {
         super.tearDown()
     }
     
+    // Testing to log in
     func testLoginSuccess() {
         // Prepare a fake 200-OK JSON response
         let loginJSON = """
@@ -50,48 +51,49 @@ final class LoginViewModelTests: XCTestCase {
         
         let loginURL = URL(string: "https://hopla.onrender.com/users/login/")!
         MockURLProtocol.stubResponses = [
-          loginURL: (
-            200,
-            loginJSON,          // Data?
-            nil as Error?       // Error?
-          )
+            loginURL: (
+                200,
+                loginJSON,          // Data?
+                nil as Error?       // Error?
+            )
         ]
         
         let exp = expectation(description: "login succeeds and sets isLoggedIn = true")
         
         viewModel.$isLoggedIn
-          .dropFirst()              // ignore the initial `false`
-          .sink { isLogged in
-            XCTAssertTrue(isLogged, "Expected isLoggedIn to flip to true on 200")
-            exp.fulfill()
-          }
-          .store(in: &cancellables)
+            .dropFirst()              // ignore the initial `false`
+            .sink { isLogged in
+                XCTAssertTrue(isLogged, "Expected isLoggedIn to flip to true on 200")
+                exp.fulfill()
+            }
+            .store(in: &cancellables)
         
         viewModel.login(email: "test@example.com", password: "secret")
         
         wait(for: [exp], timeout: 1.0)
     }
     
+    // Testing an unauthorized login attempt
     func testLoginUnauthorized() {
         // Stub a 401 Unauthorized
         let loginURL = URL(string: "https://hopla.onrender.com/users/login/")!
         MockURLProtocol.stubResponses = [
-          loginURL: (
-            401,
-            Data("Unauthorized".utf8),
-            nil as Error?
-          )
+            loginURL: (
+                401,
+                Data("Unauthorized".utf8),
+                nil as Error?
+            )
         ]
         
         let exp = expectation(description: "login fails with 401 and sets errorMessage")
         
         viewModel.$errorMessage
-          .dropFirst()              // ignore the initial `nil`
-          .sink { msg in
-            XCTAssertEqual(msg, "Invalid email or password")
-            exp.fulfill()
-          }
-          .store(in: &cancellables)
+            .dropFirst()              // ignore the initial `nil`
+            .sink { msg in
+                XCTAssertEqual(msg, "Invalid email or password")
+                exp.fulfill()
+            }
+            .store(in: &cancellables)
         
         viewModel.login(email: "bad@example.com", password: "wrong")
         

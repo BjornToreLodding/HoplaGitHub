@@ -1,119 +1,118 @@
-
 {
-  "trails": [
-    {
-      "id": "12345678-0000-0000-0021-123456780021",
-      "name": "Sjølystturen",
-      "pictureUrl": "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1020&h=420&fit=crop",
-      "averageRating": 5,
-      "isFavorite": true,
-      "distance": null,
-      "filters": [
+    "trails": [
         {
-          "id": "12345678-0000-0000-0101-123456780001",
-          "name": "SurfaceType",
-          "displayName": "Underlag",
-          "type": "MultiEnum",
-          "options": ["Gravel","Sand","Asphalt","Dirt"],
-          "value": "Dirt,Gravel",
-          "defaultValue": "Gravel,Dirt"
+            "id": "12345678-0000-0000-0021-123456780021",
+            "name": "Sjølystturen",
+            "pictureUrl": "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1020&h=420&fit=crop",
+            "averageRating": 5,
+            "isFavorite": true,
+            "distance": null,
+            "filters": [
+                {
+                    "id": "12345678-0000-0000-0101-123456780001",
+                    "name": "SurfaceType",
+                    "displayName": "Underlag",
+                    "type": "MultiEnum",
+                    "options": ["Gravel","Sand","Asphalt","Dirt"],
+                    "value": "Dirt,Gravel",
+                    "defaultValue": "Gravel,Dirt"
+                },
+                {
+                    "id": "12345678-0000-0000-0101-123456780002",
+                    "name": "Difficulty",
+                    "displayName": "Vanskelighetsgrad",
+                    "type": "Enum",
+                    "options": ["Easy","Medium","Hard"],
+                    "value": "Medium",
+                    "defaultValue": "Easy"
+                }
+            ]
         },
         {
-          "id": "12345678-0000-0000-0101-123456780002",
-          "name": "Difficulty",
-          "displayName": "Vanskelighetsgrad",
-          "type": "Enum",
-          "options": ["Easy","Medium","Hard"],
-          "value": "Medium",
-          "defaultValue": "Easy"
-        }
-      ]
-    },
-    {
-      "id": "12345678-0000-0000-0021-123456780020",
-      "name": "BjerkeTravbanespurten",
-      "pictureUrl": "https://plus.unsplash.com/premium_photo-1661869024027-5114007c9a18?w=1020&h=420&fit=crop",
-      "averageRating": 5,
-      "isFavorite": true,
-      "distance": null,
-      "filters": [
-        {
-          "id": "12345678-0000-0000-0101-123456780001",
-          "name": "SurfaceType",
-          "displayName": "Underlag",
-          "type": "MultiEnum",
-          "options": ["Gravel","Sand","Asphalt","Dirt"],
-          "value": "Gravel,Asphalt",
-          "defaultValue": "Gravel,Dirt"
+            "id": "12345678-0000-0000-0021-123456780020",
+            "name": "BjerkeTravbanespurten",
+            "pictureUrl": "https://plus.unsplash.com/premium_photo-1661869024027-5114007c9a18?w=1020&h=420&fit=crop",
+            "averageRating": 5,
+            "isFavorite": true,
+            "distance": null,
+            "filters": [
+                {
+                    "id": "12345678-0000-0000-0101-123456780001",
+                    "name": "SurfaceType",
+                    "displayName": "Underlag",
+                    "type": "MultiEnum",
+                    "options": ["Gravel","Sand","Asphalt","Dirt"],
+                    "value": "Gravel,Asphalt",
+                    "defaultValue": "Gravel,Dirt"
+                },
+                {
+                    "id": "12345678-0000-0000-0101-123456780002",
+                    "name": "Difficulty",
+                    "displayName": "Vanskelighetsgrad",
+                    "type": "Enum",
+                    "options": ["Easy","Medium","Hard"],
+                    "value": "Easy",
+                    "defaultValue": "Easy"
+                }
+            ]
         },
         {
-          "id": "12345678-0000-0000-0101-123456780002",
-          "name": "Difficulty",
-          "displayName": "Vanskelighetsgrad",
-          "type": "Enum",
-          "options": ["Easy","Medium","Hard"],
-          "value": "Easy",
-          "defaultValue": "Easy"
-        }
-      ]
-    },
-    {
-      "id": "12345678-0000-0000-0021-123456780024",
-      "name": "Raufossløypa",
-      "pictureUrl": "https://images.unsplash.com/photo-1433190152045-5a94184895da?w=1020&h=420&fit=crop",
-      "averageRating": 5,
-      "isFavorite": true,
-      "distance": null,
-      "filters": [
-        {
-          "id": "12345678-0000-0000-0101-123456780001",
-          "name": "SurfaceType",
-          "displayName": "Underlag",
-          "type": "MultiEnum",
-          "options": ["Gravel","Sand","Asphalt","Dirt"],
-          "value": "Asphalt",
-          "defaultValue": "Gravel,Dirt"
+            "id": "12345678-0000-0000-0021-123456780024",
+            "name": "Raufossløypa",
+            "pictureUrl": "https://images.unsplash.com/photo-1433190152045-5a94184895da?w=1020&h=420&fit=crop",
+            "averageRating": 5,
+            "isFavorite": true,
+            "distance": null,
+            "filters": [
+                {
+                    "id": "12345678-0000-0000-0101-123456780001",
+                    "name": "SurfaceType",
+                    "displayName": "Underlag",
+                    "type": "MultiEnum",
+                    "options": ["Gravel","Sand","Asphalt","Dirt"],
+                    "value": "Asphalt",
+                    "defaultValue": "Gravel,Dirt"
+                },
+                {
+                    "id": "12345678-0000-0000-0101-123456780002",
+                    "name": "Difficulty",
+                    "displayName": "Vanskelighetsgrad",
+                    "type": "Enum",
+                    "options": ["Easy","Medium","Hard"],
+                    "value": "Medium",
+                    "defaultValue": "Easy"
+                }
+            ]
         },
         {
-          "id": "12345678-0000-0000-0101-123456780002",
-          "name": "Difficulty",
-          "displayName": "Vanskelighetsgrad",
-          "type": "Enum",
-          "options": ["Easy","Medium","Hard"],
-          "value": "Medium",
-          "defaultValue": "Easy"
+            "id": "12345678-0000-0000-0021-123456780022",
+            "name": "Snarøyatråkket",
+            "pictureUrl": "https://images.unsplash.com/photo-1508144753681-9986d4df99b3?w=1020&h=420&fit=crop",
+            "averageRating": 5,
+            "isFavorite": false,
+            "distance": null,
+            "filters": [
+                {
+                    "id": "12345678-0000-0000-0101-123456780001",
+                    "name": "SurfaceType",
+                    "displayName": "Underlag",
+                    "type": "MultiEnum",
+                    "options": ["Gravel","Sand","Asphalt","Dirt"],
+                    "value": "Gravel,Sand,Asphalt",
+                    "defaultValue": "Gravel,Dirt"
+                },
+                {
+                    "id": "12345678-0000-0000-0101-123456780002",
+                    "name": "Difficulty",
+                    "displayName": "Vanskelighetsgrad",
+                    "type": "Enum",
+                    "options": ["Easy","Medium","Hard"],
+                    "value": "Hard",
+                    "defaultValue": "Easy"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "id": "12345678-0000-0000-0021-123456780022",
-      "name": "Snarøyatråkket",
-      "pictureUrl": "https://images.unsplash.com/photo-1508144753681-9986d4df99b3?w=1020&h=420&fit=crop",
-      "averageRating": 5,
-      "isFavorite": false,
-      "distance": null,
-      "filters": [
-        {
-          "id": "12345678-0000-0000-0101-123456780001",
-          "name": "SurfaceType",
-          "displayName": "Underlag",
-          "type": "MultiEnum",
-          "options": ["Gravel","Sand","Asphalt","Dirt"],
-          "value": "Gravel,Sand,Asphalt",
-          "defaultValue": "Gravel,Dirt"
-        },
-        {
-          "id": "12345678-0000-0000-0101-123456780002",
-          "name": "Difficulty",
-          "displayName": "Vanskelighetsgrad",
-          "type": "Enum",
-          "options": ["Easy","Medium","Hard"],
-          "value": "Hard",
-          "defaultValue": "Easy"
-        }
-      ]
-    }
-  ],
-  "pageNumber": 1,
-  "pageSize": 4
+    ],
+    "pageNumber": 1,
+    "pageSize": 4
 }

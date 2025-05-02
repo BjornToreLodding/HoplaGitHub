@@ -6,46 +6,47 @@
 //
 import XCTest
 
+// Testing Profile file
 final class ProfileUITests: XCTestCase {
     var app: XCUIApplication!
-
+    
     override func setUp() {
-      super.setUp()
-      continueAfterFailure = false
-      app = XCUIApplication()
-      app.launchArguments += ["-UITestMode"]
-      app.launchEnvironment = [
-        "MOCK_USER_ALIAS": "jane_doe",
-        "MOCK_USER_NAME":  "Jane Doe",
-        "MOCK_USER_EMAIL": "jane@example.com"
-      ]
-      app.launch()
+        super.setUp()
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launchArguments += ["-UITestMode"]
+        app.launchEnvironment = [
+            "MOCK_USER_ALIAS": "jane_doe",
+            "MOCK_USER_NAME":  "Jane Doe",
+            "MOCK_USER_EMAIL": "jane@example.com"
+        ]
+        app.launch()
     }
-
-
+    
+    // Test edit alias
     func testEditAliasField() {
-      app.tabBars.buttons["Profile"].tap()
-
-      let aliasLabel = app.staticTexts["profile_alias_label"]
-      XCTAssertTrue(aliasLabel.waitForExistence(timeout: 2))
-
-      XCTAssertEqual(aliasLabel.label, "jane_doe")
-
-      // now the edit button exists
-      let editButton = app.buttons["profile_alias_edit_button"]
-      XCTAssertTrue(editButton.exists)
-      editButton.tap()
-
-      let aliasField = app.textFields["profile_alias_textField"]
-      XCTAssertTrue(aliasField.exists)
-      aliasField.clearAndEnterText("new_alias")
-
-      let saveButton = app.buttons["profile_alias_save_button"]
-      XCTAssertTrue(saveButton.exists)
-      saveButton.tap()
-
-      // verify update
-      XCTAssertEqual(aliasLabel.label, "new_alias")
+        app.tabBars.buttons["Profile"].tap()
+        
+        let aliasLabel = app.staticTexts["profile_alias_label"]
+        XCTAssertTrue(aliasLabel.waitForExistence(timeout: 2))
+        
+        XCTAssertEqual(aliasLabel.label, "jane_doe")
+        
+        // now the edit button exists
+        let editButton = app.buttons["profile_alias_edit_button"]
+        XCTAssertTrue(editButton.exists)
+        editButton.tap()
+        
+        let aliasField = app.textFields["profile_alias_textField"]
+        XCTAssertTrue(aliasField.exists)
+        aliasField.clearAndEnterText("new_alias")
+        
+        let saveButton = app.buttons["profile_alias_save_button"]
+        XCTAssertTrue(saveButton.exists)
+        saveButton.tap()
+        
+        // verify update
+        XCTAssertEqual(aliasLabel.label, "new_alias")
     }
 }
 

@@ -7,16 +7,17 @@
 import Foundation
 import XCTest
 
+// A class to test the URL Protocol
 class TestURLProtocol: URLProtocol {
     static var lastRequest: URLRequest?
     static var lastRequestBody: Data?
     static var stubResponseData: Data?
     static var stubStatusCode = 200
     
-    // New: keep all requests in order
+    // Keep all requests in order
         static var requests: [URLRequest] = []
 
-    /// XCTestExpectation your test sets before calling saveHike()
+    /// XCTestExpectation the test sets before calling saveHike()
     static weak var requestExpectation: XCTestExpectation?
 
     override class func canInit(with request: URLRequest) -> Bool {

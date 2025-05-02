@@ -6,8 +6,9 @@
 //
 import XCTest
 
+// Testing Home file
 final class HomeUITests: XCTestCase {
-    var app: XCUIApplication!    
+    var app: XCUIApplication!
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
@@ -23,12 +24,13 @@ final class HomeUITests: XCTestCase {
         app.launch()
     }
     
+    // Testing to display feed and like/unlike
     func testFeedDisplaysAndLikeToggles() {
         // 1) Wait for the home screen to appear
         let homeRoot = app.otherElements["homeScreenRoot"]
         XCTAssertTrue(homeRoot.waitForExistence(timeout: 5))
         
-        // 2) Locate our stub post
+        // 2) Locate the stub post
         let postId   = "stub-1"
         let titleLbl = homeRoot.staticTexts["homepost_\(postId)_title_label"]
         let descLbl  = homeRoot.staticTexts["homepost_\(postId)_description_label"]

@@ -4,12 +4,10 @@
 //
 //  Created by Ane Marie Johnsen on 27/02/2025.
 //
-
 import SwiftUI
 import Combine
 import UIKit
 import Foundation
-
 
 // MARK: - Horse ViewModel
 class HorseViewModel: ObservableObject {
@@ -18,10 +16,11 @@ class HorseViewModel: ObservableObject {
     private let session: URLSession
     
     // DESIGNATED INIT
-        init(session: URLSession = .shared) {
-            self.session = session
-        }
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
     
+    // Fetch horses
     func fetchHorses() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -55,20 +54,21 @@ class HorseViewModel: ObservableObject {
         }.resume()
     }
     
+    // Add horse
     func addHorse(name: String, breed: String?, age: Int?, horsePicture: UIImage?, dob: String?) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/horses/create")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
+        
         var body = Data()
         let parameters: [String: String] = [
             "Name": name,
@@ -77,13 +77,13 @@ class HorseViewModel: ObservableObject {
             "Month": dob?.components(separatedBy: "-")[1] ?? "",
             "Day": dob?.components(separatedBy: "-").last ?? ""
         ]
-
+        
         for (key, value) in parameters {
             body.append("--\(boundary)\r\n".data(using: .utf8)!)
             body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
             body.append("\(value)\r\n".data(using: .utf8)!)
         }
-
+        
         if let image = horsePicture, let imageData = image.jpegData(compressionQuality: 0.8) {
             body.append("--\(boundary)\r\n".data(using: .utf8)!)
             body.append("Content-Disposition: form-data; name=\"Image\"; filename=\"horse_image.jpg\"\r\n".data(using: .utf8)!)
@@ -91,19 +91,19 @@ class HorseViewModel: ObservableObject {
             body.append(imageData)
             body.append("\r\n".data(using: .utf8)!)
         }
-
+        
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         request.httpBody = body
-
+        
         session.dataTask(with: request) { [weak self] data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 || httpResponse.statusCode == 201 {
                 print("Horse added successfully.")
-
+                
                 // Refresh the horse list after successful addition
                 DispatchQueue.main.async {
                     self?.fetchHorses()
@@ -116,19 +116,18 @@ class HorseViewModel: ObservableObject {
             }
         }.resume()
     }
-
+    
+    // Delete horse
     func deleteHorse(horseId: String) {
         // 1) Optimistically remove the horse locally
         horses.removeAll { $0.id == horseId }
-
+        
         // 2) Then fire off the network DELETE request
         guard let url = URL(string: "https://your.api/horses/\(horseId)") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-
+        
         session.dataTask(with: request) { data, response, error in
-            // You can still handle errors or non-2xx status codes here if you like,
-            // but the local removal has already happened to satisfy the test’s timing.
             if let error = error {
                 print("Delete failed:", error)
                 return
@@ -171,7 +170,7 @@ struct Horse: Identifiable, Decodable {
         var dayNumber: Int
     }
     
-    // Optional computed property to get the image from the URL
+    // To get the image from the URL
     var horseImage: UIImage? {
         guard let urlString = horsePictureUrl, // Unwrap the optional
               !urlString.isEmpty, // Check if the unwrapped value is not empty
@@ -183,9 +182,7 @@ struct Horse: Identifiable, Decodable {
     }
 }
 
-
-
-
+// My horses struct
 struct MyHorses: View {
     @StateObject private var vm = HorseViewModel()
     @State private var showAddHorseSheet = false
@@ -195,7 +192,6 @@ struct MyHorses: View {
         ZStack {
             VStack(spacing: 0) {
                 HeaderView(colorScheme: colorScheme)
-                
                 NavigationStack {
                     ZStack {
                         AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
@@ -207,10 +203,8 @@ struct MyHorses: View {
                 .navigationBarBackButtonHidden(true)
             }
             .onAppear { vm.fetchHorses() }
-            
             // Custom back button
             CustomBackButton(colorScheme: colorScheme)
-            
             // Floating Add button
             VStack {
                 Spacer()
@@ -259,8 +253,6 @@ struct HorseListView: View {
     }
 }
 
-
-
 // MARK: - Horse Row
 struct HorseRowView: View {
     var horse: Horse
@@ -291,13 +283,11 @@ struct HorseRowView: View {
                     }
                     Text(horse.name)
                         .font(.headline)
-                    
                     Spacer()
                 }
                 .padding(.vertical, 10)
             }
             .buttonStyle(PlainButtonStyle()) // Prevents unwanted button styles
-            
             // Delete Button (outside NavigationLink)
             Button(action: {
                 showDeleteAlert = true
@@ -322,13 +312,11 @@ struct HorseRowView: View {
     }
 }
 
-
-
 // MARK: - Add Horse Button
 struct AddHorseButton: View {
     @Binding var showAddHorseSheet: Bool
     var colorScheme: ColorScheme
-
+    
     var body: some View {
         Button(action: { showAddHorseSheet = true }) {
             ZStack {
@@ -337,11 +325,11 @@ struct AddHorseButton: View {
                     .fill(
                         AdaptiveColor(light: .lightGreen,
                                       dark: .darkGreen)
-                            .color(for: colorScheme)
+                        .color(for: colorScheme)
                     )
                     .frame(width: 60, height: 60)
                     .shadow(radius: 3)
-
+                
                 // White plus
                 Image(systemName: "plus")
                     .font(.system(size: 30, weight: .bold))
@@ -351,13 +339,10 @@ struct AddHorseButton: View {
     }
 }
 
-
-
 // MARK: - Custom Back Button
 struct CustomBackButton: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
-    
     var colorScheme: ColorScheme
     
     var body: some View {
@@ -380,7 +365,6 @@ struct CustomBackButton: View {
     }
 }
 
-
 // MARK: - Add Horse View
 struct AddHorseView: View {
     @ObservedObject var vm: HorseViewModel
@@ -395,7 +379,7 @@ struct AddHorseView: View {
     
     @State private var showImagePicker = false
     @Environment(\.presentationMode) var presentationMode
-
+    
     var body: some View {
         NavigationView {
             Form {
