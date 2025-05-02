@@ -4,7 +4,6 @@
 //
 //  Created by Ane Marie Johnsen on 31/01/2025.
 //
-
 import Foundation
 import SwiftUI
 import Combine
@@ -13,17 +12,16 @@ import Combine
 struct MyHike: Codable, Identifiable {
     let id: String
     var trailName: String
-    let trailId: String? // ✅ Optional TrailId
+    let trailId: String? // Optional TrailId
     let length: Double
     let duration: Double
     var pictureUrl: String?
-    var title: String // ✅ Matches `title` in API
-    var comment: String // ✅ Matches `comment` instead of `description`
-    var horseName: String? // ✅ Matches `horseName`
-    var trailButton: Bool // ✅ Matches API `trailButton`
+    var title: String // Matches `title` in API
+    var comment: String // Matches `comment` instead of `description`
+    var horseName: String? // Matches `horseName`
+    var trailButton: Bool // Matches API `trailButton`
     
 }
-
 
 // MARK: - API Response Model
 struct MyHikeResponse: Codable {
@@ -37,12 +35,10 @@ class MyHikeViewModel: ObservableObject {
     @Published var myHikes: [MyHike] = []
     @Published var isLoading = false
     @Published var rawApiResponse: String = ""
-    
     private var cancellable: AnyCancellable?
     private var currentPage: Int = 1
     private let pageSize = 4
     private var hasMorePages = true
-    
     private var fetchedIds = Set<String>()
     
     func reloadHikes() {
@@ -64,7 +60,6 @@ class MyHikeViewModel: ObservableObject {
             let comment = env["MOCK_HIKE_COMMENT"] ?? "Great view"
             let length  = Double(env["MOCK_HIKE_LENGTH"]  ?? "10.5") ?? 10.5
             let dur     = Double(env["MOCK_HIKE_DURATION"] ?? "120")  ?? 120
-            
             let stub = MyHike(
                 id: id,
                 trailName: trail,
@@ -85,12 +80,10 @@ class MyHikeViewModel: ObservableObject {
         }
         guard !isLoading else { return }
         guard hasMorePages else { return }
-        
         isLoading = true
-        
         guard let token = TokenManager.shared.getToken(),
               let userId = TokenManager.shared.getUserId() else {
-            print("❌ No token or user ID found.")
+            print("No token or user ID found.")
             return
         }
         
@@ -101,11 +94,10 @@ class MyHikeViewModel: ObservableObject {
           """
             .replacingOccurrences(of: "\n", with: "")
         
-        
-        print("📤 Final request URL:", urlString)
+        print("Final request URL:", urlString)
         
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             isLoading = false
             return
         }
@@ -126,20 +118,20 @@ class MyHikeViewModel: ObservableObject {
             
             if let data = data {
                 DispatchQueue.main.async {
-                    self.rawApiResponse = String(data: data, encoding: .utf8) ?? "No data" // ✅ Store response
-                    print("📡 Raw API Response:", self.rawApiResponse)
+                    self.rawApiResponse = String(data: data, encoding: .utf8) ?? "No data" // Store response
+                    print("Raw API Response:", self.rawApiResponse)
                 }
             }
             
             if let error = error {
-                print("❌ Request error:", error.localizedDescription)
+                print("Request error:", error.localizedDescription)
                 return
             }
             
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200,
                   let data = data else {
-                print("❌ Invalid response or status code")
+                print("Invalid response or status code")
                 return
             }
             
@@ -147,13 +139,10 @@ class MyHikeViewModel: ObservableObject {
                 let resp = try JSONDecoder().decode(MyHikeResponse.self, from: data)
                 DispatchQueue.main.async {
                     let page = resp.userHikes
-                    
                     // Reverse the batch so within it newest→oldest
                     let reversed = page.reversed()
-                    
-                    // Filter out anything whose id we've already inserted
+                    // Filter out anything whose id already inserted
                     let newOnes = reversed.filter { self.fetchedIds.insert($0.id).inserted }
-                    
                     if newOnes.isEmpty {
                         self.hasMorePages = false
                     } else {
@@ -201,9 +190,9 @@ struct MyHikes: View {
                 // 2) Background
                 AdaptiveColor(light: .mainLightBackground,
                               dark:  .mainDarkBackground)
-                    .color(for: colorScheme)
-                    .ignoresSafeArea()         // fill behind the header too
-
+                .color(for: colorScheme)
+                .ignoresSafeArea()         // fill behind the header too
+                
                 // 3) The ScrollView + LazyVStack
                 hikesScrollView
             }
@@ -264,7 +253,6 @@ struct MyHikes: View {
 
 struct HeaderViewMyHikes: View {
     var colorScheme: ColorScheme
-    
     var body: some View {
         Text("My hikes")
             .font(.custom("ArialNova", size: 20))

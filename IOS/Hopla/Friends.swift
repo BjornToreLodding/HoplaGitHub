@@ -4,10 +4,8 @@
 //
 //  Created by Ane Marie Johnsen on 31/01/2025.
 //
-
 import SwiftUI
 import Combine
-
 
 // MARK: - Friend Model
 struct Friend: Identifiable, Decodable {
@@ -15,7 +13,7 @@ struct Friend: Identifiable, Decodable {
     var name: String
     var alias: String
     var profilePictureUrl: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case id = "friendId" // maps friendId to id
         case name = "friendName" // maps friendName to name
@@ -31,7 +29,7 @@ struct User: Identifiable, Decodable {
     var alias: String?
     var profilePictureUrl: String?
     var relationStatus: PersonStatus?
-
+    
     enum CodingKeys: String, CodingKey {
         case id               // matches "id"
         case name             // matches "name"
@@ -40,7 +38,6 @@ struct User: Identifiable, Decodable {
         case relationStatus   // optional, may be missing
     }
 }
-
 
 // MARK: - Post Model / Hikes (userHikes)
 struct Post: Identifiable, Decodable {
@@ -53,18 +50,16 @@ struct Post: Identifiable, Decodable {
 
 // Enum for relation status
 enum PersonStatus: String, Codable {
-  case none     = "NONE"
-  case pending  = "PENDING"
-  case following = "FOLLOWING"
-  case friends  = "FRIENDS"
-  case block    = "BLOCK"
+    case none     = "NONE"
+    case pending  = "PENDING"
+    case following = "FOLLOWING"
+    case friends  = "FRIENDS"
+    case block    = "BLOCK"
 }
-
 
 // MARK: - Header
 struct FriendsHeaderView: View {
     var colorScheme: ColorScheme
-    
     var body: some View {
         Text("My friends")
             .font(.custom("ArialNova", size: 20))
@@ -79,7 +74,6 @@ struct FriendsHeaderView: View {
 // MARK: - Header
 struct AddFriendsHeaderView: View {
     var colorScheme: ColorScheme
-    
     var body: some View {
         Text("Add new friends")
             .font(.custom("ArialNova", size: 20))
@@ -91,33 +85,34 @@ struct AddFriendsHeaderView: View {
     }
 }
 
+// Http requests
 class FriendViewModel: ObservableObject {
     @Published var friends: [Friend] = []
     @Published var allUsers: [User] = []
     @Published var filteredFriends: [Friend] = []
-
+    
     func fetchFriends() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/userrelations/friends")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
                 print("Invalid response or status code")
                 return
             }
-
+            
             do {
                 let friends = try JSONDecoder().decode([Friend].self, from: data)
                 print("Fetched Friends:", friends) // Debugging line
@@ -130,73 +125,69 @@ class FriendViewModel: ObservableObject {
             }
         }.resume()
     }
-
+    // Fetch all users
     func fetchAllUsers() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/users/all")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
             if let http = response as? HTTPURLResponse {
-                print("🔔 fetchAllUsers statusCode:", http.statusCode)
+                print("fetchAllUsers statusCode:", http.statusCode)
             }
             guard let data = data else {
                 print("No data returned")
                 return
             }
             if let raw = String(data: data, encoding: .utf8) {
-                print("🔍 fetchAllUsers raw JSON →", raw)
+                print("fetchAllUsers raw JSON →", raw)
             }
-
+            
             do {
                 let decoder = JSONDecoder()
-                // If your JSON uses snake_case or camelCase → uncomment:
-                // decoder.keyDecodingStrategy = .convertFromSnakeCase
-
                 let users = try decoder.decode([User].self, from: data)
                 DispatchQueue.main.async {
                     self.allUsers = users
                 }
-                print("✅ Decoded users:", users)
+                print("Decoded users:", users)
             } catch {
-                print("❌ Error decoding all users:", error)
+                print("Error decoding all users:", error)
             }
         }
         .resume()
     }
-
-
+    // Add friend
     func addFriend(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/userrelations/addfriend")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: Any] = ["friendId": userId]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             DispatchQueue.main.async {
                 // Update list after adding
                 self.fetchFriends()
@@ -204,7 +195,7 @@ class FriendViewModel: ObservableObject {
             }
         }.resume()
     }
-    
+    // The search bar
     private func updateFilteredFriends() {
         if searchText.isEmpty {
             filteredFriends = friends
@@ -212,7 +203,7 @@ class FriendViewModel: ObservableObject {
             filteredFriends = friends.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
-
+    
     var searchText: String = "" {
         didSet {
             updateFilteredFriends()
@@ -220,17 +211,15 @@ class FriendViewModel: ObservableObject {
     }
 }
 
-
-
 // MARK: - Friends View
 struct Friends: View {
     @StateObject private var vm = FriendViewModel()
     @Environment(\.colorScheme) var colorScheme
-
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                // 1) Your main content
+                // 1) Main content
                 VStack(spacing: 0) {
                     FriendsHeaderView(colorScheme: colorScheme)
                     searchBar
@@ -239,25 +228,22 @@ struct Friends: View {
                             AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
                                 .color(for: colorScheme)
                         )
-                    
                     // 2) Friends list fills the rest
                     ZStack {
-                        // 1) Get a Color view from your AdaptiveColor
+                        // 1) Get a Color view from AdaptiveColor
                         AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
-                            .color(for: colorScheme)      // ← now this is a SwiftUI Color
-                            .ignoresSafeArea()            // ← valid on Color (a View)
-
-                        // 2) Your actual list on top of that background
+                            .color(for: colorScheme)
+                            .ignoresSafeArea()
+                        
+                        // 2) The actual list on top of that background
                         FriendListView(vm: vm, colorScheme: colorScheme)
                     }
                     .onAppear {
                         vm.fetchFriends()
                     }
                 }
-                
-                // 3) Custom back button (still works)
+                // 3) Custom back button
                 CustomBackButton(colorScheme: colorScheme)
-                
                 // 4) Floating Add‑Friend button
                 VStack {
                     Spacer()
@@ -284,8 +270,7 @@ struct Friends: View {
             .navigationBarBackButtonHidden(true)
         }
     }
-
-
+    
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -300,13 +285,11 @@ struct Friends: View {
     }
 }
 
-
-
 // MARK: - Friend List
 struct FriendListView: View {
     @ObservedObject var vm: FriendViewModel
     var colorScheme: ColorScheme
-
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
@@ -322,12 +305,10 @@ struct FriendListView: View {
     }
 }
 
-
 // MARK: - Friend Row
 struct FriendRowView: View {
     var colorScheme: ColorScheme
     var friend: Friend
-    
     var body: some View {
         HStack {
             if let urlString = friend.profilePictureUrl, let url = URL(string: urlString) {
@@ -363,13 +344,12 @@ struct FriendRowView: View {
     }
 }
 
-
 // MARK: - Add Friend Page
 struct AddFriendPage: View {
     @State private var searchText: String = ""
     @StateObject private var vm = FriendViewModel()
     @Environment(\.colorScheme) var colorScheme
-
+    
     var filteredUsers: [User] {
         if searchText.isEmpty {
             return vm.allUsers
@@ -381,8 +361,7 @@ struct AddFriendPage: View {
             }
         }
     }
-
-
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -390,7 +369,7 @@ struct AddFriendPage: View {
                 searchBar
                     .frame(maxWidth: .infinity)
                     .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-
+                
                 // ScrollView to make the list scrollable
                 ScrollView {
                     LazyVStack(spacing: 16) {
@@ -405,13 +384,11 @@ struct AddFriendPage: View {
             .onAppear {
                 vm.fetchAllUsers()
             }
-
             CustomBackButton(colorScheme: colorScheme)  // Custom back button
         }
         .navigationBarBackButtonHidden(true)
     }
-
-
+    
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -428,19 +405,19 @@ struct AddFriendPage: View {
         let user: User
         let colorScheme: ColorScheme
         @StateObject private var vm = FriendViewModel()
-
+        
         var body: some View {
             NavigationLink(destination: UserDetails(userId: user.id)) {
                 HStack {
                     ProfileImageView(urlString: user.profilePictureUrl)
-
+                    
                     Text(user.name ?? "No name")
                         .font(.custom("ArialNova", size: 16))
                         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                         .padding(.leading, 10)
-
+                    
                     Spacer()
-
+                    
                     if user.relationStatus == .friends {
                         Text("Friend")
                             .padding(8)
@@ -460,15 +437,14 @@ struct AddFriendPage: View {
                     }
                 }
                 .padding()
-                .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme)) //Correct
+                .background(AdaptiveColor(light: .lightPostBackground, dark: .darkPostBackground).color(for: colorScheme))
                 .shadow(radius: 2)
             }
         }
     }
-
+    
     struct ProfileImageView: View {
         let urlString: String?
-
         var body: some View {
             if let urlString = urlString, let url = URL(string: urlString) {
                 AsyncImage(url: url) { image in
@@ -488,10 +464,7 @@ struct AddFriendPage: View {
             }
         }
     }
-
-    
 }
-
 
 func addUserToFriends(_ friend: Friend) {
     // API call to either add the user as a friend or follow them
@@ -502,4 +475,3 @@ func showUnfriendAlert(for friend: Friend) {
     // Show alert to confirm unfriend
     // If confirmed, make an API call to unfriend and update the UI
 }
-

@@ -4,7 +4,6 @@
 //
 //  Created by Ane Marie Johnsen on 31/01/2025.
 //
-
 import SwiftUI
 import Combine
 
@@ -15,7 +14,7 @@ struct Following: Identifiable, Decodable {
     var alias: String
     var profilePictureUrl: String?
     var status: PersonStatus = .following // Always 'following' by default
-
+    
     enum CodingKeys: String, CodingKey {
         case id = "followingUserId"
         case name = "followingUserName"
@@ -24,11 +23,9 @@ struct Following: Identifiable, Decodable {
     }
 }
 
-
 // MARK: - Header
 struct FollowingHeaderView: View {
     var colorScheme: ColorScheme
-    
     var body: some View {
         Text("Following")
             .font(.custom("ArialNova", size: 20))
@@ -40,11 +37,13 @@ struct FollowingHeaderView: View {
     }
 }
 
+// Http requests
 class FollowingViewModel: ObservableObject {
     @Published var following: [Following] = []
     @Published var allUsers: [User] = []
     @Published var filteredFollowing: [Following] = []
     
+    // Fetch following
     func fetchFollowing() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
@@ -81,28 +80,29 @@ class FollowingViewModel: ObservableObject {
             }
         }.resume()
     }
+    // Fetch all users
     func fetchAllUsers() {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/users/all")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
                 print("Invalid response or status code")
                 return
             }
-
+            
             do {
                 let users = try JSONDecoder().decode([User].self, from: data)
                 DispatchQueue.main.async {
@@ -114,27 +114,28 @@ class FollowingViewModel: ObservableObject {
         }.resume()
     }
     
+    // Function to add new following
     func addFollowing(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/userrelations/addfollowing")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: Any] = ["followingId": userId]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             DispatchQueue.main.async {
                 // Update list after adding
                 self.fetchFollowing()
@@ -150,7 +151,7 @@ class FollowingViewModel: ObservableObject {
             filteredFollowing = following.filter { $0.name.localizedCaseInsensitiveContains(searchTextFollowing) }
         }
     }
-
+    
     var searchTextFollowing: String = "" {
         didSet {
             updateFilteredFollowing()
@@ -162,7 +163,7 @@ class FollowingViewModel: ObservableObject {
 struct FollowingView: View {
     @StateObject private var vm = FollowingViewModel()
     @Environment(\.colorScheme) var colorScheme
-
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -185,7 +186,6 @@ struct FollowingView: View {
                 vm.fetchFollowing()
             }
             CustomBackButton(colorScheme: colorScheme)
-            
             // Add Following button at the bottom-right corner
             VStack {
                 Spacer()
@@ -198,10 +198,9 @@ struct FollowingView: View {
                                 .fill(
                                     AdaptiveColor(light: .lightGreen,
                                                   dark: .darkGreen)
-                                        .color(for: colorScheme)
+                                    .color(for: colorScheme)
                                 )
                                 .frame(width: 60, height: 60)
-                            
                             // White plus
                             Image(systemName: "plus")
                                 .font(.system(size: 30, weight: .bold))
@@ -214,7 +213,7 @@ struct FollowingView: View {
             }
         }
     }
-
+    
     // MARK: - Search Bar
     private var searchBar: some View {
         HStack {
@@ -228,7 +227,6 @@ struct FollowingView: View {
         .padding(.horizontal)
     }
 }
-
 
 // MARK: - Following List
 struct FollowingListView: View {
@@ -250,12 +248,10 @@ struct FollowingListView: View {
     }
 }
 
-
 // MARK: - Following Row
 struct FollowingRowView: View {
     var colorScheme: ColorScheme
     var user: Following
-    
     var body: some View {
         HStack {
             if let urlString = user.profilePictureUrl, let url = URL(string: urlString) {
@@ -296,29 +292,28 @@ struct AddFollowingPage: View {
     @State private var searchTextFollowing: String = ""
     @StateObject private var vm = FollowingViewModel()
     @Environment(\.colorScheme) var colorScheme
-
+    
     var filteredUsers: [User] {
-      if searchTextFollowing.isEmpty {
-        return vm.allUsers
-      } else {
-        return vm.allUsers.filter { user in
-          // if name is non‑nil, check contains; otherwise false
-          user.name?
-            .localizedCaseInsensitiveContains(searchTextFollowing)
-          ?? false
+        if searchTextFollowing.isEmpty {
+            return vm.allUsers
+        } else {
+            return vm.allUsers.filter { user in
+                // if name is non‑nil, check contains; otherwise false
+                user.name?
+                    .localizedCaseInsensitiveContains(searchTextFollowing)
+                ?? false
+            }
         }
-      }
     }
-
-
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
                 AddFollowingHeaderView(colorScheme: colorScheme)
                 searchBar
-                  .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
-                                .color(for: colorScheme))
-
+                    .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
+                        .color(for: colorScheme))
+                
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(filteredUsers) { user in
@@ -335,13 +330,13 @@ struct AddFollowingPage: View {
                 }
             }
             .onAppear { vm.fetchAllUsers() }
-
+            
             CustomBackButton(colorScheme: colorScheme)
         }
         .navigationBarBackButtonHidden(true)
     }
-
-
+    
+    // Search bar
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -358,7 +353,6 @@ struct AddFollowingPage: View {
 // MARK: - Header
 struct AddFollowingHeaderView: View {
     var colorScheme: ColorScheme
-    
     var body: some View {
         Text("Add new following")
             .font(.custom("ArialNova", size: 20))
@@ -370,11 +364,12 @@ struct AddFollowingHeaderView: View {
     }
 }
 
+// Display image and name of user
 struct FollowingUserRowView: View {
     let user: User
     @ObservedObject var vm: FollowingViewModel
     let colorScheme: ColorScheme
-
+    
     var body: some View {
         HStack {
             // profile image…
@@ -382,34 +377,34 @@ struct FollowingUserRowView: View {
                let url = URL(string: urlString) {
                 AsyncImage(url: url) { image in
                     image
-                      .resizable()
-                      .scaledToFill()
-                      .frame(width: 60, height: 60)
-                      .clipShape(Circle())
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipShape(Circle())
                 } placeholder: {
                     Circle()
-                      .fill(Color.gray.opacity(0.5))
-                      .frame(width: 60, height: 60)
+                        .fill(Color.gray.opacity(0.5))
+                        .frame(width: 60, height: 60)
                 }
             } else {
                 Circle()
-                  .fill(Color.gray.opacity(0.5))
-                  .frame(width: 60, height: 60)
+                    .fill(Color.gray.opacity(0.5))
+                    .frame(width: 60, height: 60)
             }
-
+            
             // name
             Text(user.name ?? "—")
                 .font(.custom("ArialNova", size: 16))
                 .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                 .padding(.leading, 10)
             Spacer()
-
+            
             // follow/following button
             if user.relationStatus == .following {
                 Text("Following")
-                  .padding(8)
-                  .background(Color.gray)
-                  .cornerRadius(8)
+                    .padding(8)
+                    .background(Color.gray)
+                    .cornerRadius(8)
             } else {
                 Button("Follow") {
                     vm.addFollowing(userId: user.id)
@@ -422,12 +417,10 @@ struct FollowingUserRowView: View {
         }
         .padding()
         .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground)
-                      .color(for: colorScheme))
+            .color(for: colorScheme))
         .shadow(radius: 2)
     }
 }
-
-
 
 func addUserToFollowing(_ following: Following) {
     // API call to either add the user as a friend or follow them

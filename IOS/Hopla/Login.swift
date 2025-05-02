@@ -4,13 +4,12 @@
 //
 //  Created by Ane Marie Johnsen on 09/02/2025.
 //
-
 import SwiftUI
 import UIKit
 import KeychainAccess // For token
 
 extension View {
-    /// Call this in your onSubmit to swallow the keyboard
+    /// Call this in onSubmit to swallow the keyboard
     func hideKeyboardOnSubmit() -> some View {
         self
             .submitLabel(.done)
@@ -22,6 +21,7 @@ extension View {
     }
 }
 
+// Login struct
 struct Login: View {
     @Environment(\.colorScheme) var colorScheme // Detect light/dark mode
     @State private var isShowingForgottenPassword = false // True when clicking on text
@@ -36,10 +36,7 @@ struct Login: View {
     @State private var allowStatistics = false
     @State private var isShowingStatsInfo = false
     @State private var showSignUpSuccessAlert = false
-    
     @AppStorage("isLoggedIn") private var isLoggedIn = false // Track login state
-    
-    //@StateObject private var viewModel = LoginViewModel()
     @ObservedObject var viewModel: LoginViewModel
     @ObservedObject var loginViewModel: LoginViewModel
     
@@ -51,7 +48,7 @@ struct Login: View {
         !confirmNewPassword.isEmpty &&
         allowStatistics
     }
-  
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -59,20 +56,18 @@ struct Login: View {
                 Rectangle()
                     .fill(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
                     .ignoresSafeArea() // Fill the entire screen
-                
-                //   GeometryReader { geometry in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack {
                         VStack(alignment: .center) {
                             // Logo
                             Image(
-                                    colorScheme == .light
-                                      ? "LogoUtenBakgrunn"
-                                      : "logo_white_without_background"
-                                  )
-                                  .resizable()
-                                  .scaledToFit()
-                                  .frame(width: 200, height: 200)
+                                colorScheme == .light
+                                ? "LogoUtenBakgrunn"
+                                : "logo_white_without_background"
+                            )
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 200, height: 200)
                             Text("Hopla")
                                 .font(.custom("GeorgiaPro-Black", size: 60))
                         }
@@ -97,7 +92,6 @@ struct Login: View {
                             .multilineTextAlignment(.center)
                             .accessibilityIdentifier("PasswordField")
                         
-                        
                         // MARK: - Forgotten password
                         VStack {
                             Text("Forgotten password?")
@@ -116,12 +110,10 @@ struct Login: View {
                             VStack(spacing: 20) {
                                 Text("Enter your email address to reset your password:")
                                     .font(.headline)
-                                
                                 TextField("Enter email:", text: $email)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .padding()
                                     .accessibilityIdentifier("newUserEmailField")
-                                
                                 let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // To clear whitespaces
                                 
                                 Button("Send") {
@@ -145,7 +137,7 @@ struct Login: View {
                                 .padding()
                             }
                             .padding()
-                        }                      
+                        }
                         // MARK: - Login
                         
                         Button(action: {
@@ -181,7 +173,6 @@ struct Login: View {
                         .padding(.top, 30)
                         .navigationBarBackButtonHidden(true) // Hide the back arrow
                         
-                        
                         // MARK: - Sign up
                         
                         VStack {
@@ -208,11 +199,9 @@ struct Login: View {
                                     VStack(spacing: 16) {
                                         Text("Register New Account")
                                             .font(.headline)
-                                        
                                         TextField("Enter email address", text: $newEmail)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .accessibilityIdentifier("signUpEmailField")
-                                        
                                         SecureField("Enter password", text: $newPassword)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .accessibilityIdentifier("signUpPasswordField")
@@ -225,7 +214,6 @@ struct Login: View {
                                             .font(.caption)
                                             .foregroundColor(.gray)
                                             .multilineTextAlignment(.center)
-                                        
                                         if let warning = passwordMismatchWarning {
                                             Text(warning)
                                                 .accessibilityIdentifier("PasswordMismatchWarning")
@@ -234,7 +222,6 @@ struct Login: View {
                                                 .font(.caption)
                                                 .multilineTextAlignment(.center)
                                         }
-                                        
                                         // ——— checkbox + info ———
                                         HStack {
                                             Button { allowStatistics.toggle() }
@@ -242,12 +229,9 @@ struct Login: View {
                                                 Image(systemName: allowStatistics ? "checkmark.square" : "square")
                                             }
                                             .accessibilityIdentifier("statisticsCheckbox")
-                                            
                                             Text("Allow collection of statistics")
                                                 .font(.caption)
-                                            
                                             Spacer()
-                                            
                                             Button { isShowingStatsInfo = true }
                                             label: {
                                                 Image(systemName: "questionmark.circle")
@@ -259,7 +243,6 @@ struct Login: View {
                                             }
                                         }
                                         .padding(.horizontal)
-                                        
                                         // ——— Join now ———
                                         Button {
                                             // final sanity check
@@ -271,7 +254,6 @@ struct Login: View {
                                                 passwordMismatchWarning = "Passwords do not match!"
                                                 return
                                             }
-                                            
                                             viewModel.register(email: newEmail, password: newPassword) { success, message in
                                                 if success {
                                                     // dismiss + show confirmation
@@ -293,20 +275,18 @@ struct Login: View {
                                                 )
                                                 .cornerRadius(8)
                                         }
-                                        .id("JoinNowButton")                // ← give it an ID
+                                        .id("JoinNowButton")                // give it an ID
                                         .accessibilityIdentifier("JoinNowButton")
                                         .disabled(!isSignUpFormComplete)
-                                        
                                         Button("Cancel") {
                                             isShowingSignUp = false
                                         }
                                         .accessibilityIdentifier("cancelSignUp")
                                         .padding(.top, 8)
-                                        
                                     } // VStack
                                     .padding()
                                 } // ScrollView
-                                // Whenever the form *becomes* valid, scroll down to the button:
+                                // Whenever the form becomes valid, scroll down to the button:
                                 .onChange(of: isSignUpFormComplete) { valid in
                                     if valid {
                                         withAnimation {
@@ -316,7 +296,7 @@ struct Login: View {
                                 }
                             }
                         }
-                        // ← show alert on main screen
+                        // show alert on main screen
                         .alert("User created successfully", isPresented: $showSignUpSuccessAlert) {
                             Button("OK", role: .cancel) { }
                         } message: {
@@ -370,5 +350,4 @@ struct Login: View {
         let predicate = NSPredicate(format: "SELF MATCHES %@", passwordFormat)
         return predicate.evaluate(with: password)
     }
-    
 }

@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 23/03/2025.
 //
-
 import SwiftUI
 
+// Friend info struct
 struct FriendInfo: Identifiable, Decodable {
     var id: String
     var name: String
@@ -19,7 +19,7 @@ struct FriendInfo: Identifiable, Decodable {
     var userHikes: [Post]?
     var createdAt: String?
     var dob: String? = nil
-
+    
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -35,6 +35,7 @@ struct FriendInfo: Identifiable, Decodable {
     }
 }
 
+// Http requests
 class FriendDetailsViewModel: ObservableObject {
     @Published var friendDetails: FriendInfo?
     @Published var isLoading = false
@@ -56,17 +57,14 @@ class FriendDetailsViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = false
             }
-            
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-            
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
                 print("Invalid response or status code")
                 return
             }
-            
             do {
                 let decoder = JSONDecoder()
                 let friendDetails = try decoder.decode(FriendInfo.self, from: data)
@@ -79,32 +77,32 @@ class FriendDetailsViewModel: ObservableObject {
                     print("Received JSON:", jsonString) // Debugging line
                 }
             }
-
+            
         }.resume()
     }
-
+    
     // Future POST request - for later
     func addFriend(userId: String) {
         guard let token = TokenManager.shared.getToken() else {
             print("No token found")
             return
         }
-
+        
         let url = URL(string: "https://hopla.onrender.com/userrelations/friends")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: Any] = ["friendId": userId]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Request error:", error.localizedDescription)
                 return
             }
-
+            
             DispatchQueue.main.async {
                 self.fetchFriendDetails(friendId: userId) // Refresh details after adding
             }
@@ -112,12 +110,10 @@ class FriendDetailsViewModel: ObservableObject {
     }
 }
 
-
 // MARK: - Header
 struct FriendsDetailsHeader: View {
     var friend: FriendInfo?
     var colorScheme: ColorScheme
-    
     var body: some View {
         VStack {
             if let friend = friend {
@@ -140,6 +136,7 @@ struct FriendsDetailsHeader: View {
     }
 }
 
+// Details of a friend
 struct FriendsDetails: View {
     var friendId: String
     @StateObject private var vm = FriendDetailsViewModel()
@@ -158,15 +155,11 @@ struct FriendsDetails: View {
                             ScrollView {
                                 // Profile Picture
                                 profilePictureView(friend: friend)
-                                
                                 actionButtonsView(for: friend)
-                                
                                 // Friend details in a white box
                                 friendDetailsBox(friend: friend)
-                                
                                 // Description
                                 descriptionView(friend: friend)
-                                
                                 // Hikes
                                 hikesView(friend: friend)
                             }
@@ -184,7 +177,7 @@ struct FriendsDetails: View {
             vm.fetchFriendDetails(friendId: friendId)
         }
     }
-    
+    // Users profile picture
     private func profilePictureView(friend: FriendInfo) -> some View {
         if let urlString = friend.profilePictureUrl, let url = URL(string: urlString) {
             return AnyView(
@@ -194,13 +187,13 @@ struct FriendsDetails: View {
                         .frame(width: 200, height: 200)
                         .clipShape(Circle())
                         .overlay(
-                          Circle()
-                            .stroke(
-                              AdaptiveColor(light: .lightPostBackground,
-                                            dark:  .darkPostBackground)
-                                .color(for: colorScheme),
-                              lineWidth: 10
-                            )
+                            Circle()
+                                .stroke(
+                                    AdaptiveColor(light: .lightPostBackground,
+                                                  dark:  .darkPostBackground)
+                                    .color(for: colorScheme),
+                                    lineWidth: 10
+                                )
                         )
                         .padding(20)
                 } placeholder: {
@@ -214,17 +207,16 @@ struct FriendsDetails: View {
             return AnyView(EmptyView()) // Return empty view if no profile picture
         }
     }
-
+    
+    // Users name, alias, friends and horses
     private func friendDetailsBox(friend: FriendInfo) -> some View {
         return VStack(spacing: 0) {
             Text(friend.name)
                 .font(.title)
                 .fontWeight(.bold)
-            
             Text(friend.alias)
                 .font(.subheadline)
                 .foregroundColor(.gray)
-            
             HStack {
                 Text("Friends: \(friend.friendsCount ?? 0)")
                 Text("Horses: \(friend.horseCount ?? 0)")
@@ -233,8 +225,8 @@ struct FriendsDetails: View {
         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
         .padding()
     }
-
     
+    // Users description
     private func descriptionView(friend: FriendInfo) -> some View {
         if let description = friend.description {
             return AnyView(
@@ -242,7 +234,6 @@ struct FriendsDetails: View {
                     Text("Description:")
                         .font(.headline)
                         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
-                    
                     Text(description)
                         .padding()
                         .frame(width: 370)
@@ -255,6 +246,7 @@ struct FriendsDetails: View {
         }
     }
     
+    // Users hikes
     private func hikesView(friend: FriendInfo) -> some View {
         if let hikes = friend.userHikes, !hikes.isEmpty {
             return AnyView(
@@ -278,7 +270,7 @@ struct FriendsDetails: View {
                         .foregroundStyle(AdaptiveColor(light: .textLightBackground, dark: .textDarkBackground).color(for: colorScheme))
                     }
                 }
-                .padding()
+                    .padding()
             )
         } else {
             return AnyView(EmptyView()) // Return empty view if no hikes
@@ -287,10 +279,9 @@ struct FriendsDetails: View {
     
     //MARK: - Add friend/following buttons
     private func actionButtonsView(for friend: FriendInfo) -> some View {
-        // Use your existing RelationViewModel & vm
         let relationVM = RelationViewModel()
         let vm = FriendDetailsViewModel()
-
+        
         func buttonTitle(for status: PersonStatus) -> String {
             switch status {
             case .none:      return "Add Friend"
@@ -300,19 +291,19 @@ struct FriendsDetails: View {
             case .block:     return "Unblock"
             }
         }
-
+        
         // Adaptive backgrounds
         let bgColor = AdaptiveColor(
             light: .lightPostBackground,
             dark:  .darkPostBackground
         ).color(for: colorScheme)
-
+        
         // Adaptive text
         let textColor = AdaptiveColor(
             light: .textLightBackground,
             dark:  .textDarkBackground
         ).color(for: colorScheme)
-
+        
         return VStack {
             Button(action: {
                 switch friend.relationStatus {
@@ -337,5 +328,4 @@ struct FriendsDetails: View {
             .tint(bgColor)
         }
     }
-
 }

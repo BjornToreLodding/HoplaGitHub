@@ -71,10 +71,24 @@
       }
     },
     "Add new following" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny person å følge"
+          }
+        }
+      }
     },
     "Add new friends" : {
-
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legg til nye venner"
+          }
+        }
+      }
     },
     "Add Stable" : {
       "localizations" : {
@@ -1039,17 +1053,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Måned"
-          }
-        }
-      }
-    },
-    "My activity" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Min aktivitet"
           }
         }
       }

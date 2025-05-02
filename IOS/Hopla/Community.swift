@@ -1,7 +1,12 @@
+//
+//  Community.swift
+//  Hopla
+//
+//  Created by Ane Marie Johnsen on 28/01/2025.
+//
 import SwiftUI
 import Foundation
 import CoreLocation
-
 
 // MARK: - Hike Model
 struct Stable: Identifiable, Decodable, Equatable {
@@ -18,9 +23,9 @@ struct Stable: Identifiable, Decodable, Equatable {
     static func == (lhs: Stable, rhs: Stable) -> Bool {
         return lhs.stableId == rhs.stableId
     }
-    
 }
 
+// For the http requests in Community
 class StableViewModel: ObservableObject {
     @Published var stables: [Stable] = []
     private var locationManager: LocationManager
@@ -30,25 +35,24 @@ class StableViewModel: ObservableObject {
     private let session: URLSession
     
     // Inject both the location manager and session:
-       init(locationManager: LocationManager,
-            session: URLSession = .shared) {
-           self.locationManager = locationManager
-           self.session = session
-           NotificationCenter.default.addObserver(
-             self,
-             selector: #selector(handleLocationUpdate(_:)),
-             name: .didUpdateLocation,
-             object: nil
-           )
-       }
-       deinit {
-           NotificationCenter.default.removeObserver(
-             self,
-             name: .didUpdateLocation,
-             object: nil
-           )
-       }
-    
+    init(locationManager: LocationManager,
+         session: URLSession = .shared) {
+        self.locationManager = locationManager
+        self.session = session
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLocationUpdate(_:)),
+            name: .didUpdateLocation,
+            object: nil
+        )
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: .didUpdateLocation,
+            object: nil
+        )
+    }
     
     func loadMoreStablesIfNeeded(search: String? = nil, latitude: Double, longitude: Double) {
         guard !isLastPage else { return } // Stop fetching if already on the last page
@@ -57,7 +61,7 @@ class StableViewModel: ObservableObject {
             guard let self = self else { return }
             
             // If fewer than the requested number of stables are returned, assume it's the last page
-            if self.stables.count < (self.currentPage * 20) { // Assuming pageSize is 20
+            if self.stables.count < (self.currentPage * 20) { // PageSize is 20
                 self.isLastPage = true
             } else {
                 self.currentPage += 1
@@ -106,9 +110,7 @@ class StableViewModel: ObservableObject {
             }
         }
     }
-
-    
-    
+   
     private func joinStableOnServer(for stable: Stable, completion: @escaping (Bool) -> Void) {
         let url = URL(string: "https://hopla.onrender.com/stables/join")!
         var request = URLRequest(url: url)
@@ -140,9 +142,7 @@ class StableViewModel: ObservableObject {
             }
         }.resume()
     }
-    
-    
-    
+       
     private func leaveStableOnServer(for stable: Stable, completion: @escaping (Bool) -> Void) {
         let url = URL(string: "https://hopla.onrender.com/stables/leave")!
         var request = URLRequest(url: url)
@@ -175,7 +175,6 @@ class StableViewModel: ObservableObject {
         }.resume()
     }
     
-    
     func fetchStables(search: String? = nil, latitude: Double, longitude: Double, pageSize: Int = 20, pageNumber: Int = 1, completion: (() -> Void)? = nil) {
         guard !isLoading else { return } // Prevent duplicate fetches
         isLoading = true // Set loading to true
@@ -195,9 +194,7 @@ class StableViewModel: ObservableObject {
         }
         
         urlComponents.queryItems = queryItems
-        
         guard let url = urlComponents.url else { return }
-        
         var request = URLRequest(url: url)
         request.setValue("Bearer \(TokenManager.shared.getToken() ?? "")", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
@@ -209,7 +206,6 @@ class StableViewModel: ObservableObject {
                 if let httpResponse = response as? HTTPURLResponse {
                     print("HTTP Status Code: \(httpResponse.statusCode)")
                 }
-                
                 if let data = data, !data.isEmpty {
                     do {
                         let decodedResponse = try JSONDecoder().decode([Stable].self, from: data)
@@ -222,7 +218,6 @@ class StableViewModel: ObservableObject {
                             !self.stables.contains(where: { $0.stableId == stable.stableId })
                         }
                         self.stables += newStables
-                        
                         // Invoke the completion closure if provided
                         completion?()
                     } catch {
@@ -234,10 +229,7 @@ class StableViewModel: ObservableObject {
             }
         }.resume()
     }
-    
-    
-    
-    
+  
     func createStable(formData: [String: Any], completion: @escaping () -> Void) {
         let url = URL(string: "https://hopla.onrender.com/stables/create")!
         
@@ -304,15 +296,11 @@ class StableViewModel: ObservableObject {
     }
 }
 
-
-
 // MARK: - Filter bar Options
 enum FilterCommunity: String, CaseIterable, Identifiable {
     case location
     case heart
-    
     var id: String { self.rawValue }
-    
     var systemImage: String {
         switch self {
         case .location: return "location"
@@ -362,8 +350,8 @@ struct Community: View {
         }
         .onAppear(perform: fetchInitialStables)
     }
-
     
+   // Natigation
     private var navigationContent: some View {
         NavigationView {
             ScrollView {
@@ -375,6 +363,7 @@ struct Community: View {
         .navigationBarBackButtonHidden(true)
     }
     
+    // The list of communities
     private var stableList: some View {
         VStack(spacing: 10) {
             ForEach(filteredStables) { stable in
@@ -386,6 +375,7 @@ struct Community: View {
         }
     }
     
+    // To add a new community
     private var floatingButton: some View {
         VStack {
             Spacer()
@@ -394,15 +384,15 @@ struct Community: View {
                 Button(action: {
                     isShowingAddStableSheet.toggle()
                 }) { Image(systemName: "plus.circle.fill")
-                      .resizable()
-                      .frame(width: 60, height: 60)
-                      .symbolRenderingMode(.palette)
-                      .foregroundStyle(
-                        .white,
-                        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
-                          .color(for: colorScheme)
-                      )
-                      .padding()
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(
+                            .white,
+                            AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                                .color(for: colorScheme)
+                        )
+                        .padding()
                 }
                 .sheet(isPresented: $isShowingAddStableSheet) {
                     AddStableView(viewModel: viewModel)
@@ -412,6 +402,7 @@ struct Community: View {
         }
     }
     
+    // To fetch stables based on users location or Oslo
     private func fetchInitialStables() {
         if let userLocation = locationManager.userLocation {
             viewModel.fetchStables(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
@@ -421,6 +412,7 @@ struct Community: View {
         }
     }
     
+    // Load more communities if there are more
     private func handleInfiniteScroll(for stable: Stable) {
         if stable == filteredStables.last {
             if let userLocation = locationManager.userLocation {
@@ -433,7 +425,6 @@ struct Community: View {
         }
     }
     
-
     // Filter bar
     private var filterBar: some View {
         HStack {
@@ -464,6 +455,7 @@ struct Community: View {
     }
 }
 
+// Struct for new community
 struct AddStableView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
@@ -491,7 +483,6 @@ struct AddStableView: View {
                         Text("Private Group")
                     }
                 }
-                
                 
                 Section(header: Text("Image Selection")) {
                     Button(action: { showImagePicker = true }) {
@@ -528,6 +519,7 @@ struct AddStableView: View {
         }
     }
     
+    // Function to add a new stable
     private func addStable() {
         guard let userLocation = locationManager.userLocation else {
             print("User location not available")
@@ -555,12 +547,10 @@ struct AddStableView: View {
     }
 }
 
-
-
 // MARK: - Stable Card
 struct StableCard: View {
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject var viewModel: StableViewModel // Add this line to observe changes in ViewModel
+    @ObservedObject var viewModel: StableViewModel // Observe changes in ViewModel
     let stable: Stable
     
     var body: some View {
@@ -591,7 +581,6 @@ struct StableCard: View {
                             .padding(10)
                             .padding([.top, .trailing], 10)
                     }
-                    
                     VStack {
                         Spacer()
                         HStack {
@@ -611,4 +600,3 @@ struct StableCard: View {
         .buttonStyle(PlainButtonStyle()) // Prevent default button styling on NavigationLink
     }
 }
-

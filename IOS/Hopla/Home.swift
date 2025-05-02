@@ -4,13 +4,12 @@
 //
 //  Created by Ane Marie Johnsen on 28/01/2025.
 //
-
 import SwiftUI
 import CoreLocation
 
+// Post struct
 struct HomePost: Identifiable, Decodable {
     var id: String { entityId }
-
     let entityId: String
     let title: String
     let description: String
@@ -22,42 +21,42 @@ struct HomePost: Identifiable, Decodable {
     let createdAt: String
 }
 
-
-
+// Http requests
 class HomeViewModel: ObservableObject {
     @Published var homePosts: [HomePost] = []
     private let session: URLSession
     
-    // DESIGNATED INIT
-        init(session: URLSession = .shared) {
-            self.session = session
-        }
-
+    // DESIGNATED INIT, for testing
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+    
+    // Fetch posts
     func fetchPosts(for filter: String, latitude: Double? = nil, longitude: Double? = nil) {
         let args = ProcessInfo.processInfo.arguments
-            if args.contains("-UITestMode") {
-                let stub = HomePost(
-                  entityId: "stub-1",
-                  title: ProcessInfo.processInfo.environment["MOCK_POST_TITLE"] ?? "Stub Title",
-                  description: ProcessInfo.processInfo.environment["MOCK_POST_DESC"]  ?? "Stub Description",
-                  pictureUrl: nil,
-                  userAlias: ProcessInfo.processInfo.environment["MOCK_POST_ALIAS"] ?? "stub_user",
-                  userProfilePicture: nil,
-                  likes: Int(ProcessInfo.processInfo.environment["MOCK_POST_LIKES"] ?? "3") ?? 3,
-                  isLikedByUser: false,
-                  createdAt: "2025-05-01T12:00:00Z"
-                )
-                DispatchQueue.main.async {
-                  self.homePosts = [stub]
-                }
-                return
+        if args.contains("-UITestMode") {
+            let stub = HomePost(
+                entityId: "stub-1",
+                title: ProcessInfo.processInfo.environment["MOCK_POST_TITLE"] ?? "Stub Title",
+                description: ProcessInfo.processInfo.environment["MOCK_POST_DESC"]  ?? "Stub Description",
+                pictureUrl: nil,
+                userAlias: ProcessInfo.processInfo.environment["MOCK_POST_ALIAS"] ?? "stub_user",
+                userProfilePicture: nil,
+                likes: Int(ProcessInfo.processInfo.environment["MOCK_POST_LIKES"] ?? "3") ?? 3,
+                isLikedByUser: false,
+                createdAt: "2025-05-01T12:00:00Z"
+            )
+            DispatchQueue.main.async {
+                self.homePosts = [stub]
             }
-        
-        guard let token = TokenManager.shared.getToken() else {
-            print("❌ No token found")
             return
         }
-
+        
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+        
         var urlString: String
         switch filter {
         case "globe":
@@ -70,7 +69,7 @@ class HomeViewModel: ObservableObject {
             if let lat = latitude, let long = longitude {
                 urlString = "https://hopla.onrender.com/feed/all?userlat=\(lat)&userlong=\(long)&radius=120"
             } else {
-                print("❌ Missing latitude/longitude for location filter")
+                print("Missing latitude/longitude for location filter")
                 return
             }
         case "hand.thumbsup":
@@ -78,160 +77,161 @@ class HomeViewModel: ObservableObject {
         default:
             urlString = "https://hopla.onrender.com/feed/all?show=userhikes,trails,trailreviews,horses"
         }
-
+        
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL")
+            print("Invalid URL")
             return
         }
         
-        print("🌍 Fetching posts with URL: \(urlString)")
-
-
+        print("Fetching posts with URL: \(urlString)")
+        
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         session.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("❌ Error: \(error)")
+                print("Error: \(error)")
                 return
             }
-
+            
             guard let data = data else {
-                print("❌ No data received")
+                print("No data received")
                 return
             }
-
+            
             do {
                 let decoded = try JSONDecoder().decode(FeedResponse.self, from: data)
                 DispatchQueue.main.async {
                     self.homePosts = decoded.items
                 }
             } catch {
-                print("❌ Decoding error: \(error)")
+                print("Decoding error: \(error)")
             }
         }.resume()
     }
-
+    
+    // Like a post
     func likePost(entityId: String) {
         if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
             DispatchQueue.main.async {
-              self.updatePost(entityId: entityId, liked: true)
+                self.updatePost(entityId: entityId, liked: true)
             }
             return
-          }
-            guard let token = TokenManager.shared.getToken() else {
-                print("❌ No token found")
-                return
-            }
-
-            guard let url = URL(string: "https://hopla.onrender.com/reactions") else { return }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-            let body: [String: String] = ["EntityId": entityId]
-            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        }
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+        
+        guard let url = URL(string: "https://hopla.onrender.com/reactions") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: String] = ["EntityId": entityId]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        
         session.dataTask(with: request) { _, response, error in
-                if let error = error {
-                    print("❌ Like error: \(error)")
-                    return
-                }
-
-                guard let httpResponse = response as? HTTPURLResponse else { return }
-
-                DispatchQueue.main.async {
-                    if httpResponse.statusCode == 200 {
-                        self.updatePost(entityId: entityId, liked: true)
-                    } else if httpResponse.statusCode == 400 {
-                        print("⚠️ Already liked")
-                    }
-                }
-            }.resume()
-        }
-
-        func unlikePost(entityId: String) {
-            if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
-                DispatchQueue.main.async {
-                  self.updatePost(entityId: entityId, liked: false)
-                }
-                return
-              }
-            guard let token = TokenManager.shared.getToken() else {
-                print("❌ No token found")
+            if let error = error {
+                print("Like error: \(error)")
                 return
             }
-
-            guard let url = URL(string: "https://hopla.onrender.com/reactions") else { return }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "DELETE"
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-            let body: [String: String] = ["EntityId": entityId]
-            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-            session.dataTask(with: request) { _, response, error in
-                if let error = error {
-                    print("❌ Unlike error: \(error)")
-                    return
+            
+            guard let httpResponse = response as? HTTPURLResponse else { return }
+            
+            DispatchQueue.main.async {
+                if httpResponse.statusCode == 200 {
+                    self.updatePost(entityId: entityId, liked: true)
+                } else if httpResponse.statusCode == 400 {
+                    print("Already liked")
                 }
-
-                guard let httpResponse = response as? HTTPURLResponse else { return }
-
-                DispatchQueue.main.async {
-                    if httpResponse.statusCode == 200 {
-                        self.updatePost(entityId: entityId, liked: false)
-                    } else if httpResponse.statusCode == 404 {
-                        print("⚠️ No like to remove")
-                    }
-                }
-            }.resume()
-        }
-
-        private func updatePost(entityId: String, liked: Bool) {
-            if let index = homePosts.firstIndex(where: { $0.entityId == entityId }) {
-                var post = homePosts[index]
-                let newLikes = liked ? post.likes + 1 : max(post.likes - 1, 0)
-                homePosts[index] = HomePost(
-                    entityId: post.entityId,
-                    title: post.title,
-                    description: post.description,
-                    pictureUrl: post.pictureUrl,
-                    userAlias: post.userAlias,
-                    userProfilePicture: post.userProfilePicture,
-                    likes: newLikes,
-                    isLikedByUser: liked,
-                    createdAt: post.createdAt
-                )
             }
+        }.resume()
+    }
+    
+    // Unlike a post
+    func unlikePost(entityId: String) {
+        if ProcessInfo.processInfo.arguments.contains("-UITestMode") {
+            DispatchQueue.main.async {
+                self.updatePost(entityId: entityId, liked: false)
+            }
+            return
         }
+        guard let token = TokenManager.shared.getToken() else {
+            print("No token found")
+            return
+        }
+        
+        guard let url = URL(string: "https://hopla.onrender.com/reactions") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: String] = ["EntityId": entityId]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        
+        session.dataTask(with: request) { _, response, error in
+            if let error = error {
+                print("Unlike error: \(error)")
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else { return }
+            
+            DispatchQueue.main.async {
+                if httpResponse.statusCode == 200 {
+                    self.updatePost(entityId: entityId, liked: false)
+                } else if httpResponse.statusCode == 404 {
+                    print("No like to remove")
+                }
+            }
+        }.resume()
+    }
+    
+    // Update a post
+    private func updatePost(entityId: String, liked: Bool) {
+        if let index = homePosts.firstIndex(where: { $0.entityId == entityId }) {
+            var post = homePosts[index]
+            let newLikes = liked ? post.likes + 1 : max(post.likes - 1, 0)
+            homePosts[index] = HomePost(
+                entityId: post.entityId,
+                title: post.title,
+                description: post.description,
+                pictureUrl: post.pictureUrl,
+                userAlias: post.userAlias,
+                userProfilePicture: post.userProfilePicture,
+                likes: newLikes,
+                isLikedByUser: liked,
+                createdAt: post.createdAt
+            )
+        }
+    }
 }
 
 struct FeedResponse: Decodable {
     let items: [HomePost]
 }
 
-
-
+// Home struct view
 struct Home: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel = HomeViewModel()
     @StateObject private var locationManager = LocationManager()
     @State private var selectedFilter: String = "globe"
-
-
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 Rectangle()
                     .fill(AdaptiveColor.background.color(for: colorScheme))
                     .ignoresSafeArea()
-
+                
                 VStack(spacing: 0) {
                     filterBar
                     ScrollView {
@@ -251,7 +251,7 @@ struct Home: View {
                             if let location = locationManager.userLocation {
                                 viewModel.fetchPosts(for: newValue, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
                             } else {
-                                print("❌ Location not yet available")
+                                print("Location not yet available")
                             }
                         } else {
                             viewModel.fetchPosts(for: newValue)
@@ -264,13 +264,14 @@ struct Home: View {
                             viewModel.fetchPosts(for: selectedFilter)
                         }
                     }
-
+                    
                 }
             }
         }
         .accessibilityIdentifier("homeScreenRoot")
     }
-
+    
+    // Filter bar
     private var filterBar: some View {
         HStack {
             SwiftUI.Picker("Filter", selection: $selectedFilter) {
@@ -297,11 +298,12 @@ struct Home: View {
     }
 }
 
+// Post container view
 struct PostContainer: View {
     var post: HomePost
     var colorScheme: ColorScheme
     @ObservedObject var viewModel: HomeViewModel
-
+    
     var formattedDate: String {
         let isoFormatter = ISO8601DateFormatter()
         if let date = isoFormatter.date(from: post.createdAt) {
@@ -311,7 +313,7 @@ struct PostContainer: View {
         }
         return ""
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Header
@@ -323,23 +325,23 @@ struct PostContainer: View {
                 }
                 .frame(width: 40, height: 40)
                 .clipShape(Circle())
-
+                
                 Text(post.userAlias ?? "Unknown user")
                     .font(.headline)
                     .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
-
+                
                 Spacer()
             }
-
+            
             Text(post.title)
                 .accessibilityIdentifier("homepost_\(post.id)_title_label")
                 .bold()
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
-
+            
             Text(post.description)
                 .accessibilityIdentifier("homepost_\(post.id)_description_label")
                 .adaptiveTextColor(light: .textLightBackground, dark: .textDarkBackground)
-
+            
             if let url = URL(string: post.pictureUrl ?? "") {
                 AsyncImage(url: url) { image in
                     image.resizable()
@@ -351,7 +353,7 @@ struct PostContainer: View {
                 .clipped()
                 .cornerRadius(2)
             }
-
+            
             HStack {
                 Button(action: {
                     if post.isLikedByUser {
@@ -365,14 +367,14 @@ struct PostContainer: View {
                 }
                 .accessibilityIdentifier("homepost_\(post.id)_like_button")
                 .accessibilityValue(post.isLikedByUser ? "liked" : "not_liked")
-
+                
                 Text("\(post.likes)")
                     .accessibilityIdentifier("homepost_\(post.id)_likes_label")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-
+                
                 Spacer()
-
+                
                 Text(formattedDate)
                     .font(.footnote)
                     .foregroundColor(.gray)
@@ -384,4 +386,3 @@ struct PostContainer: View {
         .padding(.horizontal)
     }
 }
-

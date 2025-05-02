@@ -4,9 +4,9 @@
 //
 //  Created by Ane Marie Johnsen on 27/02/2025.
 //
-
 import SwiftUI
 
+// Message with content, timestamp, senderId and alias
 struct ServerMessage: Decodable {
     let content: String
     let timestamp: String
@@ -14,6 +14,7 @@ struct ServerMessage: Decodable {
     let senderAlias: String
 }
 
+// Format time
 private func formatTime(from isoString: String) -> String {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds] // Handles timestamps with milliseconds
@@ -26,6 +27,7 @@ private func formatTime(from isoString: String) -> String {
     return "Unknown Time"
 }
 
+// Format date
 private func formatDate(from isoString: String) -> String {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds] // Consistent with `formatTime`
@@ -65,150 +67,147 @@ struct CustomBackButtonCommunityChat: View {
     }
 }
 
+// The community chat view
 struct CommunityChat: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
-    
     let stable: Stable
     var scrollToBottom: Bool
-    
     @State private var messages: [Message] = []
     @State private var newMessage: String = ""
     @State private var shouldScroll = false  // Track when to scroll
     
     var body: some View {
-            NavigationStack {
-                ZStack(alignment: .topLeading) {
-                    VStack(spacing: 0) {
-                        ScrollViewReader { scrollViewProxy in
-                            VStack(spacing: 0) {
-                                // MARK: — Group Name Header
-                                Text(stable.stableName)
-                                    .font(.custom("ArialNova", size: 20))
-                                    .fontWeight(.bold)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 40)
-                                    .background(
-                                        AdaptiveColor(light: .lightGreen, dark: .darkGreen)
-                                            .color(for: colorScheme)
-                                    )
-                                    .foregroundColor(.white)
-
-                                // MARK: — Messages Section
-                                ScrollView {
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        ForEach(messages, id: \.id) { message in
-                                            VStack {
-                                                if shouldShowDate(for: message) {
-                                                    Text(message.date)
-                                                        .font(.footnote)
-                                                        .foregroundStyle(
-                                                            AdaptiveColor(light: .textLightBackground,
-                                                                          dark:  .textDarkBackground)
-                                                                .color(for: colorScheme)
-                                                        )
-                                                        .frame(maxWidth: .infinity)
-                                                        .padding(.vertical, 5)
-                                                }
-
-                                                HStack {
-                                                    if message.sender == "Me" {
-                                                        Spacer()
-                                                        VStack(alignment: .trailing) {
-                                                            Text("\(message.time): Me")
-                                                                .font(.caption2)
-                                                                .foregroundStyle(
-                                                                    AdaptiveColor(light: .textLightBackground,
-                                                                                  dark:  .textDarkBackground)
-                                                                        .color(for: colorScheme)
-                                                                )
-                                                            Text(message.text)
-                                                                .padding()
-                                                                .background(
-                                                                    AdaptiveColor(light: .lightGreen, dark: .darkGreen)
-                                                                        .color(for: colorScheme)
-                                                                        .opacity(0.8)
-                                                                )
-                                                                .cornerRadius(10)
-                                                                .foregroundColor(.white)
-                                                        }
-                                                    } else {
-                                                        VStack(alignment: .leading) {
-                                                            Text("\(message.time): \(message.sender)")
-                                                                .font(.caption2)
-                                                                .foregroundStyle(
-                                                                    AdaptiveColor(light: .textLightBackground,
-                                                                                  dark:  .textDarkBackground)
-                                                                        .color(for: colorScheme)
-                                                                )
-                                                            Text(message.text)
-                                                                .padding()
-                                                                .background(
-                                                                    AdaptiveColor(light: .lightPostBackground,
-                                                                                  dark:  .darkPostBackground)
-                                                                        .color(for: colorScheme)
-                                                                )
-                                                                .cornerRadius(10)
-                                                                .foregroundStyle(
-                                                                    AdaptiveColor(light: .textLightBackground,
-                                                                                  dark:  .textDarkBackground)
-                                                                        .color(for: colorScheme)
-                                                                )
-                                                        }
-                                                        Spacer()
-                                                    }
-                                                }
-                                            }
-                                            .id(message.id)
-                                        }
-                                    }
-                                    .padding()
-                                }
-
-                                // MARK: — Input Field
-                                HStack {
-                                    TextField("Type a message…", text: $newMessage)
-                                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                                        .padding(8)
-
-                                    Button {
-                                        sendMessage(scrollViewProxy: scrollViewProxy)
-                                    } label: {
-                                        Image(systemName: "paperplane.fill")
-                                            .foregroundColor(newMessage.isEmpty ? .white : .green)
-                                            .padding()
-                                    }
-                                    .disabled(newMessage.isEmpty)
-                                }
+        NavigationStack {
+            ZStack(alignment: .topLeading) {
+                VStack(spacing: 0) {
+                    ScrollViewReader { scrollViewProxy in
+                        VStack(spacing: 0) {
+                            // MARK: — Group Name Header
+                            Text(stable.stableName)
+                                .font(.custom("ArialNova", size: 20))
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 40)
                                 .background(
                                     AdaptiveColor(light: .lightGreen, dark: .darkGreen)
                                         .color(for: colorScheme)
                                 )
-                            }
-                            .onAppear {
-                                fetchMessages(scrollViewProxy: scrollViewProxy)
-                            }
-                            .onChange(of: messages.count) { _ in
-                                DispatchQueue.main.async {
-                                    if let last = messages.last {
-                                        scrollViewProxy.scrollTo(last.id, anchor: .bottom)
+                                .foregroundColor(.white)
+                            
+                            // MARK: — Messages Section
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    ForEach(messages, id: \.id) { message in
+                                        VStack {
+                                            if shouldShowDate(for: message) {
+                                                Text(message.date)
+                                                    .font(.footnote)
+                                                    .foregroundStyle(
+                                                        AdaptiveColor(light: .textLightBackground,
+                                                                      dark:  .textDarkBackground)
+                                                        .color(for: colorScheme)
+                                                    )
+                                                    .frame(maxWidth: .infinity)
+                                                    .padding(.vertical, 5)
+                                            }
+                                            HStack {
+                                                if message.sender == "Me" {
+                                                    Spacer()
+                                                    VStack(alignment: .trailing) {
+                                                        Text("\(message.time): Me")
+                                                            .font(.caption2)
+                                                            .foregroundStyle(
+                                                                AdaptiveColor(light: .textLightBackground,
+                                                                              dark:  .textDarkBackground)
+                                                                .color(for: colorScheme)
+                                                            )
+                                                        Text(message.text)
+                                                            .padding()
+                                                            .background(
+                                                                AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                                                                    .color(for: colorScheme)
+                                                                    .opacity(0.8)
+                                                            )
+                                                            .cornerRadius(10)
+                                                            .foregroundColor(.white)
+                                                    }
+                                                } else {
+                                                    VStack(alignment: .leading) {
+                                                        Text("\(message.time): \(message.sender)")
+                                                            .font(.caption2)
+                                                            .foregroundStyle(
+                                                                AdaptiveColor(light: .textLightBackground,
+                                                                              dark:  .textDarkBackground)
+                                                                .color(for: colorScheme)
+                                                            )
+                                                        Text(message.text)
+                                                            .padding()
+                                                            .background(
+                                                                AdaptiveColor(light: .lightPostBackground,
+                                                                              dark:  .darkPostBackground)
+                                                                .color(for: colorScheme)
+                                                            )
+                                                            .cornerRadius(10)
+                                                            .foregroundStyle(
+                                                                AdaptiveColor(light: .textLightBackground,
+                                                                              dark:  .textDarkBackground)
+                                                                .color(for: colorScheme)
+                                                            )
+                                                    }
+                                                    Spacer()
+                                                }
+                                            }
+                                        }
+                                        .id(message.id)
                                     }
+                                }
+                                .padding()
+                            }
+                            
+                            // MARK: — Input Field
+                            HStack {
+                                TextField("Type a message…", text: $newMessage)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding(8)
+                                
+                                Button {
+                                    sendMessage(scrollViewProxy: scrollViewProxy)
+                                } label: {
+                                    Image(systemName: "paperplane.fill")
+                                        .foregroundColor(newMessage.isEmpty ? .white : .green)
+                                        .padding()
+                                }
+                                .disabled(newMessage.isEmpty)
+                            }
+                            .background(
+                                AdaptiveColor(light: .lightGreen, dark: .darkGreen)
+                                    .color(for: colorScheme)
+                            )
+                        }
+                        .onAppear {
+                            fetchMessages(scrollViewProxy: scrollViewProxy)
+                        }
+                        .onChange(of: messages.count) { _ in
+                            DispatchQueue.main.async {
+                                if let last = messages.last {
+                                    scrollViewProxy.scrollTo(last.id, anchor: .bottom)
                                 }
                             }
                         }
                     }
-
-                    // MARK: — Custom Back Button Overlay
-                    CustomBackButtonCommunityChat(colorScheme: colorScheme)
-                        .padding(.leading, 16)
-                        .padding(.top, 16)
                 }
-                .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
-                .navigationBarBackButtonHidden(true)
+                
+                // MARK: — Custom Back Button Overlay
+                CustomBackButtonCommunityChat(colorScheme: colorScheme)
+                    .padding(.leading, 16)
+                    .padding(.top, 16)
             }
+            .background(AdaptiveColor(light: .mainLightBackground, dark: .mainDarkBackground).color(for: colorScheme))
+            .navigationBarBackButtonHidden(true)
         }
-    
+    }
     
     // Show date if the messages are sent on a different day
     private func shouldShowDate(for message: Message) -> Bool {
@@ -218,6 +217,7 @@ struct CommunityChat: View {
         return true
     }
     
+    // Fetch messages
     private func fetchMessages(scrollViewProxy: ScrollViewProxy) {
         let baseUrl = "https://hopla.onrender.com/stablemessages"
         guard let url = URL(string: "\(baseUrl)/\(stable.stableId)?pagesize=10&pagenumber=1") else {
@@ -274,7 +274,7 @@ struct CommunityChat: View {
                     self.messages = fetchedMessages.sorted { $0.dateObject < $1.dateObject }
                     print("Messages updated in UI.")
                     
-                    // 🛠 Delay to ensure UI updates before scrolling
+                    // Delay to ensure UI updates before scrolling
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         if let lastMessage = self.messages.last {
                             scrollViewProxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -286,8 +286,6 @@ struct CommunityChat: View {
             }
         }.resume()
     }
-    
-    
     
     // Send message function
     private func sendMessage(scrollViewProxy: ScrollViewProxy) {
@@ -356,9 +354,7 @@ struct CommunityChat: View {
             }
         }.resume()
     }
-    
 }
-
 
 //MARK: - Message Model
 struct Message: Identifiable {
@@ -369,4 +365,3 @@ struct Message: Identifiable {
     let date: String
     let dateObject: Date // New field to store actual Date object
 }
-
