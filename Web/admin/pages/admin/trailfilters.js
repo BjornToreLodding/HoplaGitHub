@@ -82,13 +82,22 @@ export async function render(container) {
             }
 
             if (type === "Int") {
+                const intGroup = document.createElement("div");
+                intGroup.className = "options-inline"; 
+            
+                const label = document.createElement("label");
+                
+            
                 const input = document.createElement("input");
                 input.type = "number";
                 input.name = id;
                 input.value = defaultValue || 0;
                 input.style.width = "50px";
                 input.disabled = true;
-                section.appendChild(input);
+            
+                intGroup.appendChild(label);
+                intGroup.appendChild(input);
+                section.appendChild(intGroup);
             }
 
             filtersContainer.appendChild(section);
