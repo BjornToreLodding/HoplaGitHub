@@ -244,16 +244,16 @@ export async function render(container) {
         const type = newForm.querySelector("input[name='filterType']:checked")?.value;
         const isActive = activeCheckbox.checked;
 
-        const alternatives = (type === "enum" || type === "multiEnum")
+        const alternatives = (type === "enum (kun ett valg)" || type === "multiEnum (flere valg)")
             ? alternativesInput.value.split(",").map(v => v.trim()).filter(Boolean)
             : [];
 
         let defaultValue = null;
 
-        if (type === "enum") {
+        if (type === "enum (kun ett valg)") {
             const selected = newForm.querySelector("input[name='defaultValue']:checked");
             defaultValue = selected?.value || null;
-        } else if (type === "multiEnum") {
+        } else if (type === "multiEnum (flere valg)") {
             const selected = Array.from(newForm.querySelectorAll("input[name='defaultValue']:checked"));
             defaultValue = selected.map(i => i.value);
         } else if (type === "int") {
