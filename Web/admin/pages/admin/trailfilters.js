@@ -97,7 +97,6 @@ export async function render(container) {
         console.error('Feil ved henting av filtrene:', error);
     }
 
-    // resten av koden for oppretting av filter (ikke endret)...
 
     const formSection = document.createElement("div");
     formSection.className = "form-section";
@@ -185,16 +184,16 @@ export async function render(container) {
         defaultValueContainer.innerHTML = "";
 
         // Skjul/vis alternatives
-        alternativesLabel.style.display = (type === "enum" || type === "multiEnum") ? "block" : "none";
+        alternativesLabel.style.display = (type === "enum (kun ett valg)" || type === "multiEnum (flere valg)") ? "block" : "none";
 
-        if (type === "enum" || type === "multiEnum") {
+        if (type === "enum (kun ett valg)" || type === "multiEnum (flere valg)") {
             const options = alternativesInput.value.split(",").map(o => o.trim()).filter(Boolean);
             options.forEach((opt, index) => {
                 const row = document.createElement("div");
                 row.className = "inline";
 
                 const input = document.createElement("input");
-                input.type = (type === "enum") ? "radio" : "checkbox";
+                input.type = (type === "enum (kun ett valg)") ? "radio" : "checkbox";
                 input.name = "defaultValue";
                 input.value = opt;
                 input.id = `default-${index}`;
