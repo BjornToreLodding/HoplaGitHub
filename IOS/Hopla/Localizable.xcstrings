@@ -512,6 +512,7 @@
       }
     },
     "English" : {
+      "extractionState" : "stale",
       "localizations" : {
         "nb" : {
           "stringUnit" : {
@@ -520,6 +521,12 @@
           }
         }
       }
+    },
+    "English OFF" : {
+
+    },
+    "English ON" : {
+
     },
     "Enter %@" : {
       "localizations" : {
@@ -781,9 +788,6 @@
         }
       }
     },
-    "Hi" : {
-
-    },
     "Hike Details" : {
       "localizations" : {
         "nb" : {
@@ -894,6 +898,9 @@
           }
         }
       }
+    },
+    "In progress..." : {
+
     },
     "Join now" : {
       "localizations" : {

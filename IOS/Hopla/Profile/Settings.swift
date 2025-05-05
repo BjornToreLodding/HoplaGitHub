@@ -49,7 +49,7 @@ struct Settings: View {
                         
                         Section(header: Text(LocalizedStringKey("The app must reload to apply language change"))) {
                             Toggle(isOn: $isEnglishSelected) {
-                                Text("English")
+                                Text(isEnglishSelected ? "English ON" : "English OFF")
                             }
                             .onChange(of: isEnglishSelected) { _ in
                                 changeLanguage()
